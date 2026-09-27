@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 04 — Methods that do things</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="oop" data-lesson="4" data-lesson-id="methods-that-do-things">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 04</span> · Foundations</span>
+
+  <h1 class="lesson-title">Methods that do things</h1>
+  <p class="lesson-lede">
+    A method is a function that belongs to an object. The good ones do one clear
+    thing, change state only when they should, and return something useful. This
+    lesson is about writing methods you would be happy to read again.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Write clear, single-purpose methods</span>
+    <span><b>Mission link</b> Behaviour that reads like intent</span>
+  </div>
+
+  <h2><span class="n">1</span>Methods change state or answer questions</h2>
+
+  <p>
+    Most methods fall into two groups. Naming them well makes code read like a
+    sentence.
+  </p>
+
+  <table>
+    <tr><th>Kind</th><th>Does what</th><th>Example</th></tr>
+    <tr><td>Command</td><td>Changes state</td><td><code>borrow()</code>, <code>restock(n)</code></td></tr>
+    <tr><td>Query</td><td>Returns information</td><td><code>is_available()</code>, <code>describe()</code></td></tr>
+  </table>
+
+  <pre><code>class Book:
+    def __init__(self, title, copies):
+        self.title = title
+        self.copies = copies
+
+    def borrow(self):                 # command
+        if self.copies == 0:
+            return False
+        self.copies -= 1
+        return True
+
+    def is_available(self):           # query
+        return self.copies &gt; 0</code></pre>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    A command <b>changes</b> the object; a query <b>reports</b> on it. Keeping them
+    separate makes behaviour predictable and easy to test.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>One method, one job</h2>
+
+  <p>
+    A method that does five things is five methods wearing a trench coat. Split it.
+  </p>
+
+  <pre><code># hard to read
+def process(self):
+    self.copies -= 1
+    self.last_borrowed = today()
+    send_email(self.owner)
+    log(f"{self.title} borrowed")
+
+# easier to read
+def borrow(self):
+    self.copies -= 1
+    self.last_borrowed = today()
+
+def notify_owner(self):
+    send_email(self.owner)</code></pre>
+
+  <div class="note good">
+    <span class="note-label">Why this helps</span>
+    Short methods are easier to name, easier to test, and easier to reuse. When a
+    method is hard to name, that is usually a sign it is doing too much.
+  </div>
+
+  <h2><span class="n">3</span>Returning useful values</h2>
+
+  <p>
+    A method should return something the caller can act on. Returning
+    <code>True</code>/<code>False</code> lets callers branch without inspecting
+    internals.
+  </p>
+
+  <pre><code>if book.borrow():
+    print("Enjoy your book")
+else:
+    print("Sorry, none left")</code></pre>
+
+  <div class="note warn">
+    <span class="note-label">Avoid</span>
+    Methods that both change state <em>and</em> print. Printing is a side effect the
+    caller cannot control. Return a value; let the caller decide what to do with it.
+  </div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Check yourself</h2>
+
+  <p>
+    Answer from memory. Every option has the same number of words.
+  </p>
+
+  <div id="quiz"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>
+      You can now tell a command from a query, split a bloated method into clear
+      pieces, and return values instead of printing. Your objects now have behaviour
+      that reads like intent.
+    </p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+
+  <ol>
+    <li>
+      Add a <code>restock(self, n)</code> command and an <code>is_available()</code>
+      query to your <code>Book</code> class.
+    </li>
+    <li>
+      Find a method you have written that does more than one thing and split it.
+    </li>
+    <li>
+      Rewrite a method that prints so that it returns a value instead, and print at
+      the call site.
+    </li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Read <a href="https://docs.python.org/3/tutorial/classes.html#method-objects">The
+    Python Tutorial → Method Objects</a>. It shows exactly how a method is bound to
+    its object.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask me anything — "when should a method return None?",
+    "how do I test a command?", "is it bad to have many small methods?". I will
+    shape the next lesson around your questions.
+  </div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Which one is a query, not a command?",
+    a: ["borrow()", "restock(3)", "is_available()"],
+    c: 2,
+    why: "is_available() only reports on the object — it does not change any state. borrow() and restock() both change copies."
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "book = Book(\"Dune\", 1)",
+      "book.borrow()",
+      "book.borrow()",
+      "book.is_available()"
+    ],
+    steps: [
+      { line: 0, vars: { book: "Book(copies=1)" } },
+      { line: 1, vars: { book: "Book(copies=0)", returns: "True" } },
+      { line: 2, vars: { book: "Book(copies=0)", returns: "False" } },
+      { line: 3, vars: { book: "Book(copies=0)", returns: "False" } }
+    ]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is a command method?",
+      a: ["One that changes state", "One that only reports", "One that prints output", "One that returns nothing"],
+      c: 0,
+      why: "A command changes the object's state, like borrow() or restock()."
+    },
+    {
+      q: "What is a query method?",
+      a: ["One that changes state", "One that reports information", "One that deletes objects", "One that builds objects"],
+      c: 1,
+      why: "A query returns information about the object without changing it, like is_available()."
+    },
+    {
+      q: "Why split a long method?",
+      a: ["It runs much faster", "It is easier to name", "It uses less memory", "It avoids all errors"],
+      c: 1,
+      why: "Short, single-purpose methods are easier to name, test, and reuse."
+    },
+    {
+      q: "Why avoid printing in methods?",
+      a: ["It is a syntax error", "It is an uncontrolled side effect", "It slows the program down", "It breaks the class"],
+      c: 1,
+      why: "Printing is a side effect the caller cannot control — return a value and let the caller decide."
+    }
+  ]);
+</script>
+</body>
+</html>

@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 09 — Abstraction</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="oop" data-lesson="9" data-lesson-id="abstraction">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 09</span> · Relationships</span>
+
+  <h1 class="lesson-title">Abstraction</h1>
+  <p class="lesson-lede">
+    Abstraction is deciding what a class <b>promises</b> and hiding how it keeps that
+    promise. An abstract base class lets you write down the promise once, and forces
+    every subclass to keep it.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Define a contract subclasses must honour</span>
+    <span><b>Mission link</b> Interfaces that stay consistent</span>
+  </div>
+
+  <h2><span class="n">1</span>The promise nobody wrote down</h2>
+
+  <p>
+    In the last lesson, polymorphism worked because every object had a
+    <code>describe</code> method. But nothing <em>enforced</em> that. Forget it and
+    you find out at runtime.
+  </p>
+
+  <pre><code>class Podcast:
+    def summary(self):        # oops — wrong name
+        return "..."
+
+for item in shelf:
+    print(item.describe())    # AttributeError, deep in a loop</code></pre>
+
+  <div class="note bad">
+    <span class="note-label">The failure</span>
+    The contract was only in your head. Nothing told you that every item needs
+    <code>describe</code> until the program crashed.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Write the contract down</h2>
+
+  <p>
+    An abstract base class declares the methods every subclass must provide. You
+    cannot build the base itself — only its concrete children.
+  </p>
+
+  <pre><code>from abc import ABC, abstractmethod
+
+class ShelfItem(ABC):
+    @abstractmethod
+    def describe(self):
+        """Return a one-line description."""</code></pre>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    The abstract class is a <b>contract</b>. It says "any ShelfItem can describe
+    itself" without saying how. Subclasses must supply the how.
+  </div>
+
+  <h2><span class="n">3</span>Fulfilling the contract</h2>
+
+  <p>
+    Subclass the abstract class and implement every abstract method. Miss one and
+    Python refuses to build the object — at the earliest possible moment.
+  </p>
+
+  <pre><code>class Book(ShelfItem):
+    def __init__(self, title, copies):
+        self.title = title
+        self.copies = copies
+
+    def describe(self):                 # fulfils the contract
+        return f"{self.title} ({self.copies} copies)"
+
+ShelfItem()      # TypeError — cannot build an abstract class
+Book("Dune", 3)  # fine</code></pre>
+
+  <div class="note good">
+    <span class="note-label">Why this is better</span>
+    The error moves from "deep in a loop at runtime" to "the moment you try to build
+    a broken class". That is the whole value of abstraction: fail early, fail clearly.
+  </div>
+
+  <div id="fill1"></div>
+
+  <h2><span class="n">4</span>Check yourself</h2>
+
+  <p>
+    Answer from memory. Every option has the same number of words.
+  </p>
+
+  <div id="quiz"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>
+      You can now write down a contract with an abstract base class, force subclasses
+      to honour it, and move errors from runtime to the moment a class is defined.
+      That is how large codebases stay consistent.
+    </p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+
+  <ol>
+    <li>
+      Create a <code>ShelfItem(ABC)</code> with an abstract <code>describe</code>.
+    </li>
+    <li>
+      Make <code>Book</code> and <code>Ebook</code> subclass it and implement
+      <code>describe</code>.
+    </li>
+    <li>
+      Try to build <code>ShelfItem()</code> directly and read the error. Then remove
+      <code>describe</code> from one subclass and try again.
+    </li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Read <a href="https://docs.python.org/3/library/abc.html">The Python Standard
+    Library → abc</a>. It documents <code>ABC</code> and
+    <code>@abstractmethod</code>.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask me anything — "abstract class vs interface?",
+    "can an abstract method have a body?", "when is abstraction overkill?". I will
+    tailor the next lesson to you.
+  </div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "When does the missing describe method fail?",
+    a: ["When the class is defined", "When the loop runs", "When the file is saved"],
+    c: 1,
+    why: "Without a contract, nothing checks the method exists until the call happens at runtime — deep inside the loop."
+  });
+
+  TeachWidgets.fill("#fill1", {
+    lines: [
+      "from abc import ABC, abstractmethod",
+      "",
+      "class ShelfItem(<0>):",
+      "    @<1>",
+      "    def describe(self):",
+      "        \"\"\"Return a one-line description.\"\"\""
+    ],
+    blanks: [
+      { a: ["ABC"], why: "Subclassing ABC marks this class as abstract, so it cannot be instantiated directly." },
+      { a: ["abstractmethod"], why: "@abstractmethod marks describe as required — every concrete subclass must implement it." }
+    ]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is an abstract class?",
+      a: ["A class with no methods", "A written-down contract", "A class with no attributes", "A class that runs faster"],
+      c: 1,
+      why: "An abstract class declares what subclasses must provide — it is a contract."
+    },
+    {
+      q: "Can you build an abstract class?",
+      a: ["Yes, always", "No, it raises TypeError", "Only inside a subclass", "Only with super()"],
+      c: 1,
+      why: "Python refuses to instantiate a class that still has unimplemented abstract methods."
+    },
+    {
+      q: "What does @abstractmethod do?",
+      a: ["Makes a method private", "Requires an implementation", "Makes a method static", "Deletes the method"],
+      c: 1,
+      why: "It marks the method as required, so every concrete subclass must implement it."
+    },
+    {
+      q: "What is the main benefit?",
+      a: ["It runs much faster", "Errors surface much earlier", "It uses less memory", "It shortens the code"],
+      c: 1,
+      why: "Abstraction moves errors from runtime to the moment a class is defined — fail early, fail clearly."
+    }
+  ]);
+</script>
+</body>
+</html>

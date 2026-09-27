@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 05 — Keeping rules inside</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="oop" data-lesson="5" data-lesson-id="keeping-rules-inside">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 05</span> · Protecting state</span>
+
+  <h1 class="lesson-title">Keeping rules inside</h1>
+  <p class="lesson-lede">
+    Encapsulation is not about secrets — it is about <b>control</b>. When the only
+    way to change an attribute is through a method that checks the rules, the object
+    can never end up in a broken state.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Make an object impossible to break</span>
+    <span><b>Mission link</b> Rules enforced in one place</span>
+  </div>
+
+  <h2><span class="n">1</span>The problem with open attributes</h2>
+
+  <p>
+    Right now anyone can reach in and set anything.
+  </p>
+
+  <pre><code>book = Book("Dune", 3)
+book.copies = -99        # nothing stops this
+book.copies = "lots"     # nor this</code></pre>
+
+  <p>
+    The object has no say in its own state. Every caller has to remember the rules,
+    and one of them will forget.
+  </p>
+
+  <div class="note bad">
+    <span class="note-label">The failure</span>
+    When state can be changed from anywhere, the rules about that state are spread
+    across the whole program. There is no single place to look, and no single place
+    to fix.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Mark it private, change it through a method</h2>
+
+  <p>
+    Python's convention: a leading underscore means "internal — do not touch from
+    outside". Then provide a method that enforces the rule.
+  </p>
+
+  <pre><code>class Book:
+    def __init__(self, title, copies):
+        self.title = title
+        self._copies = copies          # internal
+
+    def restock(self, n):
+        if n &lt; 0:
+            raise ValueError("cannot restock a negative amount")
+        self._copies += n
+
+    @property
+    def copies(self):                  # read-only view
+        return self._copies</code></pre>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    The underscore says "this is mine". The method is the <b>only door</b> into the
+    state, and it checks the rules on the way in.
+  </div>
+
+  <h2><span class="n">3</span>Python's honesty about privacy</h2>
+
+  <p>
+    Python does not truly hide anything. The underscore is a <b>promise</b>, not a
+    lock. That is deliberate: it trusts you to respect the boundary.
+  </p>
+
+  <table>
+    <tr><th>Name</th><th>Meaning</th></tr>
+    <tr><td><code>copies</code></td><td>Public — safe to use from outside.</td></tr>
+    <tr><td><code>_copies</code></td><td>Internal — do not touch from outside.</td></tr>
+    <tr><td><code>__copies</code></td><td>Name-mangled — for avoiding clashes in subclasses.</td></tr>
+  </table>
+
+  <div class="note warn">
+    <span class="note-label">Do not overdo it</span>
+    Encapsulation is for state that has <b>rules</b>. A plain data holder with no
+    invariants does not need getters and setters — that just adds noise. Protect
+    what needs protecting.
+  </div>
+
+  <div id="fill1"></div>
+
+  <h2><span class="n">4</span>Check yourself</h2>
+
+  <p>
+    Answer from memory. Every option has the same number of words.
+  </p>
+
+  <div id="quiz"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>
+      You can now protect an attribute behind a method that enforces its rules, and
+      you know that encapsulation is about control, not secrecy. Your objects can no
+      longer be broken from the outside.
+    </p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+
+  <ol>
+    <li>
+      Take your <code>Book</code> class and make <code>copies</code> internal, with a
+      <code>restock</code> method as the only way to increase it.
+    </li>
+    <li>
+      Add a <code>borrow</code> method that refuses when copies are zero.
+    </li>
+    <li>
+      Try to set <code>book._copies = -5</code> from outside. It will work — explain
+      why Python allows it, and why you still should not do it.
+    </li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Read <a href="https://docs.python.org/3/tutorial/classes.html#private-variables">The
+    Python Tutorial → Private Variables</a>. It explains the underscore convention
+    and name mangling.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask me anything — "when should I use __ vs _?",
+    "is encapsulation worth it in small scripts?", "how do I test a private
+    attribute?". I will adapt the next lesson to your questions.
+  </div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is the real problem with book.copies = -99?",
+    a: ["It is a syntax error", "The rules are bypassed", "It deletes the object"],
+    c: 1,
+    why: "The assignment works fine — that is the problem. It skips every rule the object was supposed to enforce."
+  });
+
+  TeachWidgets.fill("#fill1", {
+    lines: [
+      "class Book:",
+      "    def __init__(self, title, copies):",
+      "        self.title = title",
+      "        self.<0>copies = copies",
+      "",
+      "    def restock(self, n):",
+      "        if n &lt; 0:",
+      "            raise ValueError(\"bad amount\")",
+      "        self.<1>copies += n"
+    ],
+    blanks: [
+      { a: ["_"], why: "A single leading underscore marks the attribute as internal by convention." },
+      { a: ["_"], why: "The method reaches the same internal attribute through self, using the same underscore name." }
+    ]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is encapsulation about?",
+      a: ["Hiding data completely", "Controlling how state changes", "Making code run faster", "Reducing the file size"],
+      c: 1,
+      why: "Encapsulation is about control: state changes only through methods that enforce the rules."
+    },
+    {
+      q: "What does a leading underscore mean?",
+      a: ["The attribute is constant", "It is internal by convention", "It is a syntax error", "It is shared by all"],
+      c: 1,
+      why: "A single underscore is a convention meaning 'internal — do not touch from outside'."
+    },
+    {
+      q: "Does Python truly hide _copies?",
+      a: ["Yes, it is locked", "No, it is a promise", "Only inside methods", "Only in subclasses"],
+      c: 1,
+      why: "Python does not enforce privacy; the underscore is a promise you are trusted to keep."
+    },
+    {
+      q: "When should you add getters?",
+      a: ["For every attribute", "Only when rules exist", "Only in large classes", "Never in Python code"],
+      c: 1,
+      why: "Protect state that has rules. Plain data holders do not need getters and setters."
+    }
+  ]);
+</script>
+</body>
+</html>

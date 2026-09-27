@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 03 — The initializer</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="oop" data-lesson="3" data-lesson-id="the-initializer">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 03</span> · Foundations</span>
+
+  <h1 class="lesson-title">The initializer</h1>
+  <p class="lesson-lede">
+    <code>__init__</code> runs automatically the moment you build an object. It is
+    where an object gets its starting state — and where you can refuse to build a
+    broken one.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Set up objects correctly every time</span>
+    <span><b>Mission link</b> Objects that start in a valid state</span>
+  </div>
+
+  <h2><span class="n">1</span>It runs by itself</h2>
+
+  <p>
+    You never call <code>__init__</code> directly. Python calls it for you when you
+    write <code>Book(...)</code>.
+  </p>
+
+  <pre><code>class Book:
+    def __init__(self, title, copies):
+        print("building a book")
+        self.title = title
+        self.copies = copies
+
+dune = Book("Dune", 3)   # prints: building a book</code></pre>
+
+  <p>
+    The arguments you pass to <code>Book(...)</code> are handed straight to
+    <code>__init__</code>, after the automatic <code>self</code>.
+  </p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    <code>__init__</code> is the <b>setup step</b>. Its job is to leave the object
+    in a valid, ready-to-use state. If it finishes, the object exists.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Default values</h2>
+
+  <p>
+    Not every argument has to be required. Give a parameter a default and callers
+    can skip it.
+  </p>
+
+  <pre><code>class Book:
+    def __init__(self, title, copies=1):
+        self.title = title
+        self.copies = copies
+
+a = Book("Dune")          # copies defaults to 1
+b = Book("Dune", 5)       # copies is 5</code></pre>
+
+  <div class="note warn">
+    <span class="note-label">The mutable default trap</span>
+    Never use a mutable default like <code>tags=[]</code>. That one list is created
+    <em>once</em> and shared by every object. Use <code>tags=None</code> and create
+    the list inside <code>__init__</code> instead.
+  </div>
+
+  <h2><span class="n">3</span>Guarding the start</h2>
+
+  <p>
+    Because <code>__init__</code> is the only way in, it is the perfect place to
+    reject bad data before the object ever exists.
+  </p>
+
+  <pre><code>class Book:
+    def __init__(self, title, copies):
+        if copies &lt; 0:
+            raise ValueError("copies cannot be negative")
+        self.title = title
+        self.copies = copies
+
+Book("Dune", -1)   # ValueError — no broken object is ever made</code></pre>
+
+  <div class="note good">
+    <span class="note-label">Why this matters</span>
+    If an object can only be built through <code>__init__</code>, and
+    <code>__init__</code> checks its inputs, then <b>every</b> object in your program
+    is guaranteed valid. That is a huge amount of safety for four lines.
+  </div>
+
+  <div id="fill1"></div>
+
+  <h2><span class="n">4</span>Check yourself</h2>
+
+  <p>
+    Answer from memory. Every option has the same number of words.
+  </p>
+
+  <div id="quiz"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>
+      You know that <code>__init__</code> is the automatic setup step, that it is the
+      single gateway into an object's life, and that putting validation there means
+      no invalid object can ever exist. That is the foundation of reliable classes.
+    </p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+
+  <ol>
+    <li>
+      Add a <code>year</code> parameter to <code>Book</code> with a sensible default.
+    </li>
+    <li>
+      Add a check that <code>title</code> is not empty, raising
+      <code>ValueError</code> if it is.
+    </li>
+    <li>
+      Try the mutable-default trap on purpose: give a parameter <code>tags=[]</code>,
+      build two objects, append to one list, and print both. Explain what you see.
+    </li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Read <a href="https://docs.python.org/3/reference/datamodel.html#object.__init__">The
+    Python Data Model → object.__init__</a>. It is short and precise about when
+    <code>__init__</code> is called.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask me anything — "what is the difference between
+    __init__ and __new__?", "should I validate in __init__ or in a setter?",
+    "why is the mutable default dangerous?". I will tailor the next lesson to you.
+  </div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "How many times does __init__ run for dune = Book(\"Dune\", 3)?",
+    a: ["Zero times", "Once", "Twice"],
+    c: 1,
+    why: "Python calls __init__ exactly once, automatically, at the moment the object is created. You never call it yourself."
+  });
+
+  TeachWidgets.fill("#fill1", {
+    lines: [
+      "class Book:",
+      "    def <0>(self, title, copies):",
+      "        if copies &lt; 0:",
+      "            raise <1>(\"copies cannot be negative\")",
+      "        self.title = title",
+      "        self.copies = copies"
+    ],
+    blanks: [
+      { a: ["__init__"], why: "The initializer is always named __init__ — two underscores on each side." },
+      { a: ["ValueError"], why: "ValueError is the standard exception for an argument that has the right type but a bad value." }
+    ]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "When does __init__ run?",
+      a: ["When you call it", "Automatically at creation", "Only when imported", "After the first method"],
+      c: 1,
+      why: "Python calls __init__ for you the moment you build an object with ClassName(...)."
+    },
+    {
+      q: "What is its main job?",
+      a: ["To delete old objects", "To set starting state", "To copy the class", "To print debug output"],
+      c: 1,
+      why: "Its job is to leave the new object in a valid, ready-to-use state."
+    },
+    {
+      q: "Why validate inside __init__?",
+      a: ["It runs much faster", "It blocks invalid objects", "It saves memory space", "It hides the attributes"],
+      c: 1,
+      why: "If __init__ rejects bad input, no invalid object can ever be created."
+    },
+    {
+      q: "What is wrong with tags=[]?",
+      a: ["It is a syntax error", "One list is shared", "It cannot be changed", "It needs a type hint"],
+      c: 1,
+      why: "The default list is created once and shared by every object — a classic Python trap."
+    }
+  ]);
+</script>
+</body>
+</html>

@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OOP Cheat Sheet — Reference</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+<style>
+  .ref-toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0 8px; }
+  .ref-toc a { font-size: .8rem; border: 1px solid var(--border); background: #111a30; padding: 5px 11px; border-radius: 999px; color: var(--muted); text-decoration: none; border-bottom: 1px solid var(--border); }
+  .ref-toc a:hover { color: #fff; border-color: #3d5488; }
+  .lesson-wrap h2 { scroll-margin-top: 20px; }
+  .snippet { margin: 14px 0 22px; }
+  .snippet .lbl { font-size: .72rem; font-weight: 800; letter-spacing: .7px; text-transform: uppercase; color: var(--accent2); margin-bottom: 6px; }
+  .see { font-size: .82rem; color: var(--muted); margin: -6px 0 12px; }
+  .see a { color: var(--accent2); border-bottom: 0; }
+  .see a:hover { color: #fff; }
+  /* room for the copy button so it never sits on the first line of code */
+  .snippet pre { padding-top: 34px; }
+  @media print { .snippet pre { padding-top: 18px; } }
+</style>
+</head>
+<body class="lesson-body" data-course="oop">
+
+<div class="lesson-wrap">
+
+  <span class="lesson-kicker">Reference · Cheat sheet</span>
+  <h1 class="lesson-title">OOP Cheat Sheet</h1>
+  <p class="lesson-lede">
+    The syntax you will reach for every day, compressed. Print this, or keep it open
+    beside your editor. Every snippet is runnable Python 3.
+  </p>
+
+  <div class="ref-toc">
+    <a href="#class">Class &amp; object</a>
+    <a href="#init">Initializer</a>
+    <a href="#methods">Methods</a>
+    <a href="#inherit">Inheritance</a>
+    <a href="#composition">Composition</a>
+    <a href="#dunder">Dunder</a>
+    <a href="#property">Property</a>
+    <a href="#dataclass">Dataclass</a>
+    <a href="#abstract">Abstract</a>
+    <a href="#choose">Choosing</a>
+  </div>
+
+  <h2 id="class"><span class="n">1</span>Class &amp; object</h2>
+  <p class="see">See <a href="../lessons/0001-what-an-object-is.html">Lesson 01 — What an object actually is</a></p>
+  <div class="snippet">
+    <div class="lbl">Define a class, build objects</div>
+    <pre><code>class Book:
+    pass
+
+dune = Book()          # one object
+emma = Book()          # another, independent</code></pre>
+  </div>
+
+  <h2 id="init"><span class="n">2</span>Initializer &amp; attributes</h2>
+  <p class="see">See <a href="../lessons/0002-self-and-attributes.html">Lesson 02 — self and attributes</a> · <a href="../lessons/0003-the-initializer.html">Lesson 03 — The initializer</a></p>
+  <div class="snippet">
+    <div class="lbl">Fill in starting state</div>
+    <pre><code>class Book:
+    def __init__(self, title, copies):
+        self.title = title      # attribute on the object
+        self.copies = copies
+
+dune = Book("Dune", 3)
+print(dune.title)               # Dune</code></pre>
+  </div>
+
+  <h2 id="methods"><span class="n">3</span>Methods</h2>
+  <p class="see">See <a href="../lessons/0004-methods-that-do-things.html">Lesson 04 — Methods that do things</a> · <a href="../lessons/0012-method-kinds.html">Lesson 12 — Instance, class, static</a></p>
+  <div class="snippet">
+    <div class="lbl">Instance · class · static</div>
+    <pre><code>class Book:
+    def __init__(self, title):
+        self.title = title
+
+    def borrow(self):                 # instance: needs self
+        return f"Borrowed {self.title}"
+
+    @classmethod
+    def from_json(cls, data):         # class: needs cls
+        return cls(data["title"])
+
+    @staticmethod
+    def is_valid_isbn(code):          # static: needs neither
+        return len(code) == 13</code></pre>
+  </div>
+
+  <h2 id="inherit"><span class="n">4</span>Inheritance (is-a)</h2>
+  <p class="see">See <a href="../lessons/0007-inheritance.html">Lesson 07 — Inheritance (is-a)</a></p>
+  <div class="snippet">
+    <div class="lbl">Child extends parent, calls super()</div>
+    <pre><code>class Customer:
+    def __init__(self, name):
+        self.name = name
+
+    def introduce(self):
+        return f"I am {self.name}"
+
+class BusinessCustomer(Customer):
+    def __init__(self, name, company):
+        super().__init__(name)        # run parent's init
+        self.company = company
+
+c = BusinessCustomer("Bilal", "ABC Bank")
+print(c.introduce())                  # inherited
+print(c.company)                      # own</code></pre>
+  </div>
+
+  <h2 id="composition"><span class="n">5</span>Composition (has-a)</h2>
+  <p class="see">See <a href="../lessons/0010-composition.html">Lesson 10 — Composition (has-a)</a></p>
+  <div class="snippet">
+    <div class="lbl">An object holds another object</div>
+    <pre><code>class Address:
+    def __init__(self, city):
+        self.city = city
+
+class Customer:
+    def __init__(self, name, address):
+        self.name = name
+        self.address = address       # has-a
+
+c = Customer("Bilal", Address("Stockholm"))
+print(c.address.city)                # Stockholm</code></pre>
+  </div>
+
+  <h2 id="dunder"><span class="n">6</span>Dunder methods</h2>
+  <p class="see">See <a href="../lessons/0011-dunder-methods.html">Lesson 11 — Dunder methods</a></p>
+  <div class="snippet">
+    <div class="lbl">Plug into built-in syntax</div>
+    <pre><code>class Book:
+    def __init__(self, title):
+        self.title = title
+
+    def __str__(self):                # print(obj)
+        return f"Book: {self.title}"
+
+    def __repr__(self):               # repr(obj), debugging
+        return f"Book({self.title!r})"
+
+    def __eq__(self, other):          # obj == other
+        return self.title == other.title</code></pre>
+  </div>
+
+  <h2 id="property"><span class="n">7</span>Property</h2>
+  <p class="see">See <a href="../lessons/0006-properties.html">Lesson 06 — Properties</a></p>
+  <div class="snippet">
+    <div class="lbl">Attribute syntax, real logic underneath</div>
+    <pre><code>class Account:
+    def __init__(self, balance):
+        self._balance = balance
+
+    @property
+    def balance(self):
+        return self._balance
+
+    @balance.setter
+    def balance(self, value):
+        if value &lt; 0:
+            raise ValueError("cannot be negative")
+        self._balance = value</code></pre>
+  </div>
+
+  <h2 id="dataclass"><span class="n">8</span>Dataclass</h2>
+  <p class="see">See <a href="../lessons/0013-dataclasses.html">Lesson 13 — Dataclasses</a></p>
+  <div class="snippet">
+    <div class="lbl">Boilerplate-free data class</div>
+    <pre><code>from dataclasses import dataclass
+
+@dataclass
+class Customer:
+    name: str
+    country: str
+    risk_score: int
+
+c = Customer("Bilal", "SE", 85)
+print(c)                 # Customer(name='Bilal', ...)</code></pre>
+  </div>
+
+  <h2 id="abstract"><span class="n">9</span>Abstract base class</h2>
+  <p class="see">See <a href="../lessons/0009-abstraction.html">Lesson 09 — Abstraction</a></p>
+  <div class="snippet">
+    <div class="lbl">Force subclasses to implement</div>
+    <pre><code>from abc import ABC, abstractmethod
+
+class RiskModel(ABC):
+    @abstractmethod
+    def calculate(self, customer):
+        ...
+
+class KYCModel(RiskModel):
+    def calculate(self, customer):
+        return customer.risk_score * 1.2</code></pre>
+  </div>
+
+  <h2 id="choose"><span class="n">10</span>Choosing between them</h2>
+  <p class="see">See <a href="../lessons/0014-designing-a-system.html">Lesson 14 — Designing a system</a></p>
+  <table>
+    <tr><th>You want…</th><th>Reach for</th></tr>
+    <tr><td>One thing with data and rules</td><td>A class with <code>__init__</code> + methods</td></tr>
+    <tr><td>A class that is mostly data</td><td><code>@dataclass</code></td></tr>
+    <tr><td>"X <em>is a</em> Y"</td><td>Inheritance</td></tr>
+    <tr><td>"X <em>has a</em> Y"</td><td>Composition</td></tr>
+    <tr><td>Same call, different behaviour</td><td>Polymorphism (override the method)</td></tr>
+    <tr><td>Controlled access to a value</td><td><code>@property</code></td></tr>
+    <tr><td>A guaranteed interface</td><td><code>ABC</code> + <code>@abstractmethod</code></td></tr>
+    <tr><td>An alternate constructor</td><td><code>@classmethod</code></td></tr>
+  </table>
+
+  <div class="note warn">
+    <span class="note-label">The one warning</span>
+    OOP is a tool, not a religion. Not every noun needs a class, and unnecessary
+    abstraction is a real failure mode. If a plain dictionary or function does the
+    job clearly, use it.
+  </div>
+
+  <h2 id="lessons"><span class="n">11</span>All 14 lessons</h2>
+  <p class="see">Every lesson in the guided course, in order.</p>
+  <table>
+    <tr><th>#</th><th>Lesson</th><th>Topic</th></tr>
+    <tr><td>01</td><td><a href="../lessons/0001-what-an-object-is.html">What an object actually is</a></td><td>Foundations</td></tr>
+    <tr><td>02</td><td><a href="../lessons/0002-self-and-attributes.html">self and attributes</a></td><td>Foundations</td></tr>
+    <tr><td>03</td><td><a href="../lessons/0003-the-initializer.html">The initializer</a></td><td>Foundations</td></tr>
+    <tr><td>04</td><td><a href="../lessons/0004-methods-that-do-things.html">Methods that do things</a></td><td>Foundations</td></tr>
+    <tr><td>05</td><td><a href="../lessons/0005-keeping-rules-inside.html">Keeping rules inside</a></td><td>Protecting state</td></tr>
+    <tr><td>06</td><td><a href="../lessons/0006-properties.html">Properties</a></td><td>Protecting state</td></tr>
+    <tr><td>07</td><td><a href="../lessons/0007-inheritance.html">Inheritance (is-a)</a></td><td>Relationships</td></tr>
+    <tr><td>08</td><td><a href="../lessons/0008-polymorphism.html">Polymorphism</a></td><td>Relationships</td></tr>
+    <tr><td>09</td><td><a href="../lessons/0009-abstraction.html">Abstraction</a></td><td>Relationships</td></tr>
+    <tr><td>10</td><td><a href="../lessons/0010-composition.html">Composition (has-a)</a></td><td>Relationships</td></tr>
+    <tr><td>11</td><td><a href="../lessons/0011-dunder-methods.html">Dunder methods</a></td><td>Python power tools</td></tr>
+    <tr><td>12</td><td><a href="../lessons/0012-method-kinds.html">Instance, class, static</a></td><td>Python power tools</td></tr>
+    <tr><td>13</td><td><a href="../lessons/0013-dataclasses.html">Dataclasses</a></td><td>Python power tools</td></tr>
+    <tr><td>14</td><td><a href="../lessons/0014-designing-a-system.html">Designing a system</a></td><td>Putting it together</td></tr>
+  </table>
+
+  <div class="lesson-foot">
+    <div class="links">
+      <a href="oop-glossary.html">📖 Glossary</a>
+      <a href="../lessons/0001-what-an-object-is.html">📘 Lesson 01</a>
+      <a href="../lessons/0014-designing-a-system.html">🏗️ Lesson 14</a>
+      <a href="../course.html">🗺️ All lessons</a>
+      <a href="../../../oop_interactive_course.html">🧩 Full course</a>
+    </div>
+    <span style="color:var(--muted);font-size:.8rem">Reference · print-friendly</span>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+</body>
+</html>

@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 07 — Inheritance (is-a)</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="oop" data-lesson="7" data-lesson-id="inheritance">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 07</span> · Relationships</span>
+
+  <h1 class="lesson-title">Inheritance (is-a)</h1>
+  <p class="lesson-lede">
+    Inheritance lets one class build on another. Use it when the relationship is
+    genuinely <b>is-a</b>: an Ebook <em>is a</em> Book. Get that test wrong and
+    inheritance becomes a trap.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Share behaviour without copying code</span>
+    <span><b>Mission link</b> Reuse without duplication</span>
+  </div>
+
+  <h2><span class="n">1</span>Copying code is the smell</h2>
+
+  <p>
+    You have a <code>Book</code>. Now you need an <code>Ebook</code> that is almost
+    the same but has a file size. The tempting move is to copy the whole class.
+  </p>
+
+  <pre><code>class Ebook:
+    def __init__(self, title, copies, size_mb):
+        self.title = title
+        self.copies = copies
+        self.size_mb = size_mb
+
+    def borrow(self):        # copied from Book
+        ...</code></pre>
+
+  <p>
+    Now every fix to <code>Book.borrow</code> has to be made twice. That is the
+    problem inheritance solves.
+  </p>
+
+  <div class="note bad">
+    <span class="note-label">The failure</span>
+    Duplicated behaviour drifts. Two copies of the same rule will eventually disagree,
+    and you will not know which one is right.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Inherit and extend</h2>
+
+  <p>
+    Put the shared class in parentheses. The child gets everything the parent has,
+    and adds or overrides what it needs.
+  </p>
+
+  <pre><code>class Book:
+    def __init__(self, title, copies):
+        self.title = title
+        self.copies = copies
+
+    def borrow(self):
+        if self.copies == 0:
+            return False
+        self.copies -= 1
+        return True
+
+
+class Ebook(Book):                       # Ebook IS-A Book
+    def __init__(self, title, copies, size_mb):
+        super().__init__(title, copies)  # run the parent setup
+        self.size_mb = size_mb</code></pre>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    <code>super()</code> calls the parent's version. The child reuses the parent's
+    setup and behaviour, then adds its own.
+  </div>
+
+  <h2><span class="n">3</span>The is-a test</h2>
+
+  <p>
+    Before you inherit, say the sentence out loud. If it sounds wrong, do not
+    inherit.
+  </p>
+
+  <table>
+    <tr><th>Sentence</th><th>Verdict</th></tr>
+    <tr><td>An Ebook <b>is a</b> Book</td><td>✓ Inherit</td></tr>
+    <tr><td>A Library <b>is a</b> Book</td><td>✗ A library <em>has</em> books — use composition</td></tr>
+    <tr><td>A Customer <b>is a</b> Book</td><td>✗ Unrelated — do not inherit</td></tr>
+  </table>
+
+  <div class="note warn">
+    <span class="note-label">Deep hierarchies are a trap</span>
+    Three or four levels of inheritance become hard to follow. Prefer shallow trees,
+    and reach for composition (next lessons) when the relationship is "has-a".
+  </div>
+
+  <div id="fill1"></div>
+
+  <h2><span class="n">4</span>Check yourself</h2>
+
+  <p>
+    Answer from memory. Every option has the same number of words.
+  </p>
+
+  <div id="quiz"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>
+      You can now share behaviour between classes without copying it, call the parent
+      setup with <code>super()</code>, and — most importantly — apply the is-a test
+      before inheriting. That test will save you from most bad class designs.
+    </p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+
+  <ol>
+    <li>
+      Create an <code>Ebook(Book)</code> that adds <code>size_mb</code> and calls
+      <code>super().__init__</code>.
+    </li>
+    <li>
+      Override <code>borrow</code> in <code>Ebook</code> so it also prints the file
+      size, then call <code>super().borrow()</code> inside it.
+    </li>
+    <li>
+      Write three candidate classes and apply the is-a test to each. Note which ones
+      should use composition instead.
+    </li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Read <a href="https://docs.python.org/3/tutorial/classes.html#inheritance">The
+    Python Tutorial → Inheritance</a>. It covers single and multiple inheritance and
+    <code>super()</code>.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask me anything — "what is MRO?", "when is multiple
+    inheritance okay?", "how deep is too deep?". I will adapt the next lesson to your
+    questions.
+  </div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Which relationship should use inheritance?",
+    a: ["A Library has books", "An Ebook is a Book", "A Book has a title"],
+    c: 1,
+    why: "Inheritance is for is-a relationships. 'A library has books' is a has-a relationship, which calls for composition."
+  });
+
+  TeachWidgets.fill("#fill1", {
+    lines: [
+      "class Ebook(Book):",
+      "    def __init__(self, title, copies, size_mb):",
+      "        <0>().__init__(title, copies)",
+      "        self.size_mb = size_mb"
+    ],
+    blanks: [
+      { a: ["super"], why: "super() gives you the parent class so you can run its __init__ before adding your own attributes." }
+    ]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "When should you inherit?",
+      a: ["When code is duplicated", "When the is-a test holds", "When classes look similar", "When you need more methods"],
+      c: 1,
+      why: "Inheritance models an is-a relationship. Similar-looking classes are not enough."
+    },
+    {
+      q: "What does super() do?",
+      a: ["Creates a new object", "Calls the parent version", "Deletes the parent class", "Copies all attributes"],
+      c: 1,
+      why: "super() gives access to the parent class so you can reuse its setup and behaviour."
+    },
+    {
+      q: "What is the risk of copying?",
+      a: ["It runs much slower", "The copies drift apart", "It uses more memory", "It breaks the syntax"],
+      c: 1,
+      why: "Duplicated behaviour drifts: two copies of a rule will eventually disagree."
+    },
+    {
+      q: "What is wrong with deep trees?",
+      a: ["They run much slower", "They are hard to follow", "They use more memory", "They cannot be tested"],
+      c: 1,
+      why: "Deep inheritance hierarchies are hard to trace; prefer shallow trees and composition."
+    }
+  ]);
+</script>
+</body>
+</html>

@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 08 — Polymorphism</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="oop" data-lesson="8" data-lesson-id="polymorphism">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 08</span> · Relationships</span>
+
+  <h1 class="lesson-title">Polymorphism</h1>
+  <p class="lesson-lede">
+    Polymorphism means one call, many behaviours. You write
+    <code>item.describe()</code> once, and each object answers in its own way. It is
+    the payoff of inheritance — and the reason you can add new types without touching
+    old code.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Write code that works for types you have not written yet</span>
+    <span><b>Mission link</b> Extend without editing</span>
+  </div>
+
+  <h2><span class="n">1</span>The if-chain that keeps growing</h2>
+
+  <p>
+    Without polymorphism you end up branching on type everywhere.
+  </p>
+
+  <pre><code>def describe(item):
+    if isinstance(item, Book):
+        return f"{item.title} ({item.copies} copies)"
+    elif isinstance(item, Ebook):
+        return f"{item.title} ({item.size_mb} MB)"
+    elif isinstance(item, Audiobook):
+        return f"{item.title} ({item.minutes} min)"</code></pre>
+
+  <p>
+    Every new type means editing this function. And every other function that
+    branches on type. That is a lot of places to remember.
+  </p>
+
+  <div class="note bad">
+    <span class="note-label">The failure</span>
+    Type checks spread through the program. Adding a type means finding and editing
+    every branch — and missing one is easy.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Let each object answer</h2>
+
+  <p>
+    Give every class its own <code>describe</code>. Now the caller does not care what
+    the object is.
+  </p>
+
+  <pre><code>class Book:
+    def describe(self):
+        return f"{self.title} ({self.copies} copies)"
+
+class Ebook(Book):
+    def describe(self):
+        return f"{self.title} ({self.size_mb} MB)"
+
+for item in shelf:
+    print(item.describe())     # one call, many behaviours</code></pre>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    The caller writes one call. Each object decides how to answer. Adding a new type
+    means adding a class — <b>no existing code changes</b>.
+  </div>
+
+  <h2><span class="n">3</span>Duck typing</h2>
+
+  <p>
+    Python does not check the type. It only checks that the object has the method you
+    called. "If it walks like a duck and quacks like a duck…"
+  </p>
+
+  <pre><code>class Podcast:                 # not a Book at all
+    def describe(self):
+        return f"{self.name} (podcast)"
+
+for item in shelf:
+    print(item.describe())     # Podcast works too</code></pre>
+
+  <div class="note good">
+    <span class="note-label">Why this is powerful</span>
+    Any object with a <code>describe</code> method works — no shared parent required.
+    This is why Python code stays flexible as it grows.
+  </div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Check yourself</h2>
+
+  <p>
+    Answer from memory. Every option has the same number of words.
+  </p>
+
+  <div id="quiz"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>
+      You can now replace type-checking if-chains with a single polymorphic call, and
+      you know that Python's duck typing means any object with the right method will
+      work. Your code can now grow without being edited.
+    </p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+
+  <ol>
+    <li>
+      Give <code>Book</code> and <code>Ebook</code> each a <code>describe</code>
+      method, then loop over a mixed list calling it.
+    </li>
+    <li>
+      Add a <code>Podcast</code> class that is not a <code>Book</code> but has
+      <code>describe</code>. Confirm it works in the same loop.
+    </li>
+    <li>
+      Rewrite an <code>isinstance</code> if-chain in your own code as a polymorphic
+      method call.
+    </li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Read <a href="https://docs.python.org/3/glossary.html#term-duck-typing">The Python
+    Glossary → duck-typing</a>. It is two sentences and it is the whole idea.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask me anything — "when do I still need isinstance?",
+    "what is an abstract method?", "how does this work with lists?". I will shape the
+    next lesson around your questions.
+  </div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is the main cost of the if-chain?",
+    a: ["It runs much slower", "Every new type edits it", "It uses more memory"],
+    c: 1,
+    why: "Each new type forces you to find and edit every function that branches on type — and missing one is easy."
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "shelf = [Book(...), Ebook(...), Podcast(...)]",
+      "for item in shelf:",
+      "    item.describe()"
+    ],
+    steps: [
+      { line: 0, vars: { shelf: "[Book, Ebook, Podcast]" } },
+      { line: 1, vars: { item: "Book" } },
+      { line: 2, vars: { item: "Book", returns: "\"Dune (3 copies)\"" } },
+      { line: 2, vars: { item: "Ebook", returns: "\"Dune (2 MB)\"" } },
+      { line: 2, vars: { item: "Podcast", returns: "\"Dune (podcast)\"" } }
+    ]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is polymorphism?",
+      a: ["One call, many behaviours", "One class, many objects", "One file, many classes", "One method, many arguments"],
+      c: 0,
+      why: "Polymorphism means the same call produces different behaviour depending on the object."
+    },
+    {
+      q: "What does duck typing check?",
+      a: ["The object's class name", "The method being present", "The module it came from", "The parent class chain"],
+      c: 1,
+      why: "Python checks that the object has the method you called, not what class it is."
+    },
+    {
+      q: "Why is polymorphism better?",
+      a: ["It runs much faster", "New types need no edits", "It uses less memory", "It avoids all errors"],
+      c: 1,
+      why: "Adding a new type means adding a class — existing code does not change."
+    },
+    {
+      q: "When do you still need isinstance?",
+      a: ["Never in Python code", "For genuinely type-specific work", "For every method call", "Only inside __init__"],
+      c: 1,
+      why: "isinstance is fine when the behaviour really is type-specific, but it should not be your default."
+    }
+  ]);
+</script>
+</body>
+</html>

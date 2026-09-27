@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 02 — self and attributes</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="oop" data-lesson="2" data-lesson-id="self-and-attributes">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 02</span> · Foundations</span>
+
+  <h1 class="lesson-title">self and attributes</h1>
+  <p class="lesson-lede">
+    <code>self</code> is the first thing that confuses everyone. It is not a keyword
+    and not magic — it is just the object the method was called on, handed in
+    automatically. See that once and attributes fall into place.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~8 min</span>
+    <span><b>Win</b> Read <code>self.x</code> correctly, every time</span>
+    <span><b>Mission link</b> Each object keeps its own state</span>
+  </div>
+
+  <h2><span class="n">1</span>Two objects, two states</h2>
+
+  <p>
+    Build two books from one class, then change one. Watch the other.
+  </p>
+
+  <pre><code>class Book:
+    def __init__(self, title, copies):
+        self.title = title
+        self.copies = copies
+
+a = Book("Dune", 3)
+b = Book("Neuromancer", 1)
+
+a.copies -= 1
+
+print(a.copies)   # 2
+print(b.copies)   # 1  — untouched</code></pre>
+
+  <p>
+    Each object carries its <b>own</b> <code>title</code> and <code>copies</code>.
+    These are <b>attributes</b> (also called instance variables). Changing
+    <code>a</code> never touches <code>b</code> — that separation is the whole
+    reason objects exist. The
+    <a href="https://docs.python.org/3/tutorial/classes.html#instance-objects">Python
+    Tutorial on instance objects</a> states it plainly: instance attributes are
+    stored per object, not on the class.
+  </p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Attributes live <b>on the object</b>. Two objects from one class are two
+    separate bundles of state.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>What self actually is</h2>
+
+  <p>
+    Here is the trick that makes <code>self</code> click. These two lines do the
+    exact same thing:
+  </p>
+
+  <pre><code>a.borrow()          # the normal way
+Book.borrow(a)      # what Python really does</code></pre>
+
+  <p>
+    When you write <code>a.borrow()</code>, Python looks up <code>borrow</code> on
+    the class and calls it with <code>a</code> as the first argument. That first
+    argument is what we name <code>self</code>. It is an ordinary parameter — you
+    could name it anything, but the whole community calls it <code>self</code>
+    (<a href="https://peps.python.org/pep-0008/#function-and-method-arguments">PEP 8</a>
+    makes it a convention, not a rule).
+  </p>
+
+  <div class="note good">
+    <span class="note-label">The rule</span>
+    <code>self</code> is the object the method was called on. Inside the method,
+    <code>self.title</code> means "the title of <em>this particular</em> object".
+  </div>
+
+  <h2><span class="n">3</span>Reading and writing attributes</h2>
+
+  <p>
+    Inside a method you reach attributes through <code>self</code>. Outside, you
+    reach them through the object's name.
+  </p>
+
+  <table>
+    <tr><th>Where</th><th>How you write it</th></tr>
+    <tr><td>Inside a method</td><td><code>self.copies</code></td></tr>
+    <tr><td>Outside, on an object</td><td><code>a.copies</code></td></tr>
+    <tr><td>On the class (shared)</td><td><code>Book.copies</code> — usually a mistake</td></tr>
+  </table>
+
+  <div class="note warn">
+    <span class="note-label">Common trap</span>
+    Forgetting <code>self.</code> inside a method creates a <em>local variable</em>
+    that vanishes when the method ends. The attribute never changes. If a method
+    "does nothing", look for a missing <code>self.</code>.
+  </div>
+
+  <div id="fill1"></div>
+
+  <h2><span class="n">4</span>Recall it from memory</h2>
+
+  <p>
+    Retrieval beats re-reading. Type the two lines from memory — no scrolling up.
+    The checker ignores spacing and case.
+  </p>
+
+  <div id="fill2"></div>
+
+  <h2><span class="n">5</span>Check yourself</h2>
+
+  <p>
+    Answer from memory. Every option has the same number of words, so nothing gives
+    the answer away.
+  </p>
+
+  <div id="quiz"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>
+      You can now read <code>self.x</code> as "the x of the object this method was
+      called on", and you know <code>a.borrow()</code> is really
+      <code>Book.borrow(a)</code>. That one reframing removes the biggest early
+      source of confusion in Python OOP — and it is exactly the mental model you
+      need when your project's classes start holding real state.
+    </p>
+  </div>
+
+  <h2><span class="n">6</span>Do this next</h2>
+
+  <ol>
+    <li>
+      Write a <code>Book</code> class with a <code>describe(self)</code> method that
+      returns a sentence using <code>self.title</code> and <code>self.copies</code>.
+    </li>
+    <li>
+      Call <code>Book.describe(a)</code> directly, passing the object yourself. It
+      should behave exactly like <code>a.describe()</code>.
+    </li>
+    <li>
+      Deliberately drop the <code>self.</code> in one assignment, print the attribute
+      afterwards, and explain why it did not change.
+    </li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Read
+    <a href="https://docs.python.org/3/tutorial/classes.html#a-word-about-names-and-objects">The
+    Python Tutorial → A Word About Names and Objects</a>. It explains why Python
+    passes <code>self</code> explicitly when other languages hide it. For the deeper
+    "why", see <em>Fluent Python</em> (Ramalho), ch. 1 and 11.
+  </div>
+
+  <div class="note">
+    <span class="note-label">Go further</span>
+    When an exercise misbehaves, ask in
+    <a href="https://reddit.com/r/learnpython">r/learnpython</a> — a large, friendly
+    community that reviews small examples. Testing your understanding against other
+    learners is how the knowledge becomes wisdom.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask me anything — "why does Python make self explicit?",
+    "what is an instance variable vs a class variable?", "can two objects share an
+    attribute?". I can adapt the next lesson to whatever tripped you up.
+  </div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "After a.copies -= 1, what is b.copies?",
+    a: ["2", "1", "an error"],
+    c: 1,
+    why: "Each object has its own copies attribute. Changing a's state leaves b completely untouched — that is the whole point of instance state."
+  });
+
+  TeachWidgets.fill("#fill1", {
+    lines: [
+      "class Counter:",
+      "    def __init__(self):",
+      "        <0>.count = 0",
+      "",
+      "    def bump(self):",
+      "        <1>.count += 1"
+    ],
+    blanks: [
+      { a: ["self"], why: "Inside __init__ you attach the attribute to the object being built — that object is self." },
+      { a: ["self"], why: "bump must change the attribute on the object it was called on, so it reaches it through self." }
+    ]
+  });
+
+  TeachWidgets.fill("#fill2", {
+    label: "Type from memory",
+    lines: [
+      "a.borrow()          # the normal way",
+      "<0>      # what Python really does"
+    ],
+    blanks: [
+      { a: ["Book.borrow(a)"], why: "Python looks up borrow on the class and passes the object as the first argument — that argument is self." }
+    ]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is self inside a method?",
+      a: ["A special Python keyword", "The object being used", "The class definition itself", "A global variable name"],
+      c: 1,
+      why: "self is just the first parameter, filled in automatically with the object the method was called on."
+    },
+    {
+      q: "What does a.borrow() really do?",
+      a: ["Calls borrow on class", "Calls Book.borrow on a", "Creates a brand object", "Copies the class definition"],
+      c: 1,
+      why: "Python looks up the method on the class and passes the object as the first argument."
+    },
+    {
+      q: "Where do attributes live?",
+      a: ["On each separate object", "On the class definition", "In a global dictionary", "In the method body"],
+      c: 0,
+      why: "Attributes are stored per object, so two objects from one class keep separate state."
+    },
+    {
+      q: "What happens if you forget self?",
+      a: ["Python raises an error", "A local variable appears", "The attribute is updated", "The class is modified"],
+      c: 1,
+      why: "Without self. you create a local variable that disappears when the method returns."
+    }
+  ]);
+</script>
+</body>
+</html>

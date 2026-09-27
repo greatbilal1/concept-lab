@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 13 — Dataclasses</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="oop" data-lesson="13" data-lesson-id="dataclasses">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 13</span> · Python power tools</span>
+
+  <h1 class="lesson-title">Dataclasses</h1>
+  <p class="lesson-lede">
+    Most classes you write are mostly boilerplate: store some values, print them,
+    compare them. <code>@dataclass</code> writes that boilerplate for you, so you can
+    spend your lines on the parts that are actually interesting.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Delete boilerplate without losing clarity</span>
+    <span><b>Mission link</b> Less code, same behaviour</span>
+  </div>
+
+  <h2><span class="n">1</span>Boilerplate you have written before</h2>
+
+  <p>
+    Look at how much of this class is just plumbing.
+  </p>
+
+  <pre><code>class Book:
+    def __init__(self, title, copies):
+        self.title = title
+        self.copies = copies
+
+    def __repr__(self):
+        return f"Book(title={self.title!r}, copies={self.copies!r})"
+
+    def __eq__(self, other):
+        if not isinstance(other, Book):
+            return NotImplemented
+        return (self.title, self.copies) == (other.title, other.copies)</code></pre>
+
+  <p>
+    Three methods, and only one line of it is a real decision. The rest is
+    mechanical.
+  </p>
+
+  <div class="note bad">
+    <span class="note-label">The failure</span>
+    Boilerplate is not just noise — it is a place for bugs. Forget one field in
+    <code>__eq__</code> and equality silently becomes wrong.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Let the decorator write it</h2>
+
+  <pre><code>from dataclasses import dataclass
+
+@dataclass
+class Book:
+    title: str
+    copies: int = 0</code></pre>
+
+  <p>
+    That is the whole class. You get <code>__init__</code>, <code>__repr__</code>,
+    and <code>__eq__</code> for free, generated from the field declarations.
+  </p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    A dataclass is a class whose fields are declared as typed attributes. The
+    decorator reads those declarations and generates the boring methods.
+  </div>
+
+  <h2><span class="n">3</span>Mutable defaults and frozen</h2>
+
+  <p>
+    Two details that catch everyone at least once.
+  </p>
+
+  <pre><code>from dataclasses import dataclass, field
+
+@dataclass
+class Shelf:
+    name: str
+    books: list = field(default_factory=list)   # NOT books: list = []
+
+@dataclass(frozen=True)
+class Point:
+    x: int
+    y: int</code></pre>
+
+  <div class="note warn">
+    <span class="note-label">Two gotchas</span>
+    Never use a mutable default like <code>[]</code> — every instance would share the
+    same list. Use <code>field(default_factory=list)</code>. And
+    <code>frozen=True</code> makes the object immutable, which also makes it hashable.
+  </div>
+
+  <div id="fill1"></div>
+
+  <h2><span class="n">4</span>Check yourself</h2>
+
+  <p>
+    Answer from memory. Every option has the same number of words.
+  </p>
+
+  <div id="quiz"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>
+      You can now replace three methods of boilerplate with a decorator and two typed
+      lines, avoid the mutable-default trap, and make immutable value objects with
+      <code>frozen=True</code>. Less code, fewer bugs.
+    </p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+
+  <ol>
+    <li>
+      Rewrite your <code>Book</code> class as a <code>@dataclass</code>.
+    </li>
+    <li>
+      Add a <code>Shelf</code> dataclass with
+      <code>books: list = field(default_factory=list)</code>.
+    </li>
+    <li>
+      Make a <code>Point</code> dataclass with <code>frozen=True</code> and try to
+      change one of its fields. Read the error.
+    </li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Read <a href="https://docs.python.org/3/library/dataclasses.html">The Python
+    Standard Library → dataclasses</a>. Pay attention to
+    <code>field(default_factory=...)</code> and <code>frozen</code>.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask me anything — "dataclass vs plain class?",
+    "what is __post_init__?", "when should I use frozen?". I will adapt the next
+    lesson to your questions.
+  </div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Which methods does @dataclass generate?",
+    a: ["Only the __init__ method", "Init, repr, and eq", "Every dunder method"],
+    c: 1,
+    why: "@dataclass generates __init__, __repr__, and __eq__ from the field declarations — the three you almost always want."
+  });
+
+  TeachWidgets.fill("#fill1", {
+    lines: [
+      "from dataclasses import dataclass, field",
+      "",
+      "@<0>",
+      "class Shelf:",
+      "    name: str",
+      "    books: list = field(<1>=list)"
+    ],
+    blanks: [
+      { a: ["dataclass"], why: "@dataclass reads the field declarations and generates the boilerplate methods." },
+      { a: ["default_factory"], why: "default_factory=list gives each instance its own fresh list instead of sharing one." }
+    ]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What does @dataclass generate?",
+      a: ["Only the __init__ method", "Init, repr, and eq", "Every dunder method", "Only the __repr__ method"],
+      c: 1,
+      why: "It generates __init__, __repr__, and __eq__ from the declared fields."
+    },
+    {
+      q: "Why avoid a list default?",
+      a: ["It runs much slower", "Instances would share it", "It breaks the decorator", "It cannot be typed"],
+      c: 1,
+      why: "A mutable default is created once, so every instance would share the same list."
+    },
+    {
+      q: "What does frozen=True do?",
+      a: ["Makes the object immutable", "Makes the object faster", "Hides all the fields", "Sorts the fields"],
+      c: 0,
+      why: "frozen=True prevents attribute assignment after creation, and makes the object hashable."
+    },
+    {
+      q: "When is a dataclass best?",
+      a: ["When storing plain data", "When behaviour is complex", "When you need inheritance", "When performance is critical"],
+      c: 0,
+      why: "Dataclasses shine for value objects that mostly store data with little custom behaviour."
+    }
+  ]);
+</script>
+</body>
+</html>

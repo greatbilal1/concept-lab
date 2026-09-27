@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 06 — Properties</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="oop" data-lesson="6" data-lesson-id="properties">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 06</span> · Protecting state</span>
+
+  <h1 class="lesson-title">Properties</h1>
+  <p class="lesson-lede">
+    A property lets an attribute <b>look</b> like plain data while actually running
+    code. You get the safety of a method with the clean syntax of
+    <code>book.copies</code>.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Add validation without changing the syntax</span>
+    <span><b>Mission link</b> Clean call sites, safe internals</span>
+  </div>
+
+  <h2><span class="n">1</span>Methods are safe but noisy</h2>
+
+  <p>
+    In the last lesson we protected <code>copies</code> behind methods. Safe — but
+    the call sites got uglier.
+  </p>
+
+  <pre><code>book.get_copies()      # a method call
+book.set_copies(5)     # another method call</code></pre>
+
+  <p>
+    A property gives you the same protection with the syntax you already wanted.
+  </p>
+
+  <pre><code>book.copies            # reads like data
+book.copies = 5        # writes like data</code></pre>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    A property is a method wearing an attribute's clothes. The caller sees data; the
+    class runs code.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The @property decorator</h2>
+
+  <p>
+    Decorate a method with <code>@property</code> and it becomes readable as an
+    attribute. Add a matching setter to make it writable.
+  </p>
+
+  <pre><code>class Book:
+    def __init__(self, title, copies):
+        self.title = title
+        self.copies = copies          # goes through the setter
+
+    @property
+    def copies(self):
+        return self._copies
+
+    @copies.setter
+    def copies(self, value):
+        if value &lt; 0:
+            raise ValueError("copies cannot be negative")
+        self._copies = value</code></pre>
+
+  <div class="note good">
+    <span class="note-label">Why this is elegant</span>
+    The rule lives in one place, but callers write <code>book.copies = 5</code> as if
+    it were a plain attribute. You can add validation later without changing a single
+    call site.
+  </div>
+
+  <h2><span class="n">3</span>Read-only and computed properties</h2>
+
+  <p>
+    A property with no setter is read-only. A property can also compute a value on
+    the fly instead of storing it.
+  </p>
+
+  <pre><code>class Book:
+    @property
+    def is_available(self):           # computed, read-only
+        return self._copies &gt; 0
+
+book.is_available    # True — no parentheses, no stored field</code></pre>
+
+  <div class="note warn">
+    <span class="note-label">Watch out</span>
+    A property should be cheap and side-effect free. If reading it does heavy work or
+    changes state, make it a normal method instead — the name should tell the truth.
+  </div>
+
+  <div id="fill1"></div>
+
+  <h2><span class="n">4</span>Check yourself</h2>
+
+  <p>
+    Answer from memory. Every option has the same number of words.
+  </p>
+
+  <div id="quiz"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>
+      You can now add validation to an attribute without changing how callers use it,
+      and you can expose computed values as clean read-only attributes. Your classes
+      stay safe <em>and</em> pleasant to use.
+    </p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+
+  <ol>
+    <li>
+      Convert your <code>copies</code> attribute into a property with a validating
+      setter.
+    </li>
+    <li>
+      Add a read-only <code>is_available</code> property that computes from
+      <code>_copies</code>.
+    </li>
+    <li>
+      Try <code>book.is_available = False</code> and explain the error you get.
+    </li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Read <a href="https://docs.python.org/3/library/functions.html#property">The
+    Python Standard Library → property</a>. It documents the decorator, the setter,
+    and the deleter.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask me anything — "when is a property overkill?",
+    "can a property be slow?", "how do I make a property deletable?". I will tailor
+    the next lesson to you.
+  </div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What does book.copies = 5 actually run?",
+    a: ["A plain assignment", "The copies setter", "The copies getter"],
+    c: 1,
+    why: "Because copies is a property, the assignment is routed through the setter method — that is where the validation runs."
+  });
+
+  TeachWidgets.fill("#fill1", {
+    lines: [
+      "class Book:",
+      "    @<0>",
+      "    def copies(self):",
+      "        return self._copies",
+      "",
+      "    @copies.<1>",
+      "    def copies(self, value):",
+      "        if value &lt; 0:",
+      "            raise ValueError(\"bad\")",
+      "        self._copies = value"
+    ],
+    blanks: [
+      { a: ["property"], why: "The @property decorator turns the getter method into a readable attribute." },
+      { a: ["setter"], why: "@copies.setter registers the write path for the same property name." }
+    ]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is a property?",
+      a: ["A stored class variable", "A method read as data", "A private attribute name", "A type of decorator"],
+      c: 1,
+      why: "A property is a method that is accessed with attribute syntax — data on the outside, code inside."
+    },
+    {
+      q: "What does @property do?",
+      a: ["Makes a method readable", "Makes a method writable", "Deletes an attribute", "Copies the class"],
+      c: 0,
+      why: "@property makes the decorated method readable as an attribute, without parentheses."
+    },
+    {
+      q: "How do you make it writable?",
+      a: ["Add a second decorator", "Add a matching setter", "Use a private name", "Call it as a method"],
+      c: 1,
+      why: "A matching @name.setter method registers the write path for the property."
+    },
+    {
+      q: "When is a property overkill?",
+      a: ["When rules exist", "When it is plain data", "When it is computed", "When it is read-only"],
+      c: 1,
+      why: "If there are no rules to enforce, a plain attribute is simpler and clearer."
+    }
+  ]);
+</script>
+</body>
+</html>

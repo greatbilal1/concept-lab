@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 01 — What an object actually is</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="oop" data-lesson="1" data-lesson-id="what-an-object-is">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 01</span> · Foundations</span>
+
+  <h1 class="lesson-title">What an object actually is</h1>
+  <p class="lesson-lede">
+    Before classes, before <code>self</code>, before inheritance — there is one idea.
+    An object is <b>data that carries its own behaviour</b>. Get this and everything
+    else in OOP is a variation on it.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Build and use your first object</span>
+    <span><b>Mission link</b> Boundaries that keep a growing project readable</span>
+  </div>
+
+  <h2><span class="n">1</span>The problem with loose data</h2>
+
+  <p>
+    Imagine you are building the project from your mission — say a small library
+    catalogue. You start the obvious way: a dictionary per book.
+  </p>
+
+  <pre><code>book = {
+    "title": "Dune",
+    "author": "Herbert",
+    "copies": 3,
+}
+
+print(book["title"])   # Dune</code></pre>
+
+  <p>
+    This works. But the data and the rules about the data live in different places.
+    Nothing stops this:
+  </p>
+
+  <pre><code>book["copies"] = -5          # a book with negative copies?
+book["titel"] = "Dune"       # typo — silently creates a new key
+print(book["copies"])        # -5, and nobody complained</code></pre>
+
+  <div class="note bad">
+    <span class="note-label">The failure</span>
+    The dictionary has no opinion about what a book <em>is</em>. Any key, any value,
+    any time. As the project grows, every part of the code has to remember the rules
+    — and one part will forget.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>An object bundles data with its rules</h2>
+
+  <p>
+    An <b>object</b> is a bundle of two things that belong together:
+  </p>
+
+  <ul>
+    <li><b>State</b> — the data it remembers (<code>title</code>, <code>author</code>, <code>copies</code>).</li>
+    <li><b>Behaviour</b> — the operations it can perform (<code>borrow()</code>, <code>restock()</code>).</li>
+  </ul>
+
+  <p>
+    The behaviour is the part dictionaries cannot give you. It is where the rules
+    live — right next to the data they protect.
+  </p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    An object is <b>state + behaviour in one unit</b>. The state is what it knows;
+    the behaviour is what it can do. Always picture both together.
+  </div>
+
+  <h2><span class="n">3</span>Your first object</h2>
+
+  <p>
+    Here is the same book, as an object. Read it slowly — every line is doing
+    something specific.
+  </p>
+
+  <pre><code>class Book:
+    def __init__(self, title, author, copies):
+        self.title = title
+        self.author = author
+        self.copies = copies
+
+    def borrow(self):
+        if self.copies &lt;= 0:
+            return "No copies left"
+        self.copies -= 1
+        return f"Borrowed {self.title}"
+
+
+dune = Book("Dune", "Herbert", 3)
+print(dune.borrow())    # Borrowed Dune
+print(dune.copies)      # 2</code></pre>
+
+  <p>Three things just happened, and they are the whole of OOP in miniature:</p>
+
+  <table>
+    <tr><th>Line</th><th>What it does</th></tr>
+    <tr><td><code>class Book:</code></td><td>Defines the <b>blueprint</b> — what every book will have.</td></tr>
+    <tr><td><code>dune = Book(...)</code></td><td>Builds one <b>object</b> from the blueprint.</td></tr>
+    <tr><td><code>dune.borrow()</code></td><td>Calls the object's <b>behaviour</b>, which changes its own <b>state</b>.</td></tr>
+  </table>
+
+  <div class="note good">
+    <span class="note-label">Why this is better</span>
+    The rule "you cannot borrow a book with zero copies" now lives <em>inside</em>
+    <code>borrow()</code>. No caller can bypass it. Change the rule once, and every
+    part of the program obeys.
+  </div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Check yourself</h2>
+
+  <p>
+    Answer from memory — do not scroll back up. Each option has the same number of
+    words, so nothing gives the answer away. You get feedback the moment you click.
+  </p>
+
+  <div id="quiz"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>
+      You can now explain, in your own words, why an object beats a loose dictionary:
+      it keeps the <b>rules</b> next to the <b>data</b>. That single idea is the reason
+      OOP exists, and every later lesson — <code>self</code>, inheritance, composition —
+      is a way of organising that bundle better.
+    </p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+
+  <ol>
+    <li>
+      Open a Python REPL (<code>python3</code> in a terminal) and type the
+      <code>Book</code> class above by hand. Do not copy-paste — typing it is the
+      practice.
+    </li>
+    <li>
+      Add a <code>restock(self, n)</code> method that adds <code>n</code> copies.
+      Call it, then print <code>dune.copies</code>.
+    </li>
+    <li>
+      Break it on purpose: call <code>dune.borrow()</code> four times in a row.
+      What happens on the fourth call? Why is that better than the dictionary
+      silently going negative?
+    </li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Read <a href="https://docs.python.org/3/tutorial/classes.html">The Python Tutorial
+    → Classes</a> (python.org). It is the canonical reference for everything in this
+    lesson. Read the first two sections only — stop when you reach "Scopes and
+    Namespaces".
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher (me) anything — "why does
+    <code>self</code> come first?", "what if I forget <code>__init__</code>?",
+    "show me this with my own project's data". There are no bad questions here, and
+    I can adapt the next lesson to whatever you found confusing.
+  </div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  /* predict-then-reveal */
+  TeachWidgets.predict("#predict1", {
+    q: "You run the second snippet. What does the last line print?",
+    a: ["-5", "3", "an error"],
+    c: 0,
+    why: "The dictionary accepted -5 without complaint. Nothing in the data structure knows a book cannot have negative copies — that is exactly the gap an object fills."
+  });
+
+  /* step-through trace of the Book example */
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "dune = Book(\"Dune\", \"Herbert\", 3)",
+      "dune.borrow()",
+      "    self.copies -= 1",
+      "print(dune.copies)"
+    ],
+    steps: [
+      { line: 0, vars: { dune: "Book(title='Dune', copies=3)" } },
+      { line: 1, vars: { dune: "Book(title='Dune', copies=3)", self: "dune" } },
+      { line: 2, vars: { dune: "Book(title='Dune', copies=2)", self: "dune" } },
+      { line: 3, vars: { dune: "Book(title='Dune', copies=2)" } }
+    ]
+  });
+
+  /* the quiz — every option is exactly three words */
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is an object?",
+      a: ["A running program file", "Data bundled with behaviour", "A named code block", "A list of instructions"],
+      c: 1,
+      why: "An object keeps its state (data) and its behaviour (methods) together in one unit."
+    },
+    {
+      q: "What does a class provide?",
+      a: ["A blueprint for objects", "A finished running object", "A single stored value", "A loop over items"],
+      c: 0,
+      why: "The class describes what every object of that kind will have; the object is one thing built from it."
+    },
+    {
+      q: "Why is an object better here?",
+      a: ["It runs much faster", "It uses less memory", "It keeps rules nearby", "It needs fewer lines"],
+      c: 2,
+      why: "The rule about copies lives inside borrow(), so no caller can bypass it."
+    },
+    {
+      q: "What does self refer to?",
+      a: ["The class itself always", "The object being used", "A global variable name", "The parent class object"],
+      c: 1,
+      why: "self is the particular object the method was called on — it is how a method reaches its own data."
+    }
+  ]);
+</script>
+</body>
+</html>

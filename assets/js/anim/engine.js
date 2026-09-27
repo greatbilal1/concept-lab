@@ -22,6 +22,14 @@
 (function (global) {
   "use strict";
 
+  /* ---------- style handling ----------
+     Numeric style values are treated as pixels, except for the
+     properties below, which are unitless in CSS. */
+  const UNITLESS = {
+    opacity: 1, zIndex: 1, lineHeight: 1, flexGrow: 1, flexShrink: 1,
+    order: 1, zoom: 1, fontWeight: 1, columnCount: 1, tabSize: 1,
+  };
+
   /* ---------- easing ---------- */
   const clamp01 = (x) => (x < 0 ? 0 : x > 1 ? 1 : x);
   const lerp = (a, b, t) => a + (b - a) * t;
@@ -50,6 +58,7 @@
   function createStage(host, scenes, opts) {
     opts = opts || {};
     const duration = opts.duration || 6000; // ms per scene
+    const once = !!opts.once; // play a single pass, then hold the last frame
     const reduce = global.matchMedia
       ? global.matchMedia("(prefers-reduced-motion: reduce)")
       : { matches: false };
@@ -57,6 +66,20 @@
     const layer = document.createElement("div");
     layer.className = "xa-layer";
     host.appendChild(layer);
+
+    // Scenes are authored in a 960x540 space; scale the layer to fit
+    // the host tile so the whole composition stays visible.
+    function fit() {
+      const w = host.clientWidth;
+      if (!w) return;
+      layer.style.setProperty("--xa-scale", w / 960);
+    }
+    fit();
+    if (global.ResizeObserver) {
+      new ResizeObserver(fit).observe(host);
+    } else {
+      global.addEventListener("resize", fit);
+    }
 
     let nodes = new Map(); // key -> DOM node
     let sceneIndex = -1;
@@ -81,10 +104,19 @@
       const s = item.style || {};
       for (const prop in s) {
         const v = s[prop];
-        node.style[prop] = typeof v === "number" ? v + "px" : v;
+        node.style[prop] =
+          typeof v === "number" && !UNITLESS[prop] ? v + "px" : v;
       }
-      if (item.text != null && node.textContent !== item.text) {
-        node.textContent = item.text;
+      // `html` wins over `text` when both are present.
+      if (item.html != null) {
+        if (node.__html !== item.html) {
+          node.innerHTML = item.html;
+          node.__html = item.html;
+        }
+      } else if (item.text != null) {
+        if (node.textContent !== item.text) {
+          node.textContent = item.text;
+        }
       }
       if (item.cls) node.className = "xa " + item.cls;
     }
@@ -123,6 +155,27 @@
       if (!visible) return;
       if (!start) start = now;
       const elapsed = now - start;
+
+      // `once`: run through every scene a single time, then stop on
+      // the final frame instead of looping back to the start.
+      if (once) {
+        const total = duration * scenes.length;
+        if (elapsed >= total) {
+          sceneIndex = scenes.length - 1;
+          draw(1);
+          visible = false;
+          return;
+        }
+        const idx = Math.floor(elapsed / duration);
+        if (idx !== sceneIndex) {
+          sceneIndex = idx;
+          clear();
+        }
+        draw((elapsed % duration) / duration);
+        raf = requestAnimationFrame(tick);
+        return;
+      }
+
       const idx = Math.floor(elapsed / duration) % scenes.length;
       if (idx !== sceneIndex) {
         sceneIndex = idx;
@@ -148,7 +201,13 @@
     if (reduce.matches) {
       sceneIndex = 0;
       draw(0.5);
-      return { play() {}, pause() {}, destroy() { clear(); layer.remove(); } };
+      const still = {
+        play() {},
+        pause() {},
+        destroy() { clear(); layer.remove(); },
+      };
+      host.__xaStage = still;
+      return still;
     }
 
     const io = new IntersectionObserver(
@@ -159,7 +218,7 @@
     );
     io.observe(host);
 
-    return {
+    const handle = {
       play,
       pause,
       destroy() {
@@ -169,6 +228,8 @@
         layer.remove();
       },
     };
+    host.__xaStage = handle;
+    return handle;
   }
 
   global.Explainer = {
