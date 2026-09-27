@@ -299,34 +299,6 @@ main{max-width:1180px;margin:auto;padding:0 20px 90px}
   background:radial-gradient(circle at 30% 20%,#1e2c50,#111a30 70%);
   border-bottom:1px solid var(--border);
 }
-/* Remotion-rendered explainer video layered over the CSS stage.
-   The CSS art stays underneath as an offline / reduced-motion fallback. */
-.concept .stage .stage-video{
-  position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
-  opacity:0;transition:opacity .5s ease;pointer-events:none;z-index:2;
-}
-.concept .stage .stage-video.ready{opacity:1}
-.concept .stage.has-video .grid-lines,
-.concept .stage.has-video .ring,
-.concept .stage.has-video .core,
-.concept .stage.has-video .node,
-.concept .stage.has-video .chip,
-.concept .stage.has-video .link,
-.concept .stage.has-video .mess,
-.concept .stage.has-video .panel,
-.concept .stage.has-video .wire,
-.concept .stage.has-video .blk,
-.concept .stage.has-video .whole,
-.concept .stage.has-video .knob,
-.concept .stage.has-video .track,
-.concept .stage.has-video .readout,
-.concept .stage.has-video .stand,
-.concept .stage.has-video .beam,
-.concept .stage.has-video .pivot,
-.concept .stage.has-video .pan{opacity:0;transition:opacity .5s ease}
-@media(prefers-reduced-motion:reduce){
-  .concept .stage .stage-video{display:none}
-}
 .concept .stage .grid-lines{
   position:absolute;inset:0;opacity:.5;
   background-image:linear-gradient(#ffffff0a 1px,transparent 1px),linear-gradient(90deg,#ffffff0a 1px,transparent 1px);
@@ -524,6 +496,7 @@ footer .small{font-size:.85rem;opacity:.8}
   .reveal,.course{opacity:1!important;transform:none!important}
 }
 </style>
+<link rel="stylesheet" href="explainer.css">
 </head>
 <body>
 
@@ -921,8 +894,7 @@ footer .small{font-size:.85rem;opacity:.8}
   <div class="concepts">
 
     <div class="concept reveal">
-      <div class="stage anim-mental">
-        <video class="stage-video" data-src="videos/MentalModels.mp4" muted loop playsinline preload="none"></video>
+      <div class="stage anim-mental" data-anim="MentalModels">
         <div class="grid-lines"></div>
         <div class="ring"></div>
         <div class="core">🧠</div>
@@ -938,8 +910,7 @@ footer .small{font-size:.85rem;opacity:.8}
     </div>
 
     <div class="concept reveal">
-      <div class="stage anim-state">
-        <video class="stage-video" data-src="videos/StateBehavior.mp4" muted loop playsinline preload="none"></video>
+      <div class="stage anim-state" data-anim="StateBehavior">
         <div class="grid-lines"></div>
         <div class="chip data">balance = 1000</div>
         <div class="link"></div>
@@ -954,8 +925,7 @@ footer .small{font-size:.85rem;opacity:.8}
     </div>
 
     <div class="concept reveal">
-      <div class="stage anim-abstract">
-        <video class="stage-video" data-src="videos/Abstraction.mp4" muted loop playsinline preload="none"></video>
+      <div class="stage anim-abstract" data-anim="Abstraction">
         <div class="grid-lines"></div>
         <div class="mess"><span></span><span></span><span></span><span></span><span></span></div>
         <div class="panel">calculate()</div>
@@ -969,8 +939,7 @@ footer .small{font-size:.85rem;opacity:.8}
     </div>
 
     <div class="concept reveal">
-      <div class="stage anim-compose">
-        <video class="stage-video" data-src="videos/Composition.mp4" muted loop playsinline preload="none"></video>
+      <div class="stage anim-compose" data-anim="Composition">
         <div class="grid-lines"></div>
         <div class="wire w1"></div><div class="wire w2"></div><div class="wire w3"></div><div class="wire w4"></div>
         <div class="blk b1">A</div><div class="blk b2">B</div><div class="blk b3">C</div>
@@ -985,8 +954,7 @@ footer .small{font-size:.85rem;opacity:.8}
     </div>
 
     <div class="concept reveal">
-      <div class="stage anim-experiment">
-        <video class="stage-video" data-src="videos/Experimentation.mp4" muted loop playsinline preload="none"></video>
+      <div class="stage anim-experiment" data-anim="Experimentation">
         <div class="grid-lines"></div>
         <div class="knob k1">↻</div><div class="knob k2">↺</div>
         <div class="track"><div class="fill"></div></div>
@@ -1001,8 +969,7 @@ footer .small{font-size:.85rem;opacity:.8}
     </div>
 
     <div class="concept reveal">
-      <div class="stage anim-trade">
-        <video class="stage-video" data-src="videos/DesignTradeoffs.mp4" muted loop playsinline preload="none"></video>
+      <div class="stage anim-trade" data-anim="DesignTradeoffs">
         <div class="grid-lines"></div>
         <div class="stand"></div>
         <div class="beam"></div>
@@ -1070,38 +1037,22 @@ const io = new IntersectionObserver((entries)=>{
 },{threshold:.12, rootMargin:"0px 0px -40px 0px"});
 document.querySelectorAll(".reveal, .course").forEach(el=>io.observe(el));
 
-/* ---------- Remotion explainer videos ----------
-   Videos are lazy-loaded only when their card scrolls into view, and only
-   when the user has not asked for reduced motion. The CSS art underneath
-   stays visible until the video has actually decoded a frame, so the card
-   never flashes empty. */
-const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-const videoEls = [...document.querySelectorAll(".stage-video")];
-
-if(!reduceMotion && videoEls.length){
-  const vio = new IntersectionObserver((entries)=>{
-    entries.forEach((e)=>{
-      const v = e.target;
-      if(e.isIntersecting){
-        if(!v.src) v.src = v.dataset.src;
-        v.play().catch(()=>{});
-      } else {
-        v.pause();
-      }
-    });
-  },{threshold:.25});
-
-  videoEls.forEach((v)=>{
-    v.addEventListener("loadeddata",()=>{
-      v.classList.add("ready");
-      v.closest(".stage")?.classList.add("has-video");
-    },{once:true});
-    v.addEventListener("error",()=>{
-      // Video missing or unsupported -> keep the CSS animation as fallback.
-      v.remove();
-    },{once:true});
-    vio.observe(v);
+/* ---------- live explainer animations ----------
+   Each concept stage plays a DOM/CSS animation instead of a video file,
+   so the page works offline straight from disk. */
+function startExplainers(){
+  if(!window.Explainer || !window.ExplainerScenes) return;
+  document.querySelectorAll(".concept .stage").forEach((stage)=>{
+    const name = stage.dataset.anim;
+    const scene = window.ExplainerScenes.hub[name];
+    if(!scene) return;
+    window.Explainer.createStage(stage, [scene], {duration:6000});
   });
+}
+if(document.readyState === "loading"){
+  document.addEventListener("DOMContentLoaded", startExplainers);
+} else {
+  startExplainers();
 }
 
 /* ---------- back to top ---------- */
@@ -1136,5 +1087,7 @@ document.querySelectorAll(".stat b").forEach(el=>{
   requestAnimationFrame(tick);
 });
 </script>
+<script src="explainer.js"></script>
+<script src="explainers.js"></script>
 </body>
 </html>

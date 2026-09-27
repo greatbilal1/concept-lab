@@ -10,8 +10,9 @@ account required.
 |---|---|
 | `index.html` | **Concept Lab** — the hub. 32 course cards plus six animated concept explainers. |
 | `oop_interactive_course.html` | **Python OOP** — a 20-section interactive course with syntax-highlighted code, quizzes, and a live experiment lab. |
-| `videos/` | 25 MP4 explainers rendered with Remotion. |
-| `remotion/` | The Remotion project that generates those videos. |
+| `explainer.js` | The animation runtime: a tiny keyed-reconciliation engine that turns a scene function into a live DOM animation. |
+| `explainer.css` | Shared animation primitives (cards, chips, code panels, rings, badges, captions). |
+| `explainers.js` | All 25 scene definitions — 6 hub + 19 course. |
 
 ## The courses
 
@@ -24,50 +25,59 @@ The other 31 are placeholders, ready for content.
 
 ## Animated explainers
 
-Every concept on the site is explained twice: once as CSS art (which works
-with zero dependencies and no network) and once as a short looping video
-rendered with [Remotion](https://www.remotion.dev/).
+Every concept on the site is explained by a short, looping animation that runs
+live in the browser. There are no video files — the animations are plain DOM
+elements styled with CSS, so they work offline straight from disk.
 
 - **6 hub explainers** — mental models, state & behavior, abstraction,
   composition, experimentation, design trade-offs.
 - **19 course explainers** — one per OOP concept section, each teaching the
   specific idea from that section.
 
-The videos are 960×540, 30 fps, 4 seconds, and loop seamlessly.
+Each animation is a 6-second loop that cycles through its scenes seamlessly.
 
-### How the site uses them
+### How it works
 
-Each explainer tile contains a `<video>` layered over the CSS art:
+`explainer.js` exposes `window.Explainer.createStage(host, scenes, opts)`.
+A *scene* is a plain function of normalized time `t ∈ [0, 1)` that returns a
+flat list of elements, each with a stable key `k`:
 
-- **Lazy** — the video `src` is only set once the tile scrolls into view.
-- **Paused off-screen** — an `IntersectionObserver` pauses videos that leave
-  the viewport.
-- **Graceful fallback** — if a video fails to load it removes itself and the
-  CSS animation remains.
-- **Reduced motion** — under `prefers-reduced-motion: reduce` the videos are
-  hidden and the CSS art is shown instead.
-
-> **Note:** browsers block media loaded from `file://` URLs. The CSS art
-> fallback covers that case, but to see the videos serve the folder over
-> HTTP, e.g. `python3 -m http.server`.
-
-## Regenerating the videos
-
-```bash
-cd remotion
-npm install
-npm run render:all     # renders all 25 -> ../videos/*.mp4
-npm run studio         # live preview at localhost:3000
+```js
+function mentalModels(t) {
+  return [
+    el("ring", { left: 380, top: 180, width: 200, height: 200, borderRadius: "50%" }),
+    text("cap", "A model is a simplified map of reality", { bottom: 40 }),
+  ];
+}
 ```
 
-See `remotion/README.md` for the full composition list and design notes.
+On every frame the runtime reconciles the returned list against the DOM:
+
+- A key that already exists keeps its **same DOM node**, so CSS transitions
+  animate it smoothly between frames.
+- A key that disappears is removed; a new key is created.
+- Numbers in `style` are converted to pixels automatically.
+
+This is what makes counting numbers, state flips (✓ allowed → ✕ rejected), and
+before/after comparisons possible — things CSS alone cannot express.
+
+### Behaviour
+
+- **Plays in view** — an `IntersectionObserver` starts the loop when a tile
+  scrolls into view and pauses it when it leaves.
+- **Reduced motion** — under `prefers-reduced-motion: reduce` the runtime
+  draws a single static frame and never starts the loop.
+- **No dependencies** — no frameworks, no build step, no network requests.
+
+> **Note:** because everything is DOM + CSS, the site works when opened
+> directly from `file://` — no local server needed.
 
 ## Design
 
 Both pages share one set of design tokens (dark navy panels, cyan/violet
-accents, Inter for prose and a monospace stack for code). The Remotion
-project mirrors those tokens in `remotion/src/theme.ts` so the videos match
-the page exactly.
+accents, Inter for prose and a monospace stack for code). `explainers.js`
+mirrors those tokens in its `T` palette so the animations match the page
+exactly.
 
 ## License
 
