@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 04 — Default values</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="functions-modular-thinking" data-lesson="4" data-lesson-id="default-values">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 04</span> · Passing</span>
+
+  <h1 class="lesson-title">Default values</h1>
+  <p class="lesson-lede">
+    Most of the time a caller wants the usual behaviour, and only sometimes wants to
+    change it. A default value lets a parameter be optional — and hides one of the
+    nastiest traps in Python.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Write a function with an optional parameter</span>
+    <span><b>Mission link</b> Make the common case easy</span>
+  </div>
+
+  <h2><span class="n">1</span>Make a parameter optional</h2>
+
+  <p>
+    A <b>default value</b> is written in the definition with an equals sign. If the
+    caller supplies that argument, the default is ignored; if they leave it out, the
+    default is used.
+  </p>
+
+  <pre><code>def greet(name, greeting="Hello"):
+    print(greeting + ", " + name)
+
+greet("Ada")                 # Hello, Ada
+greet("Ada", "Good morning") # Good morning, Ada</code></pre>
+
+  <p>
+    The common case — a plain hello — needs no second argument. The unusual case
+    still works. That is the whole point of a default: it makes the frequent call
+    short without removing the option.
+  </p>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Order matters</h2>
+
+  <p>
+    A parameter with a default must come <b>after</b> every parameter without one.
+    Python needs to know which arguments are required before it can match the
+    optional ones.
+  </p>
+
+  <pre><code>def greet(greeting="Hello", name):   # SyntaxError
+    ...
+
+def greet(name, greeting="Hello"):   # fine
+    ...</code></pre>
+
+  <p>
+    Read the rule as: required first, optional last. It matches how you read a call
+    — the values you must give come first.
+  </p>
+
+  <div id="diagram1"></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">3</span>The mutable default trap</h2>
+
+  <p>
+    Here is the trap. A default value is evaluated <b>once</b>, when the definition
+    runs — not on every call. If that default is a mutable object like a list, every
+    call shares the <b>same</b> list.
+  </p>
+
+  <pre><code>def add_item(item, basket=[]):   # the trap
+    basket.append(item)
+    return basket
+
+add_item("apple")   # ['apple']
+add_item("pear")    # ['apple', 'pear']  — not ['pear']!</code></pre>
+
+  <p>
+    The second call did not start with an empty basket. It started with the basket
+    the first call left behind, because there is only one basket. The fix is to use
+    <code>None</code> as the default and build a fresh list inside the body.
+  </p>
+
+  <pre><code>def add_item(item, basket=None):
+    if basket is None:
+        basket = []
+    basket.append(item)
+    return basket</code></pre>
+
+  <div class="note warn">
+    <span class="note-label">Watch out</span>
+    Never use a list, dict or set as a default value. Use <code>None</code> and
+    create the object inside the body. The default is created once; the body runs
+    every call.
+  </div>
+
+  <div id="intro1"></div>
+
+  <h2><span class="n">4</span>Make it optional</h2>
+
+  <p>
+    Here is the win for today. The lab below has an optional parameter. Call it with
+    and without the second argument, then try the mutable-default trap for yourself.
+  </p>
+
+  <div id="lab1"></div>
+
+  <div id="fill1"></div>
+
+  <h2><span class="n">5</span>Check yourself</h2>
+
+  <p>
+    Answer from memory — do not scroll back up. Each option has the same number of
+    words, so nothing gives the answer away.
+  </p>
+
+  <div id="quiz"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>
+      You can now make a parameter optional, and you know the one rule that keeps
+      defaults safe: they are created once, so they must never be mutable. That rule
+      will save you from a bug that is famously hard to find, because the function
+      looks completely innocent.
+    </p>
+  </div>
+
+  <h2><span class="n">6</span>Do this next</h2>
+
+  <ol>
+    <li>
+      Write a function <code>power(base, exponent=2)</code> that returns the base
+      raised to the exponent, and call it with one and two arguments.
+    </li>
+    <li>
+      Write the buggy <code>add_item</code> above, call it twice, and print the
+      result each time. Watch the list grow.
+    </li>
+    <li>
+      Fix it with the <code>None</code> pattern, and confirm the second call now
+      starts empty.
+    </li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Read <a href="https://docs.python.org/3/reference/compound_stmts.html#function-definitions">Python — Compound Statements: Function definitions</a>.
+    Look for the "Important warning" about default values — it is the trap in this
+    lesson, in the official words.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher (me) anything — "why is the default
+    created once?", "can a default be another function?", "what does None mean
+    here?". There are no bad questions here.
+  </div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  /* predict-then-reveal */
+  TeachWidgets.predict("#predict1", {
+    q: "When is a default value created?",
+    a: ["Once, at the definition", "Every time it is called", "Only when it is used", "When the file is saved"],
+    c: 0,
+    why: "The default is evaluated once when the def line runs, which is why a mutable default is shared across calls."
+  });
+
+  /* required before optional */
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      { title: "required", lines: ["name"] },
+      { title: "then", lines: ["optional"] },
+      { title: "optional", lines: ["greeting=\"Hello\""] },
+      { title: "rule", lines: ["required first"] }
+    ]
+  });
+
+  /* step through the default being used */
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "def greet(name, greeting=\"Hello\"):",
+      "    print(greeting + \", \" + name)",
+      "greet(\"Ada\")",
+      "greet(\"Ada\", \"Hi\")"
+    ],
+    steps: [
+      { line: 0, vars: { action: "define greet" } },
+      { line: 2, vars: { name: "\"Ada\"", greeting: "\"Hello\"", action: "default used" } },
+      { line: 1, vars: { printed: "Hello, Ada" } },
+      { line: 3, vars: { name: "\"Ada\"", greeting: "\"Hi\"", action: "default ignored" } },
+      { line: 1, vars: { printed: "Hi, Ada" } }
+    ]
+  });
+
+  /* three things defaults give you */
+  TeachWidgets.introCards("#intro1", {
+    cards: [
+      { ico: "✅", title: "Optional", body: "The caller may leave the argument out and still get a sensible result." },
+      { ico: "📏", title: "Required first", body: "A defaulted parameter must come after every required one." },
+      { ico: "⚠️", title: "Created once", body: "A mutable default is shared by every call — use None instead." }
+    ]
+  });
+
+  /* the tiny interpreter */
+  TeachWidgets.lab("#lab1", {
+    label: "Run it — call with and without the second argument",
+    starter: "def greet(name, greeting=\"Hello\"):\n    print(greeting + \", \" + name)\n\ngreet(\"Ada\")\ngreet(\"Ada\", \"Good morning\")"
+  });
+
+  /* recall from memory */
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the default",
+    lines: [
+      "A default value is written with an <0> sign",
+      "A defaulted parameter must come <1> the required ones",
+      "A mutable default is created <2>, not per call"
+    ],
+    blanks: [
+      { a: ["equals"], why: "The default is written as name=value in the definition." },
+      { a: ["after"], why: "Required parameters must come first; optional ones follow." },
+      { a: ["once"], why: "The default is evaluated once at definition time, so a list default is shared." }
+    ]
+  });
+
+  /* the quiz — every option is exactly four words */
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "When is a default used?",
+      a: ["When the argument is missing", "When the argument is None", "When the body is empty", "When the call is first"],
+      c: 0,
+      why: "The default applies only when the caller does not supply that argument."
+    },
+    {
+      q: "Where must a default go?",
+      a: ["After every required parameter", "Before every required parameter", "Anywhere in the list", "Only at the very end"],
+      c: 0,
+      why: "A defaulted parameter must come after all parameters without defaults."
+    },
+    {
+      q: "Why is a list default dangerous?",
+      a: ["It is created only once", "It is created every call", "It cannot be changed", "It copies itself each time"],
+      c: 0,
+      why: "The default is evaluated once, so every call shares the same list."
+    },
+    {
+      q: "What is the safe pattern?",
+      a: ["Default to None, build inside", "Default to an empty list", "Never use any defaults", "Always pass every argument"],
+      c: 0,
+      why: "Default to None and create the mutable object inside the body, so each call gets a fresh one."
+    }
+  ]);
+</script>
+</body>
+</html>

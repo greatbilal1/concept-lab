@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Functions &amp; Modular Thinking Cheat Sheet — Reference</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+<style>
+  .ref-toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0 8px; }
+  .ref-toc a { font-size: .8rem; border: 1px solid var(--border); background: #111a30; padding: 5px 11px; border-radius: 999px; color: var(--muted); text-decoration: none; border-bottom: 1px solid var(--border); }
+  .ref-toc a:hover { color: #fff; border-color: #3d5488; }
+  .lesson-wrap h2 { scroll-margin-top: 20px; }
+  .snippet { margin: 14px 0 22px; }
+  .snippet .lbl { font-size: .72rem; font-weight: 800; letter-spacing: .7px; text-transform: uppercase; color: var(--accent2); margin-bottom: 6px; }
+  .see { font-size: .82rem; color: var(--muted); margin: -6px 0 12px; }
+  .see a { color: var(--accent2); border-bottom: 0; }
+  .see a:hover { color: #fff; }
+  /* room for the copy button so it never sits on the first line of code */
+  .snippet pre { padding-top: 34px; }
+  @media print { .snippet pre { padding-top: 18px; } }
+</style>
+</head>
+<body class="lesson-body" data-course="functions-modular-thinking">
+
+<div class="lesson-wrap">
+
+  <span class="lesson-kicker">Reference · Cheat sheet</span>
+  <h1 class="lesson-title">Functions &amp; Modular Thinking Cheat Sheet</h1>
+  <p class="lesson-lede">
+    The facts you will reach for every day, compressed. Print this, or keep it open
+    beside your editor. Every snippet is runnable Python 3.
+  </p>
+
+  <div class="ref-toc">
+    <a href="#define">Defining</a>
+    <a href="#call">Calling</a>
+    <a href="#params">Parameters</a>
+    <a href="#defaults">Defaults</a>
+    <a href="#return">Return</a>
+    <a href="#none">None</a>
+    <a href="#stack">Call stack</a>
+    <a href="#scope">Scope</a>
+    <a href="#contract">Contracts</a>
+    <a href="#split">Splitting</a>
+  </div>
+
+  <h2 id="define"><span class="n">1</span>Defining</h2>
+  <p class="see">See <a href="../lessons/0001-naming-a-block-of-work.html">Lesson 01 — Naming a block of work</a></p>
+  <div class="snippet">
+    <div class="lbl">A definition gives a block of work a name</div>
+    <pre><code>def greet():
+    print("Hello")
+
+# def creates the function; it does not run it
+# the body runs only when the function is called</code></pre>
+  </div>
+
+  <h2 id="call"><span class="n">2</span>Calling</h2>
+  <p class="see">See <a href="../lessons/0002-calling-a-function.html">Lesson 02 — Calling a function</a></p>
+  <div class="snippet">
+    <div class="lbl">A call runs the body, then comes back</div>
+    <pre><code>def greet():
+    print("Hello")
+
+greet()      # runs the body once
+greet()      # runs it again — a call is repeatable
+
+# the call site is where the name is used with ()</code></pre>
+  </div>
+
+  <h2 id="params"><span class="n">3</span>Parameters</h2>
+  <p class="see">See <a href="../lessons/0003-parameters-and-arguments.html">Lesson 03 — Parameters and arguments</a></p>
+  <div class="snippet">
+    <div class="lbl">One body, many values</div>
+    <pre><code>def greet(name, greeting):
+    print(greeting + ", " + name)
+
+greet("Ada", "Hello")            # positional
+greet(greeting="Hi", name="Ada") # keyword
+
+# parameter = the name in the def
+# argument  = the value in the call</code></pre>
+  </div>
+
+  <h2 id="defaults"><span class="n">4</span>Defaults</h2>
+  <p class="see">See <a href="../lessons/0004-default-values.html">Lesson 04 — Default values</a></p>
+  <div class="snippet">
+    <div class="lbl">Optional parameters — and the mutable trap</div>
+    <pre><code>def greet(name, greeting="Hello"):
+    print(greeting + ", " + name)
+
+greet("Ada")            # Hello, Ada
+greet("Ada", "Hi")      # Hi, Ada
+
+# required parameters must come first
+# NEVER default to a list, dict or set:
+def add(item, basket=None):   # the safe pattern
+    if basket is None:
+        basket = []
+    basket.append(item)
+    return basket</code></pre>
+  </div>
+
+  <h2 id="return"><span class="n">5</span>Return</h2>
+  <p class="see">See <a href="../lessons/0005-returning-a-value.html">Lesson 05 — Returning a value</a></p>
+  <div class="snippet">
+    <div class="lbl">Hand a value back to the call</div>
+    <pre><code>def add(a, b):
+    return a + b
+
+total = add(2, 3)        # total is 5
+print(add(2, 3) * 10)    # 50 — the result is usable
+
+# return also stops the function immediately
+# print shows a value; return hands it to the program</code></pre>
+  </div>
+
+  <h2 id="none"><span class="n">6</span>None</h2>
+  <p class="see">See <a href="../lessons/0006-multiple-returns-and-none.html">Lesson 06 — Multiple returns and None</a></p>
+  <div class="snippet">
+    <div class="lbl">Several exits, and the implicit None</div>
+    <pre><code>def sign(n):
+    if n &gt; 0: return "positive"
+    if n &lt; 0: return "negative"
+    return "zero"        # every path should return
+
+def show(x):
+    print(x)             # no return
+
+show(5)                  # prints 5
+print(show(5))           # None — the implicit return</code></pre>
+  </div>
+
+  <h2 id="stack"><span class="n">7</span>Call stack</h2>
+  <p class="see">See <a href="../lessons/0007-the-call-stack.html">Lesson 07 — The call stack</a></p>
+  <div class="snippet">
+    <div class="lbl">Paused calls, and reading a traceback</div>
+    <pre><code>def double(n): return n * 2
+def quad(n):   return double(double(n))
+
+quad(3)   # stack: <module> > quad > double > double
+
+# Traceback (most recent call last):
+#   File "app.py", line 8, in &lt;module&gt;
+#   File "app.py", line 5, in quad
+#   File "app.py", line 2, in double
+# TypeError: ...
+# read it bottom-up — the last frame is the failure</code></pre>
+  </div>
+
+  <h2 id="scope"><span class="n">8</span>Scope</h2>
+  <p class="see">See <a href="../lessons/0008-scope-local-and-global.html">Lesson 08 — Scope: local and global</a></p>
+  <div class="snippet">
+    <div class="lbl">Local names, global names, shadowing</div>
+    <pre><code>count = 0            # global
+
+def bump():
+    count = 1        # local — shadows the global
+    print(count)     # 1
+
+bump()
+print(count)         # 0 — the global is untouched
+
+# an assignment anywhere makes the name local
+# everywhere in that body → UnboundLocalError
+# prefer passing in and returning out over global</code></pre>
+  </div>
+
+  <h2 id="contract"><span class="n">9</span>Contracts</h2>
+  <p class="see">See <a href="../lessons/0009-contracts-docstrings-hints.html">Lesson 09 — Contracts: docstrings and hints</a></p>
+  <div class="snippet">
+    <div class="lbl">Docstring and type hints</div>
+    <pre><code>def area(width: float, height: float) -&gt; float:
+    """Return the area of a rectangle.
+
+    width and height are positive numbers in metres.
+    """
+    return width * height
+
+# docstring = what it does, in words
+# hints     = expected types in and out
+# hints are not enforced at runtime</code></pre>
+  </div>
+
+  <h2 id="split"><span class="n">10</span>Splitting</h2>
+  <p class="see">See <a href="../lessons/0010-splitting-a-program.html">Lesson 10 — Splitting a program</a></p>
+  <div class="snippet">
+    <div class="lbl">One job per function</div>
+    <pre><code>def average(numbers):
+    """Return the mean of a list of numbers."""
+    return sum(numbers) / len(numbers)
+
+def result(avg):
+    """Return 'pass' or 'fail' for an average."""
+    return "pass" if avg &gt;= 70 else "fail"
+
+def report(scores):
+    """Print a report for a list of scores."""
+    avg = average(scores)
+    print("Scores:", scores)
+    print("Average:", avg)
+    print("Result:", result(avg))
+
+report([88, 92, 79, 95, 61])
+
+# split by job, not by line count
+# if you cannot describe it without "and", split it</code></pre>
+  </div>
+
+  <div class="lesson-foot">
+    <div class="links">
+      <a href="functions-modular-thinking-glossary.html">📖 Glossary</a>
+      <a href="../lessons/0001-naming-a-block-of-work.html">📘 Lesson 01</a>
+      <a href="../lessons/0010-splitting-a-program.html">🏷️ Lesson 10</a>
+      <a href="../course.html">🗺️ All lessons</a>
+      <a href="../../../index.html">🏠 Home</a>
+    </div>
+    <span style="color:var(--muted);font-size:.8rem">Reference · print-friendly</span>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/course-runtime.js"></script>
+</body>
+</html>

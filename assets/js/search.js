@@ -5,7 +5,6 @@
 
      window.COURSES   (data/courses.js)
      window.GLOSSARY  (data/glossary.js)
-     window.CONCEPTS  (data/concepts.js)
 
    It builds a flat index once, then filters it as the user types.
    No network, no libraries, works from file://.
@@ -67,10 +66,6 @@
         ? (hrefOf(g.course) + (g.section ? "#" + g.section : ""))
         : "glossary.html";
       addEntry("Glossary", g.term, g.short || g.def || "", href, g.def || g.short || "");
-    });
-
-    (global.CONCEPTS || []).forEach(function (c) {
-      addEntry("Concept", c.title, c.body || "", c.link || "#concepts", c.body || "");
     });
   }
 

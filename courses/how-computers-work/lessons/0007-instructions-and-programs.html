@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 07 — Instructions and programs</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="how-computers-work" data-lesson="7" data-lesson-id="instructions-and-programs">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 07</span> · The machine</span>
+
+  <h1 class="lesson-title">Instructions and programs</h1>
+  <p class="lesson-lede">
+    The CPU reads numbers and treats them as commands. This lesson is about that
+    encoding — how a number becomes "add these two things", and how a list of those
+    numbers becomes a program.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~12 min</span>
+    <span><b>Win</b> Decode a four-instruction program</span>
+    <span><b>Mission link</b> How source text becomes commands</span>
+  </div>
+
+  <h2><span class="n">1</span>An instruction is just a number</h2>
+
+  <p>
+    The CPU has no concept of "ADD". It has a table of operations, and each one is
+    identified by a number — an <b>opcode</b>. The instruction is that number, plus
+    the operands it needs.
+  </p>
+
+  <pre><code>opcode  operation
+0x01    LOAD   R, address
+0x02    STORE  address, R
+0x03    ADD    R1, R2
+0x04    JUMP   address
+0x05    HALT</code></pre>
+
+  <p>
+    That table is the <b>instruction set</b>. It is the contract between the hardware
+    and every program that will ever run on it. Different CPU families have different
+    tables — that is what "x86" and "ARM" mean.
+  </p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    A program is a list of numbers in memory. The CPU does not distinguish code from
+    data — it just reads numbers and, if the PC points at them, treats them as
+    commands.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Machine code and assembly</h2>
+
+  <p>
+    The raw numbers are <b>machine code</b>. Nobody writes machine code by hand, so we
+    invented <b>assembly language</b> — the same instructions, spelled with short
+    readable names. An assembler translates one into the other, one line at a time.
+  </p>
+
+  <div id="diagram1"></div>
+
+  <p>
+    This is a one-to-one mapping. One assembly line becomes one machine instruction.
+    That is what makes assembly "low level": you are still thinking in the CPU's
+    terms, just with better spelling.
+  </p>
+
+  <div id="intro1"></div>
+
+  <h2><span class="n">3</span>Decode a program</h2>
+
+  <p>
+    Here is a tiny program. Read it line by line and work out what it does before you
+    look at the trace:
+  </p>
+
+  <pre><code>0x00  LOAD  R1, 0x10     ; R1 = memory[0x10]
+0x01  LOAD  R2, 0x11     ; R2 = memory[0x11]
+0x02  ADD   R1, R2       ; R1 = R1 + R2
+0x03  STORE 0x12, R1     ; memory[0x12] = R1
+0x04  HALT</code></pre>
+
+  <p>
+    It loads two numbers, adds them, stores the result, and stops. That is a complete
+    program — five instructions, and it does real work.
+  </p>
+
+  <div id="trace1"></div>
+
+  <div class="note good">
+    <span class="note-label">This is the whole idea</span>
+    Every program you have ever run — a browser, a game, a compiler — is a list like
+    this, just enormously longer. The structure never changes: load, compute, store,
+    branch, repeat.
+  </div>
+
+  <h2><span class="n">4</span>Decode it yourself</h2>
+
+  <p>
+    Here is the win. Given this program and starting state, work out the final value
+    of <code>R1</code>:
+  </p>
+
+  <pre><code>memory[0x10] = 9
+memory[0x11] = 4
+
+0x00  LOAD  R1, 0x10
+0x01  LOAD  R2, 0x11
+0x02  ADD   R1, R2
+0x03  HALT</code></pre>
+
+  <p>
+    <code>R1</code> becomes 9, then <code>R2</code> becomes 4, then <code>R1</code>
+    becomes <code>9 + 4 = 13</code>. Final answer: <code>R1 = 13</code>. You just
+    executed a program by reading it.
+  </p>
+
+  <div id="fill1"></div>
+
+  <h2><span class="n">5</span>Check yourself</h2>
+
+  <p>
+    Answer from memory — do not scroll back up. Each option has the same number of
+    words, so nothing gives the answer away.
+  </p>
+
+  <div id="quiz"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>
+      You can now read a small program in assembly, explain what an opcode is, and
+      trace a program's effect on registers and memory. You have crossed from "the CPU
+      runs instructions" to "I can read the instructions" — and that is the skill that
+      makes everything below your code visible.
+    </p>
+  </div>
+
+  <h2><span class="n">6</span>Do this next</h2>
+
+  <ol>
+    <li>
+      Write a four-instruction program that computes <code>memory[0x20] -
+      memory[0x21]</code> and stores it at <code>0x22</code>. You will need a SUB
+      opcode.
+    </li>
+    <li>
+      Explain why the CPU cannot tell code from data. What does that imply about
+      where a program's instructions live?
+    </li>
+    <li>
+      Look up the assembly for a language you know. Find one line of your own code
+      and see how many instructions it becomes.
+    </li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Read <a href="https://www.charlespetzold.com/code/">_Code_ by Charles Petzold</a>,
+    Chapter 22 ("The Operating System") and Chapter 24 ("The Arithmetic Logic Unit").
+    For real instruction encodings, see the
+    <a href="https://www.intel.com/content/www/us/en/developer/articles/technical/intel-sdm.html">Intel
+    Software Developer's Manual, Volume 1</a>, Chapter 3.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher (me) anything — "what is a register
+    file?", "how does a function call work?", "what is RISC versus CISC?". There are
+    no bad questions here.
+  </div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  /* machine code to assembly */
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      { title: "Assembly", lines: ["ADD R1, R2", "readable spelling"] },
+      { title: "Assembler", lines: ["one line in", "one number out"] },
+      { title: "Machine code", lines: ["0x03 0x01 0x02", "what the CPU reads"] }
+    ]
+  });
+
+  /* what a program is made of */
+  TeachWidgets.introCards("#intro1", {
+    cards: [
+      { ico: "🔢", title: "Opcode", body: "A number identifying which operation to perform." },
+      { ico: "📦", title: "Operands", body: "The registers or addresses the operation acts on." },
+      { ico: "📜", title: "Program", body: "A list of encoded instructions sitting in memory." }
+    ]
+  });
+
+  /* predict-then-reveal */
+  TeachWidgets.predict("#predict1", {
+    q: "How does the CPU know which operation to perform?",
+    a: ["From the clock", "From the opcode", "From the register"],
+    c: 1,
+    why: "The opcode is a number that indexes the instruction set. The control unit decodes it and switches the right circuits on."
+  });
+
+  /* step-through trace of a program */
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "LOAD  R1, 0x10",
+      "LOAD  R2, 0x11",
+      "ADD   R1, R2",
+      "STORE 0x12, R1"
+    ],
+    steps: [
+      { line: 0, vars: { R1: "9", R2: "-", mem10: "9" } },
+      { line: 1, vars: { R1: "9", R2: "4" } },
+      { line: 2, vars: { R1: "13", R2: "4" } },
+      { line: 3, vars: { mem12: "13", R1: "13" } }
+    ]
+  });
+
+  /* recall from memory: instruction basics */
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the blanks",
+    lines: [
+      "The number identifying an operation is the <0>.",
+      "Readable instruction names are called <1> language.",
+      "The table of all operations is the instruction <2>."
+    ],
+    blanks: [
+      { a: ["opcode"], why: "The opcode is the numeric code for one operation." },
+      { a: ["assembly"], why: "Assembly is machine code spelled with short readable names." },
+      { a: ["set"], why: "The instruction set is the CPU's full vocabulary of operations." }
+    ]
+  });
+
+  /* the quiz — every option is exactly three words */
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is an opcode?",
+      a: ["A number naming an operation", "A register holding data", "A memory address value", "A type of clock signal"],
+      c: 0,
+      why: "The opcode is the numeric identifier the CPU decodes to pick an operation."
+    },
+    {
+      q: "What is assembly language?",
+      a: ["A readable machine code", "A kind of high level", "A memory addressing mode", "A hardware description format"],
+      c: 0,
+      why: "Assembly is machine code with readable names — one line per instruction."
+    },
+    {
+      q: "What is a program?",
+      a: ["A list of instructions", "A single large number", "A set of registers", "A type of memory chip"],
+      c: 0,
+      why: "A program is encoded instructions stored in memory, read one at a time."
+    },
+    {
+      q: "What does LOAD do?",
+      a: ["Copies memory into a register", "Writes a register to memory", "Adds two register values", "Jumps to another address"],
+      c: 0,
+      why: "LOAD reads a value from memory into a register so the CPU can use it."
+    }
+  ]);
+</script>
+</body>
+</html>

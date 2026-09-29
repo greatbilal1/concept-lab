@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 11 — From source to running</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="how-computers-work" data-lesson="11" data-lesson-id="from-source-to-running">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 11</span> · Data</span>
+
+  <h1 class="lesson-title">From source to running</h1>
+  <p class="lesson-lede">
+    You write <code>print("hi")</code>. A moment later, something happens. This lesson
+    fills in the gap — the pipeline that turns text you can read into instructions the
+    CPU can execute.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~12 min</span>
+    <span><b>Win</b> Trace a line through the pipeline</span>
+    <span><b>Mission link</b> Where your code actually goes</span>
+  </div>
+
+  <h2><span class="n">1</span>The gap to close</h2>
+
+  <p>
+    The CPU executes machine code — numbers, from lesson seven. You write Python,
+    JavaScript, C or Rust. Something has to translate. That something is either a
+    <b>compiler</b> or an <b>interpreter</b>, and the difference matters.
+  </p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    A <b>compiler</b> translates the whole program ahead of time into machine code. An
+    <b>interpreter</b> reads and executes the program as it goes. Both end up doing
+    the same work; they differ in <em>when</em>.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Two strategies</h2>
+
+  <div id="intro1"></div>
+
+  <p>
+    Compilation is a pipeline of stages, each one transforming the program into
+    something closer to machine code:
+  </p>
+
+  <pre><code>source text
+   ↓  lexer      split into tokens
+tokens
+   ↓  parser     build a syntax tree
+tree
+   ↓  optimiser  simplify and speed up
+tree
+   ↓  codegen    emit machine instructions
+machine code</code></pre>
+
+  <p>
+    Each stage is a program in its own right. The lexer does not know what the program
+    means; the parser does not know what the CPU is. Each one just transforms its
+    input into a more structured form.
+  </p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>The hybrid: bytecode</h2>
+
+  <p>
+    Python and JavaScript take a middle path. They compile your source to
+    <b>bytecode</b> — a compact instruction set for a <b>virtual machine</b>, not for
+    real hardware — and then interpret that.
+  </p>
+
+  <pre><code>source  →  bytecode  →  virtual machine  →  real CPU
+  (you)     (compiler)     (interpreter)      (hardware)</code></pre>
+
+  <p>
+    This buys portability: the same bytecode runs anywhere the virtual machine runs.
+    It costs speed, because the virtual machine is another layer of interpretation —
+    which is why hot loops get compiled to real machine code at runtime.
+  </p>
+
+  <div id="trace1"></div>
+
+  <div class="note good">
+    <span class="note-label">The unifying view</span>
+    Every language is somewhere on a spectrum from "translated fully before running"
+    to "translated line by line while running". The CPU at the bottom only ever sees
+    machine code. Everything above is translation.
+  </div>
+
+  <h2><span class="n">4</span>Trace a line</h2>
+
+  <p>
+    Here is the win. Follow this single line all the way down:
+  </p>
+
+  <pre><code>x = 2 + 3</code></pre>
+
+  <p>
+    The lexer splits it into <code>x</code>, <code>=</code>, <code>2</code>,
+    <code>+</code>, <code>3</code>. The parser builds a tree: assign to
+    <code>x</code> the result of adding <code>2</code> and <code>3</code>. The
+    optimiser may fold it to <code>x = 5</code>. Codegen emits a load, a load, an add,
+    a store. The CPU then runs those four instructions — exactly the kind of program
+    you decoded in lesson seven.
+  </p>
+
+  <div id="fill1"></div>
+
+  <h2><span class="n">5</span>Check yourself</h2>
+
+  <p>
+    Answer from memory — do not scroll back up. Each option has the same number of
+    words, so nothing gives the answer away.
+  </p>
+
+  <div id="quiz"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>
+      You can now describe the full path from source text to a running instruction,
+      explain the difference between compiling and interpreting, and place bytecode
+      and virtual machines on that spectrum. The gap between "I wrote code" and "the
+      CPU ran it" is now filled in.
+    </p>
+  </div>
+
+  <h2><span class="n">6</span>Do this next</h2>
+
+  <ol>
+    <li>
+      Write down the four compiler stages in order, from source text to machine code.
+      Do it from memory.
+    </li>
+    <li>
+      Explain why Python is slower than C for the same loop. Your answer should
+      mention the virtual machine.
+    </li>
+    <li>
+      Find out whether your favourite language compiles, interprets, or does both.
+      Most modern ones do both.
+    </li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Read <a href="https://csapp.cs.cmu.edu/">_CS:APP_ Chapter 1</a> for the
+    compilation pipeline, and the
+    <a href="https://docs.python.org/3/library/dis.html">Python <code>dis</code>
+    module docs</a> to see real bytecode. Run <code>dis.dis(lambda: 2 + 3)</code> and
+    read the output.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher (me) anything — "what is a JIT
+    compiler?", "what is an AST?", "why is C fast?". There are no bad questions here.
+  </div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  /* the compiler pipeline */
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      { title: "Lexer", lines: ["text into tokens", "no meaning yet"] },
+      { title: "Parser", lines: ["tokens into a tree", "structure appears"] },
+      { title: "Optimiser", lines: ["simplify the tree", "make it faster"] },
+      { title: "Codegen", lines: ["tree into machine code", "the CPU can run it"] }
+    ]
+  });
+
+  /* two strategies */
+  TeachWidgets.introCards("#intro1", {
+    cards: [
+      { ico: "🏗️", title: "Compiler", body: "Translates everything ahead of time into machine code." },
+      { ico: "🎙️", title: "Interpreter", body: "Reads and executes the program as it goes along." },
+      { ico: "🧩", title: "Hybrid", body: "Compiles to bytecode, then interprets that at runtime." }
+    ]
+  });
+
+  /* predict-then-reveal */
+  TeachWidgets.predict("#predict1", {
+    q: "What does a compiler produce?",
+    a: ["Machine code", "Source text", "A memory address"],
+    c: 0,
+    why: "A compiler translates source into machine code ahead of time, so the CPU can run it directly."
+  });
+
+  /* step-through trace of the pipeline */
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "source:  x = 2 + 3",
+      "tokens:  x = 2 + 3",
+      "tree:    assign(x, add(2, 3))",
+      "codegen: load, load, add, store"
+    ],
+    steps: [
+      { line: 0, vars: { source: "x = 2 + 3" } },
+      { line: 1, vars: { tokens: "x, =, 2, +, 3" } },
+      { line: 2, vars: { tree: "assign(x, add(2, 3))" } },
+      { line: 3, vars: { instructions: "LOAD, LOAD, ADD, STORE" } }
+    ]
+  });
+
+  /* recall from memory: the pipeline */
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the stages",
+    lines: [
+      "The <0> turns source text into tokens.",
+      "The <1> builds a syntax tree.",
+      "Python compiles to <2> before interpreting it."
+    ],
+    blanks: [
+      { a: ["lexer", "lexer/tokenizer"], why: "The lexer splits raw text into meaningful tokens." },
+      { a: ["parser"], why: "The parser arranges tokens into a tree reflecting the program's structure." },
+      { a: ["bytecode"], why: "Python compiles to bytecode for its virtual machine, then interprets that." }
+    ]
+  });
+
+  /* the quiz — every option is exactly three words */
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is a compiler?",
+      a: ["A translator to machine code", "A type of memory chip", "A debugging tool", "A kind of interpreter"],
+      c: 0,
+      why: "A compiler translates a whole program into machine code ahead of time."
+    },
+    {
+      q: "What is an interpreter?",
+      a: ["It executes while reading", "It stores compiled output", "It manages memory allocation", "It optimises the source"],
+      c: 0,
+      why: "An interpreter reads and executes the program as it goes, line by line."
+    },
+    {
+      q: "What is bytecode?",
+      a: ["Instructions for a virtual machine", "A type of machine code", "A compressed source file", "A memory addressing scheme"],
+      c: 0,
+      why: "Bytecode targets a virtual machine, not real hardware, which buys portability."
+    },
+    {
+      q: "What does the parser do?",
+      a: ["Builds a syntax tree", "Splits text into tokens", "Emits machine instructions", "Runs the program"],
+      c: 0,
+      why: "The parser arranges tokens into a tree that reflects the program's structure."
+    }
+  ]);
+</script>
+</body>
+</html>

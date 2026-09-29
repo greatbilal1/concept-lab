@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 07 — The call stack</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="functions-modular-thinking" data-lesson="7" data-lesson-id="the-call-stack">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 07</span> · Scope &amp; the stack</span>
+
+  <h1 class="lesson-title">The call stack</h1>
+  <p class="lesson-lede">
+    When one function calls another, the first is not finished — it is paused,
+    waiting. The call stack is the record of all those paused calls, and reading it
+    is how you find the line that actually failed.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Read a traceback to the failing line</span>
+    <span><b>Mission link</b> Find the real bug</span>
+  </div>
+
+  <h2><span class="n">1</span>Functions calling functions</h2>
+
+  <p>
+    A function body can call another function. When it does, the first call is not
+    over — it is <b>suspended</b> at the call line, waiting for the inner call to
+    finish.
+  </p>
+
+  <pre><code>def double(n):
+    return n * 2
+
+def quadruple(n):
+    return double(double(n))
+
+print(quadruple(3))   # 12</code></pre>
+
+  <p>
+    To compute <code>quadruple(3)</code>, Python calls <code>double(3)</code>, gets
+    <code>6</code>, then calls <code>double(6)</code>, gets <code>12</code>, and
+    finally returns. At the deepest moment, three calls are alive at once.
+  </p>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The stack of frames</h2>
+
+  <p>
+    Each active call gets a <b>frame</b>: a record of its parameters, its local
+    names, and the line it is currently on. The frames stack up, newest on top, and
+    each return pops one off.
+  </p>
+
+  <div id="diagram1"></div>
+
+  <p>
+    The <b>call stack</b> is that stack. The top frame is the call running right
+    now; the frames below it are the calls waiting for it to finish. When the top
+    frame returns, the one below resumes exactly where it left off.
+  </p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">3</span>Reading a traceback</h2>
+
+  <p>
+    When an error escapes a function, Python prints a <b>traceback</b>: the stack of
+    frames from the outermost call down to the line that failed. Read it
+    <b>bottom-up</b> — the last line is where the error actually happened.
+  </p>
+
+  <pre><code>Traceback (most recent call last):
+  File "app.py", line 8, in &lt;module&gt;
+    print(quadruple(3))
+  File "app.py", line 5, in quadruple
+    return double(double(n))
+  File "app.py", line 2, in double
+    return n * 2
+TypeError: unsupported operand type(s) for *: 'str' and 'int'</code></pre>
+
+  <p>
+    The bottom frame is the real failure: <code>n * 2</code> inside
+    <code>double</code>. The frames above it are the path that got there. This is
+    the single most useful debugging skill in Python.
+  </p>
+
+  <div id="intro1"></div>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    The call stack is the list of calls that are still running. A traceback is that
+    list printed at the moment of an error — read it bottom-up to find the failing
+    line.
+  </div>
+
+  <h2><span class="n">4</span>Watch the stack grow</h2>
+
+  <p>
+    Here is the win for today. The lab below calls a function that calls another.
+    Follow the output and see the inner call finish before the outer one.
+  </p>
+
+  <div id="lab1"></div>
+
+  <div id="fill1"></div>
+
+  <h2><span class="n">5</span>Check yourself</h2>
+
+  <p>
+    Answer from memory — do not scroll back up. Each option has the same number of
+    words, so nothing gives the answer away.
+  </p>
+
+  <div id="quiz"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>
+      You can now picture the stack of paused calls behind any line of code, and you
+      can read a traceback from the bottom up to find the frame that actually
+      failed. From here, every bug report becomes a path you can follow instead of a
+      wall of red text.
+    </p>
+  </div>
+
+  <h2><span class="n">6</span>Do this next</h2>
+
+  <ol>
+    <li>
+      Write three functions that call each other in a chain, and predict the order
+      in which they finish.
+    </li>
+    <li>
+      Deliberately cause an error inside the innermost function and read the
+      traceback from the bottom up.
+    </li>
+    <li>
+      Add a <code>print</code> at the start and end of each function to watch the
+      stack grow and shrink.
+    </li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Read <a href="https://docs.python.org/3/library/traceback.html">Python — The Python Standard Library: traceback</a>.
+    It describes the frame list that a traceback is built from.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher (me) anything — "how deep can the
+    stack go?", "what is a stack overflow?", "can I print the stack myself?". There
+    are no bad questions here.
+  </div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  /* predict-then-reveal */
+  TeachWidgets.predict("#predict1", {
+    q: "When a function calls another, what happens to the first call?",
+    a: ["It pauses and waits", "It finishes immediately", "It runs again later", "It is deleted"],
+    c: 0,
+    why: "The outer call is suspended at the call line until the inner call returns."
+  });
+
+  /* the stack of frames */
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      { title: "top", lines: ["double(6)"] },
+      { title: "below", lines: ["quadruple(3)"] },
+      { title: "below", lines: ["<module>"] },
+      { title: "return", lines: ["pop the top"] }
+    ],
+    vertical: true
+  });
+
+  /* step through the nested calls */
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "def double(n):",
+      "    return n * 2",
+      "def quadruple(n):",
+      "    return double(double(n))",
+      "print(quadruple(3))"
+    ],
+    steps: [
+      { line: 4, vars: { stack: "<module>", action: "call quadruple" } },
+      { line: 3, vars: { stack: "<module> > quadruple", n: "3" } },
+      { line: 0, vars: { stack: "> quadruple > double", n: "3" } },
+      { line: 1, vars: { "3 * 2": "6", action: "return 6" } },
+      { line: 0, vars: { stack: "> quadruple > double", n: "6" } },
+      { line: 1, vars: { "6 * 2": "12", action: "return 12" } },
+      { line: 4, vars: { printed: "12", action: "stack empty" } }
+    ]
+  });
+
+  /* three things the stack gives you */
+  TeachWidgets.introCards("#intro1", {
+    cards: [
+      { ico: "📚", title: "Paused calls", body: "Each unfinished call sits on the stack, waiting to resume." },
+      { ico: "🔝", title: "Top is current", body: "The top frame is the call running right now." },
+      { ico: "🧭", title: "A path to the bug", body: "A traceback is the stack printed at the moment of failure." }
+    ]
+  });
+
+  /* the tiny interpreter */
+  TeachWidgets.lab("#lab1", {
+    label: "Run it — watch the inner call finish first",
+    starter: "def double(n):\n    print(\"double\", n)\n    return n * 2\n\ndef quadruple(n):\n    print(\"quadruple\", n)\n    return double(double(n))\n\nprint(quadruple(3))"
+  });
+
+  /* recall from memory */
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the stack",
+    lines: [
+      "Each active call gets a <0>",
+      "The <1> frame is the call running now",
+      "Read a traceback from the <2> up"
+    ],
+    blanks: [
+      { a: ["frame"], why: "A frame records one active call: its parameters, locals and current line." },
+      { a: ["top"], why: "The top of the stack is the call currently running." },
+      { a: ["bottom"], why: "The last line of a traceback is the frame where the error actually happened." }
+    ]
+  });
+
+  /* the quiz — every option is exactly four words */
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the call stack?",
+      a: ["The list of running calls", "The list of defined functions", "The order of the file", "The values of variables"],
+      c: 0,
+      why: "The call stack holds the calls that are still running, newest on top."
+    },
+    {
+      q: "What is a frame?",
+      a: ["The record of one call", "A line of the body", "A type of function", "A kind of error"],
+      c: 0,
+      why: "A frame records one active call: its parameters, locals and current line."
+    },
+    {
+      q: "How do you read a traceback?",
+      a: ["From the bottom up", "From the top down", "Left to right only", "It cannot be read"],
+      c: 0,
+      why: "The last frame is where the error happened, so read from the bottom up."
+    },
+    {
+      q: "What happens when a call returns?",
+      a: ["Its frame is removed", "Its frame stays forever", "The stack is cleared", "A new frame is added"],
+      c: 0,
+      why: "Each return pops the top frame, and the call below resumes."
+    }
+  ]);
+</script>
+</body>
+</html>

@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 04 — Gates that add</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="how-computers-work" data-lesson="4" data-lesson-id="gates-that-add">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 04</span> · Logic</span>
+
+  <h1 class="lesson-title">Gates that add</h1>
+  <p class="lesson-lede">
+    You have gates that decide. Now you need gates that <b>calculate</b>. This lesson
+    builds an adder out of two gates — and in doing so, turns a pile of switches into
+    something that can do arithmetic.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Add two numbers with gates</span>
+    <span><b>Mission link</b> Where the CPU's arithmetic comes from</span>
+  </div>
+
+  <h2><span class="n">1</span>Adding one bit to one bit</h2>
+
+  <p>
+    Forget decimal for a moment. What does it mean to add two single bits? There are
+    only four cases, and you can write them all down:
+  </p>
+
+  <pre><code>0 + 0 = 0
+0 + 1 = 1
+1 + 0 = 1
+1 + 1 = 10     ← two bits! a sum and a carry</code></pre>
+
+  <p>
+    The last line is the interesting one. <code>1 + 1</code> does not fit in one bit,
+    so it produces a <b>sum</b> bit of <code>0</code> and a <b>carry</b> bit of
+    <code>1</code> — exactly like <code>7 + 3 = 10</code> in decimal, where you write
+    <code>0</code> and carry the <code>1</code>.
+  </p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Addition is not one operation. It is <b>two</b>: a sum bit and a carry bit. Get
+    those two right and you can add any two numbers, however wide.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Two gates, one adder</h2>
+
+  <p>
+    Look at the four cases again and compare them to the truth tables from last
+    lesson. The sum column is <code>0, 1, 1, 0</code> — that is <b>XOR</b>. The carry
+    column is <code>0, 0, 0, 1</code> — that is <b>AND</b>.
+  </p>
+
+  <div id="diagram1"></div>
+
+  <p>
+    That is a <b>half adder</b>: one XOR for the sum, one AND for the carry. Two
+    gates. It is the smallest circuit that does arithmetic.
+  </p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">3</span>Chaining adders</h2>
+
+  <p>
+    A half adder has a flaw: it cannot accept a carry <em>from</em> the column to its
+    right. To add multi-bit numbers you need a <b>full adder</b>, which takes three
+    inputs — A, B, and carry-in — and produces a sum and a carry-out.
+  </p>
+
+  <p>
+    A full adder is just two half adders plus an OR gate. Chain eight of them and you
+    have an 8-bit adder: the carry-out of each column feeds the carry-in of the next.
+  </p>
+
+  <pre><code>  1 1 0 1     (13)
++ 0 1 1 1     ( 7)
+─────────
+1 0 1 0 0     (20)
+
+carries: 1 1 1 0   ← each column hands its carry left</code></pre>
+
+  <p>
+    This is exactly how you were taught to add on paper. The machine is doing the
+    same thing, one column at a time, with gates instead of pencil marks.
+  </p>
+
+  <div id="intro1"></div>
+
+  <div class="note good">
+    <span class="note-label">The big realisation</span>
+    Arithmetic is not a special power the CPU has. It is <b>wiring</b>. Addition is
+    XOR and AND, arranged in a row. Subtraction is addition with two's complement.
+    Multiplication is repeated addition, shifted. All of it is gates.
+  </div>
+
+  <h2><span class="n">4</span>Add by hand</h2>
+
+  <p>
+    Here is the win. Add these two 4-bit numbers in binary, column by column, right
+    to left, carrying as you go:
+  </p>
+
+  <pre><code>  1 0 1 1     (11)
++ 0 1 1 0     ( 6)
+─────────
+  ? ? ? ?</code></pre>
+
+  <p>
+    Column 1: <code>1 + 0 = 1</code>, no carry. Column 2: <code>1 + 1 = 10</code>,
+    write <code>0</code>, carry <code>1</code>. Column 3: <code>0 + 1 + 1 = 10</code>,
+    write <code>0</code>, carry <code>1</code>. Column 4: <code>1 + 0 + 1 = 10</code>,
+    write <code>0</code>, carry <code>1</code> out.
+  </p>
+
+  <p>
+    Answer: <code>10001</code> = 17. And indeed 11 + 6 = 17. You just ran a full
+    adder in your head.
+  </p>
+
+  <div id="fill1"></div>
+
+  <h2><span class="n">5</span>Check yourself</h2>
+
+  <p>
+    Answer from memory — do not scroll back up. Each option has the same number of
+    words, so nothing gives the answer away.
+  </p>
+
+  <div id="quiz"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>
+      You can now build an adder from two gates and explain why it works, and you can
+      add multi-bit binary numbers by hand with carries. You have turned logic into
+      arithmetic — which means the machine can now do something you would call
+      "computing".
+    </p>
+  </div>
+
+  <h2><span class="n">6</span>Do this next</h2>
+
+  <ol>
+    <li>
+      Add <code>1111</code> and <code>0001</code> in binary. What happens to the
+      carry on the last column? That overflow is a real bug class.
+    </li>
+    <li>
+      Work out which two gates make a half adder, then write out its truth table
+      yourself — four rows, sum and carry columns.
+    </li>
+    <li>
+      Add <code>1010</code> and <code>0110</code> by hand. Convert both to decimal
+      first, add them, and check your binary answer matches.
+    </li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Read <a href="https://www.charlespetzold.com/code/">_Code_ by Charles Petzold</a>,
+    Chapter 12 ("Binary Adding") — it builds the half adder and full adder from
+    scratch, exactly as this lesson does but in more detail. Then watch
+    <a href="https://eater.net/8bit">Ben Eater's adder video</a> to see it on a
+    breadboard.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher (me) anything — "how does the CPU
+    multiply?", "what is an overflow?", "how fast can an adder be?". There are no
+    bad questions here.
+  </div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  /* the half adder */
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      { title: "A, B", lines: ["two input bits", "one column"] },
+      { title: "XOR → sum", lines: ["1 when they differ", "the sum bit"] },
+      { title: "AND → carry", lines: ["1 when both are 1", "the carry bit"] }
+    ]
+  });
+
+  /* what arithmetic really is */
+  TeachWidgets.introCards("#intro1", {
+    cards: [
+      { ico: "➕", title: "Addition", body: "XOR for the sum, AND for the carry, chained." },
+      { ico: "➖", title: "Subtraction", body: "Addition of a two's complement negative number." },
+      { ico: "✖️", title: "Multiplication", body: "Repeated addition with a left shift each round." }
+    ]
+  });
+
+  /* predict-then-reveal */
+  TeachWidgets.predict("#predict1", {
+    q: "You add 1 and 1 as single bits. What is the result?",
+    a: ["One", "Two", "Zero with carry"],
+    c: 2,
+    why: "1 + 1 overflows one bit: the sum bit is 0 and a carry of 1 moves to the next column."
+  });
+
+  /* step-through trace of a half adder */
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "A = 1, B = 1",
+      "sum   = A XOR B",
+      "carry = A AND B",
+      "result = carry sum"
+    ],
+    steps: [
+      { line: 0, vars: { A: "1", B: "1" } },
+      { line: 1, vars: { A: "1", B: "1", sum: "0" } },
+      { line: 2, vars: { sum: "0", carry: "1" } },
+      { line: 3, vars: { result: "10 (binary two)" } }
+    ]
+  });
+
+  /* recall from memory: the adder */
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the adder",
+    lines: [
+      "The sum bit comes from an <0> gate.",
+      "The carry bit comes from an <1> gate.",
+      "So 1 + 1 gives sum <2> and carry 1."
+    ],
+    blanks: [
+      { a: ["xor"], why: "XOR outputs 1 exactly when the inputs differ — that is the sum." },
+      { a: ["and"], why: "AND outputs 1 only when both inputs are 1 — that is the carry." },
+      { a: ["0"], why: "1 + 1 = 10 in binary, so the sum bit is 0 and the carry is 1." }
+    ]
+  });
+
+  /* the quiz — every option is exactly three words */
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What does a half adder produce?",
+      a: ["A sum and carry", "Two separate sums", "A single output bit", "A stored memory value"],
+      c: 0,
+      why: "It produces the sum bit and the carry bit — the two halves of an addition."
+    },
+    {
+      q: "Which gate gives the sum?",
+      a: ["AND", "OR", "XOR", "NOT"],
+      c: 2,
+      why: "The sum column of the truth table is 0,1,1,0 — exactly XOR."
+    },
+    {
+      q: "Why is a full adder needed?",
+      a: ["It runs much faster", "It accepts a carry in", "It uses fewer gates", "It stores the result"],
+      c: 1,
+      why: "A full adder takes a carry-in, so adders can be chained into columns."
+    },
+    {
+      q: "What is 1011 plus 0110?",
+      a: ["10001", "10011", "11001", "10101"],
+      c: 0,
+      why: "11 + 6 = 17, and 17 in binary is 10001."
+    }
+  ]);
+</script>
+</body>
+</html>

@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 12 — Why programs are slow</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="how-computers-work" data-lesson="12" data-lesson-id="why-programs-are-slow">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 12</span> · Putting it together</span>
+
+  <h1 class="lesson-title">Why programs are slow</h1>
+  <p class="lesson-lede">
+    Everything in this course now comes together. With bits, gates, memory, the CPU
+    and the memory hierarchy in hand, you can look at a slow program and say
+    <em>why</em> it is slow — before you change a single line.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~12 min</span>
+    <span><b>Win</b> Classify three slow programs</span>
+    <span><b>Mission link</b> The payoff for the whole course</span>
+  </div>
+
+  <h2><span class="n">1</span>The bottleneck</h2>
+
+  <p>
+    A program is a chain of work, and a chain is only as fast as its slowest link. The
+    <b>bottleneck</b> is the part that everything else waits on. Optimising anything
+    else is wasted effort.
+  </p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Find the bottleneck first, then fix it. Guessing at performance is how you spend a
+    week making code 5% faster while the real problem sits untouched.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Three kinds of slow</h2>
+
+  <p>
+    Almost every performance problem is one of three shapes, and each has a different
+    fix:
+  </p>
+
+  <div id="intro1"></div>
+
+  <p>
+    The classification matters because the fixes are completely different. Making a
+    CPU-bound loop faster means better algorithms or fewer operations. Making a
+    memory-bound loop faster means better locality. Making an I/O-bound program faster
+    means overlapping the waiting with other work.
+  </p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Amdahl's law, in one sentence</h2>
+
+  <p>
+    Suppose 90% of your program's time is in one function. You make that function
+    infinitely fast. How much faster is the program?
+  </p>
+
+  <pre><code>before:  90% in the hot part  +  10% elsewhere  =  100%
+after:    0% in the hot part  +  10% elsewhere  =   10%
+
+speedup = 100 / 10 = 10×   — and no more, ever</code></pre>
+
+  <p>
+    That is <b>Amdahl's law</b>: the part you did not optimise sets a hard ceiling on
+    your speedup. It is why profiling comes before optimising — you need to know which
+    part is the 90%.
+  </p>
+
+  <div id="trace1"></div>
+
+  <div class="note good">
+    <span class="note-label">The mindset</span>
+    Measure, do not guess. A profiler tells you where the time actually goes, and it
+    is almost never where you assumed. Every experienced engineer has a story about
+    optimising the wrong function for a day.
+  </div>
+
+  <h2><span class="n">4</span>Classify three programs</h2>
+
+  <p>
+    Here is the win — and the final exercise of the course. For each program, name the
+    bottleneck:
+  </p>
+
+  <pre><code>A. A loop doing 10 million floating-point multiplications
+B. A loop summing a 1 GB array in random order
+C. A script that downloads 500 files one after another</code></pre>
+
+  <p>
+    <code>A</code> is <b>CPU-bound</b> — the arithmetic is the work. <code>B</code> is
+    <b>memory-bound</b> — random access defeats the cache, so the CPU waits on RAM.
+    <code>C</code> is <b>I/O-bound</b> — the network is the limit, and the CPU is idle
+    almost the whole time.
+  </p>
+
+  <p>
+    Three programs, three bottlenecks, three different fixes. You just did the thing
+    this whole course was building toward.
+  </p>
+
+  <div id="fill1"></div>
+
+  <h2><span class="n">5</span>Check yourself</h2>
+
+  <p>
+    Answer from memory — do not scroll back up. Each option has the same number of
+    words, so nothing gives the answer away.
+  </p>
+
+  <div id="quiz"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>
+      You can now identify a bottleneck, classify it as CPU-, memory- or I/O-bound,
+      and explain why Amdahl's law caps your speedup. More than that: you can now
+      reason about the machine underneath your code. That was the mission — and you
+      have finished it.
+    </p>
+  </div>
+
+  <h2><span class="n">6</span>Do this next</h2>
+
+  <ol>
+    <li>
+      Take a slow script you have written and classify its bottleneck. Is it CPU-,
+      memory- or I/O-bound? What is the fix?
+    </li>
+    <li>
+      Apply Amdahl's law. If 50% of a program is optimisable, what is the maximum
+      possible speedup? What if it is 99%?
+    </li>
+    <li>
+      Profile something. Run a profiler on any program you have and find the hottest
+      function. Was it where you expected?
+    </li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Read <a href="https://csapp.cs.cmu.edu/">_CS:APP_ Chapter 5 ("Optimizing Program
+    Performance")</a> and Chapter 6 ("The Memory Hierarchy"). For the profiling
+    mindset, read Brendan Gregg's
+    <a href="https://www.brendangregg.com/systems-performance-2nd-edition-book.html">_Systems
+    Performance_</a>, especially the chapter on methodologies.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher (me) anything — "what is a profiler?",
+    "what is cache blocking?", "how do I make I/O concurrent?". There are no bad
+    questions here.
+  </div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  /* the three bottlenecks */
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      { title: "CPU-bound", lines: ["arithmetic is the work", "fix: fewer operations"] },
+      { title: "Memory-bound", lines: ["waiting on RAM", "fix: better locality"] },
+      { title: "I/O-bound", lines: ["waiting on devices", "fix: overlap the waiting"] }
+    ]
+  });
+
+  /* the three kinds of slow */
+  TeachWidgets.introCards("#intro1", {
+    cards: [
+      { ico: "🧮", title: "CPU-bound", body: "The processor is busy the whole time doing arithmetic." },
+      { ico: "🧠", title: "Memory-bound", body: "The CPU waits on RAM because the cache keeps missing." },
+      { ico: "🌐", title: "I/O-bound", body: "The CPU idles while disks or networks do the work." }
+    ]
+  });
+
+  /* predict-then-reveal */
+  TeachWidgets.predict("#predict1", {
+    q: "What should you optimise first?",
+    a: ["The slowest part", "The longest function", "The newest code"],
+    c: 0,
+    why: "Always find the bottleneck first. Optimising anything else cannot make the program faster."
+  });
+
+  /* step-through trace of Amdahl's law */
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "hot part = 90% of time",
+      "make it infinitely fast",
+      "remaining = 10% of time",
+      "speedup = 100 / 10 = 10x"
+    ],
+    steps: [
+      { line: 0, vars: { hot: "90%", rest: "10%" } },
+      { line: 1, vars: { hot: "0%", rest: "10%" } },
+      { line: 2, vars: { total: "10%" } },
+      { line: 3, vars: { speedup: "10x (the ceiling)" } }
+    ]
+  });
+
+  /* recall from memory: bottlenecks */
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the blanks",
+    lines: [
+      "A loop doing heavy arithmetic is <0>-bound.",
+      "A loop with random memory access is <1>-bound.",
+      "Amdahl's law says the unoptimised part sets a <2>."
+    ],
+    blanks: [
+      { a: ["cpu", "cpu-bound"], why: "When arithmetic dominates, the processor is the bottleneck." },
+      { a: ["memory", "memory-bound"], why: "Random access defeats the cache, so the CPU waits on RAM." },
+      { a: ["ceiling", "limit", "cap"], why: "The untouched portion of the work caps the maximum speedup." }
+    ]
+  });
+
+  /* the quiz — every option is exactly three words */
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is a bottleneck?",
+      a: ["The slowest part", "The largest function", "The newest code", "The biggest file"],
+      c: 0,
+      why: "The bottleneck is the part everything else waits on — the only thing worth optimising."
+    },
+    {
+      q: "What is a memory-bound program?",
+      a: ["One waiting on RAM", "One using too much", "One storing many files", "One with large variables"],
+      c: 0,
+      why: "Memory-bound means the CPU spends its time waiting for memory, not computing."
+    },
+    {
+      q: "What does Amdahl's law say?",
+      a: ["Unoptimised parts cap speedup", "Faster CPUs fix everything", "More memory always helps", "Caches are always faster"],
+      c: 0,
+      why: "The portion you do not optimise sets a hard ceiling on total speedup."
+    },
+    {
+      q: "What should come before optimising?",
+      a: ["Profiling the program", "Rewriting the code", "Adding more memory", "Buying a faster CPU"],
+      c: 0,
+      why: "Measure first. Profiling shows where the time actually goes, not where you assume."
+    }
+  ]);
+</script>
+</body>
+</html>

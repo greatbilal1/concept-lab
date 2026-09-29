@@ -9,7 +9,8 @@ account required.
 ```
 index.html                    hub — courses, paths, concepts
 glossary.html                 glossary — every term, searchable
-oop_interactive_course.html   the OOP interactive course page
+                              (links each term to its course's own glossary)
+oop_interactive_course.html   the OOP interactive lab (legacy, still reachable)
 
 data/                         site-wide content — the only files you edit
   courses.js                  course catalogue (all 100 courses)
@@ -41,8 +42,8 @@ assets/                       SHARED code — one copy for the whole site
 
 courses/                      one folder per course — CONTENT only, no code
   oop/                        the Object-Oriented Programming course
-    course.html               lesson hub / course map
-    lessons.js                this course's lesson manifest
+    course.html               lesson hub / course map  ← the course's main page
+    lessons.js                this course's lesson manifest + glossary
     MISSION.md                why this course exists
     RESOURCES.md              primary sources
     NOTES.md                  working notes
@@ -50,6 +51,26 @@ courses/                      one folder per course — CONTENT only, no code
     reference/                glossary + cheat sheet
     learning-records/         progress notes
 ```
+
+### Where a course lives
+
+A course's **main page is `courses/<id>/course.html`** — the lesson hub. Every
+link to a course (the hub card, learning paths, concept cards, glossary sources,
+search results) resolves through `href` in `data/courses.js`, so pointing that
+field at `course.html` wires the whole site at once.
+
+### One glossary, no duplication
+
+A course's vocabulary is written **once**, in its own manifest
+(`courses/<id>/lessons.js`, as `window.TeachGlossary`). Two pages render it:
+
+- `courses/<id>/reference/<id>-glossary.html` — the full, grouped term list
+  (a shell; `assets/js/teach/lesson-engine.js` fills it in).
+- `glossary.html` — the site-wide index, which links each term back to that
+  course glossary page via the `glossary` field in `data/courses.js`.
+
+A new course adds its own `window.TeachGlossary` and a `glossary` path; nothing
+is copied. `tools/validate.js` checks every term points at a lesson that exists.
 
 ### The three layers
 

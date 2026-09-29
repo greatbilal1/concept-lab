@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 06 — References, not copies</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="variables-types-memory" data-lesson="6" data-lesson-id="references-not-copies">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 06</span> · Memory</span>
+
+  <h1 class="lesson-title">References, not copies</h1>
+  <p class="lesson-lede">
+    A name does not hold a value. It holds a <i>reference</i> — a pointer to where
+    the value lives. Once you see names as arrows rather than boxes, every sharing
+    surprise in the previous lessons becomes predictable instead of mysterious.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~11 min</span>
+    <span><b>Win</b> Draw the arrows for any assignment</span>
+    <span><b>Mission link</b> Why two names can share one value</span>
+  </div>
+
+  <h2><span class="n">1</span>A name is an arrow</h2>
+
+  <p>
+    When you write <code>a = [1, 2, 3]</code>, the list is created somewhere in
+    memory and the name <code>a</code> is bound to a <b>reference</b> to it. The
+    name does not contain the list; it points at it.
+  </p>
+
+  <pre><code>a = [1, 2, 3]   # a ──→ [1, 2, 3]
+b = a           # b ──→ [1, 2, 3]   (same list!)
+c = [1, 2, 3]   # c ──→ [1, 2, 3]   (a different list)</code></pre>
+
+  <p>
+    Two names can point at the same value, and two values can look identical while
+    being separate. The arrows are the truth; the printed contents are not.
+  </p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">2</span>Aliasing: two names, one value</h2>
+
+  <p>
+    When two names refer to the same value, we say they are <b>aliases</b>. Aliasing
+    is not an error — it is often exactly what you want. But it means a change made
+    through one name is a change to the shared value, visible through the other.
+  </p>
+
+  <pre><code>a = [1, 2, 3]
+b = a
+b[0] = 99
+print(a)     # [99, 2, 3] — a sees the change</code></pre>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Assignment copies the <b>reference</b>, not the value. After <code>b = a</code>
+    there is still only one list — two arrows pointing at it.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">3</span>Rebinding moves one arrow</h2>
+
+  <p>
+    Rebinding a name does not affect the value or the other names pointing at it.
+    It simply moves that one arrow somewhere else.
+  </p>
+
+  <pre><code>a = [1, 2, 3]
+b = a
+a = [9, 9, 9]    # a now points at a NEW list
+print(b)         # [1, 2, 3] — b still points at the old one</code></pre>
+
+  <p>
+    Compare this with the previous section. Mutating the shared value was visible
+    through both names; rebinding one name was visible through neither. Mutation
+    changes the value; rebinding changes the arrow.
+  </p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Why this matters</h2>
+
+  <p>
+    Almost every "why did my other variable change?" bug is aliasing. A function
+    receives a list, appends to it, and the caller's list changes too — because the
+    function received a reference to the same list, not a copy of it. Knowing the
+    arrow model lets you predict this before it happens.
+  </p>
+
+  <div id="intro1"></div>
+
+  <div id="fill1"></div>
+
+  <h2><span class="n">5</span>Check yourself</h2>
+
+  <p>
+    Answer from memory — do not scroll back up. Each option has the same number of
+    words, so nothing gives the answer away.
+  </p>
+
+  <div id="quiz"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>
+      You can now draw the arrows for any sequence of assignments, tell mutation
+      apart from rebinding, and explain aliasing in one sentence. This is the mental
+      model the rest of the memory half of the course is built on — the stack, the
+      heap, and garbage collection all follow from it.
+    </p>
+  </div>
+
+  <h2><span class="n">6</span>Do this next</h2>
+
+  <ol>
+    <li>
+      Draw the arrows for <code>a = [1]; b = a; b.append(2)</code> on paper, then
+      run it and check your drawing against the output.
+    </li>
+    <li>
+      Change the last line to <code>b = [9]</code> instead of <code>b.append(2)</code>.
+      Redraw the arrows and explain why the output differs.
+    </li>
+    <li>
+      Write a two-line example where aliasing is helpful rather than harmful, and
+      explain why sharing was the right choice there.
+    </li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Read <a href="https://docs.python.org/3/reference/datamodel.html#objects-values-and-types">Python — "Objects, values and types"</a>.
+    It states that names are bound to objects and that assignment never copies the
+    object itself — the reference model this lesson draws.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher (me) anything — "what is a reference
+    really?", "how do I avoid aliasing bugs?", "when is sharing a good thing?".
+    There are no bad questions here.
+  </div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  /* arrows, not boxes */
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      { title: "a", lines: ["→"] },
+      { title: "b", lines: ["→"] },
+      { title: "one list", lines: ["[1, 2, 3]"] }
+    ]
+  });
+
+  /* the three ideas */
+  TeachWidgets.introCards("#intro1", {
+    cards: [
+      { ico: "➡️", title: "Reference", body: "A name points at a value; it does not contain it." },
+      { ico: "👥", title: "Aliasing", body: "Two names pointing at one value, so changes are shared." },
+      { ico: "↪️", title: "Rebinding", body: "Moving one arrow to a new value, leaving others alone." }
+    ]
+  });
+
+  /* predict-then-reveal */
+  TeachWidgets.predict("#predict1", {
+    q: "After b = a, how many lists exist?",
+    a: ["Exactly one list", "Exactly two lists", "It depends on size"],
+    c: 0,
+    why: "Assignment copies the reference, not the value. There is still one list, now with two names pointing at it."
+  });
+
+  /* step-through: rebinding vs mutating */
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "a = [1, 2, 3]",
+      "b = a",
+      "a = [9, 9, 9]",
+      "print(b)"
+    ],
+    steps: [
+      { line: 0, vars: { a: "→ [1, 2, 3]" } },
+      { line: 1, vars: { a: "→ [1, 2, 3]", b: "→ same list" } },
+      { line: 2, vars: { a: "→ [9, 9, 9] (new)", b: "→ [1, 2, 3]" } },
+      { line: 3, vars: { output: "[1, 2, 3]" } }
+    ]
+  });
+
+  /* recall from memory */
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the blanks",
+    lines: [
+      "A name holds a <0> to a value, not the value itself.",
+      "Two names pointing at one value are called <1>.",
+      "Rebinding a name moves one <2>, leaving the value alone."
+    ],
+    blanks: [
+      { a: ["reference", "pointer"], why: "A name is bound to a reference that points at the value in memory." },
+      { a: ["aliases", "alias"], why: "Aliases are two or more names referring to the very same value." },
+      { a: ["arrow", "reference", "pointer"], why: "Rebinding moves the name's arrow to a new value; the old value is unchanged." }
+    ]
+  });
+
+  /* the quiz — every option is exactly three words */
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What does a name hold?",
+      a: ["A copy of value", "A reference to value", "A type of value", "A length of value"],
+      c: 1,
+      why: "A name is bound to a reference that points at the value; it does not contain the value."
+    },
+    {
+      q: "What is aliasing?",
+      a: ["Two names, one value", "Two values, one name", "Two types, one value", "Two copies, one name"],
+      c: 0,
+      why: "Aliasing means two or more names refer to the very same value, so changes are shared."
+    },
+    {
+      q: "What does rebinding change?",
+      a: ["The shared value", "The name's arrow", "The other names", "The value's type"],
+      c: 1,
+      why: "Rebinding moves one name's arrow to a new value; it does not change the old value or other names."
+    },
+    {
+      q: "Why do aliasing bugs happen?",
+      a: ["Values are copied wrongly", "References are shared silently", "Types are checked late", "Names are too short"],
+      c: 1,
+      why: "A function receives a reference to the same value, so mutating it changes the caller's value too."
+    }
+  ]);
+</script>
+</body>
+</html>

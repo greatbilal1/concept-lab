@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How Computers Work — Cheat Sheet</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+<style>
+  .ref-toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0 8px; }
+  .ref-toc a { font-size: .8rem; border: 1px solid var(--border); background: #111a30; padding: 5px 11px; border-radius: 999px; color: var(--muted); text-decoration: none; border-bottom: 1px solid var(--border); }
+  .ref-toc a:hover { color: #fff; border-color: #3d5488; }
+  .lesson-wrap h2 { scroll-margin-top: 20px; }
+  .snippet { margin: 14px 0 22px; }
+  .snippet .lbl { font-size: .72rem; font-weight: 800; letter-spacing: .7px; text-transform: uppercase; color: var(--accent2); margin-bottom: 6px; }
+  .see { font-size: .82rem; color: var(--muted); margin: -6px 0 12px; }
+  .see a { color: var(--accent2); border-bottom: 0; }
+  .see a:hover { color: #fff; }
+  /* room for the copy button so it never sits on the first line of code */
+  .snippet pre { padding-top: 34px; }
+  @media print { .snippet pre { padding-top: 18px; } }
+</style>
+</head>
+<body class="lesson-body" data-course="how-computers-work">
+
+<div class="lesson-wrap">
+
+  <span class="lesson-kicker">Reference · Cheat sheet</span>
+  <h1 class="lesson-title">How Computers Work — Cheat Sheet</h1>
+  <p class="lesson-lede">
+    Every number, table and rule from the twelve lessons, compressed onto one page.
+    Print this, or keep it open while you work through the course.
+  </p>
+
+  <div class="ref-toc">
+    <a href="#binary">Binary</a>
+    <a href="#hex">Hex</a>
+    <a href="#twos">Two's complement</a>
+    <a href="#gates">Gates</a>
+    <a href="#adders">Adders</a>
+    <a href="#memory">Memory &amp; clock</a>
+    <a href="#cpu">CPU cycle</a>
+    <a href="#instr">Instructions</a>
+    <a href="#hierarchy">Hierarchy</a>
+    <a href="#text">Text</a>
+    <a href="#float">Floats</a>
+    <a href="#perf">Performance</a>
+  </div>
+
+  <h2 id="binary"><span class="n">1</span>Binary &amp; place value</h2>
+  <p class="see">See <a href="../lessons/0001-bits-and-binary.html">Lesson 01 — Bits and binary</a></p>
+  <div class="snippet">
+    <div class="lbl">Weights double to the left</div>
+    <pre><code>positions:  128  64  32  16   8   4   2   1
+            2⁷   2⁶  2⁵  2⁴  2³  2²  2¹  2⁰
+
+1011  =  8 + 0 + 2 + 1  =  11
+11111 =  16+8+4+2+1     =  31
+
+1 bit   → 2 values
+8 bits  → 256 values (0–255)   ← one byte</code></pre>
+  </div>
+
+  <h2 id="hex"><span class="n">2</span>Hexadecimal &amp; nibbles</h2>
+  <p class="see">See <a href="../lessons/0002-hexadecimal.html">Lesson 02 — Hexadecimal</a></p>
+  <div class="snippet">
+    <div class="lbl">One hex digit = four bits</div>
+    <pre><code>0000=0  0100=4  1000=8  1100=C
+0001=1  0101=5  1001=9  1101=D
+0010=2  0110=6  1010=A  1110=E
+0011=3  0111=7  1011=B  1111=F
+
+byte:  1101 0110  →  D6
+CSS:   #67e8f9   →  R=67  G=e8  B=f9</code></pre>
+  </div>
+
+  <h2 id="twos"><span class="n">3</span>Two's complement</h2>
+  <p class="see">See <a href="../lessons/0002-hexadecimal.html">Lesson 02 — Hexadecimal</a></p>
+  <div class="snippet">
+    <div class="lbl">Flip every bit, then add one</div>
+    <pre><code> 1  =  0000 0001
+flip =  1111 1110
++1   =  1111 1111  =  FF  =  -1
+
+Why: subtraction becomes addition,
+so the CPU needs no subtract circuit.</code></pre>
+  </div>
+
+  <h2 id="gates"><span class="n">4</span>Logic gates</h2>
+  <p class="see">See <a href="../lessons/0003-transistors-to-gates.html">Lesson 03 — Transistors to gates</a></p>
+  <div class="snippet">
+    <div class="lbl">Truth tables &amp; NAND completeness</div>
+    <pre><code>A  B  |  AND  OR   XOR
+0  0  |   0    0    0
+0  1  |   0    1    1
+1  0  |   0    1    1
+1  1  |   1    1    0
+
+NOT A   =  A NAND A
+A AND B =  NOT (A NAND B)
+A OR  B =  (NOT A) NAND (NOT B)
+
+JS/Python bitwise:  5 &amp; 3 = 1   5 | 3 = 7   5 ^ 3 = 6</code></pre>
+  </div>
+
+  <h2 id="adders"><span class="n">5</span>Adders</h2>
+  <p class="see">See <a href="../lessons/0004-gates-that-add.html">Lesson 04 — Gates that add</a></p>
+  <div class="snippet">
+    <div class="lbl">Half adder = XOR + AND</div>
+    <pre><code>sum   = A XOR B
+carry = A AND B
+
+  1 1 0 1     (13)
++ 0 1 1 1     ( 7)
+─────────
+1 0 1 0 0     (20)
+
+Full adder = two half adders + OR (accepts carry-in)</code></pre>
+  </div>
+
+  <h2 id="memory"><span class="n">6</span>Memory cells &amp; the clock</h2>
+  <p class="see">See <a href="../lessons/0005-memory-cells.html">Lesson 05 — Memory cells</a></p>
+  <div class="snippet">
+    <div class="lbl">Feedback creates state</div>
+    <pre><code>flip-flop = two cross-coupled NAND gates
+outputs Q and Q̄ are always opposites
+
+set   →  Q becomes 1, stays 1
+reset →  Q becomes 0, stays 0
+hold  →  Q keeps whatever it had
+
+clock = the tick that decides when cells update
+register = 8 flip-flops sharing a clock = one byte</code></pre>
+  </div>
+
+  <h2 id="cpu"><span class="n">7</span>The CPU cycle</h2>
+  <p class="see">See <a href="../lessons/0006-the-cpu.html">Lesson 06 — The CPU</a></p>
+  <div class="snippet">
+    <div class="lbl">Fetch · decode · execute</div>
+    <pre><code>1. FETCH    instr = mem[PC]
+2. DECODE   work out the opcode
+3. EXECUTE  ALU does the work, PC advances
+
+parts:  program counter · registers · ALU · control unit
+PC holds the address of the NEXT instruction
+a jump writes a new value into the PC</code></pre>
+  </div>
+
+  <h2 id="instr"><span class="n">8</span>Instructions &amp; programs</h2>
+  <p class="see">See <a href="../lessons/0007-instructions-and-programs.html">Lesson 07 — Instructions and programs</a></p>
+  <div class="snippet">
+    <div class="lbl">Opcode table &amp; a tiny program</div>
+    <pre><code>0x01 LOAD  R, addr     0x03 ADD  R1, R2
+0x02 STORE addr, R     0x04 JUMP addr     0x05 HALT
+
+0x00  LOAD  R1, 0x10
+0x01  LOAD  R2, 0x11
+0x02  ADD   R1, R2
+0x03  STORE 0x12, R1
+0x04  HALT
+
+assembly = machine code with readable names (1 line = 1 instruction)</code></pre>
+  </div>
+
+  <h2 id="hierarchy"><span class="n">9</span>The memory hierarchy</h2>
+  <p class="see">See <a href="../lessons/0008-the-memory-hierarchy.html">Lesson 08 — The memory hierarchy</a></p>
+  <div class="snippet">
+    <div class="lbl">Fast &amp; small → big &amp; slow</div>
+    <pre><code>registers   bytes    ~1 ns
+cache       MBs      ~1–10 ns
+RAM         GBs      ~100 ns
+SSD         TBs      ~100 µs
+disk        TBs      ~10 ms
+
+scaled ×1e9:  register = 1 s,  RAM = 1.5 min,  disk = 4 months
+
+locality: temporal (reuse soon) · spatial (use neighbours)</code></pre>
+  </div>
+
+  <h2 id="text"><span class="n">10</span>Text &amp; characters</h2>
+  <p class="see">See <a href="../lessons/0009-text-and-characters.html">Lesson 09 — Text and characters</a></p>
+  <div class="snippet">
+    <div class="lbl">ASCII, Unicode, UTF-8</div>
+    <pre><code>65 = A    97 = a    48 = '0'    32 = space
+uppercase ↔ lowercase differ by exactly 32 (one bit)
+
+"cat"  =  63 61 74
+
+UTF-8 lengths:
+0xxxxxxx                            → 1 byte  (ASCII)
+110xxxxx 10xxxxxx                   → 2 bytes
+1110xxxx 10xxxxxx 10xxxxxx          → 3 bytes
+11110xxx 10xxxxxx 10xxxxxx 10xxxxxx → 4 bytes
+
+Every ASCII file is already valid UTF-8.</code></pre>
+  </div>
+
+  <h2 id="float"><span class="n">11</span>Floating point</h2>
+  <p class="see">See <a href="../lessons/0010-numbers-that-lie.html">Lesson 10 — Numbers that lie</a></p>
+  <div class="snippet">
+    <div class="lbl">IEEE 754 double &amp; the classic trap</div>
+    <pre><code>1 bit sign  |  11 bit exponent  |  52 bit fraction
+
+0.1 + 0.2  ==  0.30000000000000004
+0.1 + 0.2 == 0.3        →  False
+round(0.1 + 0.2, 2) == 0.3  →  True
+1e16 + 1 == 1e16        →  True
+
+Rules: never compare floats with ==
+       never store money in floats</code></pre>
+  </div>
+
+  <h2 id="perf"><span class="n">12</span>Performance</h2>
+  <p class="see">See <a href="../lessons/0011-from-source-to-running.html">Lesson 11 — From source to running</a> · <a href="../lessons/0012-why-programs-are-slow.html">Lesson 12 — Why programs are slow</a></p>
+  <div class="snippet">
+    <div class="lbl">Pipeline, bottlenecks, Amdahl's law</div>
+    <pre><code>source → lexer → parser → optimiser → codegen → machine code
+Python:  source → bytecode → virtual machine → real CPU
+
+CPU-bound     arithmetic is the work   → fewer operations
+memory-bound  waiting on RAM           → better locality
+I/O-bound     waiting on devices       → overlap the waiting
+
+Amdahl: 90% optimised to zero → max speedup = 100/10 = 10×
+Always profile before optimising.</code></pre>
+  </div>
+
+  <h2 id="index"><span class="n">13</span>All 12 lessons</h2>
+  <div class="snippet">
+    <div class="lbl">Course index</div>
+    <pre><code>01  Bits and binary            ../lessons/0001-bits-and-binary.html
+02  Hexadecimal                ../lessons/0002-hexadecimal.html
+03  Transistors to gates       ../lessons/0003-transistors-to-gates.html
+04  Gates that add             ../lessons/0004-gates-that-add.html
+05  Memory cells               ../lessons/0005-memory-cells.html
+06  The CPU                    ../lessons/0006-the-cpu.html
+07  Instructions and programs  ../lessons/0007-instructions-and-programs.html
+08  The memory hierarchy       ../lessons/0008-the-memory-hierarchy.html
+09  Text and characters        ../lessons/0009-text-and-characters.html
+10  Numbers that lie           ../lessons/0010-numbers-that-lie.html
+11  From source to running     ../lessons/0011-from-source-to-running.html
+12  Why programs are slow      ../lessons/0012-why-programs-are-slow.html</code></pre>
+  </div>
+
+  <div class="lesson-foot">
+    <div class="links">
+      <a href="how-computers-work-glossary.html">📖 Glossary</a>
+      <a href="../lessons/0001-bits-and-binary.html">📘 Lesson 01</a>
+      <a href="../lessons/0012-why-programs-are-slow.html">🏁 Lesson 12</a>
+      <a href="../course.html">🗺️ All lessons</a>
+      <a href="../../../index.html">🧩 All courses</a>
+    </div>
+    <span style="color:var(--muted);font-size:.8rem">Reference · print-friendly</span>
+  </div>
+
+</div>
+
+</body>
+</html>

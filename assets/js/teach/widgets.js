@@ -266,5 +266,67 @@
     render();
   }
 
-  global.TeachWidgets = { predict: predict, fill: fill, lab: lab, trace: trace };
+  /* ---------- static visual builders ----------
+     These render the shared visual vocabulary (see components.css).
+     They are pure markup helpers — no state, no interaction — so a
+     lesson can describe structure declaratively instead of hand-writing
+     divs. All text is escaped.
+
+       TeachWidgets.diagram("#sel", {
+         boxes: [{ title: "Customer", lines: ["name", "country"] }, …],
+         vertical: false
+       });
+
+       TeachWidgets.cards("#sel", {
+         cards: [{ title: "State", body: "…" }, …]
+       });
+
+       TeachWidgets.introCards("#sel", {
+         cards: [{ ico: "📦", title: "State", body: "…" }, …]
+       });
+  */
+
+  function esc(s) {
+    return String(s == null ? "" : s)
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+
+  function diagram(sel, cfg) {
+    var h = host(sel);
+    if (!h || !cfg || !cfg.boxes || !cfg.boxes.length) return;
+    var arrow = cfg.vertical ? "↓" : "→";
+    var arrowCls = cfg.vertical ? "arrow vert" : "arrow";
+    var parts = [];
+    cfg.boxes.forEach(function (b, i) {
+      if (i) parts.push('<span class="' + arrowCls + '">' + arrow + "</span>");
+      var lines = (b.lines || []).map(function (l) {
+        return '<span class="small">' + esc(l) + "</span>";
+      }).join("");
+      parts.push('<div class="box"><b>' + esc(b.title) + "</b>" + lines + "</div>");
+    });
+    h.innerHTML = '<div class="diagram">' + parts.join("") + "</div>";
+  }
+
+  function cards(sel, cfg) {
+    var h = host(sel);
+    if (!h || !cfg || !cfg.cards || !cfg.cards.length) return;
+    h.innerHTML = '<div class="grid">' + cfg.cards.map(function (c) {
+      return '<div class="card"><h3>' + esc(c.title) + "</h3><p>" + esc(c.body) + "</p></div>";
+    }).join("") + "</div>";
+  }
+
+  function introCards(sel, cfg) {
+    var h = host(sel);
+    if (!h || !cfg || !cfg.cards || !cfg.cards.length) return;
+    h.innerHTML = '<div class="intro-grid">' + cfg.cards.map(function (c) {
+      return '<div class="intro-card"><div class="ico">' + esc(c.ico) + "</div>" +
+        "<h4>" + esc(c.title) + "</h4><p>" + esc(c.body) + "</p></div>";
+    }).join("") + "</div>";
+  }
+
+  global.TeachWidgets = {
+    predict: predict, fill: fill, lab: lab, trace: trace,
+    diagram: diagram, cards: cards, introCards: introCards
+  };
 })(window);

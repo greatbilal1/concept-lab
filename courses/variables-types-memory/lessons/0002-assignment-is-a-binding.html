@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 02 — Assignment is a binding</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="variables-types-memory" data-lesson="2" data-lesson-id="assignment-is-a-binding">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 02</span> · Names &amp; values</span>
+
+  <h1 class="lesson-title">Assignment is a binding</h1>
+  <p class="lesson-lede">
+    The equals sign is the most misread symbol in programming. It does not mean
+    "is equal to" — it means "make this name refer to this value". Once you read
+    it that way, a lot of confusing code becomes obvious.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Predict what a swap does</span>
+    <span><b>Mission link</b> Why <code>a = b</code> is not a copy</span>
+  </div>
+
+  <h2><span class="n">1</span>The equals sign is a verb</h2>
+
+  <p>
+    In maths, <code>=</code> is a statement of fact: <code>x = 5</code> means "x is
+    equal to 5". In programming it is an <b>action</b>: "bind the name <code>x</code>
+    to the value 5". It is a command, not a claim.
+  </p>
+
+  <p>
+    That is why <code>x = x + 1</code> is perfectly sensible in code and nonsense in
+    maths. Read as a command it says: "take the value <code>x</code> currently refers
+    to, add one, and bind <code>x</code> to the result."
+  </p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    <code>name = value</code> is an instruction to <b>bind</b>. The right-hand side
+    is worked out first, then the name is pointed at the result.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Right side first, always</h2>
+
+  <p>
+    Assignment has an order. The expression on the right is fully evaluated before
+    anything happens to the name on the left. So in <code>total = price * qty</code>,
+    the multiplication happens first, producing a value, and only then is
+    <code>total</code> bound to it.
+  </p>
+
+  <pre><code>price = 4
+qty = 3
+total = price * qty   # 12 is computed, then bound to total
+print(total)          # 12</code></pre>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Binding is not copying</h2>
+
+  <p>
+    Here is where the label model pays off. When you write <code>b = a</code>, you
+    are not copying the value out of <code>a</code> into <code>b</code>. You are
+    binding <code>b</code> to the <i>same value</i> that <code>a</code> refers to.
+    Two names, one value.
+  </p>
+
+  <pre><code>a = 5
+b = a        # b now refers to the same 5
+a = 9        # a moves to 9; b is untouched
+print(a, b)  # 9 5</code></pre>
+
+  <p>
+    For numbers this looks like copying, because numbers cannot be changed. But the
+    mechanism is binding, and for values that <i>can</i> change, the difference is
+    dramatic — that is Lesson 06.
+  </p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>The classic swap</h2>
+
+  <p>
+    A famous beginner puzzle: swap two variables. The naive attempt fails, and the
+    reason is binding.
+  </p>
+
+  <pre><code>a = 1
+b = 2
+a = b     # a now refers to 2 — the 1 is lost
+b = a     # b refers to 2 as well
+print(a, b)   # 2 2  — not swapped!</code></pre>
+
+  <p>
+    The first line overwrites <code>a</code>'s binding before its old value is saved
+    anywhere. The fix is to hold the old value in a third name first — or, in Python,
+    to use the tuple trick <code>a, b = b, a</code>, which evaluates the whole right
+    side before rebinding either name.
+  </p>
+
+  <div id="fill1"></div>
+
+  <h2><span class="n">5</span>Check yourself</h2>
+
+  <p>
+    Answer from memory — do not scroll back up. Each option has the same number of
+    words, so nothing gives the answer away.
+  </p>
+
+  <div id="quiz"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>
+      You can now read <code>=</code> as a command rather than a claim, predict the
+      result of a sequence of assignments, and explain why the naive swap fails. You
+      also know that <code>b = a</code> binds rather than copies — the fact that
+      makes the memory lessons ahead make sense.
+    </p>
+  </div>
+
+  <h2><span class="n">6</span>Do this next</h2>
+
+  <ol>
+    <li>
+      Predict the output of <code>a = 1; b = 2; a = b; b = a</code> before running
+      it. Then run it and explain the result in terms of bindings.
+    </li>
+    <li>
+      Fix the swap using a temporary third variable. Then fix it again with
+      <code>a, b = b, a</code> and explain why the second version works.
+    </li>
+    <li>
+      Write one line of code that would be nonsense in maths but correct in Python,
+      such as <code>x = x + 1</code>, and explain it as a command.
+    </li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Read <a href="https://docs.python.org/3/reference/simple_stmts.html#assignment-statements">Python — "Assignment statements"</a>.
+    It defines assignment as binding a name to a value, and documents the
+    right-side-first rule and the tuple-swap form used above.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher (me) anything — "why does Python
+    evaluate the right side first?", "what does a, b = b, a really do?", "can a name
+    refer to two values?". There are no bad questions here.
+  </div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  /* the order of assignment */
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      { title: "1. evaluate", lines: ["price * qty", "→ 12"] },
+      { title: "2. bind", lines: ["total", "→ 12"] }
+    ]
+  });
+
+  /* predict-then-reveal */
+  TeachWidgets.predict("#predict1", {
+    q: "What does x = x + 1 mean in code?",
+    a: ["x equals itself plus one", "Bind x to x plus one", "x is compared to x plus one"],
+    c: 1,
+    why: "It is a command: compute x + 1, then bind the name x to that result. The old value is replaced by the new binding."
+  });
+
+  /* step-through: the failed swap */
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "a = 1",
+      "b = 2",
+      "a = b",
+      "b = a"
+    ],
+    steps: [
+      { line: 0, vars: { a: "→ 1", b: "unbound" } },
+      { line: 1, vars: { a: "→ 1", b: "→ 2" } },
+      { line: 2, vars: { a: "→ 2", b: "→ 2", lost: "1" } },
+      { line: 3, vars: { a: "→ 2", b: "→ 2" } }
+    ]
+  });
+
+  /* recall from memory */
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the blanks",
+    lines: [
+      "Assignment <0> a name to a value.",
+      "The right-hand side is evaluated <1>.",
+      "To swap two names safely, save the old value in a <2> name."
+    ],
+    blanks: [
+      { a: ["binds", "points", "refers"], why: "Assignment binds the name to the value; it does not copy the value." },
+      { a: ["first"], why: "The expression on the right is fully evaluated before the name is rebound." },
+      { a: ["third", "temporary", "temp"], why: "A temporary name holds the old value so it is not lost when the first name is rebound." }
+    ]
+  });
+
+  /* the quiz — every option is exactly three words */
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What does the equals sign do?",
+      a: ["States a fact", "Binds a name", "Compares two values", "Copies the value"],
+      c: 1,
+      why: "In code, = is a command that binds the name on the left to the value on the right."
+    },
+    {
+      q: "Which side is evaluated first?",
+      a: ["The left side", "The right side", "Both at once", "It depends"],
+      c: 1,
+      why: "The right-hand expression is fully evaluated, then the name on the left is bound to the result."
+    },
+    {
+      q: "What does b = a do?",
+      a: ["Copies the value", "Binds b to a's value", "Makes a and b equal", "Deletes the old b"],
+      c: 1,
+      why: "It binds b to the same value a refers to. It does not copy the value into a new place."
+    },
+    {
+      q: "Why does the naive swap fail?",
+      a: ["Python forbids swapping", "The first value is lost", "The names are immutable", "The types do not match"],
+      c: 1,
+      why: "The first assignment overwrites a's binding before its old value is saved anywhere."
+    }
+  ]);
+</script>
+</body>
+</html>

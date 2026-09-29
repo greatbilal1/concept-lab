@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 06 — The CPU</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="how-computers-work" data-lesson="6" data-lesson-id="the-cpu">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 06</span> · The machine</span>
+
+  <h1 class="lesson-title">The CPU</h1>
+  <p class="lesson-lede">
+    You have gates, adders and memory. Now assemble them into a machine that runs a
+    program. The CPU is smaller than you think: a handful of registers, an adder, and
+    a loop that never stops.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~12 min</span>
+    <span><b>Win</b> Hand-run one clock cycle</span>
+    <span><b>Mission link</b> The engine every program runs on</span>
+  </div>
+
+  <h2><span class="n">1</span>The three-part loop</h2>
+
+  <p>
+    A CPU does one thing, over and over, billions of times a second:
+  </p>
+
+  <pre><code>1. FETCH    read the next instruction from memory
+2. DECODE   work out what that instruction means
+3. EXECUTE  do it, and move to the next instruction</code></pre>
+
+  <p>
+    That is the whole design. Everything else — caches, pipelines, multiple cores —
+    is an optimisation of this loop. If you understand fetch–decode–execute, you
+    understand the CPU.
+  </p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    The CPU is not clever. It has no idea what your program means. It reads a number,
+    looks it up in a table of operations, performs one, and moves on.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The parts</h2>
+
+  <p>
+    Five components, and you already know what four of them are:
+  </p>
+
+  <div id="intro1"></div>
+
+  <p>
+    The <b>program counter</b> is the star of the show. It holds the address of the
+    next instruction. After each instruction it increments — usually by 1, sometimes
+    jumping somewhere else. A jump is what makes loops and conditionals possible.
+  </p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>One cycle, step by step</h2>
+
+  <p>
+    Let us run a single instruction by hand. Suppose the program counter holds
+    <code>0x10</code>, and memory at that address contains the instruction
+    "add register 1 to register 2".
+  </p>
+
+  <div id="trace1"></div>
+
+  <p>
+    Notice how much is happening. The PC was read, memory was accessed, the
+    instruction was decoded, the ALU did arithmetic, a register was written, and the
+    PC advanced. All of that in one tick of the clock.
+  </p>
+
+  <div class="note good">
+    <span class="note-label">Scale check</span>
+    A modern CPU runs this loop around 3 billion times per second, and often several
+    instructions per tick. The loop you just traced by hand happens faster than you
+    can blink — but it is the same loop.
+  </div>
+
+  <h2><span class="n">4</span>Run a cycle yourself</h2>
+
+  <p>
+    Here is the win. Given this tiny machine state, work out what happens on the next
+    tick:
+  </p>
+
+  <pre><code>PC      = 0x20
+R1      = 5
+R2      = 7
+memory[0x20] = "ADD R1, R2"   (result goes into R1)</code></pre>
+
+  <p>
+    Fetch: read memory at <code>0x20</code>. Decode: it is an ADD. Execute: the ALU
+    computes <code>5 + 7 = 12</code> and writes it to <code>R1</code>. Then the PC
+    becomes <code>0x21</code>.
+  </p>
+
+  <p>
+    Final state: <code>R1 = 12</code>, <code>R2 = 7</code>, <code>PC = 0x21</code>.
+    You just executed an instruction.
+  </p>
+
+  <div id="fill1"></div>
+
+  <h2><span class="n">5</span>Check yourself</h2>
+
+  <p>
+    Answer from memory — do not scroll back up. Each option has the same number of
+    words, so nothing gives the answer away.
+  </p>
+
+  <div id="quiz"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>
+      You can now name the parts of a CPU, explain the fetch–decode–execute loop, and
+      hand-run a single clock cycle. You have gone from "the CPU is a magic chip" to
+      "the CPU is a loop over a table of operations" — which is the single biggest
+      demystification in this course.
+    </p>
+  </div>
+
+  <h2><span class="n">6</span>Do this next</h2>
+
+  <ol>
+    <li>
+      Run another cycle by hand. Start with <code>PC = 0x30</code>,
+      <code>R1 = 100</code>, and <code>memory[0x30] = "SUB R1, 1"</code>. What are
+      the final values?
+    </li>
+    <li>
+      Explain why the program counter must exist. What would break if the CPU had no
+      way to know which instruction came next?
+    </li>
+    <li>
+      Work out how many instructions a 3 GHz CPU executes in one second, assuming one
+      instruction per cycle. Then think about how much work that is.
+    </li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Read <a href="https://www.charlespetzold.com/code/">_Code_ by Charles Petzold</a>,
+    Chapter 17 ("Automation") and Chapter 24 ("The Arithmetic Logic Unit"), which
+    assemble the CPU from the parts you have already built. For the modern picture,
+    see <a href="https://csapp.cs.cmu.edu/">_CS:APP_ Chapter 4</a>.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher (me) anything — "what is a pipeline?",
+    "how does a jump work?", "why do CPUs have multiple cores?". There are no bad
+    questions here.
+  </div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  /* the five parts */
+  TeachWidgets.introCards("#intro1", {
+    cards: [
+      { ico: "📍", title: "Program counter", body: "Holds the address of the next instruction to run." },
+      { ico: "📥", title: "Registers", body: "A few tiny, very fast slots for values in use." },
+      { ico: "🧮", title: "ALU", body: "The adder and logic from earlier lessons, doing the work." },
+      { ico: "🎛️", title: "Control unit", body: "Reads the instruction and switches the right parts on." }
+    ]
+  });
+
+  /* the loop */
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      { title: "Fetch", lines: ["read at the PC", "instruction arrives"] },
+      { title: "Decode", lines: ["look up the op", "set the switches"] },
+      { title: "Execute", lines: ["ALU does the work", "PC advances"] }
+    ]
+  });
+
+  /* predict-then-reveal */
+  TeachWidgets.predict("#predict1", {
+    q: "What does the program counter hold?",
+    a: ["The last result", "The next address", "The current clock"],
+    c: 1,
+    why: "The PC holds the memory address of the next instruction to fetch. It is how the CPU knows where it is."
+  });
+
+  /* step-through trace of one cycle */
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "fetch:  instr = mem[PC]",
+      "decode: op = ADD R1, R2",
+      "execute: R1 = R1 + R2",
+      "advance: PC = PC + 1"
+    ],
+    steps: [
+      { line: 0, vars: { PC: "0x10", instr: "ADD R1, R2" } },
+      { line: 1, vars: { op: "ADD", R1: "5", R2: "7" } },
+      { line: 2, vars: { R1: "12", R2: "7" } },
+      { line: 3, vars: { PC: "0x11", R1: "12" } }
+    ]
+  });
+
+  /* recall from memory: the cycle */
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the cycle",
+    lines: [
+      "The three stages are fetch, decode and <0>.",
+      "The <1> holds the address of the next instruction.",
+      "The <2> performs the arithmetic."
+    ],
+    blanks: [
+      { a: ["execute"], why: "Fetch, decode, execute — the loop the CPU never leaves." },
+      { a: ["program counter", "pc"], why: "The PC tracks where the CPU is in the program." },
+      { a: ["alu", "arithmetic logic unit"], why: "The ALU is the adder and logic circuit doing the computation." }
+    ]
+  });
+
+  /* the quiz — every option is exactly three words */
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the CPU's loop?",
+      a: ["Fetch, decode, execute", "Read, write, erase", "Load, store, jump", "Input, process, output"],
+      c: 0,
+      why: "Every CPU repeats fetch, decode, execute — billions of times per second."
+    },
+    {
+      q: "What does the ALU do?",
+      a: ["Stores the instructions", "Performs the arithmetic", "Counts the clock ticks", "Fetches from memory"],
+      c: 1,
+      why: "The ALU is the arithmetic and logic unit — the adder from lesson four."
+    },
+    {
+      q: "Why does the PC increment?",
+      a: ["To save more power", "To reach the next instruction", "To clear the registers", "To slow the clock down"],
+      c: 1,
+      why: "Incrementing the PC moves execution to the following instruction in memory."
+    },
+    {
+      q: "What is a jump instruction?",
+      a: ["A change of address", "A faster clock speed", "A larger register size", "A type of memory access"],
+      c: 0,
+      why: "A jump writes a new value into the PC, which is how loops and branches work."
+    }
+  ]);
+</script>
+</body>
+</html>

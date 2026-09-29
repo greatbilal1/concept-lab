@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 09 — Leaving a loop early</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="control-flow-logic" data-lesson="9" data-lesson-id="leaving-a-loop-early">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 09</span> · Loops</span>
+
+  <h1 class="lesson-title">Leaving a loop early</h1>
+  <p class="lesson-lede">
+    Sometimes you already have the answer and there is no reason to keep looking.
+    This lesson is about <code>break</code> and <code>continue</code> — the two
+    statements that let you steer a loop from the inside.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Search a list and stop at the first match</span>
+    <span><b>Mission link</b> Loops that respond to what they find</span>
+  </div>
+
+  <h2><span class="n">1</span>break: stop the loop</h2>
+
+  <p>
+    <code>break</code> ends the nearest enclosing loop immediately. Not the current
+    pass — the whole loop. Execution continues at the first line after the loop.
+  </p>
+
+  <pre><code>for n in [3, 7, 12, 5]:
+    if n &gt; 10:
+        print("Found", n)
+        break
+    print("Checked", n)</code></pre>
+
+  <p>
+    That prints <code>Checked 3</code>, <code>Checked 7</code>, then
+    <code>Found 12</code> — and stops. The <code>5</code> is never looked at,
+    because the loop is already over.
+  </p>
+
+  <div id="diagram1"></div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>continue: skip this pass</h2>
+
+  <p>
+    <code>continue</code> is gentler. It abandons the rest of the current pass and
+    jumps straight to the next one. The loop itself keeps going.
+  </p>
+
+  <pre><code>for n in [1, 2, 3, 4, 5]:
+    if n % 2 == 0:
+        continue
+    print(n)          # 1, 3, 5</code></pre>
+
+  <p>
+    The even numbers are skipped, but the loop still visits every item. Use
+    <code>continue</code> when you want to ignore some items rather than stop
+    looking.
+  </p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    <code>break</code> leaves the loop. <code>continue</code> skips one pass. Both
+    affect only the <b>nearest</b> loop — inside a nested loop, they do not touch
+    the outer one.
+  </div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">3</span>The loop else clause</h2>
+
+  <p>
+    Python has a feature most languages lack: a loop can carry an <code>else</code>
+    block. It runs only if the loop finished <b>without</b> hitting
+    <code>break</code>.
+  </p>
+
+  <pre><code>for n in [3, 7, 12]:
+    if n &gt; 10:
+        print("Found", n)
+        break
+else:
+    print("Nothing over ten")</code></pre>
+
+  <p>
+    Read it as "if we never broke out". It is the natural way to express a search
+    that reports failure — and it is why <code>break</code> is not just an
+    optimisation.
+  </p>
+
+  <div id="intro1"></div>
+
+  <div class="note warn">
+    <span class="note-label">Watch out</span>
+    The loop <code>else</code> is not an "if the loop was empty" clause, and it is
+    not a fallback for the loop body. It is specifically "the loop ran to
+    completion without a <code>break</code>".
+  </div>
+
+  <h2><span class="n">4</span>Search and stop</h2>
+
+  <p>
+    Here is the win for today. The lab below searches a list and stops at the first
+    match. Change the target, or the list, and watch how many items get checked.
+  </p>
+
+  <div id="lab1"></div>
+
+  <div id="fill1"></div>
+
+  <h2><span class="n">5</span>Check yourself</h2>
+
+  <p>
+    Answer from memory — do not scroll back up. Each option has the same number of
+    words, so nothing gives the answer away.
+  </p>
+
+  <div id="quiz"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>
+      You can now write a loop that stops as soon as it has what it needs, and one
+      that skips the items it does not care about. Together with the loop
+      <code>else</code>, that is a complete search — and search is what most loops
+      are actually doing.
+    </p>
+  </div>
+
+  <h2><span class="n">6</span>Do this next</h2>
+
+  <ol>
+    <li>
+      Write a loop that finds the first name in a list starting with "S", and prints
+      "none found" if there is no such name.
+    </li>
+    <li>
+      Rewrite a loop that uses <code>continue</code> so it uses an <code>if</code>
+      instead, and explain which version reads better.
+    </li>
+    <li>
+      Write a nested loop and prove that <code>break</code> inside the inner loop
+      does not stop the outer one.
+    </li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Read <a href="https://docs.python.org/3/tutorial/controlflow.html#break-and-continue-statements-and-else-clauses-on-loops">Python — break and continue Statements, and else Clauses on Loops</a>.
+    It is the canonical explanation of the loop <code>else</code>, which is the part
+    most people have never seen.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher (me) anything — "why is it called
+    loop else?", "can I break out of two loops?", "is break bad style?". There are
+    no bad questions here.
+  </div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  /* break vs continue */
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      { title: "break", lines: ["leave the loop"] },
+      { title: "continue", lines: ["skip this pass"] },
+      { title: "else", lines: ["ran without break"] }
+    ]
+  });
+
+  /* predict-then-reveal */
+  TeachWidgets.predict("#predict1", {
+    q: "After break runs, where does execution continue?",
+    a: ["The next pass", "After the loop", "The loop start"],
+    c: 1,
+    why: "break ends the whole loop, so execution resumes at the first statement after it — not at the next pass."
+  });
+
+  /* step through a search with break */
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "for n in [3, 7, 12, 5]:",
+      "    if n > 10:",
+      "        break",
+      "    print(n)"
+    ],
+    steps: [
+      { line: 0, vars: { n: "3" } },
+      { line: 1, vars: { "3 > 10": "False" } },
+      { line: 3, vars: { printed: "3" } },
+      { line: 1, vars: { "7 > 10": "False" } },
+      { line: 3, vars: { printed: "7" } },
+      { line: 1, vars: { "12 > 10": "True" } },
+      { line: 2, vars: { action: "break — loop ends" } }
+    ]
+  });
+
+  /* three things break and continue give you */
+  TeachWidgets.introCards("#intro1", {
+    cards: [
+      { ico: "🛑", title: "Stop searching", body: "break ends the loop the moment the answer is found — no wasted passes." },
+      { ico: "⏭️", title: "Skip an item", body: "continue abandons one pass and moves straight to the next item." },
+      { ico: "🔍", title: "Report failure", body: "The loop else runs only when no break happened, so it means not found." }
+    ]
+  });
+
+  /* the tiny interpreter */
+  TeachWidgets.lab("#lab1", {
+    label: "Run it — change the target and watch the search stop",
+    starter: "target = 12\nfor n in [3, 7, 12, 5]:\n    if n == target:\n        print(\"Found\", n)\n        break\n    print(\"Checked\", n)"
+  });
+
+  /* recall from memory */
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the statements",
+    lines: [
+      "break leaves the <0> loop",
+      "continue skips the rest of the <1> pass",
+      "The loop else runs only without a <2>"
+    ],
+    blanks: [
+      { a: ["nearest"], why: "break affects only the closest enclosing loop, not any outer one." },
+      { a: ["current"], why: "continue abandons the current pass and jumps to the next item." },
+      { a: ["break"], why: "The loop else is skipped entirely if the loop was exited with break." }
+    ]
+  });
+
+  /* the quiz — every option is exactly three words */
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What does break do?",
+      a: ["Skips one pass", "Ends the loop", "Restarts the loop", "Pauses the loop"],
+      c: 1,
+      why: "break ends the nearest enclosing loop immediately and continues after it."
+    },
+    {
+      q: "What does continue do?",
+      a: ["Ends the loop", "Skips this pass", "Restarts from zero", "Exits the program"],
+      c: 1,
+      why: "continue abandons the rest of the current pass and moves to the next item."
+    },
+    {
+      q: "When does loop else run?",
+      a: ["When break happened", "When no break happened", "Always, after the loop", "Never, it is unused"],
+      c: 1,
+      why: "The else block runs only if the loop finished without hitting break."
+    },
+    {
+      q: "Which loop does break affect?",
+      a: ["The nearest one", "Every enclosing one", "The outermost one", "All of them"],
+      c: 0,
+      why: "break only leaves the closest loop; an outer loop keeps running."
+    }
+  ]);
+</script>
+</body>
+</html>

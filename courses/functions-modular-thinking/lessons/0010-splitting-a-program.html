@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 10 — Splitting a program</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="functions-modular-thinking" data-lesson="10" data-lesson-id="splitting-a-program">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 10</span> · Modular thinking</span>
+
+  <h1 class="lesson-title">Splitting a program</h1>
+  <p class="lesson-lede">
+    Everything in this course has been building to one move: take a long script and
+    break it into named pieces, each doing one job. This lesson is that move, done
+    on a real program.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~12 min</span>
+    <span><b>Win</b> Split a script into functions</span>
+    <span><b>Mission link</b> Make a program you can change</span>
+  </div>
+
+  <h2><span class="n">1</span>The long script</h2>
+
+  <p>
+    Here is a program that works. It reads a list of scores, works out the average,
+    and prints a report. It is also a wall of statements with no names.
+  </p>
+
+  <pre><code>scores = [88, 92, 79, 95, 61]
+
+total = 0
+for s in scores:
+    total = total + s
+average = total / len(scores)
+
+print("Scores:", scores)
+print("Average:", average)
+if average &gt;= 70:
+    print("Result: pass")
+else:
+    print("Result: fail")</code></pre>
+
+  <p>
+    Nothing here is wrong. But if you want to reuse the average, or test the pass
+    rule, or change the report format, you have to cut into the middle of the
+    script.
+  </p>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>One job per function</h2>
+
+  <p>
+    <b>Single responsibility</b> means each function does one thing, and its name
+    says what that thing is. Read the script above and ask: what are the separate
+    jobs?
+  </p>
+
+  <div id="diagram1"></div>
+
+  <p>
+    Three jobs: compute the average, decide the result, print the report. Each one
+    becomes a function. The script at the bottom becomes three calls.
+  </p>
+
+  <pre><code>def average(numbers):
+    """Return the mean of a list of numbers."""
+    return sum(numbers) / len(numbers)
+
+def result(avg):
+    """Return 'pass' or 'fail' for an average."""
+    return "pass" if avg &gt;= 70 else "fail"
+
+def report(scores):
+    """Print a report for a list of scores."""
+    avg = average(scores)
+    print("Scores:", scores)
+    print("Average:", avg)
+    print("Result:", result(avg))
+
+report([88, 92, 79, 95, 61])</code></pre>
+
+  <p>
+    The behaviour is identical. But now each piece has a name, a contract, and a
+    place to be tested on its own.
+  </p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">3</span>Decomposition and refactoring</h2>
+
+  <p>
+    <b>Decomposition</b> is the act of breaking a problem into smaller pieces.
+    <b>Refactoring</b> is changing the structure of code without changing what it
+    does. This lesson is both: the output is the same, the shape is new.
+  </p>
+
+  <p>
+    The test of a good split is simple. Can you describe each function in one
+    sentence without using the word "and"? If not, it is probably two functions
+    wearing one name.
+  </p>
+
+  <div id="intro1"></div>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Split by job, not by line count. Each function should do one thing, be named for
+    that thing, and be usable without reading the rest of the program.
+  </div>
+
+  <h2><span class="n">4</span>Split it yourself</h2>
+
+  <p>
+    Here is the win for today. The lab below is the long script. Break it into
+    functions, one job each, and confirm the output does not change.
+  </p>
+
+  <div id="lab1"></div>
+
+  <div id="fill1"></div>
+
+  <h2><span class="n">5</span>Check yourself</h2>
+
+  <p>
+    Answer from memory — do not scroll back up. Each option has the same number of
+    words, so nothing gives the answer away.
+  </p>
+
+  <div id="quiz"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>
+      You can now take a working script and give it a shape: named pieces, each with
+      one job and a written contract. That is the whole course in one move — and it
+      is the skill every larger program is built on, from the next course onward.
+    </p>
+  </div>
+
+  <h2><span class="n">6</span>Do this next</h2>
+
+  <ol>
+    <li>
+      Take the long script above and split it into three functions, then confirm the
+      output is unchanged.
+    </li>
+    <li>
+      Find a script you wrote earlier and name its jobs. Split the two biggest ones
+      into functions.
+    </li>
+    <li>
+      For each new function, write a one-sentence docstring that does not use the
+      word "and".
+    </li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Read <a href="https://docs.python.org/3/tutorial/controlflow.html#intermezzo-coding-style">Python — More Control Flow Tools: Intermezzo: Coding Style</a>.
+    It is the official short guide to naming and structuring code for readers.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher (me) anything — "how small is too
+    small?", "when should I merge functions?", "what comes after functions?".
+    There are no bad questions here.
+  </div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  /* predict-then-reveal */
+  TeachWidgets.predict("#predict1", {
+    q: "What is the main problem with the long script?",
+    a: ["Its pieces have no names", "It runs far too slowly", "It uses too much memory", "It has a syntax error"],
+    c: 0,
+    why: "The script works, but nothing is named, so no piece can be reused or tested alone."
+  });
+
+  /* one job per function */
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      { title: "job 1", lines: ["average(scores)"] },
+      { title: "job 2", lines: ["result(avg)"] },
+      { title: "job 3", lines: ["report(scores)"] },
+      { title: "script", lines: ["three calls"] }
+    ]
+  });
+
+  /* step through the split program */
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "def average(numbers):",
+      "    return sum(numbers) / len(numbers)",
+      "def result(avg):",
+      "    return \"pass\" if avg >= 70 else \"fail\"",
+      "avg = average([88, 92, 79, 95, 61])",
+      "print(result(avg))"
+    ],
+    steps: [
+      { line: 4, vars: { action: "call average" } },
+      { line: 1, vars: { "sum / len": "83.0", action: "return 83.0" } },
+      { line: 4, vars: { avg: "83.0" } },
+      { line: 5, vars: { action: "call result" } },
+      { line: 3, vars: { "83.0 >= 70": "True", action: "return pass" } },
+      { line: 5, vars: { printed: "pass" } }
+    ]
+  });
+
+  /* three ideas of modular thinking */
+  TeachWidgets.introCards("#intro1", {
+    cards: [
+      { ico: "🎯", title: "One job", body: "Each function does one thing, and its name says what." },
+      { ico: "🧩", title: "Decomposition", body: "Break a problem into smaller pieces you can name." },
+      { ico: "🔧", title: "Refactoring", body: "Change the shape of code without changing what it does." }
+    ]
+  });
+
+  /* the tiny interpreter */
+  TeachWidgets.lab("#lab1", {
+    label: "Run it — split the script into functions",
+    starter: "scores = [88, 92, 79, 95, 61]\n\ntotal = 0\nfor s in scores:\n    total = total + s\naverage = total / len(scores)\n\nprint(\"Scores:\", scores)\nprint(\"Average:\", average)\nif average >= 70:\n    print(\"Result: pass\")\nelse:\n    print(\"Result: fail\")"
+  });
+
+  /* recall from memory */
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the split",
+    lines: [
+      "Each function should do <0> job",
+      "Breaking a problem into pieces is <1>",
+      "Changing shape without changing behaviour is <2>"
+    ],
+    blanks: [
+      { a: ["one"], why: "Single responsibility: each function does one thing, named for that thing." },
+      { a: ["decomposition"], why: "Decomposition is breaking a problem into smaller pieces." },
+      { a: ["refactoring"], why: "Refactoring changes the structure of code without changing what it does." }
+    ]
+  });
+
+  /* the quiz — every option is exactly four words */
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is single responsibility?",
+      a: ["One job per function", "One function per file", "One line per statement", "One variable per name"],
+      c: 0,
+      why: "Single responsibility means each function does one thing, named for that thing."
+    },
+    {
+      q: "What is decomposition?",
+      a: ["Breaking a problem down", "Making the code run faster", "Removing all the functions", "Writing longer variable names"],
+      c: 0,
+      why: "Decomposition is breaking a problem into smaller pieces you can name and solve."
+    },
+    {
+      q: "What is refactoring?",
+      a: ["Changing shape, not behaviour", "Changing behaviour, not shape", "Adding features to the program", "Deleting the unused functions"],
+      c: 0,
+      why: "Refactoring changes the structure of code while keeping its behaviour identical."
+    },
+    {
+      q: "How do you test a good split?",
+      a: ["Describe each without and", "Count the lines in each", "Run it many times over", "Check the file length"],
+      c: 0,
+      why: "If you cannot describe a function in one sentence without 'and', it is probably two functions."
+    }
+  ]);
+</script>
+</body>
+</html>

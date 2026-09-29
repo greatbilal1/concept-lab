@@ -1,0 +1,229 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1180 900" role="img" aria-labelledby="dgTitle dgDesc">
+  <title id="dgTitle">self and attributes — an illustrated mental model</title>
+  <desc id="dgDesc">An illustrative diagram explaining three ideas from Lesson 02. First, one class is a blueprint while each object is a separate bundle of state, shown as two books with their own title and copies. Second, calling a.borrow() is the same as Book.borrow(a): the object you called it on is handed in as the first argument, which we name self. Third, forgetting the self. prefix inside a method creates a local variable that vanishes, so the attribute never changes.</desc>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&amp;display=swap');
+    text { font-family: 'JetBrains Mono', 'SF Mono', 'Cascadia Code', monospace; }
+    .t-title  { font-size: 30px; font-weight: 700; fill: #ffffff; }
+    .t-sub    { font-size: 15px; font-weight: 400; fill: #94a3b8; }
+    .t-h      { font-size: 19px; font-weight: 700; fill: #ffffff; }
+    .t-name   { font-size: 17px; font-weight: 600; fill: #ffffff; }
+    .t-body   { font-size: 15px; font-weight: 400; fill: #cbd5e1; }
+    .t-dim    { font-size: 14px; font-weight: 400; fill: #94a3b8; }
+    .t-ann    { font-size: 14px; font-weight: 400; fill: #94a3b8; }
+    .t-ann-hi { font-size: 14px; font-weight: 600; fill: #e2e8f0; }
+    .t-tiny   { font-size: 13px; font-weight: 500; fill: #94a3b8; }
+    .t-code   { font-size: 15px; font-weight: 500; fill: #e2e8f0; }
+    .t-code-hi{ font-size: 15px; font-weight: 700; fill: #67e8f9; }
+    .t-code-em{ font-size: 15px; font-weight: 700; fill: #6ee7b7; }
+    .t-code-vi{ font-size: 15px; font-weight: 700; fill: #c4b5fd; }
+    .t-code-ro{ font-size: 15px; font-weight: 700; fill: #fda4af; }
+    .t-legend { font-size: 14px; font-weight: 400; fill: #94a3b8; }
+    .t-legend-h{ font-size: 14px; font-weight: 700; fill: #e2e8f0; letter-spacing: .6px; }
+    .t-num    { font-size: 20px; font-weight: 700; fill: #0f172a; }
+  </style>
+
+  <defs>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#1e293b" stroke-width="0.5"/>
+    </pattern>
+
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#64748b"/>
+    </marker>
+    <marker id="arrow-cyan" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#22d3ee"/>
+    </marker>
+    <marker id="arrow-emerald" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#34d399"/>
+    </marker>
+    <marker id="arrow-violet" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#a78bfa"/>
+    </marker>
+    <marker id="arrow-amber" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#fbbf24"/>
+    </marker>
+    <marker id="arrow-rose" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#fb7185"/>
+    </marker>
+    <marker id="arrow-slate" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#94a3b8"/>
+    </marker>
+
+    <radialGradient id="spot" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#22d3ee" stop-opacity="0.22"/>
+      <stop offset="100%" stop-color="#22d3ee" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="spotRose" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#fb7185" stop-opacity="0.20"/>
+      <stop offset="100%" stop-color="#fb7185" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- ============ 1. background ============ -->
+  <rect width="100%" height="100%" fill="#0f172a"/>
+  <rect width="100%" height="100%" fill="url(#grid)"/>
+
+  <!-- ============ 2. title block ============ -->
+  <text x="40" y="58" class="t-title">self &amp; attributes</text>
+  <text x="40" y="84" class="t-sub">Lesson 02 · an illustrated mental model — one class, many objects, one hidden argument</text>
+  <line x1="40" y1="100" x2="1140" y2="100" stroke="#1e293b" stroke-width="1"/>
+
+  <!-- ============================================================= -->
+  <!-- PANEL 1 — ONE CLASS, MANY OBJECTS (two books, two states)     -->
+  <!-- ============================================================= -->
+  <rect x="40" y="122" width="1100" height="330" rx="14" fill="rgba(30,41,59,0.28)" stroke="#334155" stroke-width="1"/>
+  <circle cx="70" cy="152" r="16" fill="#22d3ee"/>
+  <text x="70" y="159" class="t-num" text-anchor="middle">1</text>
+  <text x="98" y="159" class="t-h">One class, many objects — each keeps its own state</text>
+
+  <!-- The class: a blueprint / stamp -->
+  <rect x="72" y="192" width="250" height="228" rx="10" fill="#0f172a"/>
+  <rect x="72" y="192" width="250" height="228" rx="10" fill="rgba(76,29,149,0.30)" stroke="#a78bfa" stroke-width="1.5" stroke-dasharray="7,4"/>
+  <text x="197" y="222" class="t-name" text-anchor="middle">class Book</text>
+  <text x="197" y="244" class="t-ann" text-anchor="middle">the blueprint — behaviour only</text>
+  <line x1="90" y1="258" x2="304" y2="258" stroke="#a78bfa" stroke-width="0.8" stroke-opacity="0.5"/>
+  <text x="90" y="284" class="t-code-vi">def __init__(self, title, copies)</text>
+  <text x="90" y="310" class="t-code-vi">def borrow(self)</text>
+  <text x="90" y="336" class="t-code-vi">def describe(self)</text>
+  <text x="90" y="374" class="t-ann">No title. No copies.</text>
+  <text x="90" y="394" class="t-ann">The class itself stores</text>
+  <text x="90" y="414" class="t-ann">no per-object data.</text>
+
+  <!-- stamp arrows: class -> two instances -->
+  <path d="M 322 280 C 356 280, 356 262, 386 262" fill="none" stroke="#a78bfa" stroke-width="1.4" marker-end="url(#arrow-violet)"/>
+  <path d="M 322 330 C 356 330, 356 420, 386 420" fill="none" stroke="#a78bfa" stroke-width="1.4" marker-end="url(#arrow-violet)"/>
+  <text x="354" y="252" class="t-tiny" text-anchor="middle">stamp</text>
+  <text x="354" y="444" class="t-tiny" text-anchor="middle">stamp</text>
+
+  <!-- Object a -->
+  <rect x="386" y="200" width="316" height="124" rx="10" fill="#0f172a"/>
+  <rect x="386" y="200" width="316" height="124" rx="10" fill="rgba(8,51,68,0.40)" stroke="#22d3ee" stroke-width="1.5"/>
+  <text x="408" y="228" class="t-name">a = Book("Dune", 3)</text>
+  <text x="408" y="252" class="t-ann">object a — its own bundle of state</text>
+  <line x1="404" y1="266" x2="684" y2="266" stroke="#22d3ee" stroke-width="0.8" stroke-opacity="0.5"/>
+  <text x="408" y="290" class="t-code-hi">a.title</text>
+  <text x="500" y="290" class="t-code">= "Dune"</text>
+  <text x="408" y="314" class="t-code-hi">a.copies</text>
+  <text x="500" y="314" class="t-code">= 3</text>
+
+  <!-- Object b -->
+  <rect x="386" y="358" width="316" height="124" rx="10" fill="#0f172a"/>
+  <rect x="386" y="358" width="316" height="124" rx="10" fill="rgba(6,78,59,0.40)" stroke="#34d399" stroke-width="1.5"/>
+  <text x="408" y="386" class="t-name">b = Book("Neuromancer", 1)</text>
+  <text x="408" y="410" class="t-ann">object b — a separate bundle of state</text>
+  <line x1="404" y1="424" x2="684" y2="424" stroke="#34d399" stroke-width="0.8" stroke-opacity="0.5"/>
+  <text x="408" y="448" class="t-code-em">b.title</text>
+  <text x="500" y="448" class="t-code">= "Neuromancer"</text>
+  <text x="408" y="472" class="t-code-em">b.copies</text>
+  <text x="500" y="472" class="t-code">= 1</text>
+
+  <!-- the change: a.copies -= 1 -->
+  <rect x="726" y="200" width="390" height="282" rx="10" fill="#0f172a"/>
+  <rect x="726" y="200" width="390" height="282" rx="10" fill="rgba(120,53,15,0.22)" stroke="#fbbf24" stroke-width="1.5"/>
+  <text x="748" y="230" class="t-name">Change one — watch the other</text>
+  <line x1="744" y1="244" x2="1098" y2="244" stroke="#fbbf24" stroke-width="0.8" stroke-opacity="0.5"/>
+  <text x="748" y="272" class="t-code">a.copies -= 1</text>
+  <text x="748" y="298" class="t-ann">a.copies is now 2</text>
+  <text x="748" y="320" class="t-ann">b.copies is still 1 — untouched</text>
+
+  <!-- mini before/after bars -->
+  <text x="748" y="356" class="t-tiny">a.copies</text>
+  <rect x="836" y="344" width="110" height="15" rx="3" fill="rgba(34,211,238,0.25)" stroke="#22d3ee" stroke-width="1"/>
+  <rect x="836" y="344" width="73" height="15" rx="3" fill="#22d3ee" fill-opacity="0.85"/>
+  <text x="956" y="356" class="t-tiny">3 → 2</text>
+
+  <text x="748" y="392" class="t-tiny">b.copies</text>
+  <rect x="836" y="380" width="110" height="15" rx="3" fill="rgba(52,211,153,0.25)" stroke="#34d399" stroke-width="1"/>
+  <rect x="836" y="380" width="37" height="15" rx="3" fill="#34d399" fill-opacity="0.85"/>
+  <text x="956" y="392" class="t-tiny">1 → 1</text>
+
+  <text x="748" y="432" class="t-ann-hi">Attributes live on the object.</text>
+  <text x="748" y="452" class="t-ann">Two objects from one class are two</text>
+  <text x="748" y="472" class="t-ann">separate bundles of state.</text>
+
+  <!-- ============================================================= -->
+  <!-- PANEL 2 — a.borrow() IS Book.borrow(a)  (self is handed in)   -->
+  <!-- ============================================================= -->
+  <rect x="40" y="472" width="1100" height="272" rx="14" fill="rgba(30,41,59,0.28)" stroke="#334155" stroke-width="1"/>
+  <circle cx="70" cy="502" r="16" fill="#22d3ee"/>
+  <text x="70" y="509" class="t-num" text-anchor="middle">2</text>
+  <text x="98" y="509" class="t-h">a.borrow() is really Book.borrow(a) — the object becomes self</text>
+
+  <!-- left: the normal way -->
+  <rect x="72" y="540" width="300" height="104" rx="10" fill="#0f172a"/>
+  <rect x="72" y="540" width="300" height="104" rx="10" fill="rgba(8,51,68,0.40)" stroke="#22d3ee" stroke-width="1.5"/>
+  <text x="94" y="570" class="t-ann">the normal way</text>
+  <text x="94" y="602" class="t-code-hi">a.borrow()</text>
+  <text x="94" y="626" class="t-ann">you name the object, then the method</text>
+
+  <!-- equivalence sign -->
+  <text x="404" y="596" class="t-h" text-anchor="middle" fill="#fbbf24">≡</text>
+  <text x="404" y="620" class="t-tiny" text-anchor="middle">same thing</text>
+
+  <!-- right: what Python really does -->
+  <rect x="436" y="540" width="300" height="104" rx="10" fill="#0f172a"/>
+  <rect x="436" y="540" width="300" height="104" rx="10" fill="rgba(6,78,59,0.40)" stroke="#34d399" stroke-width="1.5"/>
+  <text x="458" y="570" class="t-ann">what Python really does</text>
+  <text x="458" y="602" class="t-code-em">Book.borrow(a)</text>
+  <text x="458" y="626" class="t-ann">the object is passed as the first argument</text>
+
+  <!-- the spotlight: self = a -->
+  <circle cx="930" cy="592" r="130" fill="url(#spot)"/>
+  <rect x="772" y="540" width="344" height="104" rx="10" fill="#0f172a"/>
+  <rect x="772" y="540" width="344" height="104" rx="10" fill="rgba(8,51,68,0.40)" stroke="#22d3ee" stroke-width="1.5"/>
+  <text x="794" y="570" class="t-ann">inside the method, that first argument is named</text>
+  <text x="794" y="604" class="t-code-hi">self</text>
+  <text x="852" y="604" class="t-code">→ self is a</text>
+  <text x="794" y="628" class="t-ann">an ordinary parameter — the community just calls it self</text>
+
+  <!-- arrow from Book.borrow(a) to self -->
+  <path d="M 736 592 L 768 592" fill="none" stroke="#22d3ee" stroke-width="1.6" marker-end="url(#arrow-cyan)"/>
+
+  <!-- bottom note -->
+  <text x="94" y="678" class="t-ann-hi">self is not a keyword and not magic.</text>
+  <text x="94" y="700" class="t-ann">It is the object the method was called on, handed in automatically as the first parameter.</text>
+  <text x="94" y="722" class="t-ann">Inside a method you reach attributes through self.copies. Outside, through a.copies.</text>
+
+  <!-- ============================================================= -->
+  <!-- PANEL 3 — THE MISSING self. TRAP                              -->
+  <!-- ============================================================= -->
+  <rect x="40" y="760" width="1100" height="112" rx="14" fill="rgba(30,41,59,0.28)" stroke="#334155" stroke-width="1"/>
+  <circle cx="70" cy="790" r="16" fill="#fb7185"/>
+  <text x="70" y="797" class="t-num" text-anchor="middle">3</text>
+  <text x="98" y="797" class="t-h">The trap: forgetting self. makes a local variable that vanishes</text>
+
+  <circle cx="250" cy="838" r="110" fill="url(#spotRose)"/>
+
+  <!-- wrong -->
+  <rect x="72" y="812" width="330" height="46" rx="10" fill="#0f172a"/>
+  <rect x="72" y="812" width="330" height="46" rx="10" fill="rgba(136,19,55,0.40)" stroke="#fb7185" stroke-width="1.5"/>
+  <text x="94" y="841" class="t-code-ro">copies = copies - 1</text>
+
+  <!-- arrow -->
+  <path d="M 410 835 L 452 835" fill="none" stroke="#fb7185" stroke-width="1.6" marker-end="url(#arrow-rose)"/>
+
+  <!-- result -->
+  <rect x="460" y="812" width="330" height="46" rx="10" fill="#0f172a"/>
+  <rect x="460" y="812" width="330" height="46" rx="10" fill="rgba(136,19,55,0.28)" stroke="#fb7185" stroke-width="1.5" stroke-dasharray="6,4"/>
+  <text x="482" y="841" class="t-ann-hi">the local vanishes — the attribute never changes</text>
+
+  <!-- fix -->
+  <rect x="812" y="812" width="304" height="46" rx="10" fill="#0f172a"/>
+  <rect x="812" y="812" width="304" height="46" rx="10" fill="rgba(6,78,59,0.40)" stroke="#34d399" stroke-width="1.5"/>
+  <text x="834" y="841" class="t-code-em">self.copies = self.copies - 1</text>
+
+  <!-- ============ legend ============ -->
+  <text x="40" y="892" class="t-legend-h">LEGEND</text>
+  <rect x="118" y="883" width="14" height="12" rx="2" fill="rgba(76,29,149,0.30)" stroke="#a78bfa" stroke-width="1"/>
+  <text x="140" y="894" class="t-legend">class / blueprint</text>
+  <rect x="290" y="883" width="14" height="12" rx="2" fill="rgba(8,51,68,0.40)" stroke="#22d3ee" stroke-width="1"/>
+  <text x="312" y="894" class="t-legend">object a / self</text>
+  <rect x="462" y="883" width="14" height="12" rx="2" fill="rgba(6,78,59,0.40)" stroke="#34d399" stroke-width="1"/>
+  <text x="484" y="894" class="t-legend">object b / correct code</text>
+  <rect x="672" y="883" width="14" height="12" rx="2" fill="rgba(120,53,15,0.22)" stroke="#fbbf24" stroke-width="1"/>
+  <text x="694" y="894" class="t-legend">state change</text>
+  <rect x="822" y="883" width="14" height="12" rx="2" fill="rgba(136,19,55,0.40)" stroke="#fb7185" stroke-width="1"/>
+  <text x="844" y="894" class="t-legend">trap / mistake</text>
+</svg>

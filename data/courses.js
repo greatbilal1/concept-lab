@@ -28,9 +28,12 @@
      prereq     course ids that should be learned first
      related    course ids that pair well
      paths      path ids this course belongs to
-     concepts   concept ids this course teaches (see data/concepts.js)
      sections   [{ id, title, anim }] — course page table of contents
                 (live courses only; omitted for planned courses)
+     glossary   path to the course's own glossary page (live courses
+                only). The site-wide glossary links each term here, so
+                the term list lives in exactly one place: the course's
+                own manifest (courses/<id>/lessons.js).
    ============================================================ */
 
 window.COURSES = [
@@ -43,60 +46,127 @@ window.COURSES = [
     tag: "FOUNDATIONS", category: "foundations", level: "beginner", tier: 1,
     desc: "From transistors and binary to memory and the CPU — the machine underneath every line of code.",
     chips: ["Binary", "CPU", "Memory"], colors: { c1: "#2563eb", c2: "#0891b2" }, stageArt: "layers",
-    status: "planned", tags: ["foundations", "hardware", "cs"],
+    status: "live", tags: ["foundations", "hardware", "cs"],
+    meta: "12 lessons · interactive quizzes · hands-on counting",
     prereq: [], related: ["programming-computational-thinking", "variables-types-memory"],
     paths: ["cs-foundations"],
-    concepts: ["memory", "data-type", "value"]
+    concepts: ["memory", "data-type", "value"],
+    href: "courses/how-computers-work/course.html",
+    lessons: { href: "courses/how-computers-work/course.html", label: "Guided lessons" },
+    glossary: "courses/how-computers-work/reference/how-computers-work-glossary.html",
+    sections: [
+      { id: "numbers", title: "Numbers", anim: "HcwBits" },
+      { id: "logic", title: "Logic & circuits", anim: "HcwGates" },
+      { id: "machine", title: "The machine", anim: "HcwCpu" },
+      { id: "data", title: "Data & translation", anim: "HcwCompile" }
+    ]
   },
   {
     num: 2, id: "programming-computational-thinking", title: "Programming & Computational Thinking", emoji: "🧠",
     tag: "FOUNDATIONS", category: "foundations", level: "beginner", tier: 1,
-    desc: "Decomposition, patterns, abstraction and algorithms — how to turn a problem into steps a computer can run.",
+    desc: "Decomposition, patterns, abstraction, algorithms, evaluation and generalisation — how to turn a problem into steps a computer can run, then judge and widen them.",
     chips: ["Decomposition", "Abstraction", "Algorithms"], colors: { c1: "#7c3aed", c2: "#2563eb" }, stageArt: "flow",
-    status: "planned", tags: ["foundations", "thinking"],
+    status: "live", tags: ["foundations", "thinking"],
+    meta: "8 lessons · interactive quizzes · worked examples",
     prereq: ["how-computers-work"], related: ["control-flow-logic", "algorithms-problem-solving"],
     paths: ["cs-foundations", "python-developer"],
-    concepts: ["algorithm", "abstraction", "control-flow"]
+    concepts: ["algorithm", "abstraction", "control-flow"],
+    href: "courses/programming-computational-thinking/course.html",
+    lessons: { href: "courses/programming-computational-thinking/course.html", label: "Guided lessons" },
+    glossary: "courses/programming-computational-thinking/reference/programming-computational-thinking-glossary.html",
+    sections: [
+      { id: "thinking", title: "Computational thinking", anim: "PctLoop" },
+      { id: "decomposition", title: "Decomposition", anim: "PctDecompose" },
+      { id: "patterns", title: "Patterns", anim: "PctPattern" },
+      { id: "abstraction", title: "Abstraction", anim: "PctAbstract" },
+      { id: "algorithms", title: "Algorithms", anim: "PctAlgorithm" },
+      { id: "evaluation", title: "Evaluation", anim: "PctEvaluate" },
+      { id: "generalisation", title: "Generalisation", anim: "PctGeneralise" },
+      { id: "together", title: "Putting it together", anim: "PctTogether" }
+    ]
   },
   {
     num: 3, id: "variables-types-memory", title: "Variables, Types & Memory", emoji: "📦",
     tag: "FOUNDATIONS", category: "foundations", level: "beginner", tier: 1,
     desc: "Names, values, types and what actually happens in memory when you assign one to the other.",
     chips: ["Variables", "Types", "References"], colors: { c1: "#0891b2", c2: "#22c55e" }, stageArt: "code",
-    status: "planned", tags: ["foundations", "types"],
+    status: "live", tags: ["foundations", "types"],
+    meta: "10 lessons · interactive quizzes · worked examples",
     prereq: ["programming-computational-thinking"], related: ["control-flow-logic", "python-fundamentals"],
     paths: ["cs-foundations", "python-developer"],
-    concepts: ["variable", "value", "data-type", "memory", "state"]
+    concepts: ["variable", "value", "data-type", "memory", "state"],
+    href: "courses/variables-types-memory/course.html",
+    lessons: { href: "courses/variables-types-memory/course.html", label: "Guided lessons" },
+    glossary: "courses/variables-types-memory/reference/variables-types-memory-glossary.html",
+    sections: [
+      { id: "names", title: "Names & values", anim: "VtmName" },
+      { id: "types", title: "Types", anim: "VtmType" },
+      { id: "memory", title: "Memory", anim: "VtmRef" },
+      { id: "together", title: "Putting it together", anim: "VtmCopy" }
+    ]
   },
   {
     num: 4, id: "control-flow-logic", title: "Control Flow & Logic", emoji: "🔀",
     tag: "FOUNDATIONS", category: "foundations", level: "beginner", tier: 1,
     desc: "Conditions, loops and boolean logic — the machinery that lets a program make decisions and repeat work.",
     chips: ["Conditions", "Loops", "Booleans"], colors: { c1: "#f59e0b", c2: "#ef4444" }, stageArt: "flow",
-    status: "planned", tags: ["foundations", "logic"],
+    status: "live", tags: ["foundations", "logic"],
+    meta: "10 lessons · interactive quizzes · worked examples",
     prereq: ["variables-types-memory"], related: ["functions-modular-thinking", "algorithms-problem-solving"],
     paths: ["cs-foundations", "python-developer"],
-    concepts: ["control-flow", "state"]
+    concepts: ["control-flow", "state"],
+    href: "courses/control-flow-logic/course.html",
+    lessons: { href: "courses/control-flow-logic/course.html", label: "Guided lessons" },
+    glossary: "courses/control-flow-logic/reference/control-flow-logic-glossary.html",
+    sections: [
+      { id: "booleans", title: "Booleans", anim: "CflTruth" },
+      { id: "logic", title: "Logic", anim: "CflCombine" },
+      { id: "branching", title: "Branching", anim: "CflBranch" },
+      { id: "loops", title: "Loops", anim: "CflWhile" },
+      { id: "together", title: "Putting it together", anim: "CflTogether" }
+    ]
   },
   {
     num: 5, id: "functions-modular-thinking", title: "Functions & Modular Thinking", emoji: "🧩",
     tag: "FOUNDATIONS", category: "foundations", level: "beginner", tier: 1,
     desc: "Parameters, return values, scope and the call stack — breaking a program into pieces you can name.",
     chips: ["Parameters", "Return", "Scope"], colors: { c1: "#22c55e", c2: "#0ea5e9" }, stageArt: "code-pulse",
-    status: "planned", tags: ["foundations", "functions"],
+    status: "live", tags: ["foundations", "functions"],
+    meta: "10 lessons · interactive quizzes · worked examples",
     prereq: ["control-flow-logic"], related: ["procedural-programming", "oop"],
     paths: ["cs-foundations", "python-developer"],
-    concepts: ["function", "parameter", "return-value", "scope"]
+    concepts: ["function", "parameter", "return-value", "scope"],
+    href: "courses/functions-modular-thinking/course.html",
+    lessons: { href: "courses/functions-modular-thinking/course.html", label: "Guided lessons" },
+    glossary: "courses/functions-modular-thinking/reference/functions-modular-thinking-glossary.html",
+    sections: [
+      { id: "defining", title: "Defining", anim: "FmtDefine" },
+      { id: "passing", title: "Passing", anim: "FmtParams" },
+      { id: "returning", title: "Returning", anim: "FmtReturn" },
+      { id: "scope", title: "Scope & the stack", anim: "FmtStack" },
+      { id: "modular", title: "Modular thinking", anim: "FmtSplit" }
+    ]
   },
   {
     num: 6, id: "procedural-programming", title: "Procedural Programming", emoji: "📜",
     tag: "FOUNDATIONS", category: "foundations", level: "beginner", tier: 1,
     desc: "Organising a program as a sequence of named steps — the style most code starts in, and its limits.",
     chips: ["Steps", "State", "Modules"], colors: { c1: "#0ea5e9", c2: "#6366f1" }, stageArt: "flow",
-    status: "planned", tags: ["foundations", "procedural"],
+    status: "live", href: "courses/procedural-programming/course.html",
+    lessons: { href: "courses/procedural-programming/course.html", label: "Guided lessons" },
+    glossary: "courses/procedural-programming/reference/procedural-programming-glossary.html",
+    meta: "10 lessons · interactive quizzes · worked examples",
+    tags: ["foundations", "procedural"],
     prereq: ["functions-modular-thinking"], related: ["oop", "software-project-structure"],
     paths: ["cs-foundations", "python-developer"],
-    concepts: ["function", "state", "control-flow", "scope"]
+    concepts: ["function", "state", "control-flow", "scope"],
+    sections: [
+      { id: "steps", title: "Steps", anim: "PpSequence" },
+      { id: "data", title: "Data", anim: "PpParams" },
+      { id: "structure", title: "Structure", anim: "PpOneJob" },
+      { id: "modules", title: "Modules", anim: "PpModule" },
+      { id: "together", title: "Putting it together", anim: "PpTogether" }
+    ]
   },
   {
     num: 7, id: "oop", title: "Object-Oriented Programming", emoji: "🧩",
@@ -104,8 +174,9 @@ window.COURSES = [
     desc: "A detailed, visual, hands-on introduction to OOP — from classes and objects all the way to dataclasses and real design.",
     chips: ["Classes", "Inheritance", "Polymorphism", "Dataclasses", "+14 more"],
     colors: { c1: "#2563eb", c2: "#7c3aed" }, stageArt: "code",
-    status: "live", href: "oop_interactive_course.html",
+    status: "live", href: "courses/oop/course.html",
     lessons: { href: "courses/oop/course.html", label: "Guided lessons" },
+    glossary: "courses/oop/reference/oop-glossary.html",
     meta: "19 lessons • interactive quiz • lab",
     tags: ["python", "oop", "design", "classes"],
     prereq: ["functions-modular-thinking"],

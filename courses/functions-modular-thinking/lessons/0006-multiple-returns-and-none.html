@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 06 — Multiple returns and None</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="functions-modular-thinking" data-lesson="6" data-lesson-id="multiple-returns-and-none">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 06</span> · Returning</span>
+
+  <h1 class="lesson-title">Multiple returns and None</h1>
+  <p class="lesson-lede">
+    A function can have more than one <code>return</code>, but only one of them ever
+    runs. And a function with no <code>return</code> at all still hands something
+    back. This lesson is about both halves of that surprise.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Write a function with two exits</span>
+    <span><b>Mission link</b> Handle the empty case</span>
+  </div>
+
+  <h2><span class="n">1</span>More than one exit</h2>
+
+  <p>
+    A function body can contain several <code>return</code> statements. They are not
+    all used — the <b>first one reached</b> ends the function, and the rest are
+    skipped.
+  </p>
+
+  <pre><code>def sign(n):
+    if n &gt; 0:
+        return "positive"
+    if n &lt; 0:
+        return "negative"
+    return "zero"</code></pre>
+
+  <p>
+    Exactly one of those three lines runs, depending on <code>n</code>. This is the
+    early-exit shape from the control-flow course, now producing a value instead of
+    printing one.
+  </p>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Every path must return</h2>
+
+  <p>
+    If a function is supposed to produce a value, every path through its body must
+    reach a <code>return</code>. Miss one, and that path hands back
+    <code>None</code> — silently.
+  </p>
+
+  <pre><code>def sign(n):
+    if n &gt; 0:
+        return "positive"
+    if n &lt; 0:
+        return "negative"
+    # no return for zero!
+
+print(sign(0))   # None</code></pre>
+
+  <p>
+    The bug is invisible until you call it with <code>0</code>. This is why the
+    final <code>return</code> with no condition is worth writing even when it feels
+    redundant: it makes the last path explicit.
+  </p>
+
+  <div id="diagram1"></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">3</span>The implicit None</h2>
+
+  <p>
+    A function whose body finishes without reaching any <code>return</code> hands
+    back <code>None</code>. This is not an error — it is Python's value for "no
+    value", and it is what every printing function has been returning all along.
+  </p>
+
+  <pre><code>def show(x):
+    print(x)
+
+result = show(5)   # prints 5
+print(result)      # None</code></pre>
+
+  <p>
+    So <code>None</code> is a signal. When a call evaluates to <code>None</code>,
+    either the function is meant to be used for its side effect (like printing), or
+    a path forgot to return. Learning to tell those two apart is a real skill.
+  </p>
+
+  <div id="intro1"></div>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Only the first <code>return</code> reached runs. A function with no
+    <code>return</code> hands back <code>None</code> — so <code>None</code> is
+    either a deliberate "no value" or a forgotten return.
+  </div>
+
+  <h2><span class="n">4</span>Two exits</h2>
+
+  <p>
+    Here is the win for today. The lab below has two returns. Call it with a
+    positive and a negative number, then delete the final return and call it with
+    zero.
+  </p>
+
+  <div id="lab1"></div>
+
+  <div id="fill1"></div>
+
+  <h2><span class="n">5</span>Check yourself</h2>
+
+  <p>
+    Answer from memory — do not scroll back up. Each option has the same number of
+    words, so nothing gives the answer away.
+  </p>
+
+  <div id="quiz"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>
+      You can now write a function with several exits and be sure exactly one runs,
+      and you can read <code>None</code> as a signal rather than a mystery. That
+      second skill is what makes a traceback readable in the next lesson — most
+      "NoneType has no attribute" errors are a forgotten return.
+    </p>
+  </div>
+
+  <h2><span class="n">6</span>Do this next</h2>
+
+  <ol>
+    <li>
+      Write a function <code>grade(score)</code> with three returns: one for a pass,
+      one for a fail, and one for an invalid score.
+    </li>
+    <li>
+      Write a function that prints but does not return, and confirm its call
+      evaluates to <code>None</code>.
+    </li>
+    <li>
+      Take the <code>sign</code> function, delete the final return, and call it with
+      zero. Then put the return back.
+    </li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Read <a href="https://docs.python.org/3/library/constants.html#None">Python — Built-in Constants: None</a>.
+    It is short, and it states that <code>None</code> is the value functions return
+    when they have nothing to hand back.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher (me) anything — "can I return two
+    values at once?", "is None the same as False?", "why does my function return
+    None?". There are no bad questions here.
+  </div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  /* predict-then-reveal */
+  TeachWidgets.predict("#predict1", {
+    q: "If a function has three returns, how many run in one call?",
+    a: ["Exactly one", "All three", "Two of them", "None of them"],
+    c: 0,
+    why: "The first return reached ends the function, so exactly one of the three runs."
+  });
+
+  /* every path must return */
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      { title: "n > 0", lines: ["return positive"] },
+      { title: "n < 0", lines: ["return negative"] },
+      { title: "n == 0", lines: ["return zero"] },
+      { title: "miss one", lines: ["hands back None"] }
+    ]
+  });
+
+  /* step through the two exits */
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "def sign(n):",
+      "    if n > 0:",
+      "        return \"positive\"",
+      "    return \"not positive\"",
+      "print(sign(5))",
+      "print(sign(-5))"
+    ],
+    steps: [
+      { line: 0, vars: { action: "define sign" } },
+      { line: 4, vars: { n: "5", action: "call sign" } },
+      { line: 1, vars: { "5 > 0": "True" } },
+      { line: 2, vars: { action: "return positive" } },
+      { line: 4, vars: { printed: "positive" } },
+      { line: 5, vars: { n: "-5", action: "call sign" } },
+      { line: 1, vars: { "-5 > 0": "False" } },
+      { line: 3, vars: { action: "return not positive" } },
+      { line: 5, vars: { printed: "not positive" } }
+    ]
+  });
+
+  /* three things about None */
+  TeachWidgets.introCards("#intro1", {
+    cards: [
+      { ico: "🚪", title: "First exit wins", body: "Only the first return reached runs; the rest are skipped." },
+      { ico: "🕳️", title: "A missing path", body: "A path with no return hands back None, silently." },
+      { ico: "🔍", title: "A signal", body: "None means either no value by design, or a forgotten return." }
+    ]
+  });
+
+  /* the tiny interpreter */
+  TeachWidgets.lab("#lab1", {
+    label: "Run it — try a positive, a negative, then delete the last return",
+    starter: "def sign(n):\n    if n > 0:\n        return \"positive\"\n    if n < 0:\n        return \"negative\"\n    return \"zero\"\n\nprint(sign(5))\nprint(sign(-5))\nprint(sign(0))"
+  });
+
+  /* recall from memory */
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the exits",
+    lines: [
+      "Only the <0> return reached runs",
+      "A function with no return hands back <1>",
+      "Every path should reach a <2>"
+    ],
+    blanks: [
+      { a: ["first"], why: "The first return reached ends the function, so later ones are skipped." },
+      { a: ["None"], why: "A body that finishes without a return hands back None." },
+      { a: ["return"], why: "If a function should produce a value, every path must reach a return." }
+    ]
+  });
+
+  /* the quiz — every option is exactly four words */
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "How many returns run per call?",
+      a: ["Exactly one of them", "All of them in order", "Two of them always", "None of them ever"],
+      c: 0,
+      why: "The first return reached ends the function, so only one ever runs."
+    },
+    {
+      q: "What does a missing return give?",
+      a: ["The value None", "An empty string", "The number zero", "A syntax error"],
+      c: 0,
+      why: "A path that reaches the end of the body hands back None."
+    },
+    {
+      q: "What is None?",
+      a: ["Python's value for nothing", "The same as False", "An empty container", "A type of error"],
+      c: 0,
+      why: "None is Python's value for no value; it is not the same as False."
+    },
+    {
+      q: "Why write a final return?",
+      a: ["It makes the path explicit", "It runs much faster", "It removes all errors", "It shortens the body"],
+      c: 0,
+      why: "An unconditional final return makes the last path explicit instead of silently returning None."
+    }
+  ]);
+</script>
+</body>
+</html>

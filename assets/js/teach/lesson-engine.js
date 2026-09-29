@@ -383,6 +383,58 @@
     }).join("");
   }
 
+  /* ---------- course glossary ----------
+     A course's reference glossary page is a shell: it declares
+     <div id="courseGlossary"></div> and this renders the term list
+     from the course's own manifest (window.TeachGlossary, defined
+     in courses/<id>/lessons.js).
+
+     Each entry is { id, title, terms: [{ term, def, lesson, tags }] }.
+     `lesson` is a 1-based lesson number, resolved to a real link via
+     the manifest, so a term can never point at a lesson that moved.
+
+     The same data feeds the site-wide glossary (data/glossary.js
+     links back here), so the term list is written exactly once. */
+  function glossary() {
+    return global.TeachGlossary || [];
+  }
+
+  function renderCourseGlossary() {
+    var host = document.getElementById("courseGlossary");
+    if (!host) return;
+    var groups = glossary();
+    if (!groups.length) return;
+
+    var list = lessons();
+
+    function lessonLink(n) {
+      var l = null;
+      for (var i = 0; i < list.length; i++) if (list[i].n === n) l = list[i];
+      if (!l) return "";
+      return '<span class="see">See <a href="' + hrefFor(l.file) + '">Lesson ' +
+        String(l.n).padStart(2, "0") + " — " + l.title + "</a></span>";
+    }
+
+    /* table of contents, one chip per group */
+    var toc = document.getElementById("courseGlossaryToc");
+    if (toc) {
+      toc.innerHTML = groups.map(function (g) {
+        return '<a href="#' + escapeHtml(g.id) + '">' + g.title + "</a>";
+      }).join("");
+    }
+
+    host.innerHTML = groups.map(function (g) {
+      var terms = (g.terms || []).map(function (t) {
+        return '<div class="gloss">' +
+          "<dt>" + t.term + "</dt>" +
+          "<dd>" + t.def + lessonLink(t.lesson) + "</dd>" +
+        "</div>";
+      }).join("");
+      return '<h2 id="' + escapeHtml(g.id) + '">' + g.title + "</h2>" +
+        "<dl>" + terms + "</dl>";
+    }).join("");
+  }
+
   /* ---------- boot ---------- */
 
   function boot() {
@@ -400,6 +452,7 @@
     initProgress();
     renderFooterNav();
     renderCourseMap();
+    renderCourseGlossary();
   }
 
   global.TeachLesson = {
@@ -419,7 +472,9 @@
       return global.TeachLesson;
     },
     highlightAll: highlightAll,
-    addCopyButtons: addCopyButtons
+    addCopyButtons: addCopyButtons,
+    glossary: glossary,
+    renderCourseGlossary: renderCourseGlossary
   };
 
   if (document.readyState === "loading") {

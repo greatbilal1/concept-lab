@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 10 — Putting it together</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="control-flow-logic" data-lesson="10" data-lesson-id="putting-it-together">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 10</span> · Putting it together</span>
+
+  <h1 class="lesson-title">Putting it together</h1>
+  <p class="lesson-lede">
+    You now have booleans, comparisons, logic, branches and loops. This lesson is
+    about the thing they make when you combine them: <b>control flow</b> — the shape
+    of a program's decisions over time.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~12 min</span>
+    <span><b>Win</b> Build a small state machine that runs</span>
+    <span><b>Mission link</b> The whole course, in one program</span>
+  </div>
+
+  <h2><span class="n">1</span>Control flow is the shape</h2>
+
+  <p>
+    <b>Control flow</b> is the order in which a program's statements actually run.
+    Written top to bottom, a program looks like a list. Executed, it is a path —
+    with branches that skip whole regions and loops that revisit them.
+  </p>
+
+  <pre><code>if ready:
+    while work_left:
+        do_one_thing()
+else:
+    wait()</code></pre>
+
+  <p>
+    Nothing in that snippet is new to you. What is new is seeing it as one shape:
+    a decision that guards a repetition, with a fallback. That is the vocabulary
+    you now read code in.
+  </p>
+
+  <div id="diagram1"></div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Nesting depth is a cost</h2>
+
+  <p>
+    Every branch and loop you nest adds a level of indentation, and every level
+    makes the code harder to hold in your head. <b>Nesting depth</b> is the number
+    of levels you are currently inside.
+  </p>
+
+  <pre><code>if user:
+    if user.active:
+        if user.balance > 0:
+            if not user.locked:
+                ship()          # four levels deep</code></pre>
+
+  <p>
+    Four levels is a warning sign. The fix is usually an <b>early exit</b>: check
+    the failure cases first and leave, so the happy path stays flat.
+  </p>
+
+  <pre><code>if not user: return
+if not user.active: return
+if user.balance <= 0: return
+if user.locked: return
+ship()                      # flat, one level</code></pre>
+
+  <div class="note good">
+    <span class="note-label">Rule of thumb</span>
+    Handle the exceptions first and return early. The main path of a function should
+    read at the shallowest depth, because that is the path most readers care about.
+  </div>
+
+  <div id="intro1"></div>
+
+  <h2><span class="n">3</span>Sentinel values</h2>
+
+  <p>
+    A <b>sentinel value</b> is a special value that means "stop". It is how a loop
+    knows the input has ended when the input is a stream rather than a list.
+  </p>
+
+  <pre><code>total = 0
+while True:
+    n = read_number()
+    if n == -1:          # the sentinel
+        break
+    total = total + n</code></pre>
+
+  <p>
+    <code>-1</code> is not data — it is a signal. Sentinels are why
+    <code>while True</code> with a <code>break</code> is not always a mistake: the
+    loop is genuinely unbounded, and the exit is a decision made inside it.
+  </p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>A state machine</h2>
+
+  <p>
+    A <b>state machine</b> is a program whose behaviour depends on which state it is
+    in, and which moves between states in response to events. It is the natural
+    shape for anything with modes: a traffic light, a checkout, a game.
+  </p>
+
+  <pre><code>state = "idle"
+while state != "done":
+    event = next_event()
+    if state == "idle" and event == "start":
+        state = "running"
+    elif state == "running" and event == "stop":
+        state = "done"</code></pre>
+
+  <p>
+    Notice the pattern: a loop that keeps going, a variable holding the current
+    state, and a branch that decides the next state. Every piece of this course is
+    in those four lines.
+  </p>
+
+  <div id="lab1"></div>
+
+  <div id="fill1"></div>
+
+  <h2><span class="n">5</span>Check yourself</h2>
+
+  <p>
+    Answer from memory — do not scroll back up. Each option has the same number of
+    words, so nothing gives the answer away.
+  </p>
+
+  <div id="quiz"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>
+      You have built a state machine — a loop, a state variable and a branch — and
+      you can now read any program as a shape rather than a list. That is the whole
+      course: values that are true or false, comparisons that produce them, logic
+      that combines them, branches that choose, loops that repeat, and the discipline
+      of keeping it flat.
+    </p>
+  </div>
+
+  <h2><span class="n">6</span>Do this next</h2>
+
+  <ol>
+    <li>
+      Take a function you have written with three or more levels of nesting and
+      flatten it using early exits.
+    </li>
+    <li>
+      Write a state machine for a traffic light that cycles red, green, amber and
+      back to red.
+    </li>
+    <li>
+      Write a loop that reads numbers until a sentinel of <code>0</code> and prints
+      the largest one seen.
+    </li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Read <a href="https://docs.python.org/3/tutorial/controlflow.html">Python — More Control Flow Tools</a>.
+    It is the overview chapter for everything in this course, and it is worth
+    reading end to end now that every section will make sense.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher (me) anything — "when is a state
+    machine overkill?", "can I use a dict for states?", "what comes after this
+    course?". There are no bad questions here.
+  </div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  /* the shape of control flow */
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      { title: "decide", lines: ["if ready"] },
+      { title: "repeat", lines: ["while work_left"] },
+      { title: "fallback", lines: ["else: wait"] },
+      { title: "done", lines: ["after the loop"] }
+    ]
+  });
+
+  /* predict-then-reveal */
+  TeachWidgets.predict("#predict1", {
+    q: "What is control flow?",
+    a: ["The order statements run", "The speed of a program", "The size of a file"],
+    c: 0,
+    why: "Control flow is the actual order in which statements execute — branches skip regions and loops revisit them."
+  });
+
+  /* step through a state machine */
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "state = \"idle\"",
+      "while state != \"done\":",
+      "    event = next_event()",
+      "    if state == \"idle\" and event == \"start\":",
+      "        state = \"running\""
+    ],
+    steps: [
+      { line: 0, vars: { state: "idle" } },
+      { line: 1, vars: { "idle != done": "True", action: "enter loop" } },
+      { line: 2, vars: { event: "start" } },
+      { line: 3, vars: { "idle and start": "True" } },
+      { line: 4, vars: { state: "running", action: "loop again" } },
+      { line: 1, vars: { "running != done": "True", action: "enter loop" } },
+      { line: 2, vars: { event: "stop" } },
+      { line: 3, vars: { "running and start": "False" } },
+      { line: 1, vars: { "running != done": "True", action: "enter loop" } }
+    ]
+  });
+
+  /* three ideas for keeping control flow readable */
+  TeachWidgets.introCards("#intro1", {
+    cards: [
+      { ico: "📏", title: "Keep it flat", body: "Nesting depth is a cost — every level makes the code harder to hold." },
+      { ico: "🚪", title: "Exit early", body: "Check the failure cases first and return, so the happy path stays shallow." },
+      { ico: "🚩", title: "Use sentinels", body: "A special stop value lets an unbounded loop end on a decision inside it." }
+    ]
+  });
+
+  /* the tiny interpreter */
+  TeachWidgets.lab("#lab1", {
+    label: "Run it — a state machine that moves between states",
+    starter: "state = \"idle\"\nevents = [\"start\", \"stop\"]\nfor event in events:\n    if state == \"idle\" and event == \"start\":\n        state = \"running\"\n    elif state == \"running\" and event == \"stop\":\n        state = \"done\"\n    print(state)"
+  });
+
+  /* recall from memory */
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the ideas",
+    lines: [
+      "The order statements run is called <0>",
+      "Checking failures first and returning is an <1>",
+      "A special value meaning stop is a <2>"
+    ],
+    blanks: [
+      { a: ["control flow"], why: "Control flow is the actual execution order of a program's statements." },
+      { a: ["early exit"], why: "An early exit handles the failure cases first so the main path stays flat." },
+      { a: ["sentinel"], why: "A sentinel is a special value that signals a loop to stop." }
+    ]
+  });
+
+  /* the quiz — every option is exactly three words */
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is control flow?",
+      a: ["The order statements run", "The speed of execution", "The number of lines", "The size of memory"],
+      c: 0,
+      why: "Control flow is the order in which statements actually execute, including branches and loops."
+    },
+    {
+      q: "Why avoid deep nesting?",
+      a: ["It runs slower", "It is harder to read", "It uses more memory", "Python forbids it"],
+      c: 1,
+      why: "Nesting depth is a readability cost — each level makes the code harder to follow."
+    },
+    {
+      q: "What is an early exit?",
+      a: ["Returning before the end", "Breaking out of loops", "Skipping the first pass", "Exiting the program"],
+      c: 0,
+      why: "An early exit handles failure cases first and returns, keeping the main path flat."
+    },
+    {
+      q: "What is a sentinel value?",
+      a: ["A special stop value", "A loop counter", "A boolean flag", "A kind of error"],
+      c: 0,
+      why: "A sentinel is a special value that signals a loop to stop, like -1 for end of input."
+    }
+  ]);
+</script>
+</body>
+</html>

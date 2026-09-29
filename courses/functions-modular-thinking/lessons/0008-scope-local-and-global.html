@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 08 — Scope: local and global</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="functions-modular-thinking" data-lesson="8" data-lesson-id="scope-local-and-global">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 08</span> · Scope &amp; the stack</span>
+
+  <h1 class="lesson-title">Scope: local and global</h1>
+  <p class="lesson-lede">
+    A name created inside a function lives inside that function. A name created at
+    the top of the file lives everywhere. Knowing which is which is what stops a
+    function from quietly changing the rest of your program.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Tell local names from global ones</span>
+    <span><b>Mission link</b> Keep functions self-contained</span>
+  </div>
+
+  <h2><span class="n">1</span>Names live in scopes</h2>
+
+  <p>
+    A <b>scope</b> is the region where a name can be seen. Names assigned inside a
+    function are <b>local</b> to that call; names assigned at the top level of the
+    file are <b>global</b>.
+  </p>
+
+  <pre><code>count = 0            # global
+
+def bump():
+    count = 1        # local — a different name
+    print(count)     # 1
+
+bump()
+print(count)         # 0 — the global never changed</code></pre>
+
+  <p>
+    The assignment inside <code>bump</code> created a brand-new local name. It
+    shadowed the global for the duration of the call, then vanished. The global
+    <code>count</code> was never touched.
+  </p>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Reading out, writing in</h2>
+
+  <p>
+    A function can <b>read</b> a global name without any ceremony. But the moment it
+    <b>assigns</b> to that name, Python treats it as local for the whole function.
+  </p>
+
+  <pre><code>count = 0
+
+def bump():
+    print(count)     # reads the global: 0
+    count = count + 1  # UnboundLocalError!
+
+bump()</code></pre>
+
+  <p>
+    The error is confusing until you know the rule: because there is an assignment
+    somewhere in the body, <code>count</code> is local everywhere in that body —
+    including the line that tries to read it before it exists.
+  </p>
+
+  <div id="diagram1"></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">3</span>Shadowing</h2>
+
+  <p>
+    <b>Shadowing</b> is when a local name hides a global one of the same name. It is
+    legal, and it is usually a mistake — the reader sees one name and gets two
+    different values depending on where they are.
+  </p>
+
+  <pre><code>size = 10
+
+def scale(size):     # parameter shadows the global
+    return size * 2
+
+print(scale(3))      # 6
+print(size)          # 10 — untouched</code></pre>
+
+  <p>
+    The fix is not <code>global</code>. The fix is a better name, or passing the
+    value in as a parameter and returning the new value out. A function that only
+    touches its own parameters and locals is a function you can trust anywhere.
+  </p>
+
+  <div id="intro1"></div>
+
+  <div class="note warn">
+    <span class="note-label">Watch out</span>
+    Avoid <code>global</code> in new code. If a function needs to change something,
+    pass it in and return the new value. Globals make a function's effect invisible
+    from its call site.
+  </div>
+
+  <h2><span class="n">4</span>Keep it local</h2>
+
+  <p>
+    Here is the win for today. The lab below shows a local name shadowing a global.
+    Change the function to return a value instead, and watch the global stay safe.
+  </p>
+
+  <div id="lab1"></div>
+
+  <div id="fill1"></div>
+
+  <h2><span class="n">5</span>Check yourself</h2>
+
+  <p>
+    Answer from memory — do not scroll back up. Each option has the same number of
+    words, so nothing gives the answer away.
+  </p>
+
+  <div id="quiz"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>
+      You can now tell a local name from a global one at a glance, and you know why
+      assigning to a name makes it local for the whole function. That single rule
+      explains the <code>UnboundLocalError</code> that confuses almost everyone the
+      first time they meet it.
+    </p>
+  </div>
+
+  <h2><span class="n">6</span>Do this next</h2>
+
+  <ol>
+    <li>
+      Write a function that reads a global and prints it, then add an assignment to
+      that name and watch the error appear.
+    </li>
+    <li>
+      Write a function whose parameter shadows a global of the same name, and print
+      both values.
+    </li>
+    <li>
+      Rewrite a function that used <code>global</code> so it takes the value in and
+      returns the new one instead.
+    </li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Read <a href="https://docs.python.org/3/reference/executionmodel.html#naming-and-binding">Python — Execution model: Naming and binding</a>.
+    It defines local and global scope, and the rule that an assignment makes a name
+    local.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher (me) anything — "what is
+    nonlocal?", "why does the error say unbound?", "when is global ever right?".
+    There are no bad questions here.
+  </div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  /* predict-then-reveal */
+  TeachWidgets.predict("#predict1", {
+    q: "A name assigned inside a function is what?",
+    a: ["Local to that call", "Global to the file", "Shared by all calls", "Visible everywhere always"],
+    c: 0,
+    why: "An assignment inside a function creates a local name, visible only during that call."
+  });
+
+  /* local vs global */
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      { title: "global", lines: ["count = 0"] },
+      { title: "function", lines: ["count = 1"] },
+      { title: "inside", lines: ["prints 1"] },
+      { title: "outside", lines: ["still 0"] }
+    ]
+  });
+
+  /* step through shadowing */
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "count = 0",
+      "def bump():",
+      "    count = 1",
+      "    print(count)",
+      "bump()",
+      "print(count)"
+    ],
+    steps: [
+      { line: 0, vars: { "global count": "0" } },
+      { line: 4, vars: { action: "call bump" } },
+      { line: 2, vars: { "local count": "1", action: "new local name" } },
+      { line: 3, vars: { printed: "1" } },
+      { line: 5, vars: { "global count": "0", action: "unchanged" } }
+    ]
+  });
+
+  /* three things about scope */
+  TeachWidgets.introCards("#intro1", {
+    cards: [
+      { ico: "🏠", title: "Local", body: "A name assigned in a function lives only during that call." },
+      { ico: "🌍", title: "Global", body: "A name assigned at the top level is visible everywhere." },
+      { ico: "🎭", title: "Shadowing", body: "A local name can hide a global one of the same name." }
+    ]
+  });
+
+  /* the tiny interpreter */
+  TeachWidgets.lab("#lab1", {
+    label: "Run it — watch the global stay safe",
+    starter: "count = 0\n\ndef bump():\n    count = 1\n    print(\"inside:\", count)\n\nbump()\nprint(\"outside:\", count)"
+  });
+
+  /* recall from memory */
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the scope",
+    lines: [
+      "A name assigned in a function is <0>",
+      "A name assigned at the top is <1>",
+      "A local name hiding a global is <2>"
+    ],
+    blanks: [
+      { a: ["local"], why: "An assignment inside a function creates a local name for that call." },
+      { a: ["global"], why: "A name assigned at the top level of the file is global." },
+      { a: ["shadowing"], why: "Shadowing is when a local name hides a global one of the same name." }
+    ]
+  });
+
+  /* the quiz — every option is exactly four words */
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Where does a local name live?",
+      a: ["Inside that one call", "Everywhere in the file", "Across all the calls", "Inside the whole program"],
+      c: 0,
+      why: "A local name exists only for the duration of the call that created it."
+    },
+    {
+      q: "What makes a name local?",
+      a: ["Any assignment to it", "Only a global keyword", "Only a parameter name", "Nothing can make it"],
+      c: 0,
+      why: "If a name is assigned anywhere in the body, it is local for the whole body."
+    },
+    {
+      q: "What is shadowing?",
+      a: ["A local hiding a global", "A global hiding a local", "Two globals with one name", "An error in the scope"],
+      c: 0,
+      why: "Shadowing is a local name hiding a global name of the same spelling."
+    },
+    {
+      q: "What is the better fix?",
+      a: ["Pass in and return", "Add a global keyword", "Rename the whole file", "Use a longer variable"],
+      c: 0,
+      why: "Passing the value in and returning the new one keeps the function self-contained."
+    }
+  ]);
+</script>
+</body>
+</html>

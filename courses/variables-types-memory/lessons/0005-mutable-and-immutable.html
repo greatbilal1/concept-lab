@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 05 — Mutable and immutable</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="variables-types-memory" data-lesson="5" data-lesson-id="mutable-and-immutable">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 05</span> · Types</span>
+
+  <h1 class="lesson-title">Mutable and immutable</h1>
+  <p class="lesson-lede">
+    Some values can be changed in place; others cannot. This single distinction
+    explains why lists surprise beginners and numbers never do — and it is the
+    hinge on which the whole memory half of this course turns.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Predict when a change is shared</span>
+    <span><b>Mission link</b> Why one list edit affects two names</span>
+  </div>
+
+  <h2><span class="n">1</span>Two kinds of value</h2>
+
+  <p>
+    A value is <b>immutable</b> if it can never be changed after it is created —
+    numbers, strings, and booleans are all immutable. A value is <b>mutable</b> if
+    it can be changed in place — lists, dictionaries, and sets are mutable.
+  </p>
+
+  <pre><code>n = 5
+n = n + 1        # rebinds n to a new value; the 5 is untouched
+
+items = [1, 2, 3]
+items.append(4)  # changes the list itself, in place
+print(items)     # [1, 2, 3, 4]</code></pre>
+
+  <p>
+    Notice the difference in wording. <code>n = n + 1</code> <i>rebinds</i> the name
+    to a new value. <code>items.append(4)</code> <i>mutates</i> the existing value.
+    Those are two genuinely different operations.
+  </p>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Mutation is visible through every name</h2>
+
+  <p>
+    Here is the payoff of the label model. If two names refer to the same mutable
+    value, changing it through one name is visible through the other — because
+    there is only one value.
+  </p>
+
+  <pre><code>a = [1, 2, 3]
+b = a            # b refers to the SAME list
+b.append(4)
+print(a)         # [1, 2, 3, 4] — a changed too!</code></pre>
+
+  <p>
+    This is not a bug and not a copy failure. <code>b = a</code> bound <code>b</code>
+    to the same list, so there was never a second list to keep separate. The next
+    lesson makes this mechanism precise.
+  </p>
+
+  <div id="diagram1"></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">3</span>Why immutability is a gift</h2>
+
+  <p>
+    Immutable values are safe to share. If a number or string is passed around, no
+    one can change it out from under anyone else, so you never have to worry about
+    who else holds a reference. That is why strings are immutable: it makes them
+    safe to use as dictionary keys and to share freely.
+  </p>
+
+  <div id="intro1"></div>
+
+  <h2><span class="n">4</span>Identity: is it the same value?</h2>
+
+  <p>
+    When you need to know whether two names refer to the <i>same</i> value rather
+    than merely equal ones, you use <code>is</code>. It compares identity, not
+    content. <code>==</code> asks "do these look the same?"; <code>is</code> asks
+    "are these the very same thing?".
+  </p>
+
+  <pre><code>a = [1, 2]
+b = [1, 2]
+a == b     # True  — same contents
+a is b     # False — two different lists
+
+c = a
+a is c     # True  — the same list, two names</code></pre>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    <code>==</code> compares <b>values</b>; <code>is</code> compares <b>identity</b>.
+    For mutable values the two questions give different answers, and the difference
+    is exactly what causes shared-change surprises.
+  </div>
+
+  <div id="fill1"></div>
+
+  <h2><span class="n">5</span>Check yourself</h2>
+
+  <p>
+    Answer from memory — do not scroll back up. Each option has the same number of
+    words, so nothing gives the answer away.
+  </p>
+
+  <div id="quiz"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>
+      You can now classify any value as mutable or immutable, predict whether a
+      change will be visible through another name, and tell <code>==</code> apart
+      from <code>is</code>. That is the exact toolkit you need for the memory
+      lessons, where references and sharing become the main subject.
+    </p>
+  </div>
+
+  <h2><span class="n">6</span>Do this next</h2>
+
+  <ol>
+    <li>
+      Predict what <code>a = [1]; b = a; b.append(2); print(a)</code> prints, then
+      run it and explain the result using the word "same".
+    </li>
+    <li>
+      Repeat the experiment with a string instead of a list. Explain why the result
+      is different this time.
+    </li>
+    <li>
+      Create two equal lists and check both <code>a == b</code> and <code>a is b</code>.
+      Write one sentence explaining why the answers differ.
+    </li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Read <a href="https://docs.python.org/3/reference/datamodel.html">Python — "Data model"</a>.
+    Its section on "Objects, values and types" defines mutability and identity, and
+    states that immutable values may be shared safely.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher (me) anything — "why are lists
+    mutable?", "when should I use is?", "why are strings immutable?". There are no
+    bad questions here.
+  </div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  /* one list, two names */
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      { title: "a", lines: ["→ list"] },
+      { title: "b", lines: ["→ list"] },
+      { title: "the list", lines: ["[1, 2, 3, 4]", "one value"] }
+    ]
+  });
+
+  /* mutable vs immutable */
+  TeachWidgets.introCards("#intro1", {
+    cards: [
+      { ico: "🔒", title: "Immutable", body: "Numbers, strings, booleans. Safe to share, never change in place." },
+      { ico: "✏️", title: "Mutable", body: "Lists, dicts, sets. Can change in place, so changes are shared." },
+      { ico: "🆔", title: "Identity", body: "is asks whether two names refer to the very same value." }
+    ]
+  });
+
+  /* predict-then-reveal */
+  TeachWidgets.predict("#predict1", {
+    q: "What does b.append(4) do when b = a?",
+    a: ["Creates a second list", "Changes the shared list", "Copies the list first"],
+    c: 1,
+    why: "b refers to the same list as a, so appending mutates that one list — and the change is visible through a as well."
+  });
+
+  /* step-through: shared mutation */
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "a = [1, 2, 3]",
+      "b = a",
+      "b.append(4)",
+      "print(a)"
+    ],
+    steps: [
+      { line: 0, vars: { a: "→ [1, 2, 3]", b: "unbound" } },
+      { line: 1, vars: { a: "→ [1, 2, 3]", b: "→ same list" } },
+      { line: 2, vars: { list: "[1, 2, 3, 4]", "a and b": "both see it" } },
+      { line: 3, vars: { output: "[1, 2, 3, 4]" } }
+    ]
+  });
+
+  /* recall from memory */
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the blanks",
+    lines: [
+      "Numbers and strings are <0>.",
+      "Lists and dictionaries are <1>.",
+      "<2> compares identity, not contents."
+    ],
+    blanks: [
+      { a: ["immutable", "unchangeable"], why: "Immutable values can never be changed after creation, so they are safe to share." },
+      { a: ["mutable", "changeable"], why: "Mutable values can be changed in place, so changes are visible through every name that refers to them." },
+      { a: ["is"], why: "is compares identity — whether two names refer to the very same value — while == compares contents." }
+    ]
+  });
+
+  /* the quiz — every option is exactly three words */
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Which value is mutable?",
+      a: ["A number value", "A string value", "A list value", "A boolean value"],
+      c: 2,
+      why: "Lists can be changed in place, so they are mutable. Numbers, strings, and booleans are immutable."
+    },
+    {
+      q: "What does b = a do?",
+      a: ["Copies the value", "Binds the same value", "Creates a new list", "Deletes the old name"],
+      c: 1,
+      why: "It binds b to the same value a refers to, so both names share one value."
+    },
+    {
+      q: "What does is compare?",
+      a: ["The two contents", "The two identities", "The two types", "The two lengths"],
+      c: 1,
+      why: "is compares identity — whether two names refer to the very same value — not their contents."
+    },
+    {
+      q: "Why are strings immutable?",
+      a: ["To save memory space", "To make sharing safe", "To speed up printing", "To prevent type errors"],
+      c: 1,
+      why: "Immutable values cannot be changed by anyone, so they are safe to share and to use as keys."
+    }
+  ]);
+</script>
+</body>
+</html>

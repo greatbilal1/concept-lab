@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 07 — Grouping steps into a module</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="procedural-programming" data-lesson="7" data-lesson-id="grouping-steps-into-a-module">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 07</span> · Modules</span>
+
+  <h1 class="lesson-title">Grouping steps into a module</h1>
+  <p class="lesson-lede">
+    A file full of procedures is already a module. This lesson is about making that
+    grouping deliberate: related steps together, a clear namespace, and a main guard
+    so the file can be both run and imported.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Move related procedures into their own file</span>
+    <span><b>Mission link</b> Group steps into modules</span>
+  </div>
+
+  <h2><span class="n">1</span>A file is a module</h2>
+
+  <p>
+    In Python, every <code>.py</code> file is a <b>module</b>. Its name is the file
+    name without the extension. The procedures inside it live in that module's
+    <b>namespace</b>, which is why two modules can both define <code>total</code>
+    without clashing.
+  </p>
+
+  <pre><code># prices.py
+def load():
+    return [4, 8, 15]
+
+def total(prices):
+    result = 0
+    for p in prices:
+        result = result + p
+    return result</code></pre>
+
+  <p>
+    Grouping by job is the point. <code>prices.py</code> holds everything about
+    prices; a reader looking for price logic knows exactly which file to open.
+  </p>
+
+  <div id="diagram1"></div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The main guard</h2>
+
+  <p>
+    A module can be run directly <i>and</i> imported. The <b>main guard</b> is how you
+    tell the two apart: code inside it runs only when the file is run directly, not
+    when it is imported.
+  </p>
+
+  <pre><code># prices.py
+def load():
+    return [4, 8, 15]
+
+if __name__ == "__main__":
+    print(load())</code></pre>
+
+  <p>
+    When you run <code>python prices.py</code>, <code>__name__</code> is
+    <code>"__main__"</code> and the print runs. When another file imports
+    <code>prices</code>, <code>__name__</code> is <code>"prices"</code> and the print
+    is skipped. That is the whole trick.
+  </p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    The main guard separates "what this module provides" from "what happens when you
+    run it". Importing a module should never have side effects.
+  </div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">3</span>What belongs in a module</h2>
+
+  <p>
+    A good module groups procedures that change together and are used together. If
+    two procedures always appear in the same places, they probably belong in the same
+    file. If a procedure is used everywhere, it may belong in a shared module.
+  </p>
+
+  <pre><code># prices.py — everything about prices
+def load(): ...
+def total(prices): ...
+def average(prices): ...
+
+# report.py — everything about printing
+def header(): ...
+def row(label, value): ...
+def footer(): ...</code></pre>
+
+  <p>
+    The test is the same as Lesson 05, one level up: can you name the module in a few
+    words, and does everything in it serve that name?
+  </p>
+
+  <div id="intro1"></div>
+
+  <h2><span class="n">4</span>Group steps into a module</h2>
+
+  <p>
+    Here is the win for today. The lab below has two unrelated procedures in one
+    file. Decide which module each belongs to, then add a main guard.
+  </p>
+
+  <div id="lab1"></div>
+
+  <div id="fill1"></div>
+
+  <h2><span class="n">5</span>Check yourself</h2>
+
+  <p>
+    Answer from memory — do not scroll back up. Each option has the same number of
+    words, so nothing gives the answer away.
+  </p>
+
+  <div id="quiz"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>
+      You can group related procedures into a module and add a main guard so the file
+      works both as a script and as a library. That is the same one-job rule from
+      Lesson 05, applied to a whole file. The next lesson is about using those
+      modules from other files.
+    </p>
+  </div>
+
+  <h2><span class="n">6</span>Do this next</h2>
+
+  <ol>
+    <li>
+      Take a script with several procedures and split it into two modules, each named
+      after the job it does.
+    </li>
+    <li>
+      Add a main guard to each module and confirm that importing it prints nothing.
+    </li>
+    <li>
+      Write one sentence describing what each module provides, and check that every
+      procedure in it serves that sentence.
+    </li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Read <a href="https://docs.python.org/3/tutorial/modules.html">Python — Modules</a>.
+    It covers what a module is, the namespace idea, and the main guard in a few short
+    sections.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher (me) anything — "what is a package?",
+    "why is __name__ special?", "can a module import itself?". There are no bad
+    questions here.
+  </div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  /* file becomes module */
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      { title: "file", lines: ["prices.py"] },
+      { title: "module", lines: ["name: prices"] },
+      { title: "namespace", lines: ["prices.total"] },
+      { title: "guard", lines: ["if __name__ == ..."] }
+    ]
+  });
+
+  /* predict-then-reveal */
+  TeachWidgets.predict("#predict1", {
+    q: "What is a Python file called?",
+    a: ["A module", "A package", "A namespace", "A library"],
+    c: 0,
+    why: "Every .py file is a module, named after the file without its extension."
+  });
+
+  /* step through the main guard */
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "def load():",
+      "    return [4, 8, 15]",
+      "if __name__ == \"__main__\":",
+      "    print(load())"
+    ],
+    steps: [
+      { line: 0, vars: { action: "define load" } },
+      { line: 2, vars: { __name__: "\"__main__\"", guard: "true" } },
+      { line: 3, vars: { printed: "[4, 8, 15]" } }
+    ]
+  });
+
+  /* three things a module gives you */
+  TeachWidgets.introCards("#intro1", {
+    cards: [
+      { ico: "📦", title: "Grouping", body: "Related procedures live together, so a reader knows where to look." },
+      { ico: "🏷️", title: "Namespace", body: "Each module has its own names, so two files can reuse the same name." },
+      { ico: "🚪", title: "Main guard", body: "The file can be run directly and imported without side effects." }
+    ]
+  });
+
+  /* the tiny interpreter */
+  TeachWidgets.lab("#lab1", {
+    label: "Run it — add a main guard, then split the procedures",
+    starter: "def load():\n    return [4, 8, 15]\n\ndef print_report(total):\n    print(\"Total:\", total)\n\nprint_report(sum(load()))"
+  });
+
+  /* recall from memory */
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the blanks",
+    lines: [
+      "Every .py file is a <0>",
+      "A module's names live in its <1>",
+      "The main guard checks the <2> variable"
+    ],
+    blanks: [
+      { a: ["module"], why: "Every .py file is a module, named after the file without its extension." },
+      { a: ["namespace"], why: "A module's procedures live in that module's namespace." },
+      { a: ["__name__"], why: "The main guard checks whether __name__ equals \"__main__\"." }
+    ]
+  });
+
+  /* the quiz — every option is exactly three words */
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is a Python file?",
+      a: ["A module", "A package", "A namespace", "A library"],
+      c: 0,
+      why: "Every .py file is a module, named after the file without its extension."
+    },
+    {
+      q: "What does the main guard check?",
+      a: ["The __name__ variable", "The file extension", "The number of procedures", "The import order"],
+      c: 0,
+      why: "The main guard checks whether __name__ equals \"__main__\"."
+    },
+    {
+      q: "What should importing never do?",
+      a: ["Cause side effects", "Define procedures", "Create a namespace", "Return a value"],
+      c: 0,
+      why: "Importing a module should never run code with side effects; the main guard prevents that."
+    },
+    {
+      q: "What groups procedures together?",
+      a: ["The job they do", "The order they run", "The length of names", "The number of parameters"],
+      c: 0,
+      why: "Procedures that serve the same job belong in the same module."
+    },
+    {
+      q: "What is a module's namespace?",
+      a: ["Where its names live", "Where its files live", "Where its output goes", "Where its imports start"],
+      c: 0,
+      why: "A module's namespace is where its procedures and variables live, keeping names separate."
+    }
+  ]);
+</script>
+</body>
+</html>

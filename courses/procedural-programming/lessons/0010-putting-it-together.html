@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 10 — Putting it together</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="procedural-programming" data-lesson="10" data-lesson-id="putting-it-together">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 10</span> · Putting it together</span>
+
+  <h1 class="lesson-title">Putting it together</h1>
+  <p class="lesson-lede">
+    You have all the pieces: named steps, data in and out, one job each, no hidden
+    state, grouped into modules. This lesson is about the shape they make when you
+    put them together — and how to read a program at a glance.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Read a whole program as a pipeline of steps</span>
+    <span><b>Mission link</b> See the shape of a program</span>
+  </div>
+
+  <h2><span class="n">1</span>Program shape</h2>
+
+  <p>
+    A well-built procedural program has a recognisable <b>shape</b>: a short entry
+    point at the bottom that reads like a sentence, and a set of named steps above it
+    that each do one job.
+  </p>
+
+  <pre><code>def load_prices():
+    return [4, 8, 15]
+
+def total(prices):
+    result = 0
+    for p in prices:
+        result = result + p
+    return result
+
+def print_report(total):
+    print("Total:", total)
+
+if __name__ == "__main__":
+    print_report(total(load_prices()))</code></pre>
+
+  <p>
+    The entry point is one line. Everything above it is a named step you can read on
+    its own. That is the shape: a pipeline at the bottom, a toolbox above it.
+  </p>
+
+  <div id="diagram1"></div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Entry point and helpers</h2>
+
+  <p>
+    The <b>entry point</b> is where the program starts — the main guard, or a
+    <code>main()</code> procedure it calls. The <b>helper functions</b> are the named
+    steps it uses. Keeping the entry point short is what makes the shape readable.
+  </p>
+
+  <pre><code>def main():
+    print_report(total(load_prices()))
+
+if __name__ == "__main__":
+    main()</code></pre>
+
+  <p>
+    <code>main()</code> is a helper like any other: one job, a clear name, no hidden
+    state. The only thing special about it is that the main guard calls it.
+  </p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Read the entry point first. If you can follow it without opening any helper, the
+    program's shape is good.
+  </div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">3</span>A pipeline of steps</h2>
+
+  <p>
+    When each step takes the previous step's output, the program becomes a
+    <b>pipeline</b>: data flows in one end and a result comes out the other. Each
+    stage is a named procedure, and each stage can be tested on its own.
+  </p>
+
+  <pre><code>prices  = load_prices()      # stage 1: get the data
+summed  = total(prices)      # stage 2: compute
+report  = format_report(summed)  # stage 3: shape it
+print(report)                # stage 4: show it</code></pre>
+
+  <p>
+    This is the same data contract from Lessons 03 and 04, repeated. Pass in, return
+    out, pass in, return out. A pipeline is just that contract applied in a line.
+  </p>
+
+  <div id="intro1"></div>
+
+  <h2><span class="n">4</span>Build the whole program</h2>
+
+  <p>
+    Here is the win for today. The lab below is a complete procedural program. Read
+    the entry point first, then follow the pipeline stage by stage. Change one stage
+    and watch the whole program change.
+  </p>
+
+  <div id="lab1"></div>
+
+  <div id="fill1"></div>
+
+  <h2><span class="n">5</span>Check yourself</h2>
+
+  <p>
+    Answer from memory — do not scroll back up. Each option has the same number of
+    words, so nothing gives the answer away.
+  </p>
+
+  <div id="quiz"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>
+      You can build a program as a pipeline of named steps, with a short entry point
+      that reads like a sentence. That is procedural programming, complete: steps,
+      data, structure, modules, and shape. You also know exactly where it strains —
+      which is where the next course begins.
+    </p>
+  </div>
+
+  <h2><span class="n">6</span>Do this next</h2>
+
+  <ol>
+    <li>
+      Take a script you have written and reshape it so the entry point is one line
+      that reads like a sentence.
+    </li>
+    <li>
+      Rewrite it as a pipeline: each stage takes the previous stage's output and
+      returns the next value.
+    </li>
+    <li>
+      Read the entry point of a program you did not write, and see if you can follow
+      it without opening any helper.
+    </li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Read <a href="https://docs.python.org/3/tutorial/index.html">The Python Tutorial</a>.
+    Skim the table of contents and notice how much of it you can now place: functions,
+    modules, and the shape of a program.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher (me) anything — "what comes after
+    this?", "when is a pipeline the wrong shape?", "what is a generator?". There are
+    no bad questions here.
+  </div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  /* program shape */
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      { title: "helpers", lines: ["named steps above"] },
+      { title: "entry point", lines: ["one line below"] },
+      { title: "pipeline", lines: ["data flows through"] },
+      { title: "shape", lines: ["readable at a glance"] }
+    ]
+  });
+
+  /* predict-then-reveal */
+  TeachWidgets.predict("#predict1", {
+    q: "What should you read first in a program?",
+    a: ["The entry point", "The longest helper", "The import lines", "The last procedure"],
+    c: 0,
+    why: "Reading the entry point first shows the program's shape without opening any helper."
+  });
+
+  /* step through the pipeline */
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "def main():",
+      "    print_report(total(load_prices()))",
+      "if __name__ == \"__main__\":",
+      "    main()"
+    ],
+    steps: [
+      { line: 0, vars: { action: "define main" } },
+      { line: 2, vars: { __name__: "\"__main__\"", guard: "true" } },
+      { line: 3, vars: { action: "call main" } },
+      { line: 1, vars: { action: "call load_prices", returned: "[4, 8, 15]" } },
+      { line: 1, vars: { action: "call total", returned: "27" } },
+      { line: 1, vars: { action: "call print_report", printed: "Total: 27" } }
+    ]
+  });
+
+  /* three things a good shape gives you */
+  TeachWidgets.introCards("#intro1", {
+    cards: [
+      { ico: "📖", title: "Readability", body: "The entry point reads like a sentence, so the shape is obvious." },
+      { ico: "🧪", title: "Testability", body: "Each pipeline stage can be checked on its own, in isolation." },
+      { ico: "🔧", title: "Changeability", body: "Changing one stage changes the program without touching the rest." }
+    ]
+  });
+
+  /* the tiny interpreter */
+  TeachWidgets.lab("#lab1", {
+    label: "Run it — read the entry point, then follow the pipeline",
+    starter: "def load_prices():\n    return [4, 8, 15]\n\ndef total(prices):\n    result = 0\n    for p in prices:\n        result = result + p\n    return result\n\ndef print_report(total):\n    print(\"Total:\", total)\n\ndef main():\n    print_report(total(load_prices()))\n\nif __name__ == \"__main__\":\n    main()"
+  });
+
+  /* recall from memory */
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the blanks",
+    lines: [
+      "The program starts at the <0> point",
+      "A named step used by main is a <1> function",
+      "Steps chained by their output form a <2>"
+    ],
+    blanks: [
+      { a: ["entry"], why: "The entry point is where the program starts, usually the main guard." },
+      { a: ["helper"], why: "A helper function is a named step the entry point uses." },
+      { a: ["pipeline"], why: "A pipeline is a chain of steps where each takes the previous output." }
+    ]
+  });
+
+  /* the quiz — every option is exactly three words */
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What should you read first?",
+      a: ["The entry point", "The longest helper", "The import lines", "The last procedure"],
+      c: 0,
+      why: "Reading the entry point first shows the program's shape without opening any helper."
+    },
+    {
+      q: "What is a helper function?",
+      a: ["A named step used", "A step that is hidden", "A step with no name", "A step that never runs"],
+      c: 0,
+      why: "A helper function is a named step that the entry point uses."
+    },
+    {
+      q: "What makes a pipeline?",
+      a: ["Steps chained by output", "Steps chained by imports", "Steps chained by globals", "Steps chained by comments"],
+      c: 0,
+      why: "A pipeline is a chain of steps where each takes the previous step's output."
+    },
+    {
+      q: "What does a good shape give?",
+      a: ["Readable, testable, changeable", "Faster, smaller, quieter", "Longer, denser, cleverer", "Hidden, coupled, global"],
+      c: 0,
+      why: "A good shape makes the program readable, each stage testable, and change local."
+    }
+  ]);
+</script>
+</body>
+</html>

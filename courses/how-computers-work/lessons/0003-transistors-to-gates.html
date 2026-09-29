@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 03 — Transistors to gates</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="how-computers-work" data-lesson="3" data-lesson-id="transistors-to-gates">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 03</span> · Logic</span>
+
+  <h1 class="lesson-title">Transistors to gates</h1>
+  <p class="lesson-lede">
+    Last lesson, bits were abstract. Now they become physical. A bit is a wire with
+    voltage on it, and the simplest useful thing you can build from wires is a
+    <b>logic gate</b> — a circuit that makes a decision.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Build every gate from NAND</span>
+    <span><b>Mission link</b> Where the machine's decisions come from</span>
+  </div>
+
+  <h2><span class="n">1</span>The switch that started everything</h2>
+
+  <p>
+    A <b>transistor</b> is a switch with no moving parts. Apply a small voltage to one
+    terminal and it conducts; remove it and it stops. That is it. That is the whole
+    component.
+  </p>
+
+  <p>
+    A modern processor contains tens of billions of them, each a few nanometres
+    across. But the important thing is not the count — it is that a transistor gives
+    you a <b>controlled connection</b>, and controlled connections let you build
+    logic.
+  </p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    A transistor is a switch. A <b>logic gate</b> is a small arrangement of switches
+    that computes a rule. Everything else in this course is gates, arranged cleverly.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Four gates, four rules</h2>
+
+  <p>
+    A gate takes one or more bits in and produces one bit out. There are only a
+    handful you need to know, and each has a rule you can state in a sentence:
+  </p>
+
+  <div id="intro1"></div>
+
+  <p>
+    The complete behaviour of a gate is written as a <b>truth table</b> — every
+    possible input, and the output for each. For two inputs that is four rows:
+  </p>
+
+  <pre><code>A  B  |  AND  OR   XOR
+0  0  |   0    0    0
+0  1  |   0    1    1
+1  0  |   0    1    1
+1  1  |   1    1    0</code></pre>
+
+  <p>
+    Read the AND column: it is 1 only on the last row, where <em>both</em> inputs are
+    1. Read the XOR column: it is 1 where the inputs <em>differ</em>. That last one
+    will matter enormously in the next lesson.
+  </p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">3</span>One gate to rule them all</h2>
+
+  <p>
+    Here is the surprising part. You do not need four kinds of gate. You need
+    <b>one</b>: NAND — an AND followed by a NOT.
+  </p>
+
+  <p>
+    NAND is <b>functionally complete</b>, which means every other gate can be built
+    from NANDs alone. Watch:
+  </p>
+
+  <pre><code>NOT A   =  A NAND A
+A AND B =  NOT (A NAND B)
+A OR  B =  (NOT A) NAND (NOT B)</code></pre>
+
+  <p>
+    This is not a party trick. It is why chip fabrication is tractable: a factory
+    that can reliably print one kind of gate can print a whole processor. Real
+    designs still lean on this idea.
+  </p>
+
+  <div id="diagram1"></div>
+
+  <div class="note good">
+    <span class="note-label">Why this is beautiful</span>
+    Complexity from uniformity. Billions of identical switches, wired differently,
+    produce a machine that can run a spreadsheet, a game, or a language model. No
+    single component knows what the program is doing.
+  </div>
+
+  <h2><span class="n">4</span>Gates in your browser</h2>
+
+  <p>
+    You do not need a breadboard to practise this. Bitwise operators in JavaScript
+    (and Python) <em>are</em> gates, applied to every bit of a number at once:
+  </p>
+
+  <pre><code>5 &amp; 3    // AND  → 1     (101 &amp; 011 = 001)
+5 | 3    // OR   → 7     (101 | 011 = 111)
+5 ^ 3    // XOR  → 6     (101 ^ 011 = 110)
+~5       // NOT  → -6    (flips every bit)</code></pre>
+
+  <p>
+    Open a browser console, paste those in, and you are running logic gates. This is
+    the closest thing to touching the hardware without a soldering iron.
+  </p>
+
+  <div id="fill1"></div>
+
+  <h2><span class="n">5</span>Check yourself</h2>
+
+  <p>
+    Answer from memory — do not scroll back up. Each option has the same number of
+    words, so nothing gives the answer away.
+  </p>
+
+  <div id="quiz"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>
+      You can now write a truth table for any gate, and you know that a single gate
+      type — NAND — is enough to build all of them. You have crossed the line from
+      "bits are numbers" to "bits are decisions", which is the line between data and
+      computation.
+    </p>
+  </div>
+
+  <h2><span class="n">6</span>Do this next</h2>
+
+  <ol>
+    <li>
+      Write the truth table for <code>NOT</code>. It has one input and two rows.
+      Then write it for <code>NAND</code> — four rows.
+    </li>
+    <li>
+      Prove to yourself that <code>A NAND A</code> equals <code>NOT A</code>. Try
+      both values of <code>A</code> and check the output each time.
+    </li>
+    <li>
+      In a browser console, compute <code>12 &amp; 10</code>, <code>12 | 10</code>
+      and <code>12 ^ 10</code>. Convert each to binary by hand and confirm the
+      answers match the truth table.
+    </li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Read <a href="https://www.charlespetzold.com/code/">_Code_ by Charles Petzold</a>,
+    Chapters 8–11, which build gates from relays one at a time. Then watch
+    <a href="https://eater.net/8bit">Ben Eater's 8-bit computer series</a> — the
+    first two videos show these exact gates as physical chips.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher (me) anything — "how does a transistor
+    actually switch?", "why is NAND complete but AND not?", "what is a multiplexer?".
+    There are no bad questions here.
+  </div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  /* the four gates */
+  TeachWidgets.introCards("#intro1", {
+    cards: [
+      { ico: "🔗", title: "AND", body: "Output is 1 only when every input is 1." },
+      { ico: "➕", title: "OR", body: "Output is 1 when at least one input is 1." },
+      { ico: "🚫", title: "NOT", body: "Output is the opposite of its single input." },
+      { ico: "⚖️", title: "XOR", body: "Output is 1 only when the inputs differ." }
+    ]
+  });
+
+  /* NAND building the others */
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      { title: "NAND", lines: ["one gate type", "functionally complete"] },
+      { title: "NOT, AND, OR", lines: ["all built from it", "no other gate needed"] },
+      { title: "Whole CPU", lines: ["billions of copies", "wired differently"] }
+    ]
+  });
+
+  /* predict-then-reveal */
+  TeachWidgets.predict("#predict1", {
+    q: "An AND gate has inputs 1 and 0. What does it output?",
+    a: ["One", "Zero", "It depends"],
+    c: 1,
+    why: "AND outputs 1 only when every input is 1. One input is 0, so the output is 0."
+  });
+
+  /* step-through trace of a truth table */
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "A = 0, B = 0",
+      "A = 0, B = 1",
+      "A = 1, B = 0",
+      "A = 1, B = 1"
+    ],
+    steps: [
+      { line: 0, vars: { AND: "0", OR: "0", XOR: "0" } },
+      { line: 1, vars: { AND: "0", OR: "1", XOR: "1" } },
+      { line: 2, vars: { AND: "0", OR: "1", XOR: "1" } },
+      { line: 3, vars: { AND: "1", OR: "1", XOR: "0" } }
+    ]
+  });
+
+  /* recall from memory: gate rules */
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the outputs",
+    lines: [
+      "AND with inputs 1 and 1 gives <0>.",
+      "XOR with inputs 1 and 1 gives <1>.",
+      "OR with inputs 0 and 0 gives <2>."
+    ],
+    blanks: [
+      { a: ["1"], why: "AND is 1 only when both inputs are 1." },
+      { a: ["0"], why: "XOR is 1 only when the inputs differ — here they are the same." },
+      { a: ["0"], why: "OR is 0 only when every input is 0." }
+    ]
+  });
+
+  /* the quiz — every option is exactly three words */
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is a transistor?",
+      a: ["A tiny electric switch", "A type of memory cell", "A kind of logic gate", "A small arithmetic unit"],
+      c: 0,
+      why: "A transistor is a switch controlled by voltage — the raw material of every gate."
+    },
+    {
+      q: "What does a truth table show?",
+      a: ["The circuit's physical layout", "Every input and output", "The speed of a gate", "The cost of a chip"],
+      c: 1,
+      why: "A truth table lists every possible input combination and the resulting output."
+    },
+    {
+      q: "Which gate is functionally complete?",
+      a: ["AND", "OR", "NAND", "XOR"],
+      c: 2,
+      why: "NAND alone can build NOT, AND and OR — so it can build anything."
+    },
+    {
+      q: "When does XOR output one?",
+      a: ["When both inputs match", "When the inputs differ", "When both inputs are one", "When both inputs are zero"],
+      c: 1,
+      why: "XOR is the difference detector: it outputs 1 exactly when its inputs disagree."
+    }
+  ]);
+</script>
+</body>
+</html>

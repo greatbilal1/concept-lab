@@ -8,7 +8,6 @@
    Mount points (all optional — only what exists is rendered)
      #courseGrid   hub course cards
      #pathGrid     hub learning-path cards
-     #conceptGrid  hub concept cards
      #statCourses  hub "courses planned" counter
      #courseNav    course page sidebar
      #glossaryList glossary page term list
@@ -22,7 +21,6 @@
   var COURSES = global.COURSES || [];
   var PATHS = global.PATHS || [];
   var GLOSSARY = global.GLOSSARY || [];
-  var CONCEPTS = global.CONCEPTS || [];
 
   /* ---------- helpers ---------- */
 
@@ -136,7 +134,7 @@
           esc(c.title) + '"></a>'
       : "";
 
-    var lessonsLink = (live && c.lessons && c.lessons.href)
+    var lessonsLink = (live && c.lessons && c.lessons.href && c.lessons.href !== hrefOf(c))
       ? '<a class="course-lessons" href="' + esc(c.lessons.href) + '">' +
           Icons.svg("list-check", "ic") + esc(c.lessons.label || "Guided lessons") +
         "</a>"
@@ -169,7 +167,14 @@
   function renderCourseGrid() {
     var host = $("#courseGrid");
     if (!host) return;
-    host.innerHTML = COURSES.map(courseCard).join("");
+
+    /* The home page shows only courses that are ready to start. The full
+       catalogue (including planned courses) lives on courses.html. */
+    var liveOnly = host.dataset.liveOnly === "true";
+    var list = liveOnly
+      ? COURSES.filter(function (c) { return c.status === "live"; })
+      : COURSES;
+    host.innerHTML = list.map(courseCard).join("");
 
     /* ---- filter bar: difficulty + tier + status ----
        Built from the data, mirrors the glossary tag filter. */
@@ -180,7 +185,7 @@
     var levelCounts = {};
     var tierCounts = {};
     var statusCounts = {};
-    COURSES.forEach(function (c) {
+    list.forEach(function (c) {
       if (c.level) levelCounts[c.level] = (levelCounts[c.level] || 0) + 1;
       if (c.tier) tierCounts[c.tier] = (tierCounts[c.tier] || 0) + 1;
       if (c.status) statusCounts[c.status] = (statusCounts[c.status] || 0) + 1;
@@ -194,6 +199,17 @@
         items.join("") + "</div>";
     }
 
+    /* The status group is only useful when more than one status is on
+       the page — on the live-only home grid it would be a single chip. */
+    var statusGroup = Object.keys(statusCounts).length > 1
+      ? group("Status", "status", ["live", "in-progress", "planned"].filter(function (s) {
+          return statusCounts[s];
+        }).map(function (s) {
+          return '<button class="chip" data-status="' + esc(s) + '">' + esc(s) +
+            ' <span class="c">' + statusCounts[s] + "</span></button>";
+        }))
+      : "";
+
     bar.innerHTML =
       group("Level", "level", levels.map(function (l) {
         return '<button class="chip" data-level="' + esc(l) + '">' + esc(l) +
@@ -203,12 +219,7 @@
         return '<button class="chip" data-tier="' + t + '">' + t +
           ' <span class="c">' + tierCounts[t] + "</span></button>";
       })) +
-      group("Status", "status", ["live", "in-progress", "planned"].filter(function (s) {
-        return statusCounts[s];
-      }).map(function (s) {
-        return '<button class="chip" data-status="' + esc(s) + '">' + esc(s) +
-          ' <span class="c">' + statusCounts[s] + "</span></button>";
-      }));
+      statusGroup;
 
     var active = { level: "", tier: "", status: "" };
 
@@ -243,6 +254,8 @@
   function renderStats() {
     var el = $("#statCourses");
     if (el) el.textContent = COURSES.length;
+    var ready = $("#statReady");
+    if (ready) ready.textContent = COURSES.filter(function (c) { return c.status === "live"; }).length;
   }
 
   /* ---------- hub: learning paths ---------- */
@@ -274,54 +287,6 @@
         "<p>" + esc(p.desc) + "</p>" +
         "<ol>" + steps + "</ol>" +
         '<div class="path-foot">' + liveCount + " of " + p.steps.length + " available</div>" +
-      "</div>";
-    }).join("");
-  }
-
-  /* ---------- hub: concept cards ----------
-     Concepts are hand-authored (they are editorial, not data), but
-     the list lives in data/concepts.js so the hub shell stays empty. */
-
-  function renderConcepts() {
-    var host = $("#conceptGrid");
-    if (!host) return;
-
-    var byConcept = {};
-    CONCEPTS.forEach(function (c) { if (c.id) byConcept[c.id] = c; });
-
-    host.innerHTML = CONCEPTS.map(function (c) {
-      /* related concepts */
-      var rel = (c.related || []).map(function (id) {
-        var r = byConcept[id];
-        if (!r) return "";
-        return '<a class="crel" href="#concepts" data-concept="' + esc(id) + '">' +
-          esc(r.title) + "</a>";
-      }).join("");
-
-      /* used-by-course */
-      var used = (c.courses || []).map(function (id) {
-        var course = byId(id);
-        if (!course) return "";
-        var live = course.status === "live";
-        var label = esc(course.title);
-        return live
-          ? '<a class="cuse" href="' + esc(hrefOf(course)) + '">' + label + "</a>"
-          : '<span class="cuse soon">' + label + "</span>";
-      }).join("");
-
-      return '<div class="concept reveal" id="concept-' + esc(c.id || "") + '">' +
-        '<div class="stage ' + c.cls + '" data-anim="' + esc(c.anim) + '">' +
-          '<div class="grid-lines"></div>' + c.art +
-        "</div>" +
-        '<div class="body">' +
-          '<div class="ico">' + c.ico + "</div>" +
-          "<h4>" + c.title + "</h4>" +
-          "<p>" + esc(c.body) + "</p>" +
-          (rel ? '<div class="crels"><span class="clabel">Related</span>' + rel + "</div>" : "") +
-          (used ? '<div class="cuses"><span class="clabel">Used in</span>' + used + "</div>" : "") +
-          '<a class="learn" href="' + esc(c.link) + '">' + esc(c.cta) +
-            " " + Icons.svg("arrow-right", "ic") + "</a>" +
-        "</div>" +
       "</div>";
     }).join("");
   }
@@ -434,27 +399,26 @@
 
   function glossaryCard(g) {
     var c = byId(g.course);
-    var link = c
-      ? hrefOf(c) + "#" + g.section
-      : "#";
+    /* Link to the course's own glossary page when it has one — that page
+       renders the full term list from the course manifest, so the site
+       glossary and the course glossary can never drift apart. Fall back
+       to the course page + section anchor for courses without one. */
+    var link = "#";
+    if (c) {
+      link = c.glossary
+        ? c.glossary
+        : hrefOf(c) + "#" + g.section;
+    }
     var source = c ? c.title : g.course;
     var tags = (g.tags || []).map(function (t) {
       return '<span class="chip" data-tag="' + esc(t) + '">' + esc(t) + "</span>";
     }).join("");
-    var concept = "";
-    if (g.concept) {
-      var cc = CONCEPTS.filter(function (x) { return x.id === g.concept; })[0];
-      if (cc) {
-        concept = '<a class="gconcept" href="index.html#concept-' + esc(g.concept) + '">' +
-          Icons.svg("spark", "ic") + esc(cc.title) + "</a>";
-      }
-    }
     return '<div class="gloss reveal" data-tags="' + esc((g.tags || []).join(" ")) + '"' +
       ' data-course="' + esc(g.course) + '">' +
       '<div class="gloss-head"><h3>' + esc(g.term) + "</h3>" +
         '<a class="src" href="' + esc(link) + '">' + esc(source) + " →</a></div>" +
       "<p>" + esc(g.def) + "</p>" +
-      '<div class="chips">' + tags + concept + "</div>" +
+      '<div class="chips">' + tags + "</div>" +
     "</div>";
   }
 
@@ -521,7 +485,6 @@
     renderStats();
     renderCourseGrid();
     renderPaths();
-    renderConcepts();
     renderCourseNav();
     renderSectionHeads();
     renderRails();
