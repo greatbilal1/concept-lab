@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 04 — Catching well</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="python-errors-exceptions" data-lesson="4" data-lesson-id="catching-well">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 04</span> · Catching</span>
+
+  <h1 class="lesson-title">Catching well</h1>
+  <p class="lesson-lede">
+    You can catch an exception now. But catching is easy to get wrong in ways
+    that hide bugs for months. This lesson is about the three habits that
+    separate a handler that helps from one that hurts: catch narrowly, clean up
+    with <code>finally</code>, and never swallow a failure silently.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Write handlers that do not hide real bugs</span>
+    <span><b>Mission link</b> Failure you can trust is failure you can fix</span>
+  </div>
+
+  <h2><span class="n">1</span>The bare except trap</h2>
+
+  <p>
+    The quickest way to make an error go away is <code>except:</code> with no
+    type. It catches <i>everything</i> — including the mistakes you did not
+    expect and the ones you cannot fix. That is not handling; it is hiding.
+  </p>
+
+  <pre><code>try:
+    total = price / count
+except:
+    total = 0</code></pre>
+
+  <p>
+    If <code>price</code> is misspelled, this code does not tell you. It quietly
+    sets <code>total</code> to zero and carries on with wrong data. A
+    <code>NameError</code> that should have stopped you at line one now corrupts
+    everything downstream.
+  </p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Catch the narrowest type you can name. A bare <code>except:</code> catches
+    bugs you never meant to handle.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>finally always runs</h2>
+
+  <p>
+    Some work must happen whether or not the risky part succeeded — closing a
+    file, releasing a lock, rolling back a transaction. That is what
+    <code>finally</code> is for. It runs after the <code>try</code> block
+    finishes, after any handler, and even if the block returns.
+  </p>
+
+  <div id="diagram1"></div>
+
+  <p>
+    There is also an <code>else</code> block, which runs only when the
+    <code>try</code> succeeded. Together, <code>try</code>,
+    <code>except</code>, <code>else</code>, and <code>finally</code> give you a
+    place for every outcome.
+  </p>
+
+  <h2><span class="n">3</span>Watch cleanup happen</h2>
+
+  <p>
+    Step through this program. The exception is caught, the handler runs, and
+    then <code>finally</code> runs before the program moves on.
+  </p>
+
+  <div id="trace1"></div>
+
+  <p>
+    Notice the order: <code>try</code>, then <code>except</code>, then
+    <code>finally</code>. If the <code>try</code> had succeeded, you would see
+    <code>else</code> instead of <code>except</code>, and <code>finally</code>
+    would still run.
+  </p>
+
+  <h2><span class="n">4</span>Practice</h2>
+
+  <p>Recall the key facts from memory before the quiz.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>
+      You can now name the exact exception you expect, guarantee cleanup with
+      <code>finally</code>, and recognise a bare <code>except:</code> as the bug
+      it usually is. Your handlers will surface problems instead of burying
+      them.
+    </p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>
+      Take a bare <code>except:</code> from your own code and replace it with the
+      specific type you actually expect.
+    </li>
+    <li>
+      Add a <code>finally</code> block that prints "done" and confirm it runs
+      whether the <code>try</code> succeeds or fails.
+    </li>
+    <li>
+      Add an <code>else</code> block and confirm it runs only on success, never
+      when the handler fires.
+    </li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Read the Python tutorial's
+    <a href="https://docs.python.org/3/tutorial/errors.html">"Errors and Exceptions"</a>,
+    section 8.4, "Raising Exceptions", and section 8.6 on
+    <code>finally</code> and cleanup.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher (me) anything — "does finally run
+    if I return?", "can I have else without except?", "why is a bare except so
+    dangerous?". There are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  /* predict-then-reveal: what a bare except hides */
+  TeachWidgets.predict("#predict1", {
+    q: "A bare except: catches a NameError from a typo. What is the result?",
+    a: ["The bug is hidden", "The bug is reported", "The program stops"],
+    c: 0,
+    why: "A bare except swallows every exception, so the typo is never surfaced and the program continues with wrong data."
+  });
+
+  /* the four blocks */
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      { title: "try", lines: ["risky code", "may raise"] },
+      { title: "except", lines: ["runs on failure", "handles the type"] },
+      { title: "else", lines: ["runs on success", "no exception"] },
+      { title: "finally", lines: ["always runs", "cleanup here"] }
+    ],
+    vertical: true
+  });
+
+  /* step-through: try, except, finally order */
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "try:",
+      "    n = int(\"hello\")",
+      "except ValueError:",
+      "    n = 0",
+      "finally:",
+      "    print(\"done\")"
+    ],
+    steps: [
+      { line: 1, vars: { call: "int(\"hello\")", state: "inside try" } },
+      { line: 1, vars: { raised: "ValueError", handled: "searching handlers" } },
+      { line: 3, vars: { matched: "except ValueError", n: "0" } },
+      { line: 5, vars: { block: "finally", prints: "done", result: "program continues" } }
+    ]
+  });
+
+  /* recall from memory */
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the blanks",
+    lines: [
+      "A bare <0> catches every exception, including bugs.",
+      "The <1> block always runs, success or failure.",
+      "The <2> block runs only when the try block succeeds."
+    ],
+    blanks: [
+      { a: ["except"], why: "except: with no type catches everything, which hides real bugs." },
+      { a: ["finally"], why: "finally runs after the try and any handler, even on return." },
+      { a: ["else"], why: "else runs only when no exception was raised in the try block." }
+    ]
+  });
+
+  /* the quiz — every option in a question has the same word count */
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why is a bare except: dangerous?",
+      a: ["It hides unexpected bugs", "It runs too slowly", "It needs an import", "It skips the finally"],
+      c: 0,
+      why: "A bare except catches every exception, so mistakes you never meant to handle are silently swallowed."
+    },
+    {
+      q: "When does the finally block run?",
+      a: ["Always, on success or failure", "Only when an error raises", "Only when the try succeeds", "Only when nothing raises here"],
+      c: 0,
+      why: "finally is guaranteed to run after the try block and any handler, even if the block returns."
+    },
+    {
+      q: "When does the else block run?",
+      a: ["Only when the try succeeds", "Only when an error raises", "Only when nothing raises here", "Only when finally is skipped"],
+      c: 0,
+      why: "else runs only if the try block completed without raising any exception."
+    },
+    {
+      q: "What should you catch instead of everything?",
+      a: ["The narrowest type you expect", "The broadest type available here", "Every type in the tree", "No type at all here"],
+      c: 0,
+      why: "Naming the specific exception you expect keeps unrelated bugs propagating instead of hiding them."
+    }
+  ]);
+</script>
+</body>
+</html>

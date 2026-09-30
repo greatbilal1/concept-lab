@@ -10,8 +10,8 @@
      ]);
 
    Design rules (from the teach skill):
-     - Every answer option must be the SAME number of words, so
-       formatting never hints at the right answer.
+     - Every question has four options. Keep them plausible and
+       parallel, and avoid letting length hint at the right answer.
      - Feedback is immediate and automatic: clicking an option
        grades it on the spot, no "check answers" button.
      - A short `why` explains the answer once it is revealed.

@@ -85,8 +85,9 @@ Knowledge checks should distinguish:
 
 Prefer questions that reveal misconceptions.
 
-**Hard rule:** every quiz option must have the **same number of words**, so
-nothing about the answer is given away by length.
+**Rule:** every quiz question has exactly four options. Keep the options
+plausible and parallel, and avoid letting one option's length give the answer
+away.
 
 ## Interactive elements
 

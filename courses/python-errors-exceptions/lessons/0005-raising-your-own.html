@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 05 — Raising your own</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="python-errors-exceptions" data-lesson="5" data-lesson-id="raising-your-own">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 05</span> · Raising</span>
+
+  <h1 class="lesson-title">Raising your own</h1>
+  <p class="lesson-lede">
+    In the last lessons, Python raised exceptions while your code was running.
+    You can also raise one when your function detects an invalid value or an
+    impossible state, stopping bad data at the boundary where it first appears.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Reject invalid input with a useful exception</span>
+    <span><b>Mission link</b> Make failure explicit at its source</span>
+  </div>
+
+  <h2><span class="n">1</span>Stop a bad value early</h2>
+
+  <p>
+    Imagine a function that divides a total among a number of people. A zero
+    count is not a meaningful request. If the function lets it travel deeper,
+    the eventual division error is farther from the bad input. Validate the
+    argument where the function receives it:
+  </p>
+
+  <pre><code>def split_bill(total, people):
+    if people &lt;= 0:
+        raise ValueError("people must be greater than zero")
+    return total / people</code></pre>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Raise an exception when a function cannot honor its contract; do not return
+    a plausible-looking value that hides invalid input.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Second idea</h2>
+  <h2><span class="n">2</span>Choose a type that says what failed</h2>
+
+  <p>
+    Use <code>ValueError</code> when the type is acceptable but the value is not
+    (a negative number of people). Use <code>TypeError</code> when the kind of
+    object is wrong. Python's built-in exceptions already give callers useful
+    categories, so prefer them when they describe the failure accurately.
+    Raising does not print a message or decide how the program recovers: it
+    creates an exception and starts the same propagation you traced in Lesson
+    01.
+  </p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Third idea</h2>
+  <h2><span class="n">3</span>Follow the failure to its handler</h2>
+
+  <p>
+    A guard clause checks an assumption before the main work begins. If the
+    caller chooses to recover, it catches the named exception; otherwise the
+    traceback keeps the failure visible.
+  </p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+
+  <p>Recall the key facts from memory before the quiz.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <b>✓ Your win for today</b>
+    You can reject invalid input early, choose a built-in exception that names
+    the problem, and leave recovery to the layer that can make a useful choice.
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Write a function that accepts a percentage and raises <code>ValueError</code> outside 0 through 100.</li>
+    <li>Add a guard clause for a missing required name and include the name in its error message.</li>
+    <li>Call the function inside a narrow handler and show a friendly response without catching unrelated bugs.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Read the Python tutorial's <a href="https://docs.python.org/3/tutorial/errors.html#raising-exceptions">"Raising Exceptions"</a> section. It documents <code>raise</code> and re-raising; see RESOURCES.md.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "A function receives people=0, which would make its result meaningless. Where should it reject that input?",
+    a: ["At the function boundary with ValueError", "After division when the result is checked", "By returning zero as a special result"],
+    c: 0,
+    why: "The function knows its own contract, so it should reject an invalid argument before doing work or returning misleading data."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      { title: "Validate", lines: ["check argument", "at the boundary"] },
+      { title: "Raise", lines: ["choose a type", "include context"] },
+      { title: "Propagate", lines: ["caller may handle", "or traceback appears"] }
+    ]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "def split_bill(total, people):",
+      "    if people <= 0:",
+      "        raise ValueError(\"people must be positive\")",
+      "    return total / people",
+      "split_bill(60, 0)"
+    ],
+    steps: [
+      { line: 4, vars: { call: "split_bill(60, 0)", people: "0" } },
+      { line: 1, vars: { check: "people <= 0", result: "True" } },
+      { line: 2, vars: { raised: "ValueError", message: "people must be positive" } },
+      { line: 2, vars: { handler: "not in this function", next: "caller or traceback" } }
+    ]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the blanks",
+    lines: [
+      "The statement that raises an exception is <0>.",
+      "A check at the top of a function can be a <1> clause."
+    ],
+    blanks: [
+      { a: ["raise"], why: "raise creates an exception and begins propagation." },
+      { a: ["guard"], why: "A guard clause rejects an invalid condition before the main work." }
+    ]
+  });
+
+  /* the quiz — four questions with plausible options */
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "When is ValueError a good fit?",
+      a: ["The value has the right type but is outside the allowed range", "The caller passed an object of an unsupported type", "A file path points to no existing file", "The program cannot allocate more memory"],
+      c: 0,
+      why: "ValueError describes an argument whose type is acceptable but whose value violates the function's expectations."
+    },
+    {
+      q: "What does raise do?",
+      a: ["Creates an exception and starts its propagation", "Prints an error and exits the interpreter", "Retries the current statement automatically", "Turns a failed result into None"],
+      c: 0,
+      why: "raise signals failure by creating or re-raising an exception; it does not choose the recovery policy."
+    },
+    {
+      q: "Why validate with a guard clause?",
+      a: ["It rejects invalid input before later work can depend on it", "It catches every exception from every function call", "It turns a programming bug into a valid value", "It prevents callers from handling the failure"],
+      c: 0,
+      why: "An early check keeps invalid state from moving deeper into the program and makes the failure point clear."
+    },
+    {
+      q: "If no except clause matches a raised exception, what happens?",
+      a: ["It continues up the call stack", "Python silently discards it", "The function returns an empty value", "The nearest finally block handles it"],
+      c: 0,
+      why: "An unmatched exception propagates to the caller and eventually becomes an uncaught traceback if nobody handles it."
+    }
+  ]);
+</script>
+</body>
+</html>

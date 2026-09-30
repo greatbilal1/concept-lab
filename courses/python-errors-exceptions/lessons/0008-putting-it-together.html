@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 08 — Putting it together</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="python-errors-exceptions" data-lesson="8" data-lesson-id="putting-it-together">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 08</span> · Putting it together</span>
+
+  <h1 class="lesson-title">Putting it together</h1>
+  <p class="lesson-lede">
+    A reliable function does not pretend every operation succeeds. Put the
+    earlier ideas together: validate and raise close to the cause, clean up
+    resources with <code>with</code>, and translate expected failures once at a
+    boundary that can explain what the program can do next.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Build a small, explicit failure path</span>
+    <span><b>Mission link</b> Make failure predictable and recoverable</span>
+  </div>
+
+  <h2><span class="n">1</span>Separate work from the boundary</h2>
+
+  <p>
+    A low-level function should do the work and raise meaningful exceptions;
+    it should not decide how a command-line app, web route, or user interface
+    explains every possible failure. The outer boundary knows what response is
+    appropriate. Catch expected failures there, not around the whole program.
+  </p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Catch an exception at the lowest layer that can recover meaningfully, or at
+    the outer boundary that can report it clearly; let unrelated failures show.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Second idea</h2>
+  <h2><span class="n">2</span>Let the context manager clean up</h2>
+
+  <p>
+    File handles and similar resources need cleanup on both success and error.
+    Use a <code>with</code> statement rather than manually remembering to close
+    a file in every branch. The context manager's exit logic runs as control
+    leaves the block, including when an exception is propagating.
+  </p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Third idea</h2>
+  <h2><span class="n">3</span>Make the whole path visible</h2>
+
+  <p>
+    This small command-line style example keeps the original cause attached
+    with <code>raise ... from</code>. The outer layer handles only the failures
+    it can explain. A retry belongs only around a plausibly transient
+    operation, must be bounded, and is omitted here because reading a local
+    file or parsing its contents is not made reliable by repeating it.
+  </p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+
+  <p>Recall the key facts from memory before the quiz.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <b>✓ Your win for today</b>
+    You can trace a failure from its cause through cleanup to a deliberate
+    boundary, preserving context and producing a useful outcome without
+    swallowing unrelated bugs.
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Write a function that reads a number from a text file using <code>with</code> and raises <code>ValueError</code> for invalid contents.</li>
+    <li>At the caller, handle only <code>FileNotFoundError</code> and <code>ValueError</code> with separate messages.</li>
+    <li>Translate a low-level failure with <code>raise RuntimeError(...) from error</code>, then inspect the chained traceback.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Read the Python tutorial on <a href="https://docs.python.org/3/tutorial/errors.html#defining-clean-up-actions">defining cleanup actions</a> and the language reference for the <a href="https://docs.python.org/3/reference/compound_stmts.html#the-with-statement"><code>with</code> statement</a>. See RESOURCES.md.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "A file reader cannot decide what a command-line app should tell the user. Where should that response usually be chosen?",
+    a: ["At the outer application boundary", "Inside every low-level helper", "In the exception class constructor", "By suppressing all exceptions"],
+    c: 0,
+    why: "The boundary knows the user-facing context. Lower-level functions should report meaningful failures and let them propagate."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      { title: "read_number", lines: ["open with with", "parse or raise"] },
+      { title: "exception", lines: ["context manager", "cleans up"] },
+      { title: "main boundary", lines: ["handle expected types", "report a useful result"] }
+    ]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "def read_number(path):",
+      "    with open(path) as file:",
+      "        try:",
+      "            return int(file.read())",
+      "        except ValueError as error:",
+      "            raise ValueError(\"file must contain an integer\") from error",
+      "try:",
+      "    value = read_number(\"count.txt\")",
+      "except (FileNotFoundError, ValueError) as error:",
+      "    print(f\"Cannot load count: {error}\")"
+    ],
+    steps: [
+      { line: 1, vars: { file: "opened", cleanup: "registered by with" } },
+      { line: 3, vars: { text: "\"many\"", parse: "raises ValueError" } },
+      { line: 5, vars: { raised: "ValueError", cause: "original conversion error" } },
+      { line: 8, vars: { matched: "FileNotFoundError or ValueError", response: "clear message" } }
+    ]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the blanks",
+    lines: [
+      "A single application-level place for handling errors is an error <0>.",
+      "Use a <1> statement to guarantee resource cleanup."
+    ],
+    blanks: [
+      { a: ["boundary"], why: "An error boundary turns failures into outcomes appropriate to its layer." },
+      { a: ["with"], why: "A context manager handles setup and teardown around the block." }
+    ]
+  });
+
+  /* the quiz — four questions with plausible options */
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Where should an expected file error become a user-facing message?",
+      a: ["At a boundary that knows the user's context", "Inside every function that opens a file", "In a bare except around the entire program", "Inside the low-level exception type"],
+      c: 0,
+      why: "The boundary knows how the application can respond. A lower-level helper should expose the failure rather than choose a presentation."
+    },
+    {
+      q: "What does `with open(path)` help guarantee?",
+      a: ["The file is closed when the block exits", "The file contents are valid integers", "The file always exists before opening", "Any parsing error is silently handled"],
+      c: 0,
+      why: "The file object's context manager closes the resource when control leaves the with block, including on exceptions."
+    },
+    {
+      q: "Why use `raise NewError(...) from error`?",
+      a: ["It preserves the original exception as the cause", "It retries the failed operation once", "It prevents the new exception from propagating", "It converts the failure into a warning"],
+      c: 0,
+      why: "Exception chaining preserves the original cause while giving the higher layer a more meaningful failure type or message."
+    },
+    {
+      q: "When is retrying a failure reasonable?",
+      a: ["For a plausibly transient operation with a limit", "For every ValueError from user input", "Whenever any exception is raised", "When repeating cannot change the outcome"],
+      c: 0,
+      why: "Retries are for operations that may succeed later; they should be bounded and avoid repeating deterministic failures."
+    }
+  ]);
+</script>
+</body>
+</html>

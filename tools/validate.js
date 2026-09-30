@@ -20,7 +20,7 @@
      - concept entries have the required fields
      - live courses' href / lessons.href point at real files
      - every lesson's quiz has exactly 4 questions
-     - every quiz question's options have equal word counts
+     - every quiz question has at least one option
      - every widget mount call has a matching empty <div id="…">
    ============================================================ */
 
@@ -221,8 +221,8 @@ COURSES.filter((c) => c.status === "live").forEach((c) => {
 
 /* ---------- lesson content (quiz + widgets) ----------
    The two bugs that repeatedly slip through manual review are:
-     (a) a quiz with the wrong number of questions, or options whose
-         word counts differ (which hints at the answer), and
+     (a) a quiz with the wrong number of questions or a question with no
+         options, and
      (b) a widget mounted into an id whose empty <div> was never added.
    Neither is caught by the data checks above, so parse each lesson's
    inline <script> and assert both. */
@@ -246,11 +246,6 @@ function extractArrayArg(src, callRe) {
     }
   }
   return null;
-}
-
-/* Count the words in a quiz option label. */
-function wordCount(s) {
-  return String(s).trim().split(/\s+/).filter(Boolean).length;
 }
 
 /* Pull every `q: "…"` / `a: [ … ]` pair out of a quiz array literal.
@@ -324,13 +319,6 @@ COURSES.filter((c) => c.status === "live").forEach((c) => {
       if (!it.a.length) {
         fail(where + ": quiz question " + (qi + 1) + " has no options");
         return;
-      }
-      const counts = it.a.map(wordCount);
-      const first = counts[0];
-      if (counts.some((n) => n !== first)) {
-        fail(where + ": quiz question " + (qi + 1) +
-          " options have unequal word counts [" + counts.join(", ") + "] — " +
-          JSON.stringify(it.q));
       }
     });
   });

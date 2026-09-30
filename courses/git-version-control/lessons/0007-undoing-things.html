@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 07 — Undoing things</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="git-version-control" data-lesson="7" data-lesson-id="undoing-things">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 07</span> · Recovery</span>
+
+  <h1 class="lesson-title">Undoing things</h1>
+  <p class="lesson-lede">
+    The reason to learn Git is not to avoid mistakes — it is to make them
+    safely. This lesson is the undo toolkit.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~14 min</span>
+    <span><b>Win</b> Choose the right undo command for any situation</span>
+    <span><b>Mission link</b> Recovery is what makes branching and merging safe</span>
+  </div>
+
+  <h2><span class="n">1</span>Undo depends on where you are</h2>
+
+  <p>
+    There is no single "undo" in Git, because there is no single place a mistake
+    can live. The right command depends on <i>which tree</i> the mistake is in —
+    the model from Lesson 3.
+  </p>
+
+  <ul>
+    <li><b>Working tree</b> — you edited a file and want it back: <code>git restore file</code>.</li>
+    <li><b>Staging area</b> — you staged something by mistake: <code>git restore --staged file</code>.</li>
+    <li><b>Repository</b> — you committed something you regret: <code>git revert</code> or <code>git reset</code>.</li>
+  </ul>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Ask "which tree is the mistake in?" and the correct undo command follows
+    almost automatically.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Revert versus reset</h2>
+
+  <p>
+    These two are the ones people confuse. They do opposite things to history:
+  </p>
+
+  <p>
+    <code>git revert</code> creates a <b>new commit</b> that undoes an earlier
+    one. History is preserved — you can see both the mistake and the fix. This is
+    the safe choice on shared branches.
+  </p>
+
+  <p>
+    <code>git reset</code> <b>moves the branch pointer backwards</b>, as if the
+    later commits never happened. It rewrites history. That is fine on a branch
+    only you have, and dangerous on a branch others have pulled.
+  </p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>The safety net: reflog</h2>
+
+  <p>
+    Even if you reset away commits, they are not gone immediately. Git keeps a
+    log of everywhere <code>HEAD</code> has been:
+  </p>
+
+  <pre><code>git reflog</code></pre>
+
+  <p>
+    This is your safety net. If you reset too far, find the commit in the reflog
+    and reset back to it. Almost nothing you do in Git is truly unrecoverable
+    within a few days — which is exactly why it is safe to experiment.
+  </p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+
+  <p>Recall the key facts from memory before the quiz.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <b>✓ Your win for today</b>
+    You can pick the right undo command for a working-tree, staged, or committed
+    mistake — and recover from a bad reset with the reflog.
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Edit a file, then run <code>git restore</code> on it and confirm the change is gone.</li>
+    <li>Stage a file by mistake, then unstage it with <code>git restore --staged</code>.</li>
+    <li>Make a commit, revert it, then run <code>git reflog</code> and read the trail.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Pro Git, Chapter 2 — "Undoing Things", and Chapter 7 — "Reset Demystified"
+    (git-scm.com/book).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "You edited a file and want the committed version back. What do you run?",
+    a: [
+      "git restore on that file",
+      "git revert on that file",
+      "git reset on that file",
+      "git commit on that file"
+    ],
+    c: 0,
+    why: "The mistake is in the working tree, so git restore discards the edit. revert and reset act on commits, not uncommitted edits."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      { title: "git revert", lines: ["adds a new commit", "history preserved"] },
+      { title: "git reset", lines: ["moves the pointer back", "history rewritten"] },
+      { title: "git reflog", lines: ["records where HEAD went", "your safety net"] }
+    ]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    label: "Recovering from a bad reset",
+    code: [
+      "git reset --hard HEAD~1",
+      "git reflog",
+      "git reset --hard a3f9c21"
+    ],
+    steps: [
+      { line: 0, vars: { HEAD: "b7e2d10", lost: "a3f9c21" } },
+      { line: 1, vars: { HEAD: "b7e2d10", found: "a3f9c21" } },
+      { line: 2, vars: { HEAD: "a3f9c21", recovered: "yes" } }
+    ]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the blanks",
+    lines: [
+      "To discard an edit in the working tree, run <0>.",
+      "To unstage a file, run <1>.",
+      "To undo a commit with a new commit, run <2>.",
+      "To see where HEAD has been, run <3>."
+    ],
+    blanks: [
+      { a: ["git restore"], why: "git restore replaces the working-tree file with the committed version." },
+      { a: ["git restore --staged"], why: "The --staged flag moves the change back out of the index." },
+      { a: ["git revert"], why: "git revert adds a new commit that reverses an earlier one." },
+      { a: ["git reflog"], why: "The reflog records every position HEAD has held." }
+    ]
+  });
+
+  /* the quiz — every option must have the SAME number of words */
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Which command discards an uncommitted edit?",
+      a: ["git restore the file", "git revert the commit", "git reset the branch", "git commit the change"],
+      c: 0,
+      why: "git restore replaces the working-tree file with the committed version. revert and reset act on commits."
+    },
+    {
+      q: "What does git revert do?",
+      a: ["Adds a new undo commit", "Deletes the old commit here", "Moves the branch pointer here", "Discards working tree edits here"],
+      c: 0,
+      why: "git revert creates a new commit that reverses an earlier one, leaving history intact."
+    },
+    {
+      q: "What does git reset do to history?",
+      a: ["It moves the branch pointer", "It adds a new commit", "It deletes the repository here", "It uploads to the remote"],
+      c: 0,
+      why: "git reset moves the branch pointer backwards, effectively rewriting history."
+    },
+    {
+      q: "What is the reflog for?",
+      a: ["Recovering lost commits", "Listing remote branches", "Showing file contents", "Comparing two branches"],
+      c: 0,
+      why: "The reflog records where HEAD has been, so you can find and restore commits you reset away."
+    }
+  ]);
+</script>
+</body>
+</html>

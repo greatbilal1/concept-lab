@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 02 — Growth, not stopwatch</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="big-o-complexity" data-lesson="2" data-lesson-id="growth-not-stopwatch">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 02</span> · Growth</span>
+
+  <h1 class="lesson-title">Growth, not stopwatch</h1>
+  <p class="lesson-lede">
+    The obvious way to compare two programs is to run them and see which finishes
+    first. This lesson shows why that answer is almost useless — and what to
+    measure instead.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Predict which program wins at scale</span>
+    <span><b>Mission link</b> Why Big O is the honest comparison</span>
+  </div>
+
+  <h2><span class="n">1</span>The stopwatch lies to you</h2>
+
+  <p>
+    Suppose you write two programs that sort a list. You run both on a list of 10
+    items. Program X finishes in 2 milliseconds, Program Y in 5. You conclude X is
+    better and move on.
+  </p>
+
+  <p>
+    Now the list has 10,000 items. Program Y finishes in 40 milliseconds. Program
+    X is still running after two minutes. What happened?
+  </p>
+
+  <p>
+    Nothing changed about the programs. What changed is the <b>input size</b>, and
+    the two programs respond to it completely differently. A stopwatch on a small
+    input measures the wrong thing.
+  </p>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Three things a stopwatch cannot separate</h2>
+
+  <p>
+    When you time a program, the number you get is a blend of at least three
+    different things:
+  </p>
+
+  <ul>
+    <li><b>The algorithm's growth</b> — the thing you actually want to know.</li>
+    <li><b>The constant factor</b> — how many machine instructions each step costs.</li>
+    <li><b>The machine and the moment</b> — your CPU, your RAM, what else is running.</li>
+  </ul>
+
+  <p>
+    Big O deliberately throws away the second and third so you can see the first.
+    That is not sloppiness — it is the point. The constant factor is a detail of
+    your implementation; the growth is a property of the <b>algorithm</b>, and it
+    is the part that decides what happens at scale.
+  </p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    A stopwatch measures one run on one machine. Big O measures the <b>shape</b> of
+    the cost curve — and the shape is what survives when the input grows.
+  </div>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Where the curves cross</h2>
+
+  <p>
+    Here is the surprising part. A slower-growing algorithm can <b>lose</b> on
+    small inputs and still win overall. If Program X does $100n$ operations and
+    Program Y does $n^2$, then:
+  </p>
+
+  <pre><code>n = 10      X: 1,000 ops      Y: 100 ops      Y wins
+n = 100     X: 10,000 ops     Y: 10,000 ops   tie
+n = 1,000   X: 100,000 ops    Y: 1,000,000    X wins
+n = 10,000  X: 1,000,000      Y: 100,000,000  X wins by 100×</code></pre>
+
+  <p>
+    Step through the comparison below. The crossover point is the moment the
+    growth rate takes over from the constant factor — and past it, the constant
+    factor stops mattering at all.
+  </p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Recall the comparison rules</h2>
+
+  <p>Fill these in from memory before the quiz.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>
+      You can explain why "it ran faster on my laptop" is not an answer, and you
+      can predict which of two programs wins once the input gets large. That is
+      the judgement Big O exists to give you.
+    </p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+
+  <ol>
+    <li>
+      Take the table above and find the exact crossover point for $100n$ versus
+      $n^2$. (Set them equal and solve.)
+    </li>
+    <li>
+      Write down two algorithms you have used — a search and a sort, say — and
+      guess which grows faster. Then check against Lesson 05.
+    </li>
+    <li>
+      Think of a case where a slower-growing algorithm is genuinely the wrong
+      choice because the input is always tiny. Write one sentence about why.
+    </li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Read <a href="https://www.bigocheatsheet.com/">"Big-O Cheat Sheet" by Eric Rowell</a>
+    for the growth-rate table, then read the opening of
+    <a href="https://mitpress.mit.edu/9780262046305/introduction-to-algorithms/">_Introduction to Algorithms_</a>
+    Chapter 3 ("Growth of Functions") for why constants are discarded.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher (me) anything — "is a constant
+    factor ever worth optimising?", "what if the input is always small?", "why do
+    we ignore the machine?". There are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  /* predict-then-reveal: the small-input trap */
+  TeachWidgets.predict("#predict1", {
+    q: "Program X beat Program Y on 10 items. What can you conclude?",
+    a: ["X is the better algorithm", "Nothing about larger inputs", "Y is definitely slower"],
+    c: 1,
+    why: "A win on a tiny input tells you about constant factors, not growth. The ranking can flip completely once the input gets large."
+  });
+
+  /* the three things a stopwatch blends together */
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      { title: "Growth", lines: ["the algorithm", "what Big O keeps"] },
+      { title: "Constant", lines: ["per-step cost", "what Big O drops"] },
+      { title: "Machine", lines: ["cpu, ram, load", "what Big O drops"] }
+    ]
+  });
+
+  /* step-through: the crossover point */
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "n = 10      X = 100n = 1,000",
+      "n = 100     X = 10,000   Y = 10,000",
+      "n = 1,000   X = 100,000  Y = 1,000,000",
+      "n = 10,000  X = 1,000,000  Y = 100,000,000",
+      "winner past n = 100:  X"
+    ],
+    steps: [
+      { line: 0, vars: { n: "10", X: "1,000", Y: "100", winner: "Y" } },
+      { line: 1, vars: { n: "100", X: "10,000", Y: "10,000", winner: "tie" } },
+      { line: 2, vars: { n: "1,000", X: "100,000", Y: "1,000,000", winner: "X" } },
+      { line: 3, vars: { n: "10,000", X: "1,000,000", Y: "100,000,000", winner: "X" } },
+      { line: 4, vars: { crossover: "n = 100", winner: "X" } }
+    ]
+  });
+
+  /* recall from memory */
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — what Big O keeps and drops",
+    lines: [
+      "Big O keeps the <0> of the cost curve.",
+      "Big O drops the constant <1> of each step.",
+      "Big O also drops the effect of the <2> it runs on."
+    ],
+    blanks: [
+      { a: ["shape"], why: "The growth shape is the property of the algorithm, so it is what survives." },
+      { a: ["factor"], why: "The constant factor is an implementation detail — it changes with the language and the code." },
+      { a: ["machine"], why: "Hardware and current load vary run to run, so they cannot be part of a portable answer." }
+    ]
+  });
+
+  /* the quiz — every option is exactly six words */
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why is a stopwatch a poor way to compare algorithms?",
+      a: ["It measures the machine and moment", "It always reports the wrong number", "It cannot measure very short programs", "It only works on sorted input"],
+      c: 0,
+      why: "A timing blends the algorithm with the hardware and the current load, so it does not transfer to another machine."
+    },
+    {
+      q: "What does Big O deliberately throw away?",
+      a: ["The growth rate of the algorithm", "The constant factor and the machine", "The size of the input given", "The correctness of the algorithm here"],
+      c: 1,
+      why: "Dropping constants and hardware is what makes Big O a portable statement about the algorithm itself."
+    },
+    {
+      q: "Program X does 100n work, Y does n squared. Who wins at large n?",
+      a: ["Program X wins at large n", "Program Y wins at large n", "They always tie at large n", "Neither one can be decided here"],
+      c: 0,
+      why: "Linear growth beats quadratic growth once n is large enough, even though Y may win on tiny inputs."
+    },
+    {
+      q: "What is the crossover point in that comparison?",
+      a: ["It happens at n equals ten", "It happens at n equals hundred", "It happens at n equals thousand", "It happens at n equals million"],
+      c: 1,
+      why: "100n = n² when n = 100. Below that Y is cheaper; above it X pulls ahead and never looks back."
+    }
+  ]);
+</script>
+</body>
+</html>

@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 05 — Branching</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="git-version-control" data-lesson="5" data-lesson-id="branching">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 05</span> · Branching & merging</span>
+
+  <h1 class="lesson-title">Branching</h1>
+  <p class="lesson-lede">
+    A branch sounds like a copy of your project. It is not. It is a movable
+    label, and that one fact makes branching cheap and safe.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~12 min</span>
+    <span><b>Win</b> Create, switch, and delete branches without fear</span>
+    <span><b>Mission link</b> Branches are the foundation of every team workflow</span>
+  </div>
+
+  <h2><span class="n">1</span>A branch is a pointer</h2>
+
+  <p>
+    In most tools, "branch" means "copy the whole project and work on the copy".
+    Git does something far lighter. A branch is just a <b>pointer to a commit</b>
+    — a sticky note with a name on it, stuck to one snapshot.
+  </p>
+
+  <p>
+    When you commit, the pointer moves forward to the new commit. That is the
+    entire mechanism. Because a branch is only a name, creating one is
+    instantaneous and costs almost nothing, no matter how large your project is.
+  </p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    A branch is a movable pointer to a commit. Creating one does not copy any
+    files.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Creating and switching</h2>
+
+  <p>
+    You create a branch and switch to it in one step:
+  </p>
+
+  <pre><code>git switch -c experiment</code></pre>
+
+  <p>
+    Now <code>HEAD</code> points at <code>experiment</code>, and new commits move
+    <i>that</i> pointer. Your original branch is untouched — it still points at
+    the commit you left from. This is why branching is safe: you can try
+    something, and if it fails, the old branch never moved.
+  </p>
+
+  <p>
+    <code>git branch</code> lists your branches and marks the current one.
+    <code>git switch main</code> takes you back. Deleting a branch with
+    <code>git branch -d</code> only removes the label — the commits stay in
+    history as long as something still points at them.
+  </p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Watching a pointer move</h2>
+
+  <p>
+    Follow the pointer as you commit on a branch. Notice that the original branch
+    never moves while you are away — that is the whole point.
+  </p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+
+  <p>Recall the key facts from memory before the quiz.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <b>✓ Your win for today</b>
+    You can create a branch, commit on it, switch back, and explain why the
+    original branch did not change.
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Create a branch with <code>git switch -c</code> and make one commit on it.</li>
+    <li>Switch back to your original branch and confirm the commit is not there.</li>
+    <li>Predict what <code>git branch -d</code> would do to the commits you made.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Pro Git, Chapter 3 — "Git Branching", section "Branches in a Nutshell"
+    (git-scm.com/book).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "You create a branch on a project with 10,000 files. How long does it take?",
+    a: [
+      "It is instant, no files copied",
+      "It copies all ten thousand files",
+      "It takes longer than a commit",
+      "It needs a network connection"
+    ],
+    c: 0,
+    why: "A branch is only a pointer to a commit, so creating one writes a tiny reference. No files are copied and no network is involved."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      { title: "main", lines: ["points at commit C", "stays put while away"] },
+      { title: "experiment", lines: ["points at commit C", "moves as you commit"] },
+      { title: "HEAD", lines: ["points at experiment", "tells Git where you are"] }
+    ]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    label: "A pointer moving forward",
+    code: [
+      "git switch -c experiment",
+      "git commit -m \"try idea\"",
+      "git switch main"
+    ],
+    steps: [
+      { line: 0, vars: { main: "C", experiment: "C", HEAD: "experiment" } },
+      { line: 1, vars: { main: "C", experiment: "D", HEAD: "experiment" } },
+      { line: 2, vars: { main: "C", experiment: "D", HEAD: "main" } }
+    ]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the blanks",
+    lines: [
+      "A branch is a movable <0> to a commit.",
+      "You create and switch in one step with <1>.",
+      "The name for your current position is <2>.",
+      "Listing your branches uses <3>."
+    ],
+    blanks: [
+      { a: ["pointer", "reference", "label"], why: "A branch is just a name pointing at a commit." },
+      { a: ["git switch -c"], why: "git switch -c creates a branch and moves you onto it." },
+      { a: ["HEAD"], why: "HEAD marks the commit you are currently on." },
+      { a: ["git branch"], why: "git branch lists branches and marks the current one." }
+    ]
+  });
+
+  /* the quiz — every option must have the SAME number of words */
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is a branch, really?",
+      a: ["A pointer to a commit", "A copy of the project", "A folder of files here", "A backup of history here"],
+      c: 0,
+      why: "A branch is a movable pointer to a commit. It is not a copy of files or a backup."
+    },
+    {
+      q: "Which command creates a branch?",
+      a: ["git switch -c name", "git commit -m name", "git log --oneline name", "git diff HEAD name"],
+      c: 0,
+      why: "git switch -c creates a new branch and switches to it. The others commit, log, or diff."
+    },
+    {
+      q: "What happens to main while you work on a branch?",
+      a: ["It stays where it was", "It moves with your commits", "It gets deleted automatically here", "It merges into your branch"],
+      c: 0,
+      why: "Only the branch you are on moves as you commit. main stays at the commit you branched from."
+    },
+    {
+      q: "What does deleting a branch remove?",
+      a: ["Only the branch label", "All of its commits", "The working tree files", "The remote repository here"],
+      c: 0,
+      why: "Deleting a branch removes the name. The commits remain reachable as long as something else points at them."
+    }
+  ]);
+</script>
+</body>
+</html>

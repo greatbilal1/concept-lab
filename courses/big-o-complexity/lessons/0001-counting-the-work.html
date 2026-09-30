@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 01 — Counting the work</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="big-o-complexity" data-lesson="1" data-lesson-id="counting-the-work">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 01</span> · Growth</span>
+
+  <h1 class="lesson-title">Counting the work</h1>
+  <p class="lesson-lede">
+    You already know how to write a loop. This lesson is about a different
+    question: when the input gets bigger, how much more work does the loop do?
+    That question is the whole of Big O, and it starts with counting.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Count the steps in a loop by hand</span>
+    <span><b>Mission link</b> The raw material every later lesson measures</span>
+  </div>
+
+  <h2><span class="n">1</span>Two ways to find a name</h2>
+
+  <p>
+    Imagine a list of names on a piece of paper, and you want to know whether
+    <code>"Ada"</code> is on it. You have two honest strategies.
+  </p>
+
+  <p>
+    <b>Strategy A:</b> start at the top and read every name until you find Ada or
+    run out of paper. <b>Strategy B:</b> the list is sorted, so open it in the
+    middle, decide whether Ada is above or below, and throw away half the list.
+    Repeat.
+  </p>
+
+  <p>
+    Both strategies are correct. Both eventually give the same answer. So why does
+    anyone care which one you pick? Because of what happens when the list grows.
+  </p>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Count the steps, not the seconds</h2>
+
+  <p>
+    Here is the move that makes this whole subject work. Instead of timing a
+    program, <b>count the operations it performs</b> as a function of the input
+    size. Call the input size $n$ — the number of names on the paper.
+  </p>
+
+  <p>Strategy A, written as a loop:</p>
+
+  <pre><code>for name in names:        # runs once per name
+    if name == "Ada":     # one comparison per name
+        return True
+return False</code></pre>
+
+  <p>
+    If there are $n$ names, the loop body runs at most $n$ times. So the work is
+    <b>proportional to $n$</b>. Double the list, double the work. That is a
+    straight line, and it has a name you will meet in Lesson 03: $O(n)$.
+  </p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Big O is not about how fast your computer is. It is about <b>how the work
+    grows</b> when the input grows. Counting steps is how you find out.
+  </div>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Watch the count grow</h2>
+
+  <p>
+    Strategy B is harder to count, because it does not touch every name. Each
+    step throws away half of what is left. Start with 8 names: after one step
+    there are 4, then 2, then 1. Three steps, not eight.
+  </p>
+
+  <p>
+    Step through it below. Watch the <code>remaining</code> count fall while the
+    <code>steps</code> count creeps up — and notice that the steps grow far more
+    slowly than the list does.
+  </p>
+
+  <div id="trace1"></div>
+
+  <p>
+    For 8 names, Strategy A needs up to 8 comparisons and Strategy B needs 3. For
+    1,000 names, A needs up to 1,000 and B needs about 10. The gap is not a
+    constant factor — it <b>widens</b> as the input grows. That is the difference
+    Big O is built to describe.
+  </p>
+
+  <h2><span class="n">4</span>Recall the counting rules</h2>
+
+  <p>Fill these in from memory before the quiz.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>
+      You can look at a simple loop and say what its work is proportional to. That
+      is the skill the rest of this course sharpens: not "is this fast?", but
+      "how does this grow?".
+    </p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>
+      Write a loop that prints every pair of names in a list of $n$ names. Count
+      how many times the inner line runs. (You should get $n^2$.)
+    </li>
+    <li>
+      Count the steps in a loop that runs from 1 to $n$ but only does work when
+      the index is even. Is the count still proportional to $n$?
+    </li>
+    <li>
+      Take the two name-search strategies and predict the counts for a list of
+      16 names before you check. Then check.
+    </li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Read <a href="https://mitpress.mit.edu/9780262046305/introduction-to-algorithms/">_Introduction to Algorithms_ by Cormen, Leiserson, Rivest &amp; Stein</a>,
+    Chapter 2 ("Getting Started"). It introduces the counting discipline this
+    lesson uses, and its insertion-sort analysis is the canonical first example.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher (me) anything — "what counts as one
+    step?", "does printing count?", "what if the list is empty?". There are no bad
+    questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  /* predict-then-reveal: the misconception that both strategies are "the same" */
+  TeachWidgets.predict("#predict1", {
+    q: "Both strategies find the name. Why does the choice matter at all?",
+    a: ["One is easier to write", "They grow at different rates", "One uses less memory"],
+    c: 1,
+    why: "Correctness is identical, so the only difference left is cost — and cost is about how the work grows with the input size, not how it feels on a small list."
+  });
+
+  /* the two growth shapes, side by side */
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      { title: "n = 8", lines: ["scan: up to 8", "halve: about 3"] },
+      { title: "n = 1,000", lines: ["scan: up to 1,000", "halve: about 10"] },
+      { title: "n = 1,000,000", lines: ["scan: up to 1,000,000", "halve: about 20"] }
+    ]
+  });
+
+  /* step-through: halving the search space */
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "remaining = 8",
+      "remaining = 4",
+      "remaining = 2",
+      "remaining = 1  → found",
+      "steps = 3"
+    ],
+    steps: [
+      { line: 0, vars: { remaining: "8", steps: "0" } },
+      { line: 1, vars: { remaining: "4", steps: "1" } },
+      { line: 2, vars: { remaining: "2", steps: "2" } },
+      { line: 3, vars: { remaining: "1", steps: "3" } },
+      { line: 4, vars: { remaining: "1", steps: "3", result: "found" } }
+    ]
+  });
+
+  /* recall from memory */
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — the counting rules",
+    lines: [
+      "We measure work as a function of the input size, written <0>.",
+      "A loop that touches every element does work proportional to <1>.",
+      "A loop that halves the input each step does work proportional to <2>."
+    ],
+    blanks: [
+      { a: ["n"], why: "n is the conventional name for the input size." },
+      { a: ["n"], why: "One pass over n elements is n operations — a straight line." },
+      { a: ["log n"], why: "Halving repeatedly takes about log₂(n) steps, which grows very slowly." }
+    ]
+  });
+
+  /* the quiz — every option is exactly five words */
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What does Big O actually measure?",
+      a: ["How many seconds a program takes", "How the work grows with input", "How much memory a program uses", "How many lines of code exist"],
+      c: 1,
+      why: "Big O describes the growth of cost as the input size increases — not wall-clock time on one machine."
+    },
+    {
+      q: "A loop touches every element once. What is its growth?",
+      a: ["It grows in proportion to n", "It grows with the square n", "It grows with the log n", "It does not grow at all"],
+      c: 0,
+      why: "One operation per element means the total work is proportional to n — a straight line."
+    },
+    {
+      q: "Why count steps instead of timing the program?",
+      a: ["Counting is always much more accurate", "Timings depend on the machine used", "Timing requires a special compiler here", "Counting is easier to automate fully"],
+      c: 1,
+      why: "A stopwatch measures your laptop, not the algorithm. Counting steps gives a result that holds on any machine."
+    },
+    {
+      q: "Halving a search space each step grows how?",
+      a: ["It grows in proportion to n", "It grows with the square n", "It grows with the log n", "It does not grow at all"],
+      c: 2,
+      why: "Repeated halving takes about log₂(n) steps, which is why binary search stays cheap even for huge inputs."
+    }
+  ]);
+</script>
+</body>
+</html>

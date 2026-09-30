@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 04 — Selection and insertion sort</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="algorithms-problem-solving" data-lesson="4" data-lesson-id="selection-and-insertion-sort">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 04</span> · Sorting</span>
+
+  <h1 class="lesson-title">Selection and insertion sort</h1>
+  <p class="lesson-lede">
+    Last lesson you learned that binary search only works on a sorted list. That
+    raised an obvious question: where does the sorted list come from? Today you
+    write the two simplest answers — selection sort and insertion sort — and see
+    that sorting is really precomputation you do once so that every later search
+    is cheap.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~12 min</span>
+    <span><b>Win</b> Hand-trace both sorts on a short list and say which one wins on nearly-sorted data</span>
+    <span><b>Mission link</b> Sorting is the setup step that turns a slow search into a fast one</span>
+  </div>
+
+  <h2><span class="n">1</span>Why sort at all</h2>
+
+  <p>
+    Sorting is not the goal — it is the preparation. A sorted list is a list you
+    have paid for once and can then search, merge, and compare cheaply forever
+    after. This is the first real <b>trade-off</b> in the course: spend time up
+    front, save time on every question you ask later.
+  </p>
+
+  <p>
+    Both sorts today follow the same shape. They keep a growing sorted region at
+    the front of the list and shrink an unsorted region at the back. They differ
+    only in <i>how</i> they move the next item into place.
+  </p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Sorting is precomputation. You sort once so that searching, merging, and
+    comparing become fast for every question that follows.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Selection sort: pick the smallest, swap it forward</h2>
+
+  <p>
+    Selection sort scans the whole unsorted region, finds the smallest item, and
+    swaps it into the next slot of the sorted region. Then it repeats on what is
+    left. After <i>k</i> passes, the first <i>k</i> items are final and never move
+    again.
+  </p>
+
+  <p>
+    The cost is easy to see: the first pass looks at <i>n</i> items, the next at
+    <i>n−1</i>, then <i>n−2</i>, and so on. That is roughly <i>n²/2</i>
+    comparisons no matter what the input looks like — even a list that is already
+    sorted gets the full treatment.
+  </p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Insertion sort: slide the next card into place</h2>
+
+  <p>
+    Insertion sort works the way most people sort a hand of playing cards. You
+    take the next card and slide it left past every card that is bigger than it,
+    stopping the moment it fits. The sorted region grows by one each time.
+  </p>
+
+  <p>
+    Here is the payoff. If the list is already nearly sorted, each card barely
+    moves, so the work per item is tiny. Insertion sort is <i>adaptive</i>: its
+    cost depends on how disordered the input already is. Selection sort is not —
+    it always pays the full price.
+  </p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Two properties worth naming</h2>
+
+  <p>
+    Both sorts are <b>in-place</b>: they rearrange the list using only a constant
+    amount of extra memory, so they never need a second copy of the data. That
+    matters when the list is large or memory is tight.
+  </p>
+
+  <p>
+    Insertion sort is also <b>stable</b>: items that compare equal keep their
+    original relative order, because it only slides an item past strictly larger
+    ones. Selection sort is not stable, because a long-distance swap can jump an
+    equal item over its twin. Stability matters whenever you sort records by one
+    field after already sorting them by another.
+  </p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <b>✓ Your win for today</b>
+    You can hand-trace selection sort and insertion sort on a short list, and you
+    can explain why insertion sort is the better choice when the data is already
+    nearly sorted.
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Sort <code>[5, 2, 9, 1, 7]</code> by hand with selection sort. Write down the list after each pass.</li>
+    <li>Sort the same list with insertion sort. Count how many times an item actually moves.</li>
+    <li>Predict which sort wins on <code>[1, 2, 3, 5, 4]</code>, then check your reasoning against the trace above.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Read <a href="https://mitpress.mit.edu/9780262046305/introduction-to-algorithms/">_Introduction to Algorithms_ by Cormen, Leiserson, Rivest &amp; Stein</a>, Chapter 2 §2.1 (Insertion sort) and the exercises on selection sort in §2.2.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher (me) anything — why selection sort
+    is unstable, why anyone would use an <i>n²</i> sort at all, or how these
+    compare to the merge sort coming next. There are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "You have a list that is already almost sorted, with just one item out of place. Which sort finishes faster?",
+    a: ["Insertion sort, because it barely moves anything", "Selection sort, because it skips the sorted part", "They always take exactly the same time"],
+    c: 0,
+    why: "Insertion sort is adaptive: a nearly sorted list means each new item slides only a little, so the work per item is tiny. Selection sort always scans the whole unsorted region, so it pays the full n²/2 comparisons even when the list is already in order."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      { title: "Pass 1", lines: ["Scan all 5 items", "Smallest is 1", "Swap into slot 0"] },
+      { title: "Pass 2", lines: ["Scan remaining 4", "Smallest is 2", "Swap into slot 1"] },
+      { title: "Pass 3", lines: ["Scan remaining 3", "Smallest is 5", "Swap into slot 2"] }
+    ]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "list = [5, 2, 9, 1, 7]",
+      "take 2, slide left past 5",
+      "list = [2, 5, 9, 1, 7]",
+      "take 9, it already fits",
+      "take 1, slide left past 9, 5, 2",
+      "list = [1, 2, 5, 9, 7]"
+    ],
+    steps: [
+      { line: 0, vars: { list: "[5, 2, 9, 1, 7]", sorted: "[]" } },
+      { line: 1, vars: { list: "[5, 2, 9, 1, 7]", sorted: "[5]", moving: "2" } },
+      { line: 2, vars: { list: "[2, 5, 9, 1, 7]", sorted: "[2, 5]" } },
+      { line: 3, vars: { list: "[2, 5, 9, 1, 7]", sorted: "[2, 5, 9]", moving: "9" } },
+      { line: 4, vars: { list: "[2, 5, 9, 1, 7]", sorted: "[2, 5, 9]", moving: "1" } },
+      { line: 5, vars: { list: "[1, 2, 5, 9, 7]", sorted: "[1, 2, 5, 9]" } }
+    ]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the blanks",
+    lines: [
+      "A sort that uses only a constant amount of extra memory is called <0>.",
+      "A sort that keeps equal items in their original order is called <1>.",
+      "Insertion sort is <2> because its cost depends on how disordered the input is."
+    ],
+    blanks: [
+      { a: ["in-place", "in place"], why: "In-place means the list is rearranged without allocating a second copy of the data." },
+      { a: ["stable"], why: "Stable means items that compare equal keep their original relative order." },
+      { a: ["adaptive"], why: "Adaptive means the running time improves when the input is already partly ordered." }
+    ]
+  });
+
+  /* the quiz — every option must have the SAME number of words */
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What does selection sort do on each pass?",
+      a: ["It finds the smallest remaining item", "It swaps every adjacent pair once", "It splits the list into halves", "It inserts each item at random"],
+      c: 0,
+      why: "Selection sort scans the unsorted region, finds the smallest item, and swaps it into the next sorted slot. It never splits the list and never compares only neighbours."
+    },
+    {
+      q: "Why is insertion sort fast on nearly sorted data?",
+      a: ["Each item slides a short way", "It skips the unsorted region entirely", "It uses a second sorted copy", "It compares items in random order"],
+      c: 0,
+      why: "Insertion sort is adaptive. When the list is nearly sorted, each new item is already close to its final place, so it slides past very few larger items."
+    },
+    {
+      q: "Which property does insertion sort have that selection sort lacks?",
+      a: ["It keeps equal items in order", "It uses no extra memory here", "It always runs in linear time", "It never moves any item here"],
+      c: 0,
+      why: "Insertion sort is stable: it only slides an item past strictly larger ones, so equal items keep their original order. Selection sort's long-distance swaps can reorder equal items."
+    },
+    {
+      q: "What does it mean for a sort to be in-place?",
+      a: ["It uses only constant extra memory", "It only works on sorted input", "It always finishes in one pass", "It never compares two items here"],
+      c: 0,
+      why: "In-place means the algorithm rearranges the list using a constant amount of extra memory, rather than allocating a second full copy of the data."
+    }
+  ]);
+</script>
+</body>
+</html>
