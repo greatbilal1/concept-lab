@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Browser Events & Async JavaScript — Cheat Sheet</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+<style>
+  .ref-toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0 8px; }
+  .ref-toc a { font-size: .8rem; border: 1px solid var(--border); background: #111a30; padding: 5px 11px; border-radius: 999px; color: var(--muted); text-decoration: none; border-bottom: 1px solid var(--border); }
+  .ref-toc a:hover { color: #fff; border-color: #3d5488; }
+  .lesson-wrap h2 { scroll-margin-top: 20px; }
+  .snippet { margin: 14px 0 22px; }
+  .snippet .lbl { font-size: .72rem; font-weight: 800; letter-spacing: .7px; text-transform: uppercase; color: var(--accent2); margin-bottom: 6px; }
+  .see { font-size: .82rem; color: var(--muted); margin: -6px 0 12px; }
+  .see a { color: var(--accent2); border-bottom: 0; }
+  .see a:hover { color: #fff; }
+  .snippet pre { padding-top: 34px; }
+  @media print { .snippet pre { padding-top: 18px; } }
+</style>
+</head>
+<body class="lesson-body" data-course="browser-events-async">
+
+<div class="lesson-wrap">
+
+  <span class="lesson-kicker">Reference · Cheat sheet</span>
+  <h1 class="lesson-title">Browser Events & Async JavaScript — Cheat Sheet</h1>
+  <p class="lesson-lede">
+    The whole course on one page. Every snippet links back to the lesson that
+    teaches it.
+  </p>
+
+  <div class="ref-toc">
+    <a href="#sec-1">Event Loop Priority</a>
+    <a href="#sec-2">Event Delegation</a>
+    <a href="#sec-3">Promise Combinators</a>
+    <a href="#sec-4">Async/Await with Timeout</a>
+  </div>
+
+  <h2 id="sec-1"><span class="n">1</span>Event Loop Priority</h2>
+  <div class="snippet">
+    <div class="lbl">Execution queue hierarchy</div>
+    <pre><code>1. Call Stack (runs current synchronous code to completion)
+2. Microtask Queue (Promises, queueMicrotask) - drained completely!
+3. Render Phase (style, layout, paint)
+4. Macrotask Queue (setTimeout, setInterval, user input event)</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0002-the-event-loop-and-task-queues.html">Lesson 02 — The event loop and task queues</a>.</p>
+
+  <h2 id="sec-2"><span class="n">2</span>Event Delegation</h2>
+  <div class="snippet">
+    <div class="lbl">One listener for many children</div>
+    <pre><code>document.querySelector('#todo-list').addEventListener('click', (e) =&gt; {
+  const item = e.target.closest('li');
+  if (!item) return;
+  toggleComplete(item.dataset.id);
+});</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0004-event-bubbling-capturing-and-delegation.html">Lesson 04 — Event bubbling, capturing, and delegation</a>.</p>
+
+  <h2 id="sec-3"><span class="n">3</span>Promise Combinators</h2>
+  <div class="snippet">
+    <div class="lbl">Managing multiple concurrent requests</div>
+    <pre><code>// Fails fast if any promise rejects
+const [users, posts] = await Promise.all([fetchUsers(), fetchPosts()]);
+
+// Waits for all, never rejects
+const results = await Promise.allSettled([reqA(), reqB()]);
+
+// Resolves/rejects with the fastest responder
+const winner = await Promise.race([fetchFast(), fetchTimeout()]);</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0006-promise-chaining-and-error-handling.html">Lesson 06 — Promise chaining and error handling</a>.</p>
+
+  <h2 id="sec-4"><span class="n">4</span>Async/Await with Timeout</h2>
+  <div class="snippet">
+    <div class="lbl">Resilient fetch pattern</div>
+    <pre><code>async function fetchWithTimeout(url, ms = 5000) {
+  const controller = new AbortController();
+  const timer = setTimeout(() =&gt; controller.abort(), ms);
+  try {
+    const res = await fetch(url, { signal: controller.signal });
+    return await res.json();
+  } finally {
+    clearTimeout(timer);
+  }
+}</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0008-concurrent-async-patterns-and-resilience.html">Lesson 08 — Concurrent async patterns and resilience</a>.</p>
+
+  <div class="lesson-foot">
+    <div class="links">
+      <a href="browser-events-async-glossary.html">📖 Glossary</a>
+      <a href="../course.html">← Course map</a>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

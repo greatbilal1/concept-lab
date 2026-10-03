@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 03 — Scoping Tool Permissions: Read-Only Databases and Parameter Allow-Lists</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="ai-agent-security" data-lesson="3" data-lesson-id="scoping-tool-permissions-readonly-db">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 03</span> · Permission Scoping</span>
+
+  <h1 class="lesson-title">Scoping Tool Permissions: Read-Only Databases and Parameter Allow-Lists</h1>
+  <p class="lesson-lede">
+    Restricting tool capabilities: dedicated read-only database roles, row/column masking, and strict parameter allow-lists.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to scope tool permissions using read-only database accounts and sanitized views.</span>
+    <span><b>Mission link</b> Mastering scoping tool permissions: read-only databases and parameter allow-lists across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Scoping Tool Permissions: Read-Only Databases and Parameter Allow-Lists</h2>
+  <p>Prompt instructions like: <em>'Please only query data and do not delete anything'</em> are suggestions, not security controls. If an agent is hijacked via prompt injection, it will gladly run <code>DROP TABLE customers;</code>. <strong>Security must be enforced at the resource permission level</strong>.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Restricting tool capabilities: dedicated read-only database roles, row/column masking, and strict parameter allow-lists.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Database Permission Hardening</h2>
+  <p>Three Principles of <strong>Tool Permission Scoping</strong>:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Column Masking via Views</h2>
+  <ul><li><strong>1. Dedicated Read-Only Database Accounts:</strong> Connect the agent using a PostgreSQL user with permissions restricted strictly to `SELECT`. Even if an attacker executes SQL injection inside the tool, Postgres blocks the mutation!</li><li><strong>2. Column & Table View Masking:</strong> Never let an agent query the raw `users` table directly. Create a dedicated SQL View (`v_support_customers`) that completely omits sensitive columns like `password_hash`, `ssn`, and `credit_card_token`!</li><li><strong>3. Parameter Allow-Lists & Enums:</strong> Do not allow an agent to pass arbitrary string table names. Restrict parameters to explicit enums: `Literal["public_faqs", "order_status"]`.</li><li><strong>4. Maximum Row Limits (LIMIT 50):</strong> Hardcode a strict `LIMIT 50` into the backend tool query to prevent prompt injections from dumping the entire database in one call.</li></ul><pre><code># Creating an Agent-Safe Read-Only PostgreSQL User (SQL):
+-- 1. Create dedicated agent user
+CREATE USER ai_query_agent WITH PASSWORD 'strong_random_password';
+
+-- 2. Grant CONNECT but ZERO write privileges
+GRANT CONNECT ON DATABASE production TO ai_query_agent;
+GRANT USAGE ON SCHEMA public TO ai_query_agent;
+
+-- 3. Grant SELECT strictly on safe sanitized views (NO passwords or PII!)
+GRANT SELECT ON v_sanitized_customer_orders TO ai_query_agent;
+-- Attempts to execute DROP, INSERT, or UPDATE will fail with SQL error: Permission Denied!</code></pre><div class="callout"><p><strong>The View Masking Rule:</strong> If an agent does not need to see a column to do its job, that column must not exist in its database view. Mask PII and secrets at the database engine.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the permission scoping sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to scope tool permissions using read-only database accounts and sanitized views.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where scoping tool permissions: read-only databases and parameter allow-lists applies.</li>
+    <li>Author a unit test or verification script exercising scoping tool permissions: read-only databases and parameter allow-lists.</li>
+    <li>Document team architectural conventions regarding scoping tool permissions: read-only databases and parameter allow-lists.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Scoping Tool Permissions: Read-Only Databases and Parameter Allow-Lists.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Why is connecting an AI agent to an SQL database using a 'Read-Only' database user account critical for security?",
+    a: ["The database engine enforces that the agent can only run SELECT queries; destructive commands like DROP, DELETE, or UPDATE are physically rejected","Read-only databases run 10x faster","It allows the agent to edit table schemas","It makes database storage free"],
+    c: 0,
+    why: "Database-level read-only permissions guarantee that agents cannot alter or delete data regardless of prompt injection."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Unconstrained Tool (Disaster)",
+            "lines": [
+                  "Connected as 'postgres' superuser",
+                  "Prompt injection runs: DROP TABLE orders",
+                  "Catastrophic unrecoverable data loss"
+            ]
+      },
+      {
+            "title": "Scoped Read-Only Role (Secure)",
+            "lines": [
+                  "Connected as 'ai_query_agent'",
+                  "Permitted ONLY: SELECT on safe views",
+                  "Mutations physically rejected by Postgres!"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Scoping Tool Permissions: Read-Only Databases and Parameter Allow-Lists",
+      "def execute_flow():",
+      "    # Restricting tool capabilities: dedicated read-only...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Scoping Tool Permissions: Read-Only Databases and Parameter Allow-Lists"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Raw Table: users"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Safe View: v_agent_users"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Tool permissions must be scoped at the resource level using dedicated {1} database roles and sanitized SQL {2} that omit sensitive columns."
+],
+    blanks: [
+      {
+            "a": [
+                  "read-only"
+            ],
+            "why": "Restricted to SELECT queries only"
+      },
+      {
+            "a": [
+                  "views"
+            ],
+            "why": "Predefined virtual tables masking sensitive fields"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What error does a PostgreSQL database return if a hijacked agent attempts to run 'DELETE FROM orders' using a read-only role?",
+      a: ["ERROR: permission denied for table orders (the database engine blocks the mutation immediately)","HTTP 200 OK","The database deletes half the rows","The computer restarts"],
+      c: 0,
+      why: "PostgreSQL enforces privilege restrictions at the engine level, rejecting unauthorized write operations."
+    },
+    {
+      q: "Why is creating a sanitized SQL View better than trusting an agent prompt not to look at sensitive columns?",
+      a: ["A database view physically omits the sensitive columns from the schema, ensuring the model cannot view them even if commanded to do so","Views make queries run in memory","Views delete the sensitive data permanently","Views run without a database"],
+      c: 0,
+      why: "Views hide sensitive columns at the data layer, preventing accidental exposure or extraction."
+    },
+    {
+      q: "Why should database tools enforce a hardcoded 'LIMIT 50' on query results?",
+      a: ["It prevents an attacker from executing a full database dump that overwhelms the context window and exfiltrates mass customer records","It speeds up network cables","It reduces computer heat","LIMIT 50 is required by SQL syntax"],
+      c: 0,
+      why: "Hard row limits prevent mass data dumping and context window overflow attacks."
+    },
+    {
+      q: "What parameter constraint in Pydantic should be used to restrict an agent's database search to approved tables?",
+      a: ["Literal('table_a', 'table_b') or an Enum","str with no validation","int only","Any"],
+      c: 0,
+      why: "Literal enums enforce that the model can only supply pre-approved, validated table names."
+    }
+  ]);
+</script>
+</body>
+</html>

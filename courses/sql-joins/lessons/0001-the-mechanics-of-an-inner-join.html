@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 01 — The mechanics of an inner join</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="sql-joins" data-lesson="1" data-lesson-id="the-mechanics-of-an-inner-join">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 01</span> · Join Mechanics & Sets</span>
+
+  <h1 class="lesson-title">The mechanics of an inner join</h1>
+  <p class="lesson-lede">
+    How do two tables become one? Discover the mathematical mechanics of INNER JOIN, matching predicates, and why missing ON clauses cause cartesian disasters.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Connect related tables using INNER JOIN and explicit ON predicates</span>
+    <span><b>Mission link</b> The fundamental query operation across normalized relational databases</span>
+  </div>
+
+  <h2><span class="n">1</span>Connecting sets by identity</h2>
+  <p>In a normalized database, user information lives in <code>users</code> and order totals live in <code>orders</code>. An <b>INNER JOIN</b> connects these two tables by evaluating a <b>Join Predicate</b> (the <code>ON</code> clause): <code>users.id = orders.user_id</code>.</p><p>The mathematical rule of an INNER JOIN: <b>Only rows that have a matching partner on both sides are returned</b>. If a user has never placed an order, that user is completely excluded from the result set.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    INNER JOIN returns the intersection: rows must satisfy the ON condition in both tables.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The INNER JOIN intersection</h2>
+  <p>Visualise how the INNER JOIN extracts only the shared intersection between two tables.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing an INNER JOIN execution</h2>
+  <p>Trace how the database pairs matching rows from users and orders.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of INNER JOIN rules.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can combine normalized tables using INNER JOIN with unambiguous table aliases and predicates.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Join an authors table with a books table using an INNER JOIN on author_id.</li>
+    <li>Use table aliases (e.g. FROM users u JOIN orders o) to keep queries concise.</li>
+    <li>Observe how users with zero orders vanish from an INNER JOIN result.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Alan Beaulieu, *Learning SQL*, Chapter 5: 'Querying Multiple Tables'.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What happens if you accidentally omit the 'ON' clause when joining two 1,000-row tables?",
+    a: ["A Cartesian Product (CROSS JOIN) occurs, producing 1,000,000 rows (1,000 x 1,000)!","The query returns zero rows","The database deletes both tables","The database guesses the primary key automatically"],
+    c: 0,
+    why: "Without an ON predicate, every row in table A pairs with every row in table B (Cartesian explosion)."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Left Table: Users",
+            "lines": [
+                  "User 1 (Ada), User 2 (Bob)",
+                  "User 3 (Charlie: no orders)"
+            ]
+      },
+      {
+            "title": "ON u.id = o.user_id",
+            "lines": [
+                  "Intersection Filter",
+                  "discards User 3 (no orders)"
+            ]
+      },
+      {
+            "title": "Right Table: Orders",
+            "lines": [
+                  "Order 101 (Ada), Order 102 (Ada)",
+                  "Order 103 (Bob)"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "SELECT users.name, orders.id AS order_id, orders.total",
+      "FROM users",
+      "INNER JOIN orders ON users.id = orders.user_id;"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "left": "scan users table"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "match_check": "evaluate users.id == orders.user_id"
+            }
+      },
+      {
+            "line": 0,
+            "vars": {
+                  "projected_rows": "Ada -> Order 101, Ada -> Order 102, Bob -> Order 103"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The join returning only rows with matches on both sides is <0> JOIN.",
+      "The clause specifying matching conditions between tables is the <1> clause.",
+      "An unconstrained join pairing every row with every other row is a <2> join."
+],
+    blanks: [
+      {
+            "a": [
+                  "INNER"
+            ],
+            "why": "INNER JOIN represents set intersection."
+      },
+      {
+            "a": [
+                  "ON"
+            ],
+            "why": "The ON clause provides the join predicate."
+      },
+      {
+            "a": [
+                  "cross",
+                  "cartesian"
+            ],
+            "why": "Cross joins generate cartesian products."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What happens to a row in the left table if it has no matching records in the right table during an INNER JOIN?",
+      a: ["It is completely excluded and omitted from the final query result set","It is returned with NULL values in the right columns","The database throws a missing key error","It is duplicated five times"],
+      c: 0,
+      why: "INNER JOIN is strictly an intersection; non-matching rows on either side are dropped."
+    },
+    {
+      q: "Why are table aliases (e.g. FROM customers c JOIN orders o) recommended in multi-table joins?",
+      a: ["They disambiguate column names that exist in both tables (like id or created_at) and keep queries readable","They make queries execute twice as fast on the server","They are required by the ANSI SQL compiler","They convert strings into numbers"],
+      c: 0,
+      why: "Aliases prevent 'column reference is ambiguous' errors when joined tables share column names."
+    },
+    {
+      q: "What is an Equi-Join in SQL?",
+      a: ["A join whose condition uses an equality operator (e.g. ON a.id = b.a_id)","A join that returns an equal number of rows from both tables","A join between two identical copies of the database","A join that runs in equal time on all computers"],
+      c: 0,
+      why: "An equi-join matches rows using the equality operator (=)."
+    },
+    {
+      q: "What is a Cartesian product (CROSS JOIN)?",
+      a: ["Every row in table A is paired with every row in table B, producing A_count * B_count rows","A query that calculates the square root of all table numbers","A join that can only be run on 3D computer graphics cards","A join that deletes duplicate rows automatically"],
+      c: 0,
+      why: "A Cartesian product pairs all combinations across tables, often caused by forgetting an ON clause."
+    }
+  ]);
+</script>
+</body>
+</html>

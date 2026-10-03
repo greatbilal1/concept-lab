@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 05 — Service-to-Service Authentication (mTLS, OAuth2 Client Credentials)</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="secrets-identity" data-lesson="5" data-lesson-id="service-to-service-auth-mtls-oauth2">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 05</span> · Service Identity</span>
+
+  <h1 class="lesson-title">Service-to-Service Authentication (mTLS, OAuth2 Client Credentials)</h1>
+  <p class="lesson-lede">
+    Machine-to-machine trust: mutual TLS (mTLS), SPIFFE/SPIRE identity standards, OAuth2 Client Credentials grant, and service meshes.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to authenticate microservices securely using mTLS, SPIFFE, and OAuth2 Client Credentials.</span>
+    <span><b>Mission link</b> Mastering service-to-service authentication (mtls, oauth2 client credentials) across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Service-to-Service Authentication (mTLS, OAuth2 Client Credentials)</h2>
+  <p>Human users authenticate with passwords and MFA. But how does <strong>Microservice A</strong> authenticate when calling <strong>Microservice B</strong> inside your cloud cluster? Hardcoding a shared API secret key in both services is fragile: if the secret leaks, all service-to-service trust collapses.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Machine-to-machine trust: mutual TLS (mTLS), SPIFFE/SPIRE identity standards, OAuth2 Client Credentials grant, and service meshes.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>mTLS vs OAuth2 Client Credentials</h2>
+  <p>The Two Standard Machine-to-Machine (M2M) Authentication Models:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Service Mesh Automation</h2>
+  <ul><li><strong>1. Mutual TLS (mTLS) & Service Meshes (Istio / Linkerd):</strong> Every microservice pod is issued an ephemeral X.509 certificate. When Service A connects to Service B over TCP, both present certificates signed by an internal Certificate Authority (CA). The connection is <strong>bidirectionally authenticated and encrypted</strong> at the network layer!</li><li><strong>2. SPIFFE / SPIRE:</strong> An open standard providing cryptographically verifiable identity documents (SVIDs) to workloads in dynamic container environments.</li><li><strong>3. OAuth2 Client Credentials Grant:</strong> For HTTP API microservices: Service A authenticates against an internal Identity Provider (Keycloak / Auth0) using client credentials, receives a short-lived signed JWT, and includes it as `Authorization: Bearer <token>`. Service B verifies the signature!</li></ul><pre><code># OAuth2 Client Credentials Flow (Service-to-Service):
+# 1. Billing Service requests token from Auth Server:
+POST https://auth.company.com/oauth/token
+Payload: { "grant_type": "client_credentials", "client_id": "billing_svc", "client_secret": "..." }
+
+# 2. Auth Server returns signed, short-lived JWT valid for 15 minutes:
+Response: { "access_token": "eyJhbGci...", "expires_in": 900, "scope": "invoices:read" }
+
+# 3. Billing Service calls Invoice Service with verifiable token:
+GET https://invoices.company.com/api/v1/invoices
+Headers: { "Authorization": "Bearer eyJhbGci..." }</code></pre><div class="callout"><p><strong>The Zero Shared Secret Principle:</strong> Never use a static shared password between microservices. Use mTLS certificates or short-lived signed OAuth2 JWT tokens.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the service identity sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to authenticate microservices securely using mTLS, SPIFFE, and OAuth2 Client Credentials.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where service-to-service authentication (mtls, oauth2 client credentials) applies.</li>
+    <li>Author a unit test or verification script exercising service-to-service authentication (mtls, oauth2 client credentials).</li>
+    <li>Document team architectural conventions regarding service-to-service authentication (mtls, oauth2 client credentials).</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Service-to-Service Authentication (mTLS, OAuth2 Client Credentials).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is 'Mutual TLS' (mTLS) and how does it authenticate machine-to-machine service communication?",
+    a: ["Both communicating services present cryptographic X.509 certificates to each other, establishing mutual identity verification and an encrypted tunnel","Two computers sharing one password","A technique for speeding up network cables","A protocol for sending emails between servers"],
+    c: 0,
+    why: "mTLS provides bidirectional cryptographic authentication and encryption between communicating microservices."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Mutual TLS (mTLS / SPIFFE)",
+            "lines": [
+                  "Network transport layer authentication",
+                  "Bidirectional X.509 certificates",
+                  "Transparently managed by Service Mesh (Istio)"
+            ]
+      },
+      {
+            "title": "OAuth2 Client Credentials",
+            "lines": [
+                  "Application HTTP layer authentication",
+                  "Issues short-lived scoped JWT access tokens",
+                  "Granular API permission scopes (invoices:write)"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Service-to-Service Authentication (mTLS, OAuth2 Client Credentials)",
+      "def execute_flow():",
+      "    # Machine-to-machine trust: mutual TLS (mTLS), SPIFF...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Service-to-Service Authentication (mTLS, OAuth2 Client Credentials)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Service A Pod (Envoy Sidecar)"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Machine-to-machine authentication uses mutual {1} for transport encryption and OAuth2 Client {2} grants for scoped application API access."
+],
+    blanks: [
+      {
+            "a": [
+                  "TLS"
+            ],
+            "why": "Transport Layer Security with client certificates"
+      },
+      {
+            "a": [
+                  "Credentials"
+            ],
+            "why": "M2M OAuth2 grant type"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the primary role of a Service Mesh (like Istio or Linkerd) in microservice security?",
+      a: ["It automatically injects sidecar proxies that handle mTLS encryption, certificate rotation, and service authentication transparently","It writes application code","It replaces the database","It speeds up developer laptops"],
+      c: 0,
+      why: "Service meshes automate mTLS and certificate management without requiring custom application code."
+    },
+    {
+      q: "What is 'SPIFFE' in cloud-native identity standards?",
+      a: ["Secure Production Identity Framework for Everyone: an open standard defining cryptographic identity documents for containerized workloads","A new computer programming language","A brand of computer hardware","A database query optimizer"],
+      c: 0,
+      why: "SPIFFE provides a universal specification for workload identity in dynamic heterogeneous environments."
+    },
+    {
+      q: "Why is the OAuth2 Client Credentials grant suitable for machine-to-machine communication?",
+      a: ["It allows a service to authenticate using its own credentials directly with an identity server without requiring human user interaction","It requires entering a CAPTCHA","It makes API calls free","It runs without a network"],
+      c: 0,
+      why: "Client Credentials is the dedicated OAuth2 flow designed for backend services acting on their own behalf."
+    },
+    {
+      q: "How does scoping an OAuth2 token (e.g. 'scope: read_invoices') protect downstream services?",
+      a: ["Even if the calling service is compromised, its token cannot be used to execute write, update, or delete operations on the API","It encrypts the hard drive","It reduces GPU temperature","It deletes the database"],
+      c: 0,
+      why: "Token scopes enforce least privilege, restricting the caller to explicitly approved API actions."
+    }
+  ]);
+</script>
+</body>
+</html>

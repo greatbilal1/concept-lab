@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 08 — Debugging CSS layout bugs</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="css-layout" data-lesson="8" data-lesson-id="debugging-css-layout-bugs">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 08</span> · Responsive Design & Debugging</span>
+
+  <h1 class="lesson-title">Debugging CSS layout bugs</h1>
+  <p class="lesson-lede">
+    Why is there a mystery horizontal scrollbar on mobile? Why did that element collapse to zero height? Master visual debugging techniques and DevTools overlays.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Diagnose and fix layout overflow, z-index clipping, and collapse bugs using DevTools</span>
+    <span><b>Mission link</b> The essential troubleshooting skill for production frontend CSS craft</span>
+  </div>
+
+  <h2><span class="n">1</span>The mystery horizontal scrollbar</h2>
+  <p>The most common bug on mobile web pages is an unexpected horizontal scrollbar allowing the page to wobble sideways. This is almost always caused by an element whose width plus margins, padding, or fixed pixel dimension exceeds 100vw.</p><p>Instead of guessing, use the outline debugging trick: <code>* { outline: 1px solid red !important; }</code>. Every element's boundary box is highlighted, immediately exposing which rogue element is protruding past the viewport boundary.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Use outline or DevTools overflow inspection to instantly identify rogue elements causing horizontal scroll.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The diagnostic toolbox</h2>
+  <p>Learn the standard developer tools for debugging layout anomalies.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing a rogue overflow culprit</h2>
+  <p>Trace how a single fixed-width image breaks page responsiveness on mobile viewports.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of layout debugging strategies.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can diagnose and resolve horizontal scrollbars, collapsing containers, and z-index bugs in minutes.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Add img, video { max-width: 100%; height: auto; } to your base stylesheet.</li>
+    <li>Use the DevTools console one-liner to find overflowing elements on a page.</li>
+    <li>Inspect a flexbox container with the DevTools Flex overlay enabled.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Chrome DevTools Documentation: *Inspect CSS Grid and Flexbox Layouts* (developer.chrome.com).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Why is 'outline: 1px solid red' better than 'border: 1px solid red' when debugging layout boundaries?",
+    a: ["Outlines do not take up space in the box model, so they do not alter the layout they are debugging","Borders cannot be rendered in red color in modern browsers","Outlines automatically fix the layout bug for you","Borders only work on text paragraphs"],
+    c: 0,
+    why: "Borders add width to elements and can cause new overflow bugs; outlines take zero layout space."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "DevTools Layout Tab",
+            "lines": [
+                  "toggle Flexbox and Grid overlays",
+                  "view track lines and gap sizes"
+            ]
+      },
+      {
+            "title": "Computed Styles",
+            "lines": [
+                  "view resolved pixel dimensions",
+                  "see which CSS rule won cascade"
+            ]
+      },
+      {
+            "title": "Scroll Overflow Probe",
+            "lines": [
+                  "scroll right on mobile viewport",
+                  "inspect element touching edge"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Viewport width: 375px (iPhone)",
+      "# Container: width: 100% (375px)",
+      "# Rogue element: <img src='hero.png' style='width: 600px;'>",
+      "# Overflow: 600px > 375px -> page gains 225px horizontal scroll wobble!",
+      "# Fix: img { max-width: 100%; height: auto; }"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "screen": "375px mobile viewport"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "culprit": "fixed 600px image width"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "symptom": "horizontal scrollbar appears"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "remedy": "fluid max-width: 100% clamps image to container"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "A visual debugging rule that does not add box model width is <0>.",
+      "The property to clamp images from exceeding their container is max-<1>: 100%.",
+      "The DevTools panel showing final resolved pixel values is <2> styles."
+],
+    blanks: [
+      {
+            "a": [
+                  "outline"
+            ],
+            "why": "Outlines render outside the box model without taking up space."
+      },
+      {
+            "a": [
+                  "width"
+            ],
+            "why": "max-width: 100% ensures media shrinks responsively."
+      },
+      {
+            "a": [
+                  "Computed"
+            ],
+            "why": "Computed styles show the final calculated values applied by the browser."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the primary cause of unwanted horizontal scrollbars on mobile websites?",
+      a: ["An element with a fixed pixel width, unconstrained image, or large margin exceeding the viewport width","The mobile phone battery is below twenty percent","The website contains more than three colors","The browser is downloading a software update"],
+      c: 0,
+      why: "Any child element whose total rendered width exceeds the viewport width causes horizontal overflow."
+    },
+    {
+      q: "Why do floating elements sometimes cause parent containers to collapse to zero height?",
+      a: ["Floated elements are removed from normal flow, leaving the parent with no in-flow height unless cleared","Floats delete content from the DOM tree","Browsers charge a fee for floated elements","Floats cannot be used with text"],
+      c: 0,
+      why: "Floating takes elements out of flow; parents need 'display: flow-root' or clearfix to enclose them."
+    },
+    {
+      q: "What CSS rule should be applied to all images to prevent them from breaking responsive containers?",
+      a: ["img { max-width: 100%; height: auto; }","img { width: 1000px; }","img { display: none; }","img { position: absolute; }"],
+      c: 0,
+      why: "max-width: 100% allows images to scale down to fit small screens while preserving aspect ratio."
+    },
+    {
+      q: "What does the 'Computed' tab in browser DevTools show?",
+      a: ["The final, resolved values of all CSS properties after inheritance, cascading, and unit calculations","The source code written by the developer before compilation","The server database tables","The user internet browsing history"],
+      c: 0,
+      why: "The Computed panel shows the actual pixel measurements and resolved styles applied by the engine."
+    }
+  ]);
+</script>
+</body>
+</html>

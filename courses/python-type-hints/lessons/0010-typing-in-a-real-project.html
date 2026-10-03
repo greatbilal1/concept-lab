@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 10 — Typing in a real project</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="python-type-hints" data-lesson="10" data-lesson-id="typing-in-a-real-project">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 10</span> · Together</span>
+
+  <h1 class="lesson-title">Typing in a real project</h1>
+  <p class="lesson-lede">
+    Everything so far has been vocabulary. This lesson is about the decisions you
+    make when you add types to a codebase that already exists.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~14 min</span>
+    <span><b>Win</b> A plan for adopting types</span>
+    <span><b>Mission link</b> Intent that survives a team</span>
+  </div>
+
+  <h2><span class="n">1</span>Start at the boundaries</h2>
+
+  <p>
+    Do not annotate everything at once. Start where data enters and leaves your
+    program — public functions, API handlers, file readers. Those are the places
+    where a wrong type causes the most damage and where annotations help readers
+    most.
+  </p>
+
+  <div id="intro1"></div>
+
+  <h2><span class="n">2</span>Measure coverage</h2>
+
+  <p>
+    Type coverage is the proportion of your code that carries useful annotations.
+    Tools can report it, and it makes progress visible:
+  </p>
+
+  <pre><code>mypy --strict src/ | wc -l
+# fewer lines each week is progress</code></pre>
+
+  <div id="predict1"></div>
+
+  <p>
+    A number that goes down over time is a far better motivator than a vague sense
+    that the code is "getting typed".
+  </p>
+
+  <h2><span class="n">3</span>Where to stop</h2>
+
+  <p>
+    Not every line deserves an annotation. Local variables inside a short function
+    are usually obvious. The value is at the edges: signatures, module constants,
+    class attributes, and anything a caller can see.
+  </p>
+
+  <div id="diagram1"></div>
+
+  <p>
+    Over-annotating has a cost too — noise, churn, and annotations that restate what
+    the code already says. Aim for the smallest set of annotations that lets the
+    checker catch real mistakes.
+  </p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Types as a team contract</h2>
+
+  <p>
+    The real payoff is social. An annotation is a promise to every future reader,
+    and the checker is the referee. When a signature changes, the checker tells you
+    every call site that needs updating — which is exactly the work you would
+    otherwise do by grepping and hoping.
+  </p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Annotate the boundaries first, measure coverage, and stop where the annotations
+    stop catching real mistakes. Types are a contract, and the checker enforces it.
+  </div>
+
+  <h2><span class="n">5</span>Check yourself</h2>
+
+  <p>
+    Answer from memory — do not scroll back up. Each option has the same number of
+    words, so nothing gives the answer away.
+  </p>
+
+  <div id="fill1"></div>
+  <div id="quiz"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>
+      You have a plan: annotate boundaries first, measure coverage, tighten
+      gradually, and treat annotations as a contract the checker enforces. That is
+      the whole course, applied.
+    </p>
+  </div>
+
+  <h2><span class="n">6</span>Do this next</h2>
+
+  <ol>
+    <li>Pick one module and annotate only its public functions.</li>
+    <li>Run a checker and record the error count as your baseline.</li>
+    <li>Change one signature and watch the checker list every call site.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Read the
+    <a href="https://mypy.readthedocs.io/en/stable/">mypy documentation</a> and the
+    <a href="https://typing.readthedocs.io/en/latest/">Python typing spec</a>.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher (me) anything — "how do I convince
+    my team?", "what about legacy code?", "should CI fail on type errors?". There
+    are no bad questions here.
+  </div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  /* adoption vocabulary */
+  TeachWidgets.introCards("#intro1", {
+    cards: [
+      { ico: "🚪", title: "Boundaries", body: "Annotate where data enters." },
+      { ico: "📊", title: "Coverage", body: "Measure how much is annotated." },
+      { ico: "🤝", title: "Contract", body: "A promise the checker enforces." }
+    ]
+  });
+
+  /* predict-then-reveal */
+  TeachWidgets.predict("#predict1", {
+    q: "Where should you annotate first?",
+    a: ["Every local variable", "The public boundaries", "Only the test files"],
+    c: 1,
+    why: "Boundaries are where wrong types cause the most damage and where annotations help readers most."
+  });
+
+  /* where to stop */
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      { title: "Annotate", lines: ["signatures", "module constants"] },
+      { title: "Skip", lines: ["obvious locals", "short helpers"] },
+      { title: "Goal", lines: ["catch real mistakes", "not restate code"] }
+    ]
+  });
+
+  /* step-through trace */
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "def load(path: str) -> list[Row]: ...",
+      "load(\"data.csv\")",
+      "load(42)",
+      "mypy reports the call",
+      "every call site is listed"
+    ],
+    steps: [
+      { line: 0, vars: { path: "str", returns: "list[Row]" } },
+      { line: 1, vars: { call: "valid" } },
+      { line: 2, vars: { call: "invalid" } },
+      { line: 3, vars: { checker: "arg-type error" } },
+      { line: 4, vars: { benefit: "no grepping needed" } }
+    ]
+  });
+
+  /* recall from memory */
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — adoption",
+    lines: [
+      "Annotate the <0> first",
+      "The proportion annotated is <1>",
+      "Annotations act as a team <2>"
+    ],
+    blanks: [
+      { a: ["boundaries", "edges"], why: "Boundaries are where annotations catch the most damaging mistakes." },
+      { a: ["coverage", "type coverage"], why: "Type coverage measures how much of the code carries annotations." },
+      { a: ["contract"], why: "Annotations are a contract the checker enforces across call sites." }
+    ]
+  });
+
+  /* the quiz — every option is exactly three words */
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Where should you start?",
+      a: ["Every local variable", "The public boundaries", "Only the test files", "Only the docstrings"],
+      c: 1,
+      why: "Start at the boundaries where data enters and leaves the program."
+    },
+    {
+      q: "What is type coverage?",
+      a: ["The number of types", "The proportion annotated", "The checker's speed", "The error count"],
+      c: 1,
+      why: "Type coverage is the proportion of a codebase carrying useful annotations."
+    },
+    {
+      q: "When should you stop?",
+      a: ["When everything is annotated", "When mistakes stop appearing", "When the checker passes", "When coverage hits zero"],
+      c: 1,
+      why: "Stop where annotations no longer catch real mistakes; over-annotating adds noise."
+    },
+    {
+      q: "What does a signature change do?",
+      a: ["Breaks every caller", "Reveals hidden callers", "Slows the checker", "Removes the annotation"],
+      c: 1,
+      why: "Changing a signature makes the checker point at every caller, which is exactly the feedback you want."
+    }
+  ]);
+</script>
+</body>
+</html>

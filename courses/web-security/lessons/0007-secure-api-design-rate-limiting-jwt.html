@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 07 — Secure API Design: Rate Limiting, Input Validation, and JWT Security</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="web-security" data-lesson="7" data-lesson-id="secure-api-design-rate-limiting-jwt">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 07</span> · API Security</span>
+
+  <h1 class="lesson-title">Secure API Design: Rate Limiting, Input Validation, and JWT Security</h1>
+  <p class="lesson-lede">
+    Hardening application programming interfaces: input validation with Pydantic/Zod, rate limiting, and JSON Web Token (JWT) pitfalls.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to design secure APIs with schema validation, rate limits, and cryptographic JWT handling.</span>
+    <span><b>Mission link</b> Mastering secure api design: rate limiting, input validation, and jwt security across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Secure API Design: Rate Limiting, Input Validation, and JWT Security</h2>
+  <p>Modern web and mobile applications are driven by APIs. If your web frontend has robust security but your underlying REST API accepts unvalidated payloads, lacks rate limits, or misconfigures JWT tokens, <strong>your application is completely wide open</strong>.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Hardening application programming interfaces: input validation with Pydantic/Zod, rate limiting, and JSON Web Token (JWT) pitfalls.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Secure API Architecture</h2>
+  <p>Three Pillars of <strong>Secure API Design</strong>:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>The Infamous 'none' Algorithm Attack</h2>
+  <ul><li><strong>1. Strict Schema Input Validation (Pydantic / Zod):</strong> Never accept raw dictionaries or unvalidated JSON. Enforce types, string length bounds, and regex patterns: <code>username: str = Field(min_length=3, max_length=30, pattern=r"^[a-zA-Z0-9_]+$")</code>.</li><li><strong>2. Distributed API Rate Limiting:</strong> Enforce strict per-IP and per-user Token Bucket rate limits in Redis on authentication endpoints (`/login`, `/reset-password`) to defeat brute-force and credential stuffing bots.</li><li><strong>3. JWT Security & The 'None' Algorithm Attack:</strong> Verify the cryptographic signature on every request! Explicitly specify allowed algorithms: <code>jwt.decode(token, SECRET, algorithms=["HS256"])</code> to prevent the infamous 'none' algorithm bypass attack!</li></ul><pre><code># The Secure JWT Verification Pattern in Python:
+ALLOWED_ALGORITHMS = ["HS256"] # Explicitly forbid 'none'!
+
+def verify_user_jwt(token: str) -> dict:
+    try:
+        # Cryptographically verifies signature, expiration (exp), and algorithm:
+        payload = jwt.decode(
+            token,
+            JWT_SECRET_KEY,
+            algorithms=ALLOWED_ALGORITHMS,
+            options={"require": ["exp", "sub", "tenant_id"]}
+        )
+        return payload
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(401, "Session expired. Please log in again.")
+    except jwt.InvalidTokenError:
+        raise HTTPException(401, "Invalid or tampered authentication token!")</code></pre><div class="callout"><p><strong>The JWT Rule:</strong> Always enforce token expiration (`exp`) and sign tokens using strong cryptographic secrets. Never transmit sensitive PII in unencrypted JWT payloads.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the API security sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to design secure APIs with schema validation, rate limits, and cryptographic JWT handling.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where secure api design: rate limiting, input validation, and jwt security applies.</li>
+    <li>Author a unit test or verification script exercising secure api design: rate limiting, input validation, and jwt security.</li>
+    <li>Document team architectural conventions regarding secure api design: rate limiting, input validation, and jwt security.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Secure API Design: Rate Limiting, Input Validation, and JWT Security.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What common security vulnerability occurs if an application fails to verify the signature of a JSON Web Token (JWT)?",
+    a: ["An attacker can forge arbitrary user identity claims (e.g. 'role': 'admin') and the server will blindly accept them","The JWT file becomes too large","The browser refuses to open","The computer restarts"],
+    c: 0,
+    why: "Without cryptographic signature verification, JWT payloads can be modified and forged by anyone."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1. Input Validation (Pydantic)",
+            "lines": [
+                  "Strict types, length caps, regex bounds",
+                  "Rejects malformed payloads at ingress"
+            ]
+      },
+      {
+            "title": "2. Redis Rate Limiting",
+            "lines": [
+                  "Throttles brute-force on /login to 5 RPM",
+                  "Stops automated credential stuffing"
+            ]
+      },
+      {
+            "title": "3. Cryptographic JWT Auth",
+            "lines": [
+                  "Verifies signature with explicit HS256",
+                  "Rejects expired & tampered tokens"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Secure API Design: Rate Limiting, Input Validation, and JWT Security",
+      "def execute_flow():",
+      "    # Hardening application programming interfaces: inpu...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Secure API Design: Rate Limiting, Input Validation, and JWT Security"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Vulnerable Parser"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Hardened Parser"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Secure APIs validate input schemas strictly, rate limit authentication endpoints to defeat brute force, and enforce cryptographic {1} verification on JSON Web {2}."
+],
+    blanks: [
+      {
+            "a": [
+                  "signature"
+            ],
+            "why": "Mathematical proof of authenticity"
+      },
+      {
+            "a": [
+                  "Tokens"
+            ],
+            "why": "JWT credential standard"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the infamous 'none' algorithm vulnerability in JWT implementations?",
+      a: ["An attacker modifies the JWT header to 'alg': 'none' and strips the signature; vulnerable libraries accept the forged payload without checking cryptographic signatures","A bug where tokens have zero characters","A token that works without a server","A method for encrypting passwords"],
+      c: 0,
+      why: "Insecure parsers honour the 'none' algorithm in the header, bypassing signature checks entirely."
+    },
+    {
+      q: "Why must sensitive authentication endpoints like '/api/v1/login' enforce strict rate limits?",
+      a: ["To prevent automated bots from testing millions of breached username/password combinations (credential stuffing) against user accounts","To make logins slower for real users","To save electricity","It is required by git"],
+      c: 0,
+      why: "Rate limiting blocks automated brute-force and dictionary password attacks."
+    },
+    {
+      q: "Why is transmitting sensitive information (like Social Security numbers) in standard JWT payloads an anti-pattern?",
+      a: ["Standard JWT payloads are only base64-encoded, not encrypted; anyone who intercepts the token can decode and read the plain-text payload","JWTs cannot hold numbers","Payloads are deleted after 1 second","JWTs are only for passwords"],
+      c: 0,
+      why: "Base64 is an encoding, not encryption; standard JWT claims are readable by anyone holding the token."
+    },
+    {
+      q: "What does Pydantic input validation protect against in API request handlers?",
+      a: ["Type confusion bugs, buffer overflows, unexpected JSON keys, and malicious payloads containing dangerous character formats","Database corruption from hard drive failure","Slow internet connections","Monitor refresh rate issues"],
+      c: 0,
+      why: "Pydantic enforces strict type and length contracts before untrusted data reaches business logic."
+    }
+  ]);
+</script>
+</body>
+</html>

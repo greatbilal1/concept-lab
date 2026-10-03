@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 04 — Optional and Union</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="python-type-hints" data-lesson="4" data-lesson-id="optional-and-union">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 04</span> · Annotations</span>
+
+  <h1 class="lesson-title">Optional and Union</h1>
+  <p class="lesson-lede">
+    Real values are often one of several types. Unions say so, and narrowing is how
+    the checker keeps you safe when you use them.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~12 min</span>
+    <span><b>Win</b> Write and narrow unions</span>
+    <span><b>Mission link</b> Honest types for messy data</span>
+  </div>
+
+  <h2><span class="n">1</span>Union</h2>
+
+  <p>
+    A union says "any one of these types". The modern syntax uses a pipe:
+  </p>
+
+  <pre><code>def parse(value: str | int) -> int:
+    return int(value)</code></pre>
+
+  <p>
+    Before Python 3.10 you had to write <code>Union[str, int]</code>. Both still
+    work, but the pipe form is shorter and reads better.
+  </p>
+
+  <div id="intro1"></div>
+
+  <h2><span class="n">2</span>Optional</h2>
+
+  <p>
+    <code>Optional[X]</code> is exactly <code>X | None</code>. It is not "this
+    argument is optional" — that is what default values do. This is the single most
+    misread name in Python typing.
+  </p>
+
+  <pre><code>def find(name: str) -> Optional[str]:
+    return table.get(name)</code></pre>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">3</span>Narrowing</h2>
+
+  <p>
+    When you check a union at runtime, the checker narrows it. After
+    <code>if x is not None:</code>, the type of <code>x</code> inside the block is
+    just <code>str</code> — the <code>None</code> branch is gone.
+  </p>
+
+  <div id="diagram1"></div>
+
+  <p>
+    Narrowing is why unions are safe rather than annoying. The checker tracks which
+    branch you are in and only complains when you use a value without ruling out the
+    impossible cases.
+  </p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Reading unions out loud</h2>
+
+  <p>
+    A good habit: read <code>str | None</code> as "a string, or nothing". If that
+    sentence does not describe your function honestly, the annotation is wrong.
+  </p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    <code>Optional[X]</code> means <code>X | None</code>, not "argument is
+    optional". Narrowing is what makes unions usable.
+  </div>
+
+  <h2><span class="n">5</span>Check yourself</h2>
+
+  <p>
+    Answer from memory — do not scroll back up. Each option has the same number of
+    words, so nothing gives the answer away.
+  </p>
+
+  <div id="fill1"></div>
+  <div id="quiz"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>
+      You can write a union with the pipe syntax, explain what
+      <code>Optional</code> really means, and describe how narrowing protects you.
+    </p>
+  </div>
+
+  <h2><span class="n">6</span>Do this next</h2>
+
+  <ol>
+    <li>Rewrite one <code>Union[...]</code> in a codebase as a pipe union.</li>
+    <li>Find a function that returns <code>None</code> on failure and annotate it.</li>
+    <li>Add a narrowing check and confirm the checker stops complaining.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Read the
+    <a href="https://docs.python.org/3/library/typing.html">typing module docs</a>
+    on <code>Union</code> and <code>Optional</code>, and
+    <a href="https://peps.python.org/pep-0604/">PEP 604</a> for the pipe syntax.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher (me) anything — "is Optional
+    deprecated?", "can I union three types?", "what is a type guard?". There are no
+    bad questions here.
+  </div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  /* union vocabulary */
+  TeachWidgets.introCards("#intro1", {
+    cards: [
+      { ico: "🔀", title: "Union", body: "Any one of the listed types." },
+      { ico: "🕳️", title: "Optional", body: "Exactly the same as X | None." },
+      { ico: "🔎", title: "Narrowing", body: "Refining a union after a check." }
+    ]
+  });
+
+  /* predict-then-reveal */
+  TeachWidgets.predict("#predict1", {
+    q: "What does Optional[str] actually mean?",
+    a: ["The argument is optional", "A string or None", "A string or empty"],
+    c: 1,
+    why: "Optional[X] is shorthand for X | None; it says nothing about whether the argument has a default."
+  });
+
+  /* narrowing */
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      { title: "str | None", lines: ["before the check", "two possibilities"] },
+      { title: "if x is not None", lines: ["runtime check", "rules one out"] },
+      { title: "str", lines: ["inside the block", "narrowed type"] }
+    ]
+  });
+
+  /* step-through trace */
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "def label(x: str | None) -> str:",
+      "  if x is None:",
+      "    return \"(none)\"",
+      "  return x.upper()",
+      "checker knows x is str here"
+    ],
+    steps: [
+      { line: 0, vars: { x: "str | None", returns: "str" } },
+      { line: 1, vars: { x: "str | None" } },
+      { line: 2, vars: { branch: "None case" } },
+      { line: 3, vars: { x: "str (narrowed)" } },
+      { line: 4, vars: { checker: "no error" } }
+    ]
+  });
+
+  /* recall from memory */
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — unions",
+    lines: [
+      "The modern union syntax uses a <0>",
+      "Optional[X] is exactly X or <1>",
+      "Refining a union after a check is <2>"
+    ],
+    blanks: [
+      { a: ["pipe", "|"], why: "The pipe character joins types in a union." },
+      { a: ["None"], why: "Optional[X] is shorthand for X | None." },
+      { a: ["narrowing"], why: "Narrowing refines a union to one member after a runtime check." }
+    ]
+  });
+
+  /* the quiz — every option is exactly three words */
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What does Optional mean?",
+      a: ["The argument has default", "The value may be None", "The value is always missing", "The type is never checked"],
+      c: 1,
+      why: "Optional[X] means X | None; it is about the value, not the argument."
+    },
+    {
+      q: "Which syntax is modern?",
+      a: ["The Union call form", "The pipe form", "The Optional pair form", "The or keyword form"],
+      c: 1,
+      why: "The pipe syntax from PEP 604 is the modern union form."
+    },
+    {
+      q: "What is narrowing?",
+      a: ["Shortening a type name", "Refining after a check", "Removing an annotation", "Converting between types"],
+      c: 1,
+      why: "Narrowing refines a union to one member once a runtime check rules out the others."
+    },
+    {
+      q: "Can a union hold three?",
+      a: ["No, only two types", "Yes, any number", "Only with Optional", "Only inside brackets"],
+      c: 1,
+      why: "A union can list any number of members, such as str | int | None."
+    }
+  ]);
+</script>
+</body>
+</html>

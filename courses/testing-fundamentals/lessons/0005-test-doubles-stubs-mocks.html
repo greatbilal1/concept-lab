@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 05 — Test Doubles: Stubs, Fakes, and Mocks</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="testing-fundamentals" data-lesson="5" data-lesson-id="test-doubles-stubs-mocks">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 05</span> · Test Doubles</span>
+
+  <h1 class="lesson-title">Test Doubles: Stubs, Fakes, and Mocks</h1>
+  <p class="lesson-lede">
+    Replacing external systems and slow I/O with test doubles: stubs, fakes, spies, and mocks.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You can choose the right test double for any architectural boundary.</span>
+    <span><b>Mission link</b> Mastering test doubles: stubs, fakes, and mocks across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Test Doubles: Stubs, Fakes, and Mocks</h2>
+  <p>Real systems depend on external services: payment gateways, third-party REST APIs, email servers, and file systems. You cannot fire real credit card charges or send thousands of real emails during a local test run.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Replacing external systems and slow I/O with test doubles: stubs, fakes, spies, and mocks.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Taxonomy of Test Doubles</h2>
+  <p>Gerard Meszaros classified <strong>Test Doubles</strong> into distinct categories:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Mock Verification Sequence</h2>
+  <ul><li><strong>Dummy:</strong> Objects passed around but never actually used (e.g., filler arguments).</li><li><strong>Stub:</strong> Provides hardcoded canned answers to calls made during the test.</li><li><strong>Spy:</strong> A stub that also records how many times and with what arguments it was called.</li><li><strong>Mock:</strong> Pre-programmed with expectations about calls it should receive; verifies behavior.</li><li><strong>Fake:</strong> A working implementation with a shortcut, such as an in-memory database or repository.</li></ul><pre><code># Mocking with unittest.mock in Python
+from unittest.mock import Mock
+
+def test_send_welcome_email():
+    mock_mailer = Mock()
+    service = OnboardingService(mailer=mock_mailer)
+
+    service.register("alice@example.com")
+
+    # Verify interaction on the mock
+    mock_mailer.send_email.assert_called_once_with(
+        to="alice@example.com",
+        subject="Welcome!"
+    )</code></pre><div class="callout"><p><strong>Warning: Mocking Overkill.</strong> When you mock everything, you end up testing only your mock configurations instead of real code. Favor testing real code with Fakes over excessive mocking.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Fill in the test double classification</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can choose the right test double for any architectural boundary.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where test doubles: stubs, fakes, and mocks applies.</li>
+    <li>Author a unit test or verification script exercising test doubles: stubs, fakes, and mocks.</li>
+    <li>Document team architectural conventions regarding test doubles: stubs, fakes, and mocks.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Test Doubles: Stubs, Fakes, and Mocks.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What distinguishes a Fake from a Mock?",
+    a: ["A Fake is a working in-memory implementation (like SQLite for Postgres), while a Mock verifies interaction calls","A Fake cannot run in Python","A Mock always hits the real production API","There is no difference; they are exact synonyms"],
+    c: 0,
+    why: "Fakes have working business logic (e.g. an in-memory dictionary repository), while Mocks record calls and assert expectations."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Stub",
+            "lines": [
+                  "Returns canned data",
+                  "No call verification"
+            ]
+      },
+      {
+            "title": "Mock",
+            "lines": [
+                  "Pre-programmed expectations",
+                  "Asserts method calls & args"
+            ]
+      },
+      {
+            "title": "Fake",
+            "lines": [
+                  "Simplified working logic",
+                  "e.g., InMemoryUserRepository"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Test Doubles: Stubs, Fakes, and Mocks",
+      "def execute_flow():",
+      "    # Replacing external systems and slow I/O with test ...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Test Doubles: Stubs, Fakes, and Mocks"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "1. Inject Mock"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "2. Trigger Behavior"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "step": "3. Verify Interaction"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "A {1} returns canned data without checking calls, while a {2} verifies that expected method calls occurred."
+],
+    blanks: [
+      {
+            "a": [
+                  "stub"
+            ],
+            "why": "Provides pre-set canned responses"
+      },
+      {
+            "a": [
+                  "mock"
+            ],
+            "why": "Verifies interactions and invocations"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the primary danger of over-using mocks in test suites?",
+      a: ["Tests become tightly coupled to implementation details and pass even when real integrations are broken","Mocks increase cloud compute bills significantly","Mocks require compiled C extensions","Python disables garbage collection when mocks exist"],
+      c: 0,
+      why: "Mocks verify internal interactions rather than external behavior, making tests brittle during refactoring."
+    },
+    {
+      q: "What is an in-memory database or dictionary repository an example of?",
+      a: ["A Fake","A Stub","A Dummy","A Spy"],
+      c: 0,
+      why: "A Fake is a genuine, working implementation tailored for fast, isolated test execution."
+    },
+    {
+      q: "When is it essential to use a test double?",
+      a: ["When interacting with non-deterministic or destructive systems like payment gateways or SMS providers","When adding two integer variables together","When checking an if-statement condition","When reading a local immutable string constant"],
+      c: 0,
+      why: "External networks, third-party rate limits, and financial APIs require test doubles for safety and speed."
+    },
+    {
+      q: "What does mock.assert_called_once_with(...) verify?",
+      a: ["That the mock method was invoked exactly once with the specified argument values","That the function was executed in parallel","That the function never threw an exception","That the return value was a string"],
+      c: 0,
+      why: "It asserts both the exact invocation count (1) and the parameter payload match expectations."
+    }
+  ]);
+</script>
+</body>
+</html>

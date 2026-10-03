@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 02 — Feeding Stack Traces, Logs, and Error Outputs</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="ai-assisted-debugging" data-lesson="2" data-lesson-id="feeding-stack-traces-logs">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 02</span> · Error Context</span>
+
+  <h1 class="lesson-title">Feeding Stack Traces, Logs, and Error Outputs</h1>
+  <p class="lesson-lede">
+    Formatting and feeding execution evidence (stack traces, server logs, stderr) into agent prompts.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to feed high-signal error traces to guide AI debugging.</span>
+    <span><b>Mission link</b> Mastering feeding stack traces, logs, and error outputs across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Feeding Stack Traces, Logs, and Error Outputs</h2>
+  <p>When code crashes, junior developers often prompt an agent with vague complaints: <em>'My checkout page is broken, fix it.'</em> The agent is forced to guess across thousands of lines of code. An expert engineer provides the exact <strong>execution evidence</strong>.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Formatting and feeding execution evidence (stack traces, server logs, stderr) into agent prompts.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Anatomy of a Traceback</h2>
+  <p>A stack trace is a precise diagnostic roadmap:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Error Feeding Transformation</h2>
+  <ul><li><strong>The Exception Type:</strong> `KeyError`, `AttributeError`, `IntegrityError` instantly narrows the class of defect.</li><li><strong>The Causal Frame:</strong> The bottom-most frame points to the exact file and line number where the program crashed.</li><li><strong>The Call Stack:</strong> The sequence of caller functions shows the execution path that led to the crash.</li></ul><pre><code># The Anatomy of a High-Signal Error Prompt:
+"Investigate this test failure in tests/test_orders.py:
+Traceback (most recent call last):
+  File 'src/services/billing.py', line 54, in calculate_tax
+    tax_rate = self.tax_table[user.country]
+KeyError: 'CA'
+
+Context:
+- user.country is 'CA' (Canada).
+- Look at src/services/billing.py lines 45-65 and explain why 'CA' is missing from tax_table."</code></pre><p>With this prompt, the agent pinpoints line 54, reads the dictionary lookup, identifies that Canadian tax codes are missing, and writes a targeted fix in 30 seconds.</p><div class="callout"><p><strong>Format Tip:</strong> Always include the complete exception message and the innermost 3-5 stack frames in your prompt!</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the error feeding sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to feed high-signal error traces to guide AI debugging.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where feeding stack traces, logs, and error outputs applies.</li>
+    <li>Author a unit test or verification script exercising feeding stack traces, logs, and error outputs.</li>
+    <li>Document team architectural conventions regarding feeding stack traces, logs, and error outputs.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Feeding Stack Traces, Logs, and Error Outputs.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What part of a Python traceback provides the most critical signal for an agent?",
+    a: ["The file path, line number, and the exact exception type and message at the bottom of the trace","The Python version string","The time of day the test ran","The developer's username"],
+    c: 0,
+    why: "The bottom line (exception type and message) and the innermost frame pinpoint the exact crash site."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Call Path",
+            "lines": [
+                  "test_order -> process -> calculate_tax",
+                  "Follows caller chain downwards"
+            ]
+      },
+      {
+            "title": "Crash Site",
+            "lines": [
+                  "src/billing.py:54",
+                  "Exact line where execution halted"
+            ]
+      },
+      {
+            "title": "Exception Message",
+            "lines": [
+                  "KeyError: 'CA'",
+                  "Identifies missing dictionary key"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Feeding Stack Traces, Logs, and Error Outputs",
+      "def execute_flow():",
+      "    # Formatting and feeding execution evidence (stack t...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Feeding Stack Traces, Logs, and Error Outputs"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Vague Complaint"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Evidence-Rich Prompt"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Feeding the complete exception message and innermost stack {1} allows the agent to navigate directly to the {2} site."
+],
+    blanks: [
+      {
+            "a": [
+                  "frames"
+            ],
+            "why": "Function call levels in a traceback"
+      },
+      {
+            "a": [
+                  "crash"
+            ],
+            "why": "Location where code failed"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why is the bottom line of a Python traceback the most important?",
+      a: ["It contains the specific exception type and error description that explains why execution halted","It shows the Python license","It displays the CPU clock speed","It indicates git branch status"],
+      c: 0,
+      why: "The final line states the exact runtime failure reason (e.g. TypeError, KeyError)."
+    },
+    {
+      q: "What additional information should you provide alongside a server error log?",
+      a: ["The input payload or request arguments that triggered the failure","The server electricity bill","A picture of the server rack","The names of all files in the repo"],
+      c: 0,
+      why: "Providing the input payload allows the agent to trace the execution path that led to the crash."
+    },
+    {
+      q: "What happens if you truncate a traceback and omit the innermost frame?",
+      a: ["The agent cannot see where the crash actually occurred and must search blindly across callers","The code runs faster","The compiler fixes the bug","The terminal prints blue text"],
+      c: 0,
+      why: "Omitting the crash site deprives the model of the most critical diagnostic signal."
+    },
+    {
+      q: "How does feeding reproduction steps prevent agent confusion?",
+      a: ["It establishes an unambiguous deterministic path to trigger and verify the defect","It turns off Python warnings","It speeds up network connections","It reduces file sizes"],
+      c: 0,
+      why: "Reproduction steps allow the agent to verify both the failure and the subsequent fix."
+    }
+  ]);
+</script>
+</body>
+</html>

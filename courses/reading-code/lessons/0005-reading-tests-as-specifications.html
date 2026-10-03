@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 05 — Reading tests as specifications</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="reading-code" data-lesson="5" data-lesson-id="reading-tests-as-specifications">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 05</span> · Mental Models & Tests</span>
+
+  <h1 class="lesson-title">Reading tests as specifications</h1>
+  <p class="lesson-lede">
+    Documentation lies; tests run. When documentation is stale or absent, the test suite is the single most accurate specification of what the code does.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Extract accurate business rules and expected edge cases by reading unit tests</span>
+    <span><b>Mission link</b> Discovers the true business contract of unfamiliar modules</span>
+  </div>
+
+  <h2><span class="n">1</span>Tests as living documentation</h2>
+  <p>Design documents, wiki pages, and inline comments quickly drift out of date as code evolves. But automated tests must pass every time CI runs. If a test is passing, the behavior it asserts is true right now.</p><p>Before reading a complex algorithm, open its accompanying test file. The test names, setups, and assertions show you the valid inputs, the expected outputs, and the edge cases the original author cared about.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Tests are executable specifications: they describe intended behavior and never get out of date.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Anatomy of an informative test</h2>
+  <p>Well-written tests follow the Arrange-Act-Assert pattern, laying bare the setup conditions and the exact expected result.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Extracting business rules from tests</h2>
+  <p>Observe how reading test cases reveals discount rules that would take hours to decipher from the implementation code.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your understanding of tests as specifications.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can open any test suite and extract the authoritative business rules of a feature in minutes.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Open a test file in your repository and list three business rules it defines.</li>
+    <li>Find a test that checks an edge case or error condition.</li>
+    <li>Run just that single test locally using your test runner CLI.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Martin Fowler, *Given When Then & Executable Specifications* (martinfowler.com/bliki).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Why is a passing test more trustworthy than an inline code comment?",
+    a: ["Tests are verified by the runtime on every build; comments are ignored","Tests are written in legal language approved by compliance teams","Comments cannot be viewed in modern code editors","Tests take up less space on developer hard drives"],
+    c: 0,
+    why: "Comments easily drift from reality because outdated comments do not break the build."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Arrange",
+            "lines": [
+                  "given: a user with balance $50",
+                  "input conditions"
+            ]
+      },
+      {
+            "title": "Act",
+            "lines": [
+                  "when: user purchases $20 item",
+                  "call the method"
+            ]
+      },
+      {
+            "title": "Assert",
+            "lines": [
+                  "then: remaining balance is $30",
+                  "expected outcome"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "def test_order_over_100_gets_free_shipping():",
+      "    order = Order(total=105)",
+      "    assert order.shipping_cost == 0",
+      "# Business rule: Orders > $100 receive free shipping"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "rule": "free shipping condition"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "threshold": "105 > 100"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "expected_shipping": "0"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The three steps of a clear test are Arrange, <0>, and Assert.",
+      "Tests that run in CI and prove current behavior are <1> specifications.",
+      "Inputs chosen right at threshold boundaries test <2> cases."
+],
+    blanks: [
+      {
+            "a": [
+                  "Act"
+            ],
+            "why": "Arrange sets up data; Act triggers execution; Assert verifies results."
+      },
+      {
+            "a": [
+                  "executable",
+                  "living"
+            ],
+            "why": "Executable specifications guarantee behavior matches code."
+      },
+      {
+            "a": [
+                  "edge"
+            ],
+            "why": "Edge cases verify boundary conditions like zero, empty lists, or limits."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What makes unit tests the most reliable documentation in a project?",
+      a: ["They are continuously executed and must pass, ensuring they never drift from code","They are automatically translated into multiple human spoken languages","They are stored in external cloud databases rather than git repos","They can only be authored by certified system architects"],
+      c: 0,
+      why: "Tests cannot silently drift out of sync with code because stale tests cause CI failures."
+    },
+    {
+      q: "What does the 'Assert' step in a unit test reveal to a reader?",
+      a: ["The expected state, return value, or side effect of the operation","The names of all developers who wrote the function","The CPU clock speed of the production server","The database connection string credentials"],
+      c: 0,
+      why: "Assertions declare the exact outcome expected when the code runs correctly."
+    },
+    {
+      q: "If an implementation is confusing but its tests are clear, what should you do?",
+      a: ["Trust the tests to understand the intended contract and inputs/outputs","Delete the tests and rewrite the algorithm from intuition","File an issue claiming the code is completely broken","Ignore both and read online blogs about software design"],
+      c: 0,
+      why: "The tests define the contract: how it is achieved inside is secondary to what it achieves."
+    },
+    {
+      q: "What can you learn from tests that assert exceptions are raised?",
+      a: ["What invalid inputs the system explicitly rejects and how errors are handled","That the author did not know how to handle errors properly","That the software cannot be run in modern web browsers","That the database tables are missing indexes"],
+      c: 0,
+      why: "Negative tests document expected error boundaries and invalid input policies."
+    }
+  ]);
+</script>
+</body>
+</html>

@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 04 — What Integration Tests Actually Verify</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="unit-integration-testing" data-lesson="4" data-lesson-id="what-integration-tests-verify">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 04</span> · Integration Testing</span>
+
+  <h1 class="lesson-title">What Integration Tests Actually Verify</h1>
+  <p class="lesson-lede">
+    Understanding the purpose of integration tests: testing real seams, contracts, and cross-boundary communication.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You understand the vital role of integration testing across real architectural seams.</span>
+    <span><b>Mission link</b> Mastering what integration tests actually verify across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of What Integration Tests Actually Verify</h2>
+  <p>There is a classic software engineering joke: <em>2 unit tests, 0 integration tests</em>, accompanied by a picture of a sliding door that works perfectly until someone installs a trash can directly in its path. Individual units can pass with 100% test coverage while the system as a whole is completely broken.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Understanding the purpose of integration tests: testing real seams, contracts, and cross-boundary communication.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Unit vs Integration Focus</h2>
+  <p><strong>Integration tests</strong> verify the seams where two or more subsystems meet:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Database Seam Verification</h2>
+  <ul><li>Does our ORM query match the actual PostgreSQL database schema?</li><li>Does our JSON serializer format timestamps in the exact ISO format expected by the frontend?</li><li>Does our queue consumer handle serialized messages published by the background worker?</li></ul><pre><code># Integration test: Verifying real database insertion and constraints
+def test_create_order_persists_to_database(db_session):
+    service = OrderService(db_session)
+    order = service.create_order(customer_id="cust_123", amount=99.50)
+
+    # Verify record was physically written to SQL table
+    saved = db_session.execute(
+        "SELECT customer_id, amount FROM orders WHERE id = :id",
+        {"id": order.id}
+    ).fetchone()
+
+    assert saved.customer_id == "cust_123"
+    assert float(saved.amount) == 99.50</code></pre><p>Notice that we did not mock the database session. We verified that our SQL syntax, foreign keys, and column data types succeed against a real database instance.</p><div class="callout"><p><strong>Focus:</strong> Integration tests should focus on boundaries and contracts, not business edge cases. Let unit tests handle 20 algorithmic permutations; let integration tests verify that the pipeline connects.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the integration testing sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You understand the vital role of integration testing across real architectural seams.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where what integration tests actually verify applies.</li>
+    <li>Author a unit test or verification script exercising what integration tests actually verify.</li>
+    <li>Document team architectural conventions regarding what integration tests actually verify.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for What Integration Tests Actually Verify.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What critical bugs do integration tests catch that unit tests are blind to?",
+    a: ["Schema mismatches, incorrect SQL queries, and broken contracts between cooperating components","Syntax errors caught by the compiler","Code formatting and variable naming inconsistencies","Missing docstrings in function signatures"],
+    c: 0,
+    why: "Integration tests verify that components actually interact correctly across real interfaces and databases."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Unit Tests",
+            "lines": [
+                  "Test 15 edge cases & algorithms",
+                  "Run in microseconds in RAM"
+            ]
+      },
+      {
+            "title": "The Seam / Boundary",
+            "lines": [
+                  "SQL syntax, foreign keys, schema",
+                  "JSON serialization & headers"
+            ]
+      },
+      {
+            "title": "Integration Tests",
+            "lines": [
+                  "Test the seam with 1-2 happy paths",
+                  "Verify cross-layer communication"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing What Integration Tests Actually Verify",
+      "def execute_flow():",
+      "    # Understanding the purpose of integration tests: te...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "What Integration Tests Actually Verify"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "1. Write Operation"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "2. Database Engine"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "step": "3. Direct Query Assert"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "While unit tests exhaustively check algorithmic permutations, integration tests verify that {1} communicate across real {2}."
+],
+    blanks: [
+      {
+            "a": [
+                  "components"
+            ],
+            "why": "Subsystems and services"
+      },
+      {
+            "a": [
+                  "boundaries"
+            ],
+            "why": "Seams between databases, networks, and layers"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why is testing against a real database better than mocking database queries?",
+      a: ["Mocks cannot validate SQL syntax, table constraints, triggers, or transaction semantics","Mocking databases requires root permissions","Real databases execute in zero milliseconds","SQL queries cannot be tested in Python"],
+      c: 0,
+      why: "Mocks return whatever canned data you tell them to return; they cannot validate real SQL rules."
+    },
+    {
+      q: "How many variations should typically be tested in an integration test compared to a unit test?",
+      a: ["Fewer: verify the happy path and critical boundary errors; leave algorithmic permutations to unit tests","More: test every possible if-statement condition against the real database","Zero: integration tests should not assert outcomes","Exactly the same number"],
+      c: 0,
+      why: "Integration tests are slower; use them to verify connection and contracts, not algorithmic permutations."
+    },
+    {
+      q: "What is an architectural 'seam'?",
+      a: ["A place where you can alter behavior without editing code in that place, such as an interface or network boundary","A line of code with a syntax error","The end of a Python file","A git merge conflict"],
+      c: 0,
+      why: "Michael Feathers defines a seam as an interface boundary where components meet and can be isolated or tested."
+    },
+    {
+      q: "What happens if a database column is renamed in production but tests only use mocks?",
+      a: ["The mock tests pass green, but production crashes with a column not found database error","The tests fail with a syntax warning","The database automatically updates its schema","The git repository reverts the commit"],
+      c: 0,
+      why: "Mocks do not know about real database schemas, creating dangerous false confidence."
+    }
+  ]);
+</script>
+</body>
+</html>

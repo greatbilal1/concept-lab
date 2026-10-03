@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 03 — Session IDs and cookie lifecycle</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="authentication-sessions" data-lesson="3" data-lesson-id="session-ids-and-cookie-lifecycle">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 03</span> · Stateful Session Systems</span>
+
+  <h1 class="lesson-title">Session IDs and cookie lifecycle</h1>
+  <p class="lesson-lede">
+    How does the server remember that you logged in? Explore the stateful session model: generating high-entropy session IDs and managing cookie lifecycles.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Design stateful session authentication workflows using random session tokens</span>
+    <span><b>Mission link</b> The classic, battle-tested architecture for web application state</span>
+  </div>
+
+  <h2><span class="n">1</span>The stateful session architecture</h2>
+  <p>In a <b>stateful session architecture</b>, the server generates a cryptographically secure random string called a <b>Session ID</b> upon successful login. The server saves this ID in its database alongside user metadata (<code>user_id: 42, role: 'admin'</code>).</p><p>The server then issues a <code>Set-Cookie: sid=a8f9c2...</code> header to the browser. On every future request, the browser includes this cookie. The server looks up the session ID in its store to identify the user.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    A session ID is an opaque pointer to server-side session state stored in a secure cookie.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Session authentication sequence</h2>
+  <p>Follow the full lifecycle from credential submission to authenticated session lookups.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing session revocation on logout</h2>
+  <p>Trace how logging out instantly invalidates access by deleting the server-side session record.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of session mechanics.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can implement stateful session authentication with instant revocation and opaque session tokens.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Generate a cryptographically secure random session ID using crypto.randomBytes(32).</li>
+    <li>Implement a /logout route that destroys the session in the server database.</li>
+    <li>Verify why predictable session IDs (e.g. sid=1, sid=2) allow catastrophic account takeovers.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    OWASP: *Session Management Cheat Sheet* (cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is stored inside a session ID cookie in a stateful architecture?",
+    a: ["An opaque, high-entropy random identifier that points to server-side database records","The user's actual password and credit card number in plain text","The full SQL database query required to fetch user data","The server private encryption key"],
+    c: 0,
+    why: "Session IDs contain zero business data: they are purely random opaque handles."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1. Login (POST /login)",
+            "lines": [
+                  "verify password hash",
+                  "generate cryptographically random session ID"
+            ]
+      },
+      {
+            "title": "2. Save & Issue Cookie",
+            "lines": [
+                  "save session in Redis / DB",
+                  "Set-Cookie: sid=xyz; HttpOnly; Secure"
+            ]
+      },
+      {
+            "title": "3. Subsequent Requests",
+            "lines": [
+                  "browser sends Cookie: sid=xyz",
+                  "server retrieves user session from store"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# User clicks Logout -> POST /logout",
+      "sid = request.cookies['sid']",
+      "redis.delete(f'session:{sid}') # session destroyed on server immediately!",
+      "response.set_cookie('sid', '', max_age=0) # instructs browser to clear cookie"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "action": "user initiates logout"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "revocation": "session destroyed in server store in 1ms"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "browser_cleanup": "cookie expired and removed from client jar"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The random token identifying a user session is a session <0>.",
+      "A session architecture where servers store active session records is <1>.",
+      "To immediately terminate a session everywhere, delete the record from the server <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "ID",
+                  "identifier"
+            ],
+            "why": "Session IDs index server session records."
+      },
+      {
+            "a": [
+                  "stateful"
+            ],
+            "why": "Stateful systems maintain server-side session persistence."
+      },
+      {
+            "a": [
+                  "store",
+                  "database"
+            ],
+            "why": "Deleting the server session record instantly revokes access."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why must session IDs be generated using cryptographically secure random number generators (CSPRNG)?",
+      a: ["To ensure session IDs are unpredictable, preventing attackers from guessing other users' active sessions","Because pseudorandom generators run too slowly for web servers","To encrypt the user's email address inside the token","Because the HTTP specification forbids numbers in cookies"],
+      c: 0,
+      why: "Predictable session tokens allow attackers to hijack accounts by simply incrementing IDs."
+    },
+    {
+      q: "What is the primary architectural advantage of stateful sessions over stateless JWT tokens?",
+      a: ["Instant server-side revocation: deleting the session record immediately invalidates the user access","Stateful sessions eliminate the need for server databases","Stateful sessions work without internet connections","Stateful sessions cannot be read by web servers"],
+      c: 0,
+      why: "Servers have direct control over sessions; invalidating a session takes effect in 1ms."
+    },
+    {
+      q: "What is 'Session Fixation'?",
+      a: ["An attack where an attacker forces a victim to use a known session ID before logging in, stealing access","A software bug where sessions never expire","A database backup script failure","A network firewall hardware error"],
+      c: 0,
+      why: "Session fixation exploits servers that reuse the same session ID across authentication state transitions."
+    },
+    {
+      q: "How do you defend against Session Fixation attacks?",
+      a: ["Always regenerate and issue a brand new session ID immediately upon successful login","Disable all cookies on the website","Ask users to change their password on every visit","Set cookie expiration to 5 seconds"],
+      c: 0,
+      why: "Regenerating the session ID upon login destroys any pre-seeded attacker token."
+    }
+  ]);
+</script>
+</body>
+</html>

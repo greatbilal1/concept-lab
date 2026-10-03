@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 04 — Surrogate keys versus natural keys</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="database-design" data-lesson="4" data-lesson-id="surrogate-keys-versus-natural-keys">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 04</span> · Many-to-Many & Keys</span>
+
+  <h1 class="lesson-title">Surrogate keys versus natural keys</h1>
+  <p class="lesson-lede">
+    Should you use email addresses and SSNs as primary keys, or auto-incrementing integers and UUIDs? Discover the trade-offs of surrogate versus natural keys.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Select between surrogate IDs, natural keys, and UUIDs based on architectural requirements</span>
+    <span><b>Mission link</b> Determines primary key durability and refactoring safety across schemas</span>
+  </div>
+
+  <h2><span class="n">1</span>The fragility of natural keys</h2>
+  <p>A <b>Natural Key</b> is a unique attribute that exists in the real world: a social security number, an email address, or an ISBN. It seems tempting to use <code>email</code> as a primary key, but real-world data changes: users update their email addresses, companies rebrand, and typos happen.</p><p>If a natural key changes, every foreign key in dozens of child tables must be updated! A <b>Surrogate Key</b> (like an auto-incrementing <code>id SERIAL</code> or <code>UUID</code>) has zero business meaning: it never changes, isolating database structure from business reality.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Natural keys change in the real world; surrogate keys never change, keeping relations stable.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Surrogate key variants: Integers versus UUIDs</h2>
+  <p>Compare auto-incrementing integers with globally unique UUID identifiers.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing integer sequence leakage</h2>
+  <p>Trace how sequential integer IDs reveal proprietary business metrics to competitors.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of key selection trade-offs.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can choose the optimal primary key strategy, balancing indexing performance with privacy and stability.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Generate a UUID in PostgreSQL using gen_random_uuid().</li>
+    <li>Explain why UUIDv7 is superior to UUIDv4 for database B-tree indexing.</li>
+    <li>Ensure natural unique attributes (like email) have a UNIQUE constraint while using a surrogate PK.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Bill Karwin, *SQL Antipatterns*, Chapter 4: 'Keyless Entry' & Chapter 5: 'Pseudokey Neat-Freak'.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Why is using a user's email address as a Primary Key risky in relational database design?",
+    a: ["Users occasionally change their email address, requiring expensive cascading updates across all foreign key tables","Email addresses cannot be indexed by SQL databases","Email addresses can only be stored on mobile phones","The @ symbol is illegal in primary key columns"],
+    c: 0,
+    why: "When a primary key mutates, every child record referencing it must be updated, risking deadlocks."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Integer (SERIAL / BIGINT)",
+            "lines": [
+                  "4 or 8 bytes (compact)",
+                  "fastest B-tree indexing",
+                  "leaks business volume (order #101)"
+            ]
+      },
+      {
+            "title": "UUID v4 (Random)",
+            "lines": [
+                  "16 bytes, globally unique",
+                  "safe for distributed generation",
+                  "causes B-tree index fragmentation"
+            ]
+      },
+      {
+            "title": "UUID v7 (Time-Ordered)",
+            "lines": [
+                  "combines timestamp + randomness",
+                  "fast B-tree indexing + global uniqueness!",
+                  "modern standard"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Competitor places order on Monday: receives order ID #1000",
+      "# Competitor places order on Tuesday: receives order ID #1250",
+      "# Deduction: 250 orders were placed in 24 hours!",
+      "# Remedy: Use non-sequential UUIDs (e.g. UUIDv7) for external URLs"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "monday_order": "id: 1000"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "tuesday_order": "id: 1250"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "vulnerability": "business sales volume exposed to anyone who orders"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "fix": "use UUIDs for public facing identifiers"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "An artificial primary key with no business meaning is a <0> key.",
+      "A real-world unique attribute (like an ISBN) is a <1> key.",
+      "A 128-bit globally unique identifier is a <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "surrogate"
+            ],
+            "why": "Surrogate keys isolate schemas from business edits."
+      },
+      {
+            "a": [
+                  "natural"
+            ],
+            "why": "Natural keys originate from domain attributes."
+      },
+      {
+            "a": [
+                  "UUID"
+            ],
+            "why": "UUID stands for Universally Unique Identifier."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is a surrogate primary key?",
+      a: ["An artificial identifier (like an auto-incrementing ID or UUID) that has no business meaning and never changes","A temporary key that expires after 24 hours","A key used only during database software upgrades","A key shared across multiple competing companies"],
+      c: 0,
+      why: "Surrogate keys provide permanent, immutable identity divorced from real-world attribute changes."
+    },
+    {
+      q: "Why do purely random UUIDv4 identifiers degrade database insert performance at scale?",
+      a: ["Randomness scatters new rows across random B-tree leaf pages, causing heavy page splits and cache churn","UUIDs cannot be stored on modern SSD drives","Random numbers cause CPU processors to overheat","UUIDs require manual compilation by developers"],
+      c: 0,
+      why: "Random keys break sequential clustering, causing expensive random disk I/O during B-tree insertion."
+    },
+    {
+      q: "What advantage does modern UUIDv7 offer over legacy UUIDv4?",
+      a: ["It prefixes a Unix timestamp, making UUIDs time-ordered and friendly to B-tree indexes while staying unique","It reduces the UUID size to 2 bytes","It converts UUIDs into plain text English words","It runs without needing an operating system"],
+      c: 0,
+      why: "UUIDv7 embeds a millisecond timestamp, combining monotonic ordering with global uniqueness."
+    },
+    {
+      q: "If you use a surrogate 'id' column, what should you do with a natural unique attribute like 'email'?",
+      a: ["Add a UNIQUE constraint on the email column to prevent duplicates","Leave the email column unconstrained","Delete the email column","Make email a foreign key"],
+      c: 0,
+      why: "Surrogate keys supply identity, but unique constraints must still enforce domain business rules."
+    }
+  ]);
+</script>
+</body>
+</html>

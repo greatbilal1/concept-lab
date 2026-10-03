@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 04 — Dropping the constants</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="big-o-complexity" data-lesson="4" data-lesson-id="dropping-the-constants">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 04</span> · Notation</span>
+
+  <h1 class="lesson-title">Dropping the constants</h1>
+  <p class="lesson-lede">
+    Lesson 03 gave you the notation. This lesson explains the rule that makes it
+    useful: when you write $O(\ldots)$, you throw away the constant factors and
+    keep only the growth shape. Here is why that is not cheating.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Simplify any cost expression to its Big O</span>
+    <span><b>Mission link</b> The rule that makes two solutions comparable</span>
+  </div>
+
+  <h2><span class="n">1</span>Two loops, one shape</h2>
+
+  <p>
+    Suppose you count the work in two programs that both scan a list of $n$ items.
+    Program A does one comparison per item. Program B does three — a comparison, a
+    bounds check, and a counter bump. Their exact counts are $n$ and $3n$.
+  </p>
+
+  <p>
+    Which is "better"? On paper, A. In Big O, <b>they are the same</b>: both are
+    $O(n)$. That feels like throwing away information, so let's see what is
+    actually being thrown away.
+  </p>
+
+  <p>
+    The $3$ in $3n$ is a <b>constant factor</b>. It depends on the language, the
+    compiler, and how you wrote the loop — not on the algorithm. Change the
+    language and the $3$ might become a $2$ or a $7$. But the $n$ stays. The $n$
+    is the part that belongs to the algorithm.
+  </p>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The rule, stated plainly</h2>
+
+  <p>
+    To reduce any cost expression to Big O, apply two moves:
+  </p>
+
+  <ul>
+    <li><b>Drop constant factors.</b> $3n$ becomes $n$. $\tfrac{1}{2}n^2$ becomes $n^2$.</li>
+    <li><b>Keep only the fastest-growing term.</b> $n^2 + n + 5$ becomes $n^2$.</li>
+  </ul>
+
+  <p>
+    The second move is the one people find strange. Why does the $n$ vanish when
+    there is an $n^2$ next to it? Because for large $n$, the $n^2$ term dominates
+    so completely that the rest is noise.
+  </p>
+
+  <div id="diagram1"></div>
+
+  <p>
+    At $n = 1{,}000$, $n^2$ is $1{,}000{,}000$ while $n + 5$ is $1{,}005$ — about
+    a tenth of one percent. At $n = 1{,}000{,}000$ the smaller terms are
+    invisible. Big O is a statement about the limit, so it keeps only what
+    survives.
+  </p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Big O keeps the <b>shape</b> and drops the <b>scale</b>. Constants and
+    smaller terms change how fast the curve climbs, but never how it is shaped.
+  </div>
+
+  <h2><span class="n">3</span>Simplify a real expression</h2>
+
+  <p>
+    Here is a cost expression you might get from counting a nested loop with a
+    little setup work: $3n^2 + 10n + 42$. Step through the simplification below
+    and watch each piece get discarded for a reason.
+  </p>
+
+  <div id="trace1"></div>
+
+  <p>
+    The answer is $O(n^2)$. Notice that the $10n$ term was not "small" — for
+    $n = 10$ it is $100$, larger than the $42$. It was dropped because it grows
+    <b>more slowly</b> than $n^2$, and Big O only cares about the long run.
+  </p>
+
+  <h2><span class="n">4</span>Recall the simplification rules</h2>
+
+  <p>Fill these in from memory before the quiz.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>
+      You can take a messy cost expression like $5n^2 + 3n + 100$ and reduce it to
+      $O(n^2)$ in one confident step — and you can explain why each discarded
+      piece did not matter.
+    </p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+
+  <ol>
+    <li>
+      Simplify each of these to Big O: $7n + 3$, $2n^2 + 500n$, $n^3 + n^2 + n$,
+      and $100$.
+    </li>
+    <li>
+      A colleague says their program is $O(2n)$ and yours is $O(n)$, so theirs is
+      slower. Write one sentence explaining what is wrong with that claim.
+    </li>
+    <li>
+      Find the crossover where $n^2$ overtakes $100n$ (set them equal). Below it,
+      which program would you actually ship? This sets up Lesson 08.
+    </li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Read <a href="https://mitpress.mit.edu/9780262046305/introduction-to-algorithms/">_Introduction to Algorithms_</a>,
+    Chapter 3 ("Growth of Functions"), section 3.1. It defines $O$ formally and
+    shows exactly why constant factors and lower-order terms are absorbed.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher (me) anything — "is a constant
+    factor ever worth optimising?", "why keep the biggest term and not the
+    smallest?", "what about $O(2^n)$?". There are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  /* predict-then-reveal: constants are dropped, so 3n and n are the same class */
+  TeachWidgets.predict("#predict1", {
+    q: "Program A does n steps, Program B does 3n. What is B's Big O?",
+    a: ["It is O(3n)", "It is O(n)", "It is O(n squared)"],
+    c: 1,
+    why: "The 3 is a constant factor, so it is dropped. Both programs are O(n) — the same growth shape, even though B does three times the work per item."
+  });
+
+  /* what survives and what is discarded */
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      { title: "3n² + 10n + 42", lines: ["drop constants", "keep biggest term"] },
+      { title: "n² + n + 1", lines: ["lower terms", "grow slower"] },
+      { title: "O(n²)", lines: ["the shape", "what remains"] }
+    ]
+  });
+
+  /* step-through: simplifying a cost expression */
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "cost = 3n² + 10n + 42",
+      "drop constants → n² + n + 1",
+      "keep biggest term → n²",
+      "answer: O(n²)",
+      "why: n² dominates as n grows"
+    ],
+    steps: [
+      { line: 0, vars: { cost: "3n² + 10n + 42" } },
+      { line: 1, vars: { after: "n² + n + 1", dropped: "3, 10, 42" } },
+      { line: 2, vars: { kept: "n²", dropped: "n, 1" } },
+      { line: 3, vars: { answer: "O(n²)" } },
+      { line: 4, vars: { reason: "n² dominates" } }
+    ]
+  });
+
+  /* recall from memory */
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — simplifying to Big O",
+    lines: [
+      "A constant multiplier like the 3 in 3n is <0>.",
+      "When several terms are added, keep the <1> one.",
+      "So 3n² + 10n + 42 simplifies to O(<2>)."
+    ],
+    blanks: [
+      { a: ["dropped"], why: "Constant factors change the scale of the curve, not its shape, so they are discarded." },
+      { a: ["biggest"], why: "The fastest-growing term dominates for large n, so the slower terms become negligible." },
+      { a: ["n²"], why: "After dropping constants and lower terms, only n² remains — the growth shape of the expression." }
+    ]
+  });
+
+  /* the quiz — every option is exactly six words */
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why is O(3n) usually written as O(n)?",
+      a: ["Because the constant factor is always dropped", "Because three is a very small number", "Because the loop runs only one time", "Because n is always larger than three"],
+      c: 0,
+      why: "Constant factors do not change the growth shape, so the convention keeps only the shape and discards the multiplier."
+    },
+    {
+      q: "What is the Big O of n squared plus n?",
+      a: ["It simplifies to O(n squared)", "It simplifies to O(n) only", "It simplifies to O(n cubed)", "It simplifies to O(1) only"],
+      c: 0,
+      why: "The n² term grows faster than n, so for large inputs it dominates and the n term is discarded."
+    },
+    {
+      q: "Why do we keep only the fastest-growing term?",
+      a: ["Because the slower terms become negligible later", "Because slower terms are always written wrong", "Because fastest term is easiest to count", "Because the slower terms never actually run"],
+      c: 0,
+      why: "As n grows, the fastest term dominates the total, so the slower terms stop affecting the growth shape."
+    },
+    {
+      q: "What is the Big O of the constant 100?",
+      a: ["It simplifies to O(1) constant", "It simplifies to O(100) exactly", "It simplifies to O(n) linear", "It simplifies to O(log n)"],
+      c: 0,
+      why: "A fixed amount of work does not grow with the input at all, so it is O(1) — constant time."
+    }
+  ]);
+</script>
+</body>
+</html>

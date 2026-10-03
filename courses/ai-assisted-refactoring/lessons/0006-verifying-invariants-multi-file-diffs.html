@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 06 — Verifying Invariants Across Large Multi-File Diffs</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="ai-assisted-refactoring" data-lesson="6" data-lesson-id="verifying-invariants-multi-file-diffs">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 06</span> · Multi-File Verification</span>
+
+  <h1 class="lesson-title">Verifying Invariants Across Large Multi-File Diffs</h1>
+  <p class="lesson-lede">
+    Auditing multi-file refactoring diffs to verify that global invariants and security rules were not compromised.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to verify global invariants and call sites across large multi-file diffs.</span>
+    <span><b>Mission link</b> Mastering verifying invariants across large multi-file diffs across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Verifying Invariants Across Large Multi-File Diffs</h2>
+  <p>Refactoring that spans multiple files is where AI coding agents shine—and where they introduce the most subtle bugs. An agent might cleanly update a function signature in `src/billing/service.py` and update 5 callers, but overlook a 6th caller buried in a background task.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Auditing multi-file refactoring diffs to verify that global invariants and security rules were not compromised.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Multi-File Verification Chain</h2>
+  <p>To verify that global invariants hold across large multi-file diffs, enforce the <strong>Three-Tier Verification Audit</strong>:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Orphaned Call Site Trap</h2>
+  <ul><li><strong>1. Whole-Project Static Type Check:</strong> Run `mypy src/` or `tsc --noEmit`. Static type checking analyzes the entire call graph, instantly catching any call site with outdated argument counts or types.</li><li><strong>2. Whole-Project Lint & Symbol Check:</strong> Run `ruff check src/` to ensure no unused imports or undefined variable references remain.</li><li><strong>3. Full Test Suite Execution:</strong> Execute the complete unit and integration test suite, not just the test file closest to the edit.</li></ul><pre><code># The Multi-File Verification Command Chain:
+$ mypy src/ tests/               # 1. Mathematical type check across all call sites
+$ ruff check src/ tests/         # 2. Syntax, dead imports, and naming check
+$ pytest                          # 3. Full behavioral test suite
+# ONLY when all 3 pass with code 0 is the multi-file diff approved!</code></pre><div class="callout"><p><strong>The Golden Verification:</strong> Never rely on human visual review alone for a 20-file diff. Whole-project type checking is your mathematical proof of consistency.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the multi-file verification sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to verify global invariants and call sites across large multi-file diffs.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where verifying invariants across large multi-file diffs applies.</li>
+    <li>Author a unit test or verification script exercising verifying invariants across large multi-file diffs.</li>
+    <li>Document team architectural conventions regarding verifying invariants across large multi-file diffs.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Verifying Invariants Across Large Multi-File Diffs.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is a common risk when an agent performs a refactoring that touches 25 different files?",
+    a: ["The agent may update function signatures in some files while missing call sites in others, causing runtime TypeErrors","The operating system running out of file handles","The git branch becoming read-only","All unit tests automatically deleting themselves"],
+    c: 0,
+    why: "Incomplete multi-file refactoring leaves orphaned call sites that fail at runtime."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1. Static Type Check (Mypy/TS)",
+            "lines": [
+                  "Scans all call sites across repo",
+                  "Catches mismatched parameter types"
+            ]
+      },
+      {
+            "title": "2. Linter & Dead Code (Ruff)",
+            "lines": [
+                  "Catches orphaned imports & variables",
+                  "Ensures syntax cleanliness"
+            ]
+      },
+      {
+            "title": "3. Full Test Suite (Pytest)",
+            "lines": [
+                  "Executes full regression suite",
+                  "Verifies behavioral preservation"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Verifying Invariants Across Large Multi-File Diffs",
+      "def execute_flow():",
+      "    # Auditing multi-file refactoring diffs to verify th...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Verifying Invariants Across Large Multi-File Diffs"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Agent Updates Signature"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Overlooked Background Task"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "step": "Caught by Mypy"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Large multi-file diffs must be verified using whole-project {1} checking to prove that all call {2} match updated signatures."
+],
+    blanks: [
+      {
+            "a": [
+                  "type"
+            ],
+            "why": "Static type analysis like Mypy"
+      },
+      {
+            "a": [
+                  "sites"
+            ],
+            "why": "Locations where functions are invoked"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why is whole-project static type checking essential after an agent alters a function signature?",
+      a: ["It traverses the entire codebase to mathematically verify that every single caller passes the correct arguments","It compiles Python into machine code","It reduces repository size","It makes unit tests run in parallel"],
+      c: 0,
+      why: "Type checkers inspect the complete call graph to catch mismatched parameters across all files."
+    },
+    {
+      q: "What happens if an engineer only runs the test file closest to the modified file during a large refactor?",
+      a: ["Unrelated modules that depend on the modified code may be broken without being tested, leading to production outages","The test runner crashes","The code becomes read-only","Git refuses to commit"],
+      c: 0,
+      why: "Cross-module regressions are only caught by running the full test suite or dependent tests."
+    },
+    {
+      q: "How does git diff inspection help verify multi-file refactoring?",
+      a: ["It allows the reviewer to verify that only intended files were modified and no unexpected files were touched by the agent","It converts code to HTML","It encrypts the commit","It runs tests automatically"],
+      c: 0,
+      why: "Inspecting git diff ensures the agent did not make rogue or unintended modifications outside task scope."
+    },
+    {
+      q: "What should you do if Mypy reports 15 errors after a multi-file refactoring diff?",
+      a: ["Feed the exact Mypy error list back to the agent and instruct it to update the remaining call sites until Mypy passes","Disable Mypy in CI","Ignore the type errors and merge","Delete the modified files"],
+      c: 0,
+      why: "Providing the compiler error list directs the agent to fix the remaining call sites systematically."
+    }
+  ]);
+</script>
+</body>
+</html>

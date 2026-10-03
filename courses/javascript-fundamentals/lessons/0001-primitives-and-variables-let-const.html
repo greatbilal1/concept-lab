@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 01 — Primitives and variables: let vs const</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="javascript-fundamentals" data-lesson="1" data-lesson-id="primitives-and-variables-let-const">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 01</span> · Primitives & Variables</span>
+
+  <h1 class="lesson-title">Primitives and variables: let vs const</h1>
+  <p class="lesson-lede">
+    Stop using var. Master the modern let and const keywords, the Temporal Dead Zone, and the fundamental boundary between primitives and objects.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Choose appropriately between let, const, and JavaScript primitive types</span>
+    <span><b>Mission link</b> Forms the foundational variable model of modern ECMAScript</span>
+  </div>
+
+  <h2><span class="n">1</span>The seven primitive types</h2>
+  <p>JavaScript values fall into two categories: <b>Primitives</b> and <b>Objects</b>. There are seven primitive types: <code>number</code>, <code>string</code>, <code>boolean</code>, <code>null</code>, <code>undefined</code>, <code>symbol</code>, and <code>bigint</code>.</p><p>Primitives are strictly <b>immutable</b>: you cannot add properties to them or mutate their internal contents. Variables hold primitive values directly by value; objects are held by memory reference.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Primitives are immutable values copied by value; objects are mutable structures accessed by reference.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Variable declarations compared</h2>
+  <p>Understand why modern JavaScript strictly forbids legacy var in favor of block-scoped let and const.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing the Temporal Dead Zone (TDZ)</h2>
+  <p>Trace how let and const protect you from using variables before their initialization line.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your recall of variable binding rules.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can choose the right variable binding strategy and avoid legacy variable hoisting bugs.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit a script and convert all legacy var declarations to const or let.</li>
+    <li>Trigger an intentional TDZ ReferenceError to observe the engine protection in action.</li>
+    <li>Verify why mutating an object declared with const is legal.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Dr. Axel Rauschmayer, *Exploring JS: Variables and Scoping* (exploringjs.com).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What does 'const arr = [1, 2]; arr.push(3);' do?",
+    a: ["Successfully appends 3 to the array, because const prevents reassigning the variable, not mutating the object","Throws a TypeError because const makes all array contents completely immutable","Converts the array into a string","Deletes the first element of the array"],
+    c: 0,
+    why: "const protects the variable binding from reassignment; it does not freeze the underlying object."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "const (Default)",
+            "lines": [
+                  "block-scoped, TDZ enforced",
+                  "cannot be reassigned",
+                  "use for 95% of variables"
+            ]
+      },
+      {
+            "title": "let (Reassignable)",
+            "lines": [
+                  "block-scoped, TDZ enforced",
+                  "can be reassigned",
+                  "use for loops & counters"
+            ]
+      },
+      {
+            "title": "var (Legacy / Avoid)",
+            "lines": [
+                  "function-scoped, hoisted to undefined",
+                  "accidental global leaks",
+                  "deprecated in modern code"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Line 1: Scope entered; variable 'age' enters Temporal Dead Zone",
+      "# Line 2: console.log(age) -> ReferenceError: Cannot access 'age' before initialization",
+      "let age = 30; # TDZ ends; variable is initialized",
+      "console.log(age); # prints 30"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "scope": "block entered"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "error": "ReferenceError in TDZ"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "initialized": "age = 30"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "output": "30"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The keyword for variables that will not be reassigned is <0>.",
+      "The keyword for mutable block-scoped variables is <1>.",
+      "The state where a let variable cannot be accessed before declaration is the <2> Dead Zone."
+],
+    blanks: [
+      {
+            "a": [
+                  "const"
+            ],
+            "why": "const creates an un-reassignable binding."
+      },
+      {
+            "a": [
+                  "let"
+            ],
+            "why": "let creates a mutable block-scoped variable."
+      },
+      {
+            "a": [
+                  "Temporal"
+            ],
+            "why": "The Temporal Dead Zone (TDZ) guards against uninitialized access."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What does the 'const' keyword guarantee in JavaScript?",
+      a: ["The variable identifier cannot be reassigned to a different value or reference","The object referenced by the variable cannot have its properties modified","The variable is encrypted in computer RAM","The variable can only hold positive numbers"],
+      c: 0,
+      why: "const protects the identifier binding from reassignment; object immutability requires Object.freeze."
+    },
+    {
+      q: "What is the scope of variables declared with 'let' and 'const'?",
+      a: ["Block scope (bounded by the nearest enclosing curly braces {})","Global scope across all browser tabs","Function scope only (ignoring if statements and loops)","File scope on Windows computers only"],
+      c: 0,
+      why: "let and const are block-scoped; they exist only within their enclosing { ... } block."
+    },
+    {
+      q: "Which of the following is a primitive value in JavaScript?",
+      a: ["Symbol('id')","new Date()","[1, 2, 3]","{ name: 'Ada' }"],
+      c: 0,
+      why: "Symbol is one of the seven primitive types; Dates, Arrays, and plain Objects are reference types."
+    },
+    {
+      q: "What happens when you try to access a 'let' variable before its declaration line?",
+      a: ["A ReferenceError is thrown because the variable is in the Temporal Dead Zone","It silently evaluates to undefined like legacy var","The browser crashes immediately","The computer CPU executes the line in reverse"],
+      c: 0,
+      why: "let and const enter the TDZ at scope start; reading them before declaration throws ReferenceError."
+    }
+  ]);
+</script>
+</body>
+</html>

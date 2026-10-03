@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 05 — Processes and signals</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="command-line-shell" data-lesson="5" data-lesson-id="processes-and-signals">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 05</span> · Processes & Permissions</span>
+
+  <h1 class="lesson-title">Processes and signals</h1>
+  <p class="lesson-lede">
+    Every running program is a process managed by the operating system kernel. Learn to inspect process states, control jobs, and send termination signals.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Monitor running processes with ps and manage execution using UNIX signals</span>
+    <span><b>Mission link</b> Provides essential system control over running background software</span>
+  </div>
+
+  <h2><span class="n">1</span>The anatomy of a process</h2>
+  <p>A process is an instance of a running program. The kernel assigns each process a unique numerical <b>Process ID (PID)</b>, an allocated memory space, and parent-child hierarchy tracking.</p><p>You inspect running processes with <code>ps aux</code> or interactive monitors like <code>top</code> and <code>htop</code>. When you need to communicate with a process, you send an asynchronous <b>signal</b> using the <code>kill</code> utility.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    A process is a container of state; signals are notifications sent by the kernel to that container.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The essential UNIX signals</h2>
+  <p>Understand the four most important operating system signals and how processes respond to them.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing process termination</h2>
+  <p>Trace how a gracefully requested shutdown allows a database process to save state before exiting.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of process control signals.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can find rogue processes, monitor system resource usage, and terminate hung tasks cleanly.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Find the PID of your web browser or terminal using ps aux | grep.</li>
+    <li>Launch a long-running sleep command in the background with &.</li>
+    <li>Bring the background job to the foreground with fg and stop it with Ctrl-C.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    W. Richard Stevens, *Advanced Programming in the UNIX Environment* (Chapter 10: 'Signals').
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What signal does pressing Ctrl-C in a terminal send to the foreground process?",
+    a: ["SIGTERM (15)","SIGINT (2)","SIGKILL (9)","SIGHUP (1)"],
+    c: 1,
+    why: "Ctrl-C sends SIGINT (Interrupt), requesting the foreground program to stop cleanly."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "SIGINT (2)",
+            "lines": [
+                  "keyboard interrupt (Ctrl-C)",
+                  "graceful prompt to stop"
+            ]
+      },
+      {
+            "title": "SIGTERM (15)",
+            "lines": [
+                  "default kill signal",
+                  "request to flush and exit"
+            ]
+      },
+      {
+            "title": "SIGKILL (9)",
+            "lines": [
+                  "kernel force kill",
+                  "cannot be caught or ignored"
+            ]
+      },
+      {
+            "title": "SIGHUP (1)",
+            "lines": [
+                  "terminal hangup",
+                  "often reloads configuration"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "kill -15 1420       # send SIGTERM to PID 1420",
+      "# Process catches SIGTERM, flushes buffers to disk",
+      "# Process closes network sockets cleanly",
+      "# Process calls exit(0) and terminates"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "signal": "SIGTERM sent to PID 1420"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "status": "flushing dirty database pages"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "status": "closing client TCP connections"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "state": "process terminated gracefully"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The unique integer identifying a running program is its <0>.",
+      "The uncatchable force-kill signal number is <1>.",
+      "The default graceful termination signal number is <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "PID",
+                  "Process ID"
+            ],
+            "why": "PID is the numerical Process ID assigned by the OS."
+      },
+      {
+            "a": [
+                  "9",
+                  "SIGKILL"
+            ],
+            "why": "Signal 9 (SIGKILL) terminates a process unconditionally via the kernel."
+      },
+      {
+            "a": [
+                  "15",
+                  "SIGTERM"
+            ],
+            "why": "Signal 15 (SIGTERM) is the standard polite termination request."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why should you always try SIGTERM (15) before resorting to SIGKILL (9)?",
+      a: ["SIGTERM allows the process to close files, flush buffers, and clean up state","SIGTERM uses less electrical battery power on laptop computers","SIGKILL requires administrator root privileges in all operating systems","SIGTERM automatically backs up source code to git repositories"],
+      c: 0,
+      why: "SIGTERM allows orderly cleanup; SIGKILL terminates instantly, risking corrupted data."
+    },
+    {
+      q: "Can a process intercept, block, or ignore a SIGKILL (9) signal?",
+      a: ["No, the kernel handles SIGKILL directly without giving the process a choice","Yes, if the process is written in C or C++","Yes, if the process is running as a background service","No, unless the computer has more than 16 gigabytes of RAM"],
+      c: 0,
+      why: "SIGKILL and SIGSTOP cannot be caught, blocked, or ignored by any user process."
+    },
+    {
+      q: "How do you launch a shell command into the background immediately?",
+      a: ["Append an ampersand (&) to the end of the command line","Type 'background' before the command name","Hold down the Shift key while pressing Enter","Redirect output to the /etc/hosts system file"],
+      c: 0,
+      why: "The trailing '&' instructs the shell to spawn the process without blocking the prompt."
+    },
+    {
+      q: "What does the 'top' command provide?",
+      a: ["A real-time, interactive dashboard of active processes and system resource usage","A list of the top ten largest files on the local filesystem","A search engine for finding open-source code on the internet","A tool that increases CPU clock frequencies safely"],
+      c: 0,
+      why: "top provides continuous dynamic monitoring of CPU, memory, and process lists."
+    }
+  ]);
+</script>
+</body>
+</html>

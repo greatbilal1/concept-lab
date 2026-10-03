@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 05 — Roles, permissions, and security</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="postgresql" data-lesson="5" data-lesson-id="roles-permissions-and-security">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 05</span> · Security & Permissions</span>
+
+  <h1 class="lesson-title">Roles, permissions, and security</h1>
+  <p class="lesson-lede">
+    Stop connecting your web application as the 'postgres' superuser. Master PostgreSQL role-based security: users, groups, GRANT, REVOKE, and the Principle of Least Privilege.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Configure dedicated database application roles with least-privilege permissions</span>
+    <span><b>Mission link</b> Prevents accidental database drops and limits blast radius during application compromises</span>
+  </div>
+
+  <h2><span class="n">1</span>The danger of the superuser</h2>
+  <p>Connecting an application as the <code>postgres</code> superuser is an enormous security vulnerability. If an SQL injection flaw exists in your app, an attacker has full root access: they can read any table, drop the entire database, and even execute shell commands on the server via <code>COPY PROGRAM</code>!</p><p>Security mandates the <b>Principle of Least Privilege</b>: create dedicated application roles with permission to access <i>only the specific tables they need</i>, with zero superuser or schema alteration privileges.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Never run applications as superusers; grant only the minimum necessary privileges to dedicated roles.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The privilege delegation workflow</h2>
+  <p>Learn the standard sequence for configuring secure application roles.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing permission enforcement</h2>
+  <p>Trace how PostgreSQL rejects a DROP TABLE command attempted by an application role.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of PostgreSQL security commands.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can design and enforce least-privilege role hierarchies that protect databases from destructive attacks.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Create a read-only reporting role that only possesses SELECT permissions.</li>
+    <li>Create a dedicated application user with a strong password and test connecting.</li>
+    <li>Inspect all roles in psql using the \du command.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    PostgreSQL Documentation: *Database Roles* (postgresql.org/docs/current/user-manag.html).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is the difference between a 'User' and a 'Group' in modern PostgreSQL?",
+    a: ["They are both 'Roles'; a user is simply a role configured with the LOGIN attribute","Users are stored on disk; groups are stored in memory","Groups can only have up to five members","There is no role concept in PostgreSQL"],
+    c: 0,
+    why: "In PostgreSQL, users and groups are unified under 'Roles'; LOGIN allows connecting as a user."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1. Create Role",
+            "lines": [
+                  "CREATE ROLE app_user WITH LOGIN PASSWORD 'secret';",
+                  "no superuser, no create-db privileges"
+            ]
+      },
+      {
+            "title": "2. Grant Connect",
+            "lines": [
+                  "GRANT CONNECT ON DATABASE my_db TO app_user;",
+                  "grants entry to database"
+            ]
+      },
+      {
+            "title": "3. Table Privileges",
+            "lines": [
+                  "GRANT SELECT, INSERT, UPDATE ON ALL TABLES IN SCHEMA public TO app_user;",
+                  "strictly limits mutation capabilities"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Attacker attempts SQL injection via compromised web app:",
+      "DROP TABLE users;",
+      "# Engine checks role permissions for 'app_user':",
+      "# Error: permission denied for table users (must be table owner!)",
+      "# Result: Attack thwarted at the database security gate!"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "injection_attempt": "DROP TABLE users;"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "check": "app_user role lacks DROP privilege on relation"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "denied": "query rejected; database schema protected"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The SQL command conferring access rights to a role is <0>.",
+      "The SQL command withdrawing access rights from a role is <1>.",
+      "A role permitted to initiate a database session must have the <2> attribute."
+],
+    blanks: [
+      {
+            "a": [
+                  "GRANT"
+            ],
+            "why": "GRANT confers table and schema privileges."
+      },
+      {
+            "a": [
+                  "REVOKE"
+            ],
+            "why": "REVOKE withdraws permissions."
+      },
+      {
+            "a": [
+                  "LOGIN"
+            ],
+            "why": "WITH LOGIN enables authenticating as that role."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the Principle of Least Privilege in database security?",
+      a: ["A role should only be granted the minimum permissions strictly necessary to perform its required job","All users should be granted superuser privileges to avoid permission errors","Passwords should be as short as possible to type quickly","The database should be restarted after every query"],
+      c: 0,
+      why: "Least privilege minimizes the blast radius if an application account is compromised."
+    },
+    {
+      q: "Why is connecting an application as the 'postgres' superuser dangerous?",
+      a: ["Superusers bypass all permission checks, can read any database, drop tables, and execute OS shell commands","Superusers consume twice as much network bandwidth","Superusers cannot use B-tree indexes","The postgres user cannot run SELECT queries"],
+      c: 0,
+      why: "Superusers have god-mode authority, enabling full system takeover through SQL injection."
+    },
+    {
+      q: "How do you give a read-only role access to all future tables created in a schema?",
+      a: ["ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT ON TABLES TO readonly_role;","By running GRANT every five minutes in a cron job","By setting the table background color to grey","Future tables cannot be granted permissions automatically"],
+      c: 0,
+      why: "ALTER DEFAULT PRIVILEGES automatically applies grants to newly created tables."
+    },
+    {
+      q: "What file configures client authentication methods (md5, scram-sha-256) and network IP access in PostgreSQL?",
+      a: ["pg_hba.conf (Host-Based Authentication)","postgresql.conf","nginx.conf","/etc/hosts"],
+      c: 0,
+      why: "pg_hba.conf controls client IP access, database permissions, and authentication mechanisms."
+    }
+  ]);
+</script>
+</body>
+</html>

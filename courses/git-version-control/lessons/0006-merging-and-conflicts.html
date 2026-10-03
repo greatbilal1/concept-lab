@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 06 — Merging and conflicts</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="git-version-control" data-lesson="6" data-lesson-id="merging-and-conflicts">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 06</span> · Branching & merging</span>
+
+  <h1 class="lesson-title">Merging and conflicts</h1>
+  <p class="lesson-lede">
+    Branches are only useful if you can bring them back together. Merging is how,
+    and conflicts are not errors — they are Git asking you a question.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~14 min</span>
+    <span><b>Win</b> Merge a branch and resolve a conflict calmly</span>
+    <span><b>Mission link</b> Every team workflow ends in a merge</span>
+  </div>
+
+  <h2><span class="n">1</span>Two kinds of merge</h2>
+
+  <p>
+    You merge by switching to the branch you want to keep and pulling the other
+    one in:
+  </p>
+
+  <pre><code>git switch main
+git merge experiment</code></pre>
+
+  <p>
+    If <code>main</code> has not moved since you branched, Git can simply slide
+    the pointer forward. That is a <b>fast-forward</b> merge — no new commit, no
+    work. If both branches have new commits, Git must combine them, and it
+    creates a <b>merge commit</b> with two parents.
+  </p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    A fast-forward just moves a pointer. A real merge creates a commit that joins
+    two lines of history.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>When Git cannot decide</h2>
+
+  <p>
+    Git merges automatically when the two branches changed <i>different</i>
+    parts of a file. But if both changed the <b>same lines</b>, Git cannot know
+    which version you want. It stops and marks the file as conflicted.
+  </p>
+
+  <p>
+    Inside the file you will see markers:
+  </p>
+
+  <pre><code>&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD
+your version
+&#61;&#61;&#61;&#61;&#61;&#61;&#61;
+their version
+&gt;&gt;&gt;&gt;&gt;&gt;&gt; experiment</code></pre>
+
+  <p>
+    A conflict is not a failure. It is Git saying "I need a human decision here".
+    You edit the file to the version you want, delete the markers, then
+    <code>git add</code> the file and <code>git commit</code> to finish the
+    merge.
+  </p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Resolving step by step</h2>
+
+  <p>
+    Follow a conflict from the moment it appears to the finished merge. The
+    important part is that <code>git status</code> always tells you what is left
+    to do.
+  </p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+
+  <p>Recall the key facts from memory before the quiz.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <b>✓ Your win for today</b>
+    You can merge a branch, recognise a conflict, and resolve it without panic.
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Create two branches that edit different files, then merge one into the other.</li>
+    <li>Create a deliberate conflict by editing the same line on both branches.</li>
+    <li>Resolve it, then run <code>git status</code> at each step to see what Git wants.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Pro Git, Chapter 3 — "Basic Branching and Merging", including "Basic Merge
+    Conflicts" (git-scm.com/book).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "main has not moved since you branched. What does merging do?",
+    a: [
+      "It slides the pointer forward",
+      "It creates a merge commit",
+      "It asks you to resolve conflicts",
+      "It deletes the other branch"
+    ],
+    c: 0,
+    why: "When the target has not moved, Git fast-forwards: it just moves the pointer. No merge commit or conflict is needed."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      { title: "main", lines: ["C -> D", "your work"] },
+      { title: "experiment", lines: ["C -> E", "their work"] },
+      { title: "merge commit", lines: ["parents: D and E", "joins both lines"] }
+    ]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    label: "Resolving a conflict",
+    code: [
+      "git merge experiment",
+      "edit the conflicted file",
+      "git add essay.txt",
+      "git commit"
+    ],
+    steps: [
+      { line: 0, vars: { state: "conflicted", staged: "no", merged: "no" } },
+      { line: 1, vars: { state: "resolved", staged: "no", merged: "no" } },
+      { line: 2, vars: { state: "resolved", staged: "yes", merged: "no" } },
+      { line: 3, vars: { state: "resolved", staged: "yes", merged: "yes" } }
+    ]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the blanks",
+    lines: [
+      "A merge that only moves a pointer is a <0> merge.",
+      "A merge that joins two lines creates a <1> commit.",
+      "Git marks overlapping edits as a <2>.",
+      "You finish a merge by staging and then <3>."
+    ],
+    blanks: [
+      { a: ["fast-forward", "fast forward"], why: "A fast-forward simply advances the branch pointer." },
+      { a: ["merge"], why: "A merge commit has two parents and joins both histories." },
+      { a: ["conflict"], why: "A conflict is Git asking which version you want." },
+      { a: ["committing", "commit"], why: "After staging the resolved file, you commit to complete the merge." }
+    ]
+  });
+
+  /* the quiz — every option must have the SAME number of words */
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "When does a fast-forward merge happen?",
+      a: ["When the target never moved", "When both branches changed lines", "When a conflict is present", "When you delete a branch"],
+      c: 0,
+      why: "A fast-forward is possible only when the branch you merge into has no new commits of its own."
+    },
+    {
+      q: "What does a merge commit have?",
+      a: ["Two parent commits", "One parent commit", "No parent commits", "Three parent commits"],
+      c: 0,
+      why: "A merge commit records both lines of history, so it has two parents."
+    },
+    {
+      q: "What causes a merge conflict?",
+      a: ["Both branches changed same lines", "Both branches changed different files", "One branch has no commits", "You forgot to commit first"],
+      c: 0,
+      why: "Git merges different regions automatically. It stops only when both sides changed the same lines."
+    },
+    {
+      q: "How do you finish a merge?",
+      a: ["Stage the file and commit", "Delete the other branch here", "Run git log --oneline here", "Push to the remote server"],
+      c: 0,
+      why: "After resolving and staging the file, a commit completes the merge. Deleting or pushing does not finish it."
+    }
+  ]);
+</script>
+</body>
+</html>

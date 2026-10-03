@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 05 — Relative vs absolute imports</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="python-modules-packages" data-lesson="5" data-lesson-id="relative-and-absolute-imports">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 05</span> · Packages</span>
+
+  <h1 class="lesson-title">Relative vs absolute imports</h1>
+  <p class="lesson-lede">
+    Inside a package you can name a sibling module two ways: from the project root,
+    or from where you are standing. Both work. Only one of them survives a
+    refactor, and this lesson is about which.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Choose imports that survive moves</span>
+    <span><b>Mission link</b> Write code that is easy to change</span>
+  </div>
+
+  <h2><span class="n">1</span>Two ways to say the same thing</h2>
+
+  <p>
+    Suppose you are editing <code>myapp/report.py</code> and you need
+    <code>clean</code> from <code>myapp/helpers.py</code>. You have two spellings:
+  </p>
+
+  <pre><code># absolute — from the project root
+from myapp.helpers import clean
+
+# relative — from where this file sits
+from .helpers import clean</code></pre>
+
+  <p>
+    The leading dot in the second one means "the package I am in". Two dots mean
+    "the parent package". The name is resolved relative to the file's own location,
+    not to the directory you ran Python from.
+  </p>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Reading the dots</h2>
+
+  <p>
+    The dot count is a small grammar, and it is worth memorising exactly:
+  </p>
+
+  <div id="intro1"></div>
+
+  <p>
+    Notice that a relative import can never escape the top-level package. There is
+    no syntax for "go above the root", which is deliberate — it keeps a package
+    self-contained.
+  </p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    A relative import says <b>"near me"</b>. An absolute import says <b>"from the
+    root"</b>. Only the absolute one still means the same thing if you move the file.
+  </div>
+
+  <h2><span class="n">3</span>The refactor test</h2>
+
+  <p>
+    Here is the argument that settles it. Imagine you decide
+    <code>report.py</code> belongs in a new subpackage, so you move it from
+    <code>myapp/report.py</code> to <code>myapp/output/report.py</code>.
+  </p>
+
+  <div id="trace1"></div>
+
+  <p>
+    The absolute import kept working because it never mentioned the file's own
+    location. The relative import broke, because <code>.helpers</code> now means
+    <code>myapp.output.helpers</code>, which does not exist. That is the whole
+    trade-off in one move.
+  </p>
+
+  <h2><span class="n">4</span>So when is relative right?</h2>
+
+  <p>
+    Relative imports are not wrong — they are <b>local</b>. They are a good fit when
+    the package is a self-contained unit that will be vendored, copied, or renamed
+    as a whole, because then "near me" is exactly the relationship you mean.
+  </p>
+
+  <div id="diagram1"></div>
+
+  <p>
+    The practical rule most teams settle on: <b>absolute imports by default</b>,
+    relative imports only for short hops within a tightly coupled subpackage. And
+    never mix the two styles for the same relationship in the same file.
+  </p>
+
+  <div class="note good">
+    <span class="note-label">Why this matters later</span>
+    Import style is the first thing a reviewer notices. Absolute imports make a
+    file readable in isolation — you can open it, see
+    <code>from myapp.helpers import clean</code>, and know where to look without
+    knowing where the file lives. That property is worth more than the few
+    characters you save.
+  </div>
+
+  <h2><span class="n">5</span>Check yourself</h2>
+
+  <p>
+    Answer from memory — do not scroll back up. Each option has the same number of
+    words, so nothing gives the answer away.
+  </p>
+
+  <div id="fill1"></div>
+  <div id="quiz"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>
+      You can now read any import and say whether it is anchored to the root or to
+      the file, and you can predict which ones break when a file moves. That is a
+      refactoring skill, not just a syntax fact.
+    </p>
+  </div>
+
+  <h2><span class="n">6</span>Do this next</h2>
+
+  <ol>
+    <li>
+      In a package you own, find every relative import. For each one, ask whether
+      moving that file would break it.
+    </li>
+    <li>
+      Convert one relative import to absolute and run the code. Then move the file
+      into a subpackage and confirm the absolute one still works.
+    </li>
+    <li>
+      Try <code>from .. import something</code> from a top-level module and read
+      the error. It is the "attempted relative import beyond top-level package"
+      message.
+    </li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Read PEP 328,
+    <a href="https://peps.python.org/pep-0328/">"Imports: Multi-Line and Absolute/Relative"</a>,
+    which introduced this syntax and explains the reasoning in the author's own words.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher (me) anything — "why did Python 2
+    have implicit relative imports?", "can I use relative imports in a script?",
+    "what does the linter say about this?". There are no bad questions here.
+  </div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  /* the dot grammar */
+  TeachWidgets.introCards("#intro1", {
+    cards: [
+      { ico: "📍", title: "from . import x", body: "The current package — a sibling of this file." },
+      { ico: "⬆️", title: "from .. import x", body: "The parent package — one level up from here." },
+      { ico: "⬆️⬆️", title: "from ... import x", body: "The grandparent package — two levels up." }
+    ]
+  });
+
+  /* predict-then-reveal */
+  TeachWidgets.predict("#predict1", {
+    q: "You move `myapp/report.py` into `myapp/output/report.py`. Which import still works?",
+    a: ["The relative import survives", "The absolute import survives", "Both imports still work"],
+    c: 1,
+    why: "from myapp.helpers import clean is anchored to the root, so it is unaffected. from .helpers import clean now points at myapp.output.helpers, which does not exist."
+  });
+
+  /* step-through trace of the refactor */
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "before: myapp/report.py",
+      "  from myapp.helpers import clean   -> OK",
+      "  from .helpers import clean        -> OK",
+      "after:  myapp/output/report.py",
+      "  from myapp.helpers import clean   -> OK",
+      "  from .helpers import clean        -> ModuleNotFoundError"
+    ],
+    steps: [
+      { line: 0, vars: { location: "myapp/report.py" } },
+      { line: 1, vars: { absolute: "resolves to myapp.helpers" } },
+      { line: 2, vars: { relative: "resolves to myapp.helpers" } },
+      { line: 3, vars: { location: "myapp/output/report.py" } },
+      { line: 4, vars: { absolute: "still myapp.helpers" } },
+      { line: 5, vars: { relative: "myapp.output.helpers — missing" } }
+    ]
+  });
+
+  /* the two styles */
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      { title: "Absolute", lines: ["from myapp.helpers", "anchored to root"] },
+      { title: "Relative", lines: ["from .helpers", "anchored to file"] },
+      { title: "Rule of thumb", lines: ["absolute by default", "relative for short hops"] }
+    ]
+  });
+
+  /* recall from memory */
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — decode the dots",
+    lines: [
+      "<code>from .helpers import clean</code> means the package <0>",
+      "<code>from ..utils import clean</code> means the package <1>",
+      "An import anchored to the project root is called an <2> import."
+    ],
+    blanks: [
+      { a: ["I am in", "current", "this one"], why: "One dot means the package containing this file." },
+      { a: ["one level up", "parent", "above"], why: "Two dots climb one level to the parent package." },
+      { a: ["absolute"], why: "Absolute imports are written from the project root, e.g. from myapp.helpers import clean." }
+    ]
+  });
+
+  /* the quiz — every option is exactly three words */
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What does one dot mean?",
+      a: ["The project root package", "The current package here", "The parent package above", "The standard library package"],
+      c: 1,
+      why: "A single leading dot means the package that contains the current file."
+    },
+    {
+      q: "What does two dots mean?",
+      a: ["The project root package", "The current package here", "The parent package above", "The standard library package"],
+      c: 2,
+      why: "Two dots climb one level to the parent package."
+    },
+    {
+      q: "Which survives a file move?",
+      a: ["The relative import form", "The absolute import form", "Both forms survive equally", "Neither form survives moves"],
+      c: 1,
+      why: "Absolute imports are anchored to the root, so relocating a file does not change their meaning."
+    },
+    {
+      q: "What is the usual default?",
+      a: ["Relative imports everywhere", "Absolute imports by default", "Mixing both in one file", "Star imports for brevity"],
+      c: 1,
+      why: "Most teams default to absolute imports and reserve relative imports for short hops inside a subpackage."
+    }
+  ]);
+</script>
+</body>
+</html>

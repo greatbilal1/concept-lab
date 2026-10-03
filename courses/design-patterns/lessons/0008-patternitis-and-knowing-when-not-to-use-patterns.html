@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 08 — Patternitis and knowing when not to use patterns</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="design-patterns" data-lesson="8" data-lesson-id="patternitis-and-knowing-when-not-to-use-patterns">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 08</span> · Pattern Overuse & Real-World Craft</span>
+
+  <h1 class="lesson-title">Patternitis and knowing when not to use patterns</h1>
+  <p class="lesson-lede">
+    The disease of over-design. Learn to recognize 'Patternitis', why junior developers over-complicate simple code, and how to design for simplicity and clarity.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Diagnose and prevent pattern overuse by applying simplicity and YAGNI principles</span>
+    <span><b>Mission link</b> Cultivates mature engineering judgment over intellectual showing off</span>
+  </div>
+
+  <h2><span class="n">1</span>The disease of over-design</h2>
+  <p>Every developer who reads the Gang of Four book catches a temporary disease known as <b>Patternitis</b>. Suddenly, every simple three-line function becomes an <code>AbstractFactoryStrategyVisitorObserverAdapter</code>! A simple shopping cart is buried under 15 layers of indirection.</p><p>Design patterns are <b>solutions to specific, proven problems</b>. If the problem does not exist, the pattern adds pure architectural debt and cognitive overhead. The mark of a true senior engineer is not how many patterns they can pack into a codebase, but <b>how simple they can keep the code while still solving the business problem</b>.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Design patterns are solutions to specific problems; applying them without the problem is over-engineering.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The simplicity hierarchy</h2>
+  <p>Choose the simplest solution that solves the current business problem cleanly.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing the cure for Patternitis</h2>
+  <p>Trace how replacing an over-engineered Factory with a simple dictionary lookup deletes 80 lines of code.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of design pattern discipline.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can balance design pattern knowledge with radical simplicity, choosing the right tool for the job without over-engineering.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit a complex class in your codebase and ask: 'Could this be replaced with a simple dictionary or function?'</li>
+    <li>Refactor an over-engineered factory into a clean lookup map.</li>
+    <li>Embrace the philosophy: 'Make it work, make it right, make it fast' in that strict order.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Kevlin Henney, *97 Things Every Programmer Should Know*, 'Simplicity Before Generality' (O'Reilly).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is 'Patternitis' in software engineering culture?",
+    a: ["The tendency of developers to over-engineer simple problems by forcing design patterns where simple code would suffice","An inflammation of the wrists from typing","A bug in the compiler","A security vulnerability in web browsers"],
+    c: 0,
+    why: "Patternitis occurs when developers treat patterns as goals rather than contextual tools."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Level 1: Plain Function",
+            "lines": [
+                  "simplest, zero indirection",
+                  "a simple pure function solves 80% of problems!"
+            ]
+      },
+      {
+            "title": "Level 2: Parameter / Strategy",
+            "lines": [
+                  "introduce variability when needed",
+                  "pass a callback function"
+            ]
+      },
+      {
+            "title": "Level 3: Full GoF Pattern",
+            "lines": [
+                  "use only when complexity demands it",
+                  "e.g. multi-step lifecycle state machines"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Over-engineered: AbstractTaxCalculatorFactory, CanadianTaxStrategy, UsTaxStrategy...",
+      "# 6 classes, 4 interfaces, 90 lines of boilerplate to calculate 2 percentages!",
+      "# The Cure (Simple Dictionary Mapping):",
+      "TAX_RATES = {'US': 0.08, 'CA': 0.12, 'UK': 0.20}",
+      "def get_tax(subtotal, country): return subtotal * TAX_RATES.get(country, 0.0)",
+      "# Result: 2 lines of readable, testable code that solves the exact same problem!"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "over_design": "90 lines of pattern boilerplate for static lookup"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "simple_refactoring": "dictionary mapping replaces 6 classes"
+            }
+      },
+      {
+            "line": 5,
+            "vars": {
+                  "outcome": "clarity restored; maintainability maximized"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The over-application of design patterns to simple problems is <0>.",
+      "The principle 'Keep It Simple, Stupid' is abbreviated as <1>.",
+      "Patterns should be introduced through <2> when real friction appears, not upfront."
+],
+    blanks: [
+      {
+            "a": [
+                  "Patternitis"
+            ],
+            "why": "Patternitis describes premature pattern addiction."
+      },
+      {
+            "a": [
+                  "KISS"
+            ],
+            "why": "KISS favors simplicity over cleverness."
+      },
+      {
+            "a": [
+                  "refactoring"
+            ],
+            "why": "Refactor toward patterns as code evolves."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "When should a design pattern be introduced into a codebase?",
+      a: ["Through refactoring when actual complexity, duplication, or variability emerges and genuinely demands it","At the very beginning of a project before writing any business logic","Whenever you want to impress senior managers","On every single function without exception"],
+      c: 0,
+      why: "Patterns should emerge through refactoring to solve proven pain points, not speculative guesswork."
+    },
+    {
+      q: "What is the KISS principle in software engineering?",
+      a: ["Keep It Simple, Stupid: avoid unnecessary complexity and favor straightforward solutions","Keep Interfaces Strictly Synchronous","Keyboard Input Standardization System","Kernel Instruction System Security"],
+      c: 0,
+      why: "KISS reminds engineers that simple code is easier to read, test, and maintain."
+    },
+    {
+      q: "Why is a simple dictionary lookup often better than a full Factory Method class hierarchy?",
+      a: ["A dictionary accomplishes the mapping in two lines of code without creating multiple classes, interfaces, and boilerplate files","Dictionaries run on quantum computers","Factories are forbidden in Python","Dictionaries delete memory leaks"],
+      c: 0,
+      why: "When logic is static data mapping, a dictionary provides the simplest possible solution."
+    },
+    {
+      q: "What is the ultimate mark of maturity in software architecture?",
+      a: ["The ability to write simple, readable, maintainable code and resisting the urge to show off unnecessary complexity","Using all 23 Gang of Four patterns in a single project","Writing functions that have no comments","Writing code using only single-letter variables"],
+      c: 0,
+      why: "Simplicity is the hardest discipline; true craftsmanship solves hard problems with simple, elegant designs."
+    }
+  ]);
+</script>
+</body>
+</html>

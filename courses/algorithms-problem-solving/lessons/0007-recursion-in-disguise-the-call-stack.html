@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 07 — Recursion in disguise: the call stack</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="algorithms-problem-solving" data-lesson="7" data-lesson-id="recursion-in-disguise-the-call-stack">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 07</span> · Recursion</span>
+
+  <h1 class="lesson-title">Recursion in disguise: the call stack</h1>
+  <p class="lesson-lede">
+    Last lesson you traced <code>factorial(4)</code> and noticed something odd:
+    the calls piled up before any multiplication happened. Something has to
+    remember all those paused calls and their half-finished work. That something
+    is the call stack, and once you see it, recursion stops feeling like magic.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~12 min</span>
+    <span><b>Win</b> Explain what the call stack holds and why deep recursion can overflow it</span>
+    <span><b>Mission link</b> The call stack is the machine's bookkeeping for every recursive algorithm</span>
+  </div>
+
+  <h2><span class="n">1</span>Where do the paused calls live?</h2>
+
+  <p>
+    When <code>factorial(4)</code> calls <code>factorial(3)</code>, the outer
+    call is not finished — it is waiting for a result to multiply. The machine
+    cannot throw that work away, so it parks it somewhere and comes back later.
+  </p>
+
+  <p>
+    That somewhere is the <b>call stack</b>. Every time a function is called, a
+    new record is pushed on top. Every time a function returns, its record is
+    popped off. The stack is last-in, first-out: the most recent call is always
+    the one that finishes first.
+  </p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    The call stack is the machine's memory of unfinished work. Each call pushes a
+    frame; each return pops one. Recursion is just the stack doing its normal job.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Stack frames</h2>
+
+  <p>
+    Each record on the stack is called a <b>stack frame</b>. A frame holds the
+    function's local variables, the arguments it was called with, and the place
+    to resume once it returns. For <code>factorial(3)</code>, the frame remembers
+    that <code>n</code> is 3 and that it still owes a multiplication by 3.
+  </p>
+
+  <p>
+    This is why recursion costs memory. Ten nested calls mean ten frames alive at
+    once. A loop doing the same work keeps only one frame, because it never needs
+    to remember a paused call.
+  </p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Watch the stack grow and unwind</h2>
+
+  <p>
+    Follow the stack depth as <code>factorial(4)</code> runs. It grows to four
+    frames on the way down, then unwinds one frame at a time on the way back up.
+  </p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Stack overflow and tail recursion</h2>
+
+  <p>
+    The stack has a fixed size. If recursion goes too deep — say a million nested
+    calls — the frames run out of room and the program crashes with a
+    <b>stack overflow</b>. This is exactly what happens when a base case is
+    missing, and it is also why recursion depth matters even when the base case
+    is correct.
+  </p>
+
+  <p>
+    One special case avoids the growth. If the recursive call is the very last
+    thing the function does, with no work left to combine afterwards, the frame
+    is no longer needed and can be replaced instead of pushed. That pattern is
+    called <b>tail recursion</b>, and some languages optimise it into a loop.
+  </p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <b>✓ Your win for today</b>
+    You can describe what a stack frame holds, trace the stack growing and
+    unwinding, and explain why deep recursion can overflow it.
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Draw the call stack for <code>factorial(3)</code> at its deepest point, labelling each frame.</li>
+    <li>Explain why a loop that sums a list uses less memory than a recursive sum.</li>
+    <li>Rewrite a recursive countdown so the recursive call is the last step, making it tail recursive.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Read <a href="https://mitpress.mit.edu/9780262046305/introduction-to-algorithms/">_Introduction to Algorithms_ by Cormen, Leiserson, Rivest &amp; Stein</a>, Chapter 4 (Recurrences) for how the depth of recursive calls shapes an algorithm's cost.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher (me) anything — what exactly lives
+    in a frame, why the stack is last-in first-out, or how tail recursion avoids
+    growing it. There are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What does the call stack store while a recursive function runs?",
+    a: ["The paused calls and their local data", "Only the final answer of the function", "A sorted copy of the input list"],
+    c: 0,
+    why: "Each unfinished call is parked on the stack as a frame holding its arguments, local variables, and where to resume. That is how the machine remembers work it has not finished yet."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      { title: "Push", lines: ["A call starts", "New frame on top", "Stack grows"] },
+      { title: "Pop", lines: ["A call returns", "Top frame removed", "Stack shrinks"] }
+    ]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "call factorial(4), push frame",
+      "call factorial(3), push frame",
+      "call factorial(2), push frame",
+      "call factorial(1), push frame",
+      "base case returns 1, pop frame",
+      "factorial(2) returns 2, pop frame",
+      "factorial(3) returns 6, pop frame",
+      "factorial(4) returns 24, pop frame"
+    ],
+    steps: [
+      { line: 0, vars: { depth: "1", top: "factorial(4)" } },
+      { line: 1, vars: { depth: "2", top: "factorial(3)" } },
+      { line: 2, vars: { depth: "3", top: "factorial(2)" } },
+      { line: 3, vars: { depth: "4", top: "factorial(1)" } },
+      { line: 4, vars: { depth: "3", top: "factorial(2)" } },
+      { line: 5, vars: { depth: "2", top: "factorial(3)" } },
+      { line: 6, vars: { depth: "1", top: "factorial(4)" } },
+      { line: 7, vars: { depth: "0", top: "none" } }
+    ]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the blanks",
+    lines: [
+      "Each paused call is stored as a <0> on the stack.",
+      "Running out of stack space causes a <1>.",
+      "When the recursive call is the last step, the pattern is called <2>."
+    ],
+    blanks: [
+      { a: ["stack frame", "frame"], why: "A stack frame holds one call's arguments, local variables, and return point." },
+      { a: ["stack overflow"], why: "Too many nested frames exhaust the fixed stack space, and the program crashes with a stack overflow." },
+      { a: ["tail recursion"], why: "Tail recursion is when the recursive call is the final action, so the frame can be replaced instead of pushed." }
+    ]
+  });
+
+  /* the quiz — every option must have the SAME number of words */
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is pushed onto the call stack?",
+      a: ["A frame for each active call", "A copy of the whole program", "Only the final return value here", "A sorted version of the input"],
+      c: 0,
+      why: "Every active call gets its own frame holding its arguments, locals, and return point. The stack is the collection of those frames."
+    },
+    {
+      q: "In what order does the call stack unwind?",
+      a: ["Last in, first out", "First in, first out", "Random order each time", "Alphabetical order by name"],
+      c: 0,
+      why: "The stack is last-in, first-out: the most recently pushed call is the one that returns first, which is why the deepest call finishes before its caller."
+    },
+    {
+      q: "What causes a stack overflow?",
+      a: ["Recursion nested too deeply", "Sorting a long list", "Comparing too many items", "Using too many variables"],
+      c: 0,
+      why: "The stack has a fixed size. Too many nested calls push more frames than fit, and the program crashes with a stack overflow."
+    },
+    {
+      q: "What makes a recursive call tail recursive?",
+      a: ["It is the final action taken", "It calls itself twice over here", "It has no base case ever", "It stores results in a list"],
+      c: 0,
+      why: "If the recursive call is the very last thing the function does, no work remains to combine afterwards, so the frame can be replaced rather than pushed."
+    }
+  ]);
+</script>
+</body>
+</html>

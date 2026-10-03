@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 04 — Test Fixtures and Setup/Teardown</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="testing-fundamentals" data-lesson="4" data-lesson-id="test-fixtures-and-setup">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 04</span> · Fixtures</span>
+
+  <h1 class="lesson-title">Test Fixtures and Setup/Teardown</h1>
+  <p class="lesson-lede">
+    Creating clean, reproducible test environments using fixtures and managing resource lifecycle safely.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You can manage test environments cleanly and reliably with pytest fixtures.</span>
+    <span><b>Mission link</b> Mastering test fixtures and setup/teardown across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Test Fixtures and Setup/Teardown</h2>
+  <p>Tests must be <strong>isolated and independent</strong>. Running test 10 after test 1 should yield the exact same result as running test 10 alone. If test 1 creates a record in a shared database and forgets to clean it up, test 10 might fail unpredictably.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Creating clean, reproducible test environments using fixtures and managing resource lifecycle safely.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Fixture Lifecycle</h2>
+  <p>In modern testing frameworks like pytest, <strong>fixtures</strong> manage the creation and destruction of test dependencies. Fixtures can supply sample data, database connections, API clients, or temporary directories.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Fixture Scopes</h2>
+  <pre><code>import pytest
+
+@pytest.fixture
+def sample_user():
+    # Setup: Create isolated resource
+    user = User(id=1, email="test@example.com", role="editor")
+    yield user
+    # Teardown: Clean up resource (runs even if test fails)
+    user.cleanup()
+
+def test_user_can_edit(sample_user):
+    assert sample_user.can_edit() is True</code></pre><p>The `yield` statement elegantly splits the fixture into <strong>setup</strong> (before the yield) and <strong>teardown</strong> (after the yield). Even if the test raises an unhandled assertion failure, pytest guarantees the teardown code runs, preventing state pollution.</p><div class="callout"><p><strong>Rule of Thumb:</strong> Favor default `function` scope for fixtures. Only elevate to `module` or `session` scope for strictly read-only or expensive immutable resources like pre-compiled schemas.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Fill in the fixture lifecycle keywords</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can manage test environments cleanly and reliably with pytest fixtures.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where test fixtures and setup/teardown applies.</li>
+    <li>Author a unit test or verification script exercising test fixtures and setup/teardown.</li>
+    <li>Document team architectural conventions regarding test fixtures and setup/teardown.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Test Fixtures and Setup/Teardown.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is the primary danger of tests sharing mutable global state?",
+    a: ["Test order dependency: test A mutates state, causing test B to pass or fail depending on execution order","Tests run too quickly to be measured","Python deletes the fixture file automatically","The terminal loses its color formatting"],
+    c: 0,
+    why: "Shared mutable state makes tests order-dependent, brittle, and impossible to run in parallel."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1. Fixture Setup",
+            "lines": [
+                  "Create in-memory DB",
+                  "Seed default rows"
+            ]
+      },
+      {
+            "title": "2. Test Execution",
+            "lines": [
+                  "Test interacts with DB",
+                  "Assertions run"
+            ]
+      },
+      {
+            "title": "3. Fixture Teardown",
+            "lines": [
+                  "Rollback transaction",
+                  "Drop temporary tables"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Test Fixtures and Setup/Teardown",
+      "def execute_flow():",
+      "    # Creating clean, reproducible test environments usi...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Test Fixtures and Setup/Teardown"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Function Scope"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Module Scope"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "step": "Session Scope"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "In pytest fixtures, setup code runs before the {1} statement, and teardown code runs {2}."
+],
+    blanks: [
+      {
+            "a": [
+                  "yield"
+            ],
+            "why": "Python keyword used to supply the fixture value"
+      },
+      {
+            "a": [
+                  "afterwards"
+            ],
+            "why": "Execution timing of teardown logic"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why is fixture teardown guaranteed in pytest?",
+      a: ["Pytest wraps the fixture generator in a try-finally block internally","Pytest reboots the computer after each test","The operating system forcibly resets the RAM","Python garbage collector deletes all modules"],
+      c: 0,
+      why: "Pytest guarantees teardown execution using try-finally mechanics around fixture generators."
+    },
+    {
+      q: "What is the consequence of modifying a session-scoped fixture in one test?",
+      a: ["It pollutes the shared fixture state, potentially causing subsequent tests to fail unexpectedly","It speeds up the entire test suite","It converts all tests into unit tests","Pytest immediately converts the fixture to function scope"],
+      c: 0,
+      why: "Session fixtures are shared; mutating them introduces dangerous cross-test coupling."
+    },
+    {
+      q: "What built-in pytest fixture provides a temporary directory unique to each test invocation?",
+      a: ["tmp_path","temp_folder","os_temp","virtual_disk"],
+      c: 0,
+      why: "pytest provides the `tmp_path` fixture (a pathlib.Path object) for isolated file operations."
+    },
+    {
+      q: "How do you pass a fixture into a test function in pytest?",
+      a: ["Add the fixture name as an argument in the test function signature","Import the fixture globally in every test","Decorate the test with @pytest.use_fixture","Call the fixture function manually inside the test body"],
+      c: 0,
+      why: "Pytest resolves fixtures by matching parameter names in test function signatures."
+    }
+  ]);
+</script>
+</body>
+</html>

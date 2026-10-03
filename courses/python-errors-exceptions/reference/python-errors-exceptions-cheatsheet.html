@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python Errors & Exceptions — Cheat Sheet</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+<style>
+  .ref-toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0 8px; }
+  .ref-toc a { font-size: .8rem; border: 1px solid var(--border); background: #111a30; padding: 5px 11px; border-radius: 999px; color: var(--muted); text-decoration: none; border-bottom: 1px solid var(--border); }
+  .ref-toc a:hover { color: #fff; border-color: #3d5488; }
+  .lesson-wrap h2 { scroll-margin-top: 20px; }
+  .snippet { margin: 14px 0 22px; }
+  .snippet .lbl { font-size: .72rem; font-weight: 800; letter-spacing: .7px; text-transform: uppercase; color: var(--accent2); margin-bottom: 6px; }
+  .see { font-size: .82rem; color: var(--muted); margin: -6px 0 12px; }
+  .see a { color: var(--accent2); border-bottom: 0; }
+  .see a:hover { color: #fff; }
+  .snippet pre { padding-top: 34px; }
+  @media print { .snippet pre { padding-top: 18px; } }
+</style>
+</head>
+<body class="lesson-body" data-course="python-errors-exceptions">
+
+<div class="lesson-wrap">
+
+  <span class="lesson-kicker">Reference · Cheat sheet</span>
+  <h1 class="lesson-title">Python Errors & Exceptions — Cheat Sheet</h1>
+  <p class="lesson-lede">
+    The whole course on one page. Every snippet links back to the lesson that
+    teaches it.
+  </p>
+
+  <div class="ref-toc">
+    <a href="#tracebacks">Tracebacks</a>
+    <a href="#catching">Catching</a>
+    <a href="#raising">Raising</a>
+    <a href="#custom">Custom types</a>
+    <a href="#design">Design</a>
+    <a href="#boundary">Boundary</a>
+  </div>
+
+  <h2 id="tracebacks"><span class="n">1</span>Read the failure</h2>
+  <p class="see">See <a href="../lessons/0001-what-an-error-actually-is.html">Lesson 01</a> and <a href="../lessons/0002-reading-a-traceback.html">Lesson 02</a>.</p>
+  <div class="snippet">
+    <div class="lbl">Start at the bottom of the traceback</div>
+    <pre><code>Traceback (most recent call last):
+  File "app.py", line 8, in report
+    return average(values)
+  File "app.py", line 4, in average
+    return sum(values) / len(values)
+ZeroDivisionError: division by zero
+
+# Last line: exception type and message.
+# Deepest frame above it: failing file and line.</code></pre>
+  </div>
+
+  <h2 id="catching"><span class="n">2</span>Catch narrowly and clean up</h2>
+  <p class="see">See <a href="../lessons/0003-catching-what-you-expect.html">Lesson 03</a> and <a href="../lessons/0004-catching-well.html">Lesson 04</a>.</p>
+  <div class="snippet">
+    <div class="lbl">Specific handler, success path, guaranteed cleanup</div>
+    <pre><code>try:
+    age = int(raw_age)
+except ValueError:
+    print("Enter a whole number")
+else:
+    save_age(age)
+finally:
+    release_temporary_resource()
+
+# Avoid bare except: and silent pass.</code></pre>
+  </div>
+
+    <h2 id="raising"><span class="n">3</span>Raise at the cause</h2>
+    <p class="see">See <a href="../lessons/0005-raising-your-own.html">Lesson 05 — Raising your own</a>.</p>
+    <div class="snippet">
+    <div class="lbl">Guard clauses make the contract explicit</div>
+    <pre><code>def split_bill(total, people):
+    if people &lt;= 0:
+      raise ValueError("people must be greater than zero")
+    return total / people
+
+  try:
+    share = split_bill(60, 0)
+  except ValueError as error:
+    print(error)</code></pre>
+    </div>
+
+    <h2 id="custom"><span class="n">4</span>Give domain failures a type</h2>
+    <p class="see">See <a href="../lessons/0006-custom-exception-types.html">Lesson 06 — Custom exception types</a>.</p>
+    <div class="snippet">
+    <div class="lbl">Subclass Exception for ordinary application failures</div>
+    <pre><code>class OutOfStockError(Exception):
+    """Raised when an item cannot be supplied."""
+
+  def reserve(item):
+    if item.stock == 0:
+      raise OutOfStockError(f"{item.name} is unavailable")
+
+  try:
+    reserve(item)
+  except OutOfStockError as error:
+    show_unavailable(error)</code></pre>
+    </div>
+
+      <h2 id="design"><span class="n">5</span>Design useful failure</h2>
+      <p class="see">See <a href="../lessons/0007-designing-failure.html">Lesson 07 — Designing failure</a>.</p>
+      <div class="snippet">
+      <div class="lbl">Handle expected failure; preserve unexpected context</div>
+      <pre><code>try:
+      save_record(record)
+    except OSError:
+      logger.exception("Could not save record")
+      raise
+
+    # LBYL: check before acting.
+    # EAFP: try the operation; handle its specific exception.
+    # assert is for internal invariants, not user input.</code></pre>
+      </div>
+
+      <h2 id="boundary"><span class="n">6</span>One clear error boundary</h2>
+      <p class="see">See <a href="../lessons/0008-putting-it-together.html">Lesson 08 — Putting it together</a>.</p>
+      <div class="snippet">
+      <div class="lbl">Cleanup and exception chaining</div>
+      <pre><code>def read_number(path):
+      with open(path) as file:
+        try:
+          return int(file.read())
+        except ValueError as error:
+          raise ValueError("file must contain an integer") from error
+
+    try:
+      value = read_number("count.txt")
+    except (FileNotFoundError, ValueError) as error:
+      print(f"Cannot load count: {error}")
+
+    # Retry only plausibly transient failures, and set a limit.</code></pre>
+      </div>
+
+      <div class="lesson-foot">
+    <div class="links">
+      <a href="python-errors-exceptions-glossary.html">📖 Glossary</a>
+      <a href="../course.html">← Course map</a>
+    </div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script>
+  TeachLesson.init({ course: "python-errors-exceptions", lessons: window.TeachLessons || [] });
+</script>
+</body>
+</html>

@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 08 — Modules: import and export</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="javascript-fundamentals" data-lesson="8" data-lesson-id="modules-import-and-export">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 08</span> · Destructuring & Modules</span>
+
+  <h1 class="lesson-title">Modules: import and export</h1>
+  <p class="lesson-lede">
+    Stop polluting the global window object. Master ECMAScript Modules (ESM), named versus default exports, static import analysis, and modular software boundaries.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Structure JavaScript code into modular ES modules using named and default exports</span>
+    <span><b>Mission link</b> Enables scalable code organization across multi-file applications</span>
+  </div>
+
+  <h2><span class="n">1</span>The official JavaScript module standard</h2>
+  <p>Historically, JavaScript had no built-in module system: everything shared a single global namespace, leading to naming collisions. Node.js created CommonJS (<code>require</code> / <code>module.exports</code>), but today the official universal standard is <b>ECMAScript Modules (ESM)</b>.</p><p>ES Modules use <code>import</code> and <code>export</code> statements. Unlike legacy script tags, ES modules have their own isolated module scope, execute in strict mode automatically, and are statically analyzable by bundlers for tree-shaking.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    ES Modules isolate scope and provide static import/export declarations for reliable dependency graphs.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Named exports versus default exports</h2>
+  <p>Understand when to use explicit named exports versus single default module exports.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing static import resolution</h2>
+  <p>Trace how the JavaScript engine resolves and loads module dependencies before executing code.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your recall of ES module syntax.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can organize applications into clean, maintainable ES modules with explicit interfaces and zero global namespace pollution.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Create an ES module that exports two utility functions using named exports.</li>
+    <li>Import the functions into another file and run it in Node or the browser.</li>
+    <li>Verify why named exports are easier to autocomplete and refactor than default exports.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    MDN Web Docs: *JavaScript modules* (developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What happens when you declare a variable with 'const x = 10;' at the top level of an ES module?",
+    a: ["It is private to that module and is NOT attached to the global window object","It automatically becomes a global variable accessible across all scripts","It throws a syntax error because modules require classes","It is saved permanently to the computer hard drive"],
+    c: 0,
+    why: "ES modules have their own top-level module scope; variables do not leak into the global window scope."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Named Exports",
+            "lines": [
+                  "export const add = ...",
+                  "import { add, sub } from './math.js'",
+                  "explicit names, refactoring safe"
+            ]
+      },
+      {
+            "title": "Default Export",
+            "lines": [
+                  "export default class User { ... }",
+                  "import User from './User.js'",
+                  "single primary export per file"
+            ]
+      },
+      {
+            "title": "Re-exporting",
+            "lines": [
+                  "export * from './buttons.js'",
+                  "aggregates index barrel files"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "// math.js: export function multiply(a, b) { return a * b; }",
+      "// main.js:",
+      "import { multiply } from './math.js';",
+      "const result = multiply(4, 5);",
+      "console.log(result); # 20"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "module_1": "math.js exports named 'multiply' binding"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "static_import": "engine links imported binding before execution"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "execution": "multiply(4, 5) evaluated"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "output": "20 logged cleanly without global pollution"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The statement used to expose functions from a module is <0>.",
+      "The statement used to consume functions from another module is <1>.",
+      "The modern standard module system is <2> Modules (ESM)."
+],
+    blanks: [
+      {
+            "a": [
+                  "export"
+            ],
+            "why": "export shares symbols from a module."
+      },
+      {
+            "a": [
+                  "import"
+            ],
+            "why": "import brings symbols into scope."
+      },
+      {
+            "a": [
+                  "ECMAScript",
+                  "ES"
+            ],
+            "why": "ES Modules (ESM) is the official specification standard."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the primary advantage of named exports over default exports?",
+      a: ["Named exports enforce exact naming, preventing accidental renaming and enabling superior IDE autocomplete and tree-shaking","Named exports run twice as fast on modern CPU processors","Named exports can only be used on numerical calculations","Named exports eliminate the need for semicolons"],
+      c: 0,
+      why: "Named exports maintain consistent symbol names across the codebase and support better tool analysis."
+    },
+    {
+      q: "How do you load an ES module directly inside an HTML file?",
+      a: ["<script type='module' src='main.js'></script>","<script format='esm' src='main.js'></script>","<module src='main.js'></module>","<link rel='module' href='main.js'>"],
+      c: 0,
+      why: "The type='module' attribute on a <script> tag signals modern ES module parsing."
+    },
+    {
+      q: "Can standard 'import' statements be called conditionally inside an if statement?",
+      a: ["No, static import declarations must be at the top level; dynamic imports use import() function","Yes, imports work anywhere inside functions and loops","Only if the condition evaluates to true","Only on Windows operating systems"],
+      c: 0,
+      why: "Static imports must be top-level for static analysis; dynamic loading uses the import() promise."
+    },
+    {
+      q: "What mode do ES modules execute in by default?",
+      a: ["Strict Mode ('use strict' is active automatically)","Quirks Mode","Legacy ECMAScript 3 Mode","Debug Mode"],
+      c: 0,
+      why: "All ES modules run in strict mode automatically without needing an explicit 'use strict' pragma."
+    }
+  ]);
+</script>
+</body>
+</html>

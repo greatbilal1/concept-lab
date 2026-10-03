@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 07 — Memory Retrieval: Re-Injecting Facts at Runtime</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="ai-memory-context" data-lesson="7" data-lesson-id="memory-retrieval-runtime-injection">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 07</span> · Memory Injection</span>
+
+  <h1 class="lesson-title">Memory Retrieval: Re-Injecting Facts at Runtime</h1>
+  <p class="lesson-lede">
+    Synthesizing memory: assembling dynamic runtime prompts that seamlessly blend system rules, user facts, and dialogue.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to inject long-term memories seamlessly into runtime prompt architectures.</span>
+    <span><b>Mission link</b> Mastering memory retrieval: re-injecting facts at runtime across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Memory Retrieval: Re-Injecting Facts at Runtime</h2>
+  <p>Having a database filled with millions of user memories is useless if you don't know how to inject them into the prompt. If you inject memories clumsily, the model will confuse past memories with current instructions.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Synthesizing memory: assembling dynamic runtime prompts that seamlessly blend system rules, user facts, and dialogue.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Runtime Memory Injection Pipeline</h2>
+  <p>The professional <strong>Runtime Memory Injection Pattern</strong>:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Recency Hierarchy</h2>
+  <ul><li><strong>1. Search at Query Ingress:</strong> When the user submits a message, generate an embedding of the query and fetch the top 2-3 most relevant long-term memory facts.</li><li><strong>2. Tag in Dedicated Context Brackets:</strong> Inject the facts in a dedicated `&lt;user_memory&gt;` block inside or directly after the system prompt.</li><li><strong>3. Explicit Recency Tagging:</strong> Include timestamps so the model knows when the fact was recorded: <code>[Updated: 2026-02-14] User moved to Seattle.</code></li><li><strong>4. Non-Intrusive Guidance:</strong> Instruct the model: <em>'Use these memories for personalization, but prioritize the user's explicit instructions in the current query if they conflict.'</em></li></ul><pre><code># The Assembled Runtime Prompt with Injected Memory:
+[
+  {
+    "role": "system",
+    "content": """You are an intelligent personal coding assistant.
+
+<user_memory>
+- User's primary programming language is TypeScript [Updated 2026-01-10].
+- User prefers Tailwind CSS over CSS modules [Updated 2026-02-01].
+- Active project directory: /Users/alice/projects/billing-app.
+</user_memory>
+
+Use these memories naturally. Do NOT mention 'according to my memory' unless asked."""
+  },
+  *recent_dialogue_turns,
+  {"role": "user", "content": "How should I style the checkout button?"}
+]
+# Result: Model automatically writes Tailwind CSS in TypeScript without being asked!</code></pre><div class="callout"><p><strong>The Seamless Effect:</strong> The user never asked for Tailwind or TypeScript, but the assistant delivered exactly what they wanted because memory was injected silently and cleanly.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the memory injection sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to inject long-term memories seamlessly into runtime prompt architectures.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where memory retrieval: re-injecting facts at runtime applies.</li>
+    <li>Author a unit test or verification script exercising memory retrieval: re-injecting facts at runtime.</li>
+    <li>Document team architectural conventions regarding memory retrieval: re-injecting facts at runtime.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Memory Retrieval: Re-Injecting Facts at Runtime.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Where in the prompt should retrieved long-term memory facts be injected for optimal model attention?",
+    a: ["In a dedicated, clearly delimited section within or directly adjacent to the system prompt at the top of the context","Buried in the middle of a 10,000-word document","At the very end after the user's question","In the URL parameter"],
+    c: 0,
+    why: "Placing retrieved user facts in or near the system prompt establishes foundational context without distracting from the query."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1. Query Arrival",
+            "lines": [
+                  "User: 'Style the button'",
+                  "Trigger memory query: 'button styling'"
+            ]
+      },
+      {
+            "title": "2. Vector Retrieval",
+            "lines": [
+                  "Searches user_memories table",
+                  "Fetches: 'User prefers Tailwind CSS'"
+            ]
+      },
+      {
+            "title": "3. Seamless Prompt Assembly",
+            "lines": [
+                  "Injects fact into <user_memory> tag",
+                  "Model answers with Tailwind automatically"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Memory Retrieval: Re-Injecting Facts at Runtime",
+      "def execute_flow():",
+      "    # Synthesizing memory: assembling dynamic runtime pr...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Memory Retrieval: Re-Injecting Facts at Runtime"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Older Memory [2024]"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Newer Memory [2026]"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Retrieved memories are injected into dedicated {1} tags with timestamps to provide seamless personalization while prioritizing current {2} instructions."
+],
+    blanks: [
+      {
+            "a": [
+                  "context"
+            ],
+            "why": "Structural prompt tags like <user_memory>"
+      },
+      {
+            "a": [
+                  "user"
+            ],
+            "why": "Immediate active query directives"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why should the model be instructed NOT to say 'According to my memory records...' in casual responses?",
+      a: ["It sounds robotic and awkward; natural conversation integrates remembered facts seamlessly into answers","It is illegal to mention memory","It causes compiler errors","It uses too many tokens"],
+      c: 0,
+      why: "Natural personalization incorporates context fluidly without breaking conversational immersion."
+    },
+    {
+      q: "What should the model do if the user's current query directly contradicts an injected long-term memory?",
+      a: ["Prioritize the immediate user query instruction over the older long-term memory","Refuse to answer","Crash the application","Argue with the user"],
+      c: 0,
+      why: "Immediate user instructions in the active prompt always take precedence over historical memories."
+    },
+    {
+      q: "Why are timestamps valuable when injecting retrieved memory snippets?",
+      a: ["They allow the model to resolve conflicting preferences by identifying which fact is more recent","They make the prompt run faster","They encrypt the text","They reduce internet bills"],
+      c: 0,
+      why: "Timestamps provide chronological context for resolving evolving user preferences."
+    },
+    {
+      q: "How many long-term memory snippets should typically be injected into a single prompt?",
+      a: ["2 to 5 highly relevant facts (consuming ~50-100 tokens), avoiding context bloat","10,000 facts","All memories ever recorded","0"],
+      c: 0,
+      why: "2-5 relevant facts deliver targeted personalization without wasting context window budget."
+    }
+  ]);
+</script>
+</body>
+</html>

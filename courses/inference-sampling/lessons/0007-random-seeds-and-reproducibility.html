@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 07 — Random Seeds and Reproducibility in LLM Inference</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="inference-sampling" data-lesson="7" data-lesson-id="random-seeds-and-reproducibility">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 07</span> · Seeds & Testing</span>
+
+  <h1 class="lesson-title">Random Seeds and Reproducibility in LLM Inference</h1>
+  <p class="lesson-lede">
+    Controlling randomness: setting seed parameters, system fingerprints, and achieving reproducible inference for testing.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to use random seeds and temperature zero for reproducible evaluations.</span>
+    <span><b>Mission link</b> Mastering random seeds and reproducibility in llm inference across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Random Seeds and Reproducibility in LLM Inference</h2>
+  <p>In scientific computing and automated unit testing, <strong>reproducibility</strong> is paramount. If a test fails in CI, you need to be able to reproduce the exact failure locally on the same inputs. But in generative AI, random sampling produces different responses every time.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Controlling randomness: setting seed parameters, system fingerprints, and achieving reproducible inference for testing.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Deterministic Seeding Architecture</h2>
+  <p>To achieve reproducible inference, model providers introduced the <strong>Seed parameter</strong>:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>The System Fingerprint Indicator</h2>
+  <ul><li><strong>The Seed Parameter:</strong> Passing an integer (e.g. `seed=42`) initializes the model's pseudo-random number generator to a fixed state.</li><li><strong>Temperature Zero:</strong> For absolute maximum determinism, pair `seed=42` with `temperature=0.0`.</li><li><strong>System Fingerprint:</strong> Providers return a `system_fingerprint` string in the response. If the provider updates their backend GPU hardware or model weights, the fingerprint changes, alerting you that the deterministic baseline shifted.</li></ul><pre><code># Reproducible API Request in Python:
+response = client.chat.completions.create(
+    model="gpt-4o",
+    messages=[{"role": "user", "content": "Sort these numbers: 8, 2, 9, 1"}],
+    temperature=0.0,
+    seed=12345
+)
+# Inspect fingerprint to verify hardware consistency:
+print(response.system_fingerprint)  # e.g. "fp_44709d6fcb"
+print(response.choices[0].message.content) # Deterministic result!</code></pre><div class="callout"><p><strong>The Testing Standard:</strong> In automated CI regression suites, always specify `temperature=0.0` and a fixed `seed`. This eliminates test flakiness caused by stochastic sampling variation.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the seed reproducibility sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to use random seeds and temperature zero for reproducible evaluations.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where random seeds and reproducibility in llm inference applies.</li>
+    <li>Author a unit test or verification script exercising random seeds and reproducibility in llm inference.</li>
+    <li>Document team architectural conventions regarding random seeds and reproducibility in llm inference.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Random Seeds and Reproducibility in LLM Inference.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Why is reproducibility challenging in commercial cloud LLM APIs even when fixing the random seed?",
+    a: ["Hardware concurrency, mixture-of-experts routing, and non-deterministic GPU floating-point operations can cause subtle variations","APIs intentionally randomize results to charge more","Seeds are deleted every hour","Python random module is broken"],
+    c: 0,
+    why: "GPU parallel race conditions and sparse MoE routing introduce minor non-determinism even with fixed seeds."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Unseeded Request (Random)",
+            "lines": [
+                  "temperature = 0.7, no seed",
+                  "Different phrasing on every run",
+                  "Flaky in automated test suites"
+            ]
+      },
+      {
+            "title": "Seeded Request (Deterministic)",
+            "lines": [
+                  "temperature = 0.0, seed = 42",
+                  "Identical token selection every time",
+                  "Reliable automated CI testing"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Random Seeds and Reproducibility in LLM Inference",
+      "def execute_flow():",
+      "    # Controlling randomness: setting seed parameters, s...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Random Seeds and Reproducibility in LLM Inference"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Consistent Fingerprint (fp_4470)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Shifted Fingerprint (fp_9182)"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Setting a fixed random {1} and temperature zero locks down pseudo-random sampling for reproducible automated {2} suites."
+],
+    blanks: [
+      {
+            "a": [
+                  "seed"
+            ],
+            "why": "PRNG initialization integer"
+      },
+      {
+            "a": [
+                  "test"
+            ],
+            "why": "Automated regression verification"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What does a change in the 'system_fingerprint' field of an LLM response indicate?",
+      a: ["The provider updated backend hardware configurations, quantization kernels, or model serving weights","The user changed their password","The computer was infected by a virus","The API token expired"],
+      c: 0,
+      why: "System fingerprints identify the specific backend serving configuration that generated the response."
+    },
+    {
+      q: "Why is fixing the seed parameter essential when running automated regression evaluations?",
+      a: ["It ensures that metric changes reflect code or prompt modifications rather than random sampling fluctuations","It makes the model run for free","It turns off billing","It translates text to HTML"],
+      c: 0,
+      why: "Controlled seeds eliminate stochastic noise from benchmark comparisons."
+    },
+    {
+      q: "Can two different model versions (e.g. gpt-4o vs gpt-4o-mini) produce identical outputs from the same seed?",
+      a: ["No; different models have different parameter weights, layer depths, and logits, resulting in completely different outputs","Yes; seeds guarantee identical text across all AI","Only if written in Python","Only on Sundays"],
+      c: 0,
+      why: "Seeds only control the random generator; different weights generate different logit distributions."
+    },
+    {
+      q: "Why do floating-point race conditions on parallel GPUs occasionally introduce subtle non-determinism?",
+      a: ["Floating-point addition is non-associative: (A + B) + C can differ from A + (B + C) in the last bit depending on thread arrival order","GPUs have broken math units","Computers forget numbers","Threads run backwards"],
+      c: 0,
+      why: "Non-associative floating-point summation across parallel CUDA threads can cause subtle round-off deviations."
+    }
+  ]);
+</script>
+</body>
+</html>

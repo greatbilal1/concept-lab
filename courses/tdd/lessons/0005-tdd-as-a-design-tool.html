@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 05 — TDD as a Design Tool: Interface-First Thinking</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="tdd" data-lesson="5" data-lesson-id="tdd-as-a-design-tool">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 05</span> · Design Impact</span>
+
+  <h1 class="lesson-title">TDD as a Design Tool: Interface-First Thinking</h1>
+  <p class="lesson-lede">
+    Using TDD to force loose coupling, high cohesion, and dependency injection into system architecture.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You understand how TDD acts as a powerful architectural design driver.</span>
+    <span><b>Mission link</b> Mastering tdd as a design tool: interface-first thinking across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of TDD as a Design Tool: Interface-First Thinking</h2>
+  <p>Many programmers think TDD is primarily a testing technique. In reality, TDD is an <strong>architectural design tool</strong> disguised as a testing practice. The tests are a beneficial byproduct; the real deliverable is a modular, decoupled architecture.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Using TDD to force loose coupling, high cohesion, and dependency injection into system architecture.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Testability Drives Architecture</h2>
+  <p>When you attempt to write a test first, code that suffers from poor design becomes immediately painful to test:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Listen to the Test Feedback</h2>
+  <ul><li><strong>Tight Coupling:</strong> If a class instantiates its own database connections or global singletons, you cannot test it without spinning up a real database. TDD forces you to use <strong>Dependency Injection</strong>.</li><li><strong>Monolithic Responsibilities:</strong> If a function does five things, testing it requires a 50-line Arrange block. TDD pushes you toward the <strong>Single Responsibility Principle</strong>.</li><li><strong>Hidden Assumptions:</strong> TDD exposes hidden inputs (like system clocks or environment variables) and turns them into explicit parameters.</li></ul><pre><code># HARD TO TEST: Tightly coupled singleton dependency
+class ReportGenerator:
+    def generate(self):
+        db = DatabaseConnection.get_instance()  # Global singleton!
+        data = db.query("SELECT * FROM sales")
+        return format_pdf(data)
+
+# EASY TO TEST (Driven by TDD): Decoupled repository interface
+class ReportGenerator:
+    def __init__(self, sales_repository):
+        self.sales_repo = sales_repository  # Injected dependency!
+
+    def generate(self):
+        data = self.sales_repo.get_sales_data()
+        return format_pdf(data)</code></pre><div class="callout"><p><strong>Listen to the Tests:</strong> Test pain is design feedback. When a test is hard to write, do not fight the test; redesign the code!</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Fill in the TDD design impact sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You understand how TDD acts as a powerful architectural design driver.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where tdd as a design tool: interface-first thinking applies.</li>
+    <li>Author a unit test or verification script exercising tdd as a design tool: interface-first thinking.</li>
+    <li>Document team architectural conventions regarding tdd as a design tool: interface-first thinking.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for TDD as a Design Tool: Interface-First Thinking.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Why is testable code almost universally better designed than untestable code?",
+    a: ["To be testable in isolation, code must have low coupling, clear seams, and explicit dependencies","Testable code runs faster on the CPU","Testable code uses fewer memory registers","Test frameworks enforce strict OOP design patterns"],
+    c: 0,
+    why: "Testability demands decoupling and clear interfaces, which are the hallmarks of clean architecture."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Hard to Test",
+            "lines": [
+                  "Hardcoded singletons",
+                  "Massive functions",
+                  "Hidden global state"
+            ]
+      },
+      {
+            "title": "Test Resistance",
+            "lines": [
+                  "Arrange phase is agonizing",
+                  "Painful mocking required"
+            ]
+      },
+      {
+            "title": "Driven Design",
+            "lines": [
+                  "Dependency Injection",
+                  "Single Responsibility",
+                  "Clean seams & interfaces"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing TDD as a Design Tool: Interface-First Thinking",
+      "def execute_flow():",
+      "    # Using TDD to force loose coupling, high cohesion, ...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "TDD as a Design Tool: Interface-First Thinking"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Pain: Massive Arrange Block"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Pain: Cannot Mock Network"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "When a class is difficult to test, it is usually a design symptom of tight {1} or lack of {2}."
+],
+    blanks: [
+      {
+            "a": [
+                  "coupling"
+            ],
+            "why": "Excessive interconnection between components"
+      },
+      {
+            "a": [
+                  "cohesion"
+            ],
+            "why": "Degree to which class elements belong together"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is meant by the phrase 'Listen to your tests'?",
+      a: ["Difficulty writing a test indicates an architectural flaw like tight coupling or poor cohesion in the production code","Listen to terminal audio notifications when tests finish","Read test failure messages out loud","Follow test framework recommendations for variable names"],
+      c: 0,
+      why: "Testing friction is the earliest and most reliable warning sign of architectural decay."
+    },
+    {
+      q: "How does TDD naturally encourage Dependency Injection?",
+      a: ["To isolate classes during test execution, dependencies must be passed in rather than hardcoded internally","TDD frameworks require dependency injection containers","Python functions only accept dependencies as arguments","Dependency injection makes tests compile faster"],
+      c: 0,
+      why: "Passing dependencies via constructors allows injecting mocks or fakes during test runs."
+    },
+    {
+      q: "What is the relationship between TDD and the Single Responsibility Principle (SRP)?",
+      a: ["Classes that do one thing are easy to arrange and test; classes that do multiple things require bloated, painful test setups","TDD requires every class to have exactly one method","SRP eliminates the need for unit tests","TDD forbids classes from having state"],
+      c: 0,
+      why: "Cohesive single-responsibility classes are vastly simpler to test in isolation."
+    },
+    {
+      q: "What happens when developers ignore test friction and use heavy monkey-patching instead?",
+      a: ["The architecture remains tightly coupled and becomes brittle, while tests become fragile and difficult to maintain","The code becomes 10x faster","The test runner fixes the architecture automatically","The compiler issues a design error"],
+      c: 0,
+      why: "Monkey-patching treats the symptom while leaving the underlying architectural rot intact."
+    }
+  ]);
+</script>
+</body>
+</html>

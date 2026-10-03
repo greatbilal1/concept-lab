@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 03 — Full outer joins and anti-joins</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="sql-joins" data-lesson="3" data-lesson-id="full-outer-joins-and-anti-joins">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 03</span> · Outer Joins & Missing Data</span>
+
+  <h1 class="lesson-title">Full outer joins and anti-joins</h1>
+  <p class="lesson-lede">
+    How do you find what ISN'T there? Learn the FULL OUTER JOIN for total reconciliations, and the Anti-Join pattern for finding customers who never bought anything.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Find missing relationships using anti-joins and reconcile datasets with FULL OUTER JOIN</span>
+    <span><b>Mission link</b> The primary pattern for auditing data discrepancies and churned users</span>
+  </div>
+
+  <h2><span class="n">1</span>Finding the missing pieces</h2>
+  <p>A common business question is negative: <i>'Find all users who have NEVER placed an order'</i>, or <i>'Find all products that have NEVER been purchased'</i>. How do you query the absence of data?</p><p>The answer is an <b>Anti-Join</b>. You perform a <code>LEFT JOIN</code> from users to orders, and then add a <code>WHERE orders.id IS NULL</code> filter. This discards all matching customers and retains <i>only customers with zero orders</i>!</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    An anti-join (LEFT JOIN ... WHERE right.id IS NULL) finds records that have zero matching children.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>FULL OUTER JOIN reconciliation</h2>
+  <p>A FULL OUTER JOIN returns all rows from both tables, pairing matches and inserting NULLs on both sides.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing an Anti-Join audit query</h2>
+  <p>Trace how the anti-join isolates inactive subscribers who have never logged in.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of anti-joins and full joins.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can write anti-joins to audit data discrepancies, find churned accounts, and perform full two-way reconciliations.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Find all registered users who have never posted a comment using an anti-join.</li>
+    <li>Reconcile two accounting ledgers using a FULL OUTER JOIN.</li>
+    <li>Compare an anti-join with a NOT EXISTS subquery in query plans.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Alan Beaulieu, *Learning SQL*, Chapter 10: 'Full Outer Joins'.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What does 'SELECT u.name FROM users u LEFT JOIN orders o ON u.id = o.user_id WHERE o.id IS NULL' return?",
+    a: ["Only users who have zero orders in the orders table","All users who have at least one order","Users whose order total is exactly $0.00","All orders that have no users"],
+    c: 0,
+    why: "The WHERE o.id IS NULL clause filters out users who had matches, keeping only non-buyers."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Matched Rows",
+            "lines": [
+                  "User with Order",
+                  "full data on both sides"
+            ]
+      },
+      {
+            "title": "Unmatched Left",
+            "lines": [
+                  "User with NO orders",
+                  "order columns are NULL"
+            ]
+      },
+      {
+            "title": "Unmatched Right",
+            "lines": [
+                  "Orphan Order with NO user",
+                  "user columns are NULL"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "SELECT u.email",
+      "FROM users u",
+      "LEFT JOIN logins l ON u.id = l.user_id",
+      "WHERE l.id IS NULL; # Anti-join filter"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "source": "scan users table"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "left_join": "joins logins (matches get login IDs; non-matches get NULL)"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "anti_join": "keeps strictly rows where l.id is NULL -> inactive users isolated"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "A query that finds records with no matching relation is an <0>-join.",
+      "The join preserving all rows from both participating tables is a <1> OUTER JOIN.",
+      "The filter in an anti-join checks WHERE child_table.id IS <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "anti"
+            ],
+            "why": "Anti-joins find the absence of relationships."
+      },
+      {
+            "a": [
+                  "FULL"
+            ],
+            "why": "FULL OUTER JOIN combines left and right outer joins."
+      },
+      {
+            "a": [
+                  "NULL"
+            ],
+            "why": "IS NULL isolates non-matching parent records."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What does a FULL OUTER JOIN return?",
+      a: ["All rows from both tables, matching rows where possible and inserting NULLs for unmatched rows on either side","Only rows that match on both sides","A Cartesian product of all rows","An error on modern SQL databases"],
+      c: 0,
+      why: "FULL OUTER JOIN combines the results of both LEFT JOIN and RIGHT JOIN in one query."
+    },
+    {
+      q: "Why is an Anti-Join (LEFT JOIN ... WHERE right.id IS NULL) often preferred over 'WHERE id NOT IN (SELECT id ...)'?",
+      a: ["If the subquery in NOT IN contains a single NULL value, the entire NOT IN query returns zero rows due to 3-valued logic!","NOT IN only works with numbers","Anti-joins use less network bandwidth","NOT IN is deprecated in modern SQL"],
+      c: 0,
+      why: "The famous 'NOT IN with NULL' trap: if the subquery returns NULL, NOT IN evaluates to UNKNOWN for all rows."
+    },
+    {
+      q: "When would you use a FULL OUTER JOIN in real-world engineering?",
+      a: ["Reconciling two systems (e.g. comparing local bank payments with Stripe transactions to find discrepancies on either side)","Querying user passwords","Deleting tables from the database","Writing mobile push notifications"],
+      c: 0,
+      why: "FULL OUTER JOIN highlights records present in A but not B, AND records in B but not A."
+    },
+    {
+      q: "What column should be checked in the WHERE clause of an anti-join?",
+      a: ["A NOT NULL column (such as the Primary Key) from the right-hand joined table","Any column from the left-hand table","A column containing text","The database version number"],
+      c: 0,
+      why: "Checking right_table.primary_key IS NULL guarantees the row lacked a match."
+    }
+  ]);
+</script>
+</body>
+</html>

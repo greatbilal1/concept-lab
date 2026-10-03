@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 02 — Tables, data types, and constraints</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="sql-relational-databases" data-lesson="2" data-lesson-id="tables-data-types-and-constraints">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 02</span> · The Relational Model & Tables</span>
+
+  <h1 class="lesson-title">Tables, data types, and constraints</h1>
+  <p class="lesson-lede">
+    Garbage in, garbage out. Learn how strict column datatypes and database constraints (PRIMARY KEY, NOT NULL, UNIQUE, CHECK) protect data integrity at the lowest level.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Design robust relational tables using appropriate data types and column constraints</span>
+    <span><b>Mission link</b> Prevents corrupted, inconsistent data from entering database storage</span>
+  </div>
+
+  <h2><span class="n">1</span>Guarding data at the gate</h2>
+  <p>Application validation code can have bugs, but database constraints never lie. <b>Constraints</b> are rules enforced by the database engine on every single write operation: <code>NOT NULL</code> forbids missing values, <code>UNIQUE</code> prevents duplicates, and <code>CHECK</code> enforces domain limits (e.g. <code>price >= 0</code>).</p><p>Every table should have a <b>Primary Key</b>: a non-null, unique column (such as an auto-incrementing integer or UUID) that permanently identifies each row for references.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Database constraints enforce business rules at the storage engine level, making bad data impossible to store.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The core constraint family</h2>
+  <p>Understand the four primary column constraints that protect data integrity.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing DDL table creation</h2>
+  <p>Trace how a table creation statement defines types and constraints simultaneously.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of SQL data types and constraints.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can write robust Data Definition Language (DDL) schemas that eliminate invalid data through constraints.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Create a table in PostgreSQL or SQLite with PRIMARY KEY, NOT NULL, and UNIQUE constraints.</li>
+    <li>Add a CHECK constraint to ensure an end date is after a start date.</li>
+    <li>Attempt to insert a duplicate value into a UNIQUE column to verify the error.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Alan Beaulieu, *Learning SQL*, Chapter 2: 'Creating and Populating a Database'.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What happens if an application tries to INSERT a negative number into a column with 'CHECK (amount >= 0)'?",
+    a: ["The database engine rejects the INSERT immediately with a constraint violation error","The database changes the number to 0 silently and inserts it","The database deletes the table","The query executes normally without checking"],
+    c: 0,
+    why: "CHECK constraints are strictly enforced by the RDBMS engine; invalid data is rejected with an error."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "PRIMARY KEY",
+            "lines": [
+                  "unique row identifier",
+                  "NOT NULL + UNIQUE automatically",
+                  "creates clustered/primary index"
+            ]
+      },
+      {
+            "title": "NOT NULL & UNIQUE",
+            "lines": [
+                  "NOT NULL: value must exist",
+                  "UNIQUE: no two rows can match"
+            ]
+      },
+      {
+            "title": "CHECK & FOREIGN KEY",
+            "lines": [
+                  "CHECK (age >= 18): custom rules",
+                  "FOREIGN KEY: references valid parent"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "CREATE TABLE accounts (",
+      "    id SERIAL PRIMARY KEY,",
+      "    email VARCHAR(255) NOT NULL UNIQUE,",
+      "    balance INTEGER NOT NULL DEFAULT 0 CHECK (balance >= 0)",
+      ");"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "pk": "auto-incrementing integer primary key defined"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "email_rules": "mandatory string, duplicate emails rejected"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "balance_rules": "integer cents, defaults to 0, negative values blocked"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The constraint guaranteeing unique row identity is PRIMARY <0>.",
+      "The constraint preventing empty missing values in a column is NOT <1>.",
+      "The constraint enforcing custom validation expressions is a <2> constraint."
+],
+    blanks: [
+      {
+            "a": [
+                  "KEY"
+            ],
+            "why": "PRIMARY KEY identifies each row uniquely."
+      },
+      {
+            "a": [
+                  "NULL"
+            ],
+            "why": "NOT NULL forbids missing data."
+      },
+      {
+            "a": [
+                  "CHECK"
+            ],
+            "why": "CHECK enforces arbitrary boolean expressions."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why is storing monetary currency as a floating-point number (FLOAT/REAL) considered dangerous?",
+      a: ["Binary floating-point math causes rounding precision errors (e.g. 0.1 + 0.2 != 0.3); store as INTEGER cents or NUMERIC/DECIMAL instead","Floating-point numbers use too much hard drive space","SQL databases forbid floats in financial tables","Floating point numbers can only store negative numbers"],
+      c: 0,
+      why: "Binary floating point cannot accurately represent base-10 fractions; use DECIMAL or integer cents."
+    },
+    {
+      q: "What is the difference between VARCHAR(255) and TEXT in modern PostgreSQL?",
+      a: ["In PostgreSQL, both use the exact same underlying storage and performance; VARCHAR(255) merely enforces a length limit","TEXT is fifty times slower than VARCHAR","VARCHAR can only store English letters","TEXT cannot be indexed by B-trees"],
+      c: 0,
+      why: "Modern Postgres stores both identically; VARCHAR simply checks maximum character bounds."
+    },
+    {
+      q: "Can a table have multiple PRIMARY KEY constraints?",
+      a: ["No, a table can have only ONE primary key (though it can be a composite key of multiple columns)","Yes, a table can have up to ten primary keys","Only on Tuesdays","Yes, if the table has no foreign keys"],
+      c: 0,
+      why: "A table has exactly one primary key; multiple unique columns are configured via UNIQUE constraints."
+    },
+    {
+      q: "What does the 'DEFAULT' clause do in a column definition?",
+      a: ["Specifies a fallback value to insert if the INSERT statement does not provide a value for that column","Forces all rows to have the same value permanently","Deletes the column if it is empty","Sets the text color to black"],
+      c: 0,
+      why: "DEFAULT supplies values automatically (e.g. DEFAULT NOW() or DEFAULT 0)."
+    }
+  ]);
+</script>
+</body>
+</html>

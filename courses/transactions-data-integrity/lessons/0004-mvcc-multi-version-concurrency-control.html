@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 04 — MVCC: Multi-Version Concurrency Control</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="transactions-data-integrity" data-lesson="4" data-lesson-id="mvcc-multi-version-concurrency-control">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 04</span> · Isolation Levels & Anomalies</span>
+
+  <h1 class="lesson-title">MVCC: Multi-Version Concurrency Control</h1>
+  <p class="lesson-lede">
+    How does PostgreSQL allow readers to never block writers, and writers to never block readers? Discover Multi-Version Concurrency Control (MVCC) and transaction snapshots.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Explain how Multi-Version Concurrency Control (MVCC) eliminates read-write lock contention</span>
+    <span><b>Mission link</b> The architectural foundation of modern high-concurrency database engines</span>
+  </div>
+
+  <h2><span class="n">1</span>Readers do not block writers</h2>
+  <p>In older database engines, reading a table acquired a shared lock that blocked anyone from writing, and writing acquired an exclusive lock that blocked anyone from reading. Under heavy traffic, databases ground to a halt.</p><p>Modern databases (PostgreSQL, MySQL InnoDB, Oracle) solve this with <b>Multi-Version Concurrency Control (MVCC)</b>. When a row is updated, the database <i>does not overwrite the old row</i>: it writes a new version of the row with an active transaction ID. <b>Readers look at an older snapshot version, while writers create new versions.</b></p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    MVCC maintains multiple versions of rows so readers never block writers and writers never block readers.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Row tuple versioning (xmin and xmax)</h2>
+  <p>How PostgreSQL uses hidden system columns (xmin and xmax) to determine row visibility.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing MVCC tuple visibility</h2>
+  <p>Trace how Transaction 102 continues reading Version 1 even after Transaction 105 committed Version 2.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of MVCC mechanics.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can explain MVCC visibility rules and understand how databases deliver consistent snapshots without blocking concurrent writes.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Inspect hidden MVCC system columns in PostgreSQL using SELECT cmin, cmax, xmin, xmax FROM table.</li>
+    <li>Demonstrate concurrent read-write execution across two terminal sessions.</li>
+    <li>Explain why frequent updates create dead tuples that require autovacuum cleanup.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    PostgreSQL Documentation: *Concurrency Control — MVCC* (postgresql.org/docs/current/mvcc-intro.html).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "In an MVCC database, does a slow 10-minute reporting query block other users from updating rows?",
+    a: ["No, the reporting query reads an older consistent snapshot of rows without blocking concurrent updates","Yes, all updates are queued and blocked for 10 minutes","The database automatically terminates the reporting query after 5 seconds","The database converts all updates into deletes"],
+    c: 0,
+    why: "MVCC readers read snapshot versions without acquiring exclusive table locks."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Row Version 1",
+            "lines": [
+                  "xmin: 100 (created by tx 100)",
+                  "xmax: 105 (deleted/updated by tx 105)",
+                  "visible to transactions < 105"
+            ]
+      },
+      {
+            "title": "Row Version 2",
+            "lines": [
+                  "xmin: 105 (created by tx 105)",
+                  "xmax: 0 (active)",
+                  "visible to transactions >= 105"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Transaction 102 starts (snapshot takes note: active tx is 102)",
+      "# Transaction 105 updates balance from $100 to $200 and COMMITS",
+      "# Transaction 102 queries balance:",
+      "# MVCC check: xmin 105 was created AFTER tx 102 snapshot!",
+      "# Result: Transaction 102 reads Version 1 ($100) — consistent snapshot preserved!"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "tx_102": "snapshot established"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "tx_105": "created new version in heap"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "visibility_rules": "tuple version 2 invisible to older snapshot"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "outcome": "reads version 1 without lock contention"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The architecture maintaining multiple row versions is Multi-Version <0> Control.",
+      "The acronym MVCC stands for Multi-Version <1> Control.",
+      "The cleanup process that purges old dead row versions is <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "Concurrency"
+            ],
+            "why": "MVCC stands for Multi-Version Concurrency Control."
+      },
+      {
+            "a": [
+                  "Concurrency"
+            ],
+            "why": "Concurrency control regulates simultaneous operations."
+      },
+      {
+            "a": [
+                  "VACUUM"
+            ],
+            "why": "VACUUM in PostgreSQL reclaims dead tuple storage."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the primary benefit of Multi-Version Concurrency Control (MVCC)?",
+      a: ["Readers never block writers, and writers never block readers, maximizing concurrency and throughput","It eliminates the need for hard drives","It automatically writes unit tests for all database queries","It converts relational tables into NoSQL documents"],
+      c: 0,
+      why: "By serving snapshot copies to readers, MVCC eliminates read-write lock contention."
+    },
+    {
+      q: "What are 'dead tuples' in PostgreSQL MVCC storage?",
+      a: ["Older versions of rows that were deleted or superseded by an update, and are no longer visible to any active transaction","Rows containing numbers below zero","Corrupted rows caused by hard drive physical damage","Rows with NULL values in their primary key"],
+      c: 0,
+      why: "When a row updates, the old version becomes a dead tuple once all older snapshots complete."
+    },
+    {
+      q: "What role does the PostgreSQL 'autovacuum' background daemon perform?",
+      a: ["It scans tables, marks dead tuple space as reusable for future inserts, and updates table statistics","It deletes old user accounts after 30 days of inactivity","It resets forgotten database passwords","It reboots the server computer once a week"],
+      c: 0,
+      why: "Autovacuum cleans up dead tuple bloat and updates statistical histograms automatically."
+    },
+    {
+      q: "What hidden column in PostgreSQL records the transaction ID that created a row?",
+      a: ["xmin","xmax","ctid","created_by"],
+      c: 0,
+      why: "xmin stores the creating transaction ID; xmax stores the deleting/updating transaction ID."
+    }
+  ]);
+</script>
+</body>
+</html>

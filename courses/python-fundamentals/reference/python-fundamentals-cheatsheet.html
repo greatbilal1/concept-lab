@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python Fundamentals — Cheat Sheet</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+<style>
+  .ref-toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0 8px; }
+  .ref-toc a { font-size: .8rem; border: 1px solid var(--border); background: #111a30; padding: 5px 11px; border-radius: 999px; color: var(--muted); text-decoration: none; border-bottom: 1px solid var(--border); }
+  .ref-toc a:hover { color: #fff; border-color: #3d5488; }
+  .lesson-wrap h2 { scroll-margin-top: 20px; }
+  .snippet { margin: 14px 0 22px; }
+  .snippet .lbl { font-size: .72rem; font-weight: 800; letter-spacing: .7px; text-transform: uppercase; color: var(--accent2); margin-bottom: 6px; }
+  .see { font-size: .82rem; color: var(--muted); margin: -6px 0 12px; }
+  .see a { color: var(--accent2); border-bottom: 0; }
+  .see a:hover { color: #fff; }
+  .snippet pre { padding-top: 34px; }
+  @media print { .snippet pre { padding-top: 18px; } }
+</style>
+</head>
+<body class="lesson-body" data-course="python-fundamentals">
+
+<div class="lesson-wrap">
+
+  <span class="lesson-kicker">Reference · Cheat sheet</span>
+  <h1 class="lesson-title">Python Fundamentals — Cheat Sheet</h1>
+  <p class="lesson-lede">
+    The whole course on one page. Every snippet links back to the lesson that
+    teaches it.
+  </p>
+
+  <div class="ref-toc">
+    <a href="#run">Running code</a>
+    <a href="#names">Names &amp; values</a>
+    <a href="#types">Core types</a>
+    <a href="#strings">Strings</a>
+    <a href="#lists">Lists</a>
+    <a href="#decisions">Decisions</a>
+    <a href="#loops">Loops</a>
+    <a href="#functions">Functions</a>
+    <a href="#scope">Scope &amp; args</a>
+    <a href="#modules">Modules</a>
+  </div>
+
+  <h2 id="run"><span class="n">1</span>Running code</h2>
+  <p class="see">See <a href="../lessons/0001-running-your-first-program.html">Lesson 01 — Running your first program</a></p>
+  <div class="snippet">
+    <div class="lbl">REPL vs file</div>
+    <pre><code>python3            # start the REPL (interactive)
+python3 app.py     # run a file top to bottom
+
+# a comment — ignored by Python
+print("hello")     # expression -> value -> printed
+
+# traceback reads bottom-up:
+#   the LAST line names the error
+#   the lines above show the call path</code></pre>
+  </div>
+
+  <h2 id="names"><span class="n">2</span>Names &amp; values</h2>
+  <p class="see">See <a href="../lessons/0002-names-and-values.html">Lesson 02 — Names and values</a></p>
+  <div class="snippet">
+    <div class="lbl">Assignment binds a name to a value</div>
+    <pre><code>score = 10          # name = value
+score = score + 5   # rebind to a new value (15)
+
+a = 1
+b = a               # b points at the same value
+a = 2               # rebinding a does NOT change b
+
+print(missing)      # NameError: name is not defined
+
+# PEP 8: lowercase_with_underscores for names</code></pre>
+  </div>
+
+  <h2 id="types"><span class="n">3</span>Core types</h2>
+  <p class="see">See <a href="../lessons/0003-the-core-types.html">Lesson 03 — The core types</a></p>
+  <div class="snippet">
+    <div class="lbl">int, float, bool, None</div>
+    <pre><code>type(42)        # &lt;class 'int'&gt;
+type(3.14)      # &lt;class 'float'&gt;
+type(True)      # &lt;class 'bool'&gt;
+type(None)      # &lt;class 'NoneType'&gt;
+
+int("7")        # 7        (string -> int)
+float("2.5")    # 2.5
+str(42)         # "42"
+bool(0)         # False    (0, "", [], None are falsy)
+
+7 / 2           # 3.5   true division
+7 // 2          # 3     floor division
+7 % 2           # 1     remainder
+2 ** 10         # 1024  power</code></pre>
+  </div>
+
+  <h2 id="strings"><span class="n">4</span>Strings &amp; f-strings</h2>
+  <p class="see">See <a href="../lessons/0004-strings-and-f-strings.html">Lesson 04 — Strings and f-strings</a></p>
+  <div class="snippet">
+    <div class="lbl">Immutable text</div>
+    <pre><code>name = "Ada"
+name[0]            # "A"      index from 0
+name[-1]           # "a"      last character
+name[0:2]          # "Ad"     slice (end excluded)
+len(name)          # 3
+
+name.upper()       # "ADA"
+name.lower()       # "ada"
+"  hi  ".strip()   # "hi"
+"a,b,c".split(",") # ["a", "b", "c"]
+
+f"{name} is {len(name)}"   # "Ada is 3"
+
+# strings are immutable: name[0] = "B" raises TypeError</code></pre>
+  </div>
+
+  <h2 id="lists"><span class="n">5</span>Lists &amp; indexing</h2>
+  <p class="see">See <a href="../lessons/0005-lists-and-indexing.html">Lesson 05 — Lists and indexing</a></p>
+  <div class="snippet">
+    <div class="lbl">Ordered, mutable sequences</div>
+    <pre><code>nums = [10, 20, 30]
+nums[0]            # 10
+nums[-1]           # 30
+nums[0:2]          # [10, 20]
+len(nums)          # 3
+
+nums.append(40)    # [10, 20, 30, 40]
+nums[0] = 99       # lists ARE mutable
+20 in nums         # True
+
+for n in nums:     # iterate values
+    print(n)
+
+for i, n in enumerate(nums):   # index + value
+    print(i, n)</code></pre>
+  </div>
+
+  <h2 id="decisions"><span class="n">6</span>Making decisions</h2>
+  <p class="see">See <a href="../lessons/0006-making-decisions.html">Lesson 06 — Making decisions</a></p>
+  <div class="snippet">
+    <div class="lbl">if / elif / else &amp; comparisons</div>
+    <pre><code>if score &gt;= 90:
+    grade = "A"
+elif score &gt;= 80:
+    grade = "B"
+else:
+    grade = "C"
+
+# comparisons:  ==  !=  &lt;  &lt;=  &gt;  &gt;=
+# combine:      and   or   not
+
+if 0 &lt; score &lt;= 100:      # chained comparison
+    print("in range")
+
+# falsy values: 0, 0.0, "", [], {}, None, False</code></pre>
+  </div>
+
+  <h2 id="loops"><span class="n">7</span>Loops &amp; repetition</h2>
+  <p class="see">See <a href="../lessons/0007-loops-and-repetition.html">Lesson 07 — Loops and repetition</a></p>
+  <div class="snippet">
+    <div class="lbl">for and while</div>
+    <pre><code>for i in range(3):     # 0, 1, 2
+    print(i)
+
+range(2, 6)            # 2, 3, 4, 5
+range(0, 10, 2)        # 0, 2, 4, 6, 8
+
+n = 3
+while n &gt; 0:           # repeat while true
+    print(n)
+    n -= 1
+
+for n in nums:
+    if n == 20:
+        break          # stop the loop
+    if n == 10:
+        continue       # skip to next</code></pre>
+  </div>
+
+  <h2 id="functions"><span class="n">8</span>Defining functions</h2>
+  <p class="see">See <a href="../lessons/0008-defining-functions.html">Lesson 08 — Defining functions</a></p>
+  <div class="snippet">
+    <div class="lbl">def, parameters, return</div>
+    <pre><code>def double(n):
+    """Return n times two."""
+    return n * 2
+
+double(5)          # 10
+
+def area(w, h):
+    return w * h
+
+area(3, 4)         # 12   positional
+area(h=4, w=3)     # 12   keyword
+
+# no return -> returns None
+def log(msg):
+    print(msg)</code></pre>
+  </div>
+
+  <h2 id="scope"><span class="n">9</span>Scope &amp; arguments</h2>
+  <p class="see">See <a href="../lessons/0009-scope-and-arguments.html">Lesson 09 — Scope and arguments</a></p>
+  <div class="snippet">
+    <div class="lbl">LEGB &amp; defaults</div>
+    <pre><code># lookup order: Local, Enclosing, Global, Built-in
+def f():
+    x = 1          # local — gone after the call
+    return x
+
+def greet(name, greeting="Hello"):   # default
+    return f"{greeting}, {name}!"
+
+greet("Ada")                 # "Hello, Ada!"
+greet("Ada", greeting="Hi")  # "Hi, Ada!"
+
+# TRAP: never default to a mutable value
+def add(item, items=None):   # GOOD
+    if items is None:
+        items = []
+    items.append(item)
+    return items</code></pre>
+  </div>
+
+  <h2 id="modules"><span class="n">10</span>Modules &amp; the standard library</h2>
+  <p class="see">See <a href="../lessons/0010-modules-and-the-standard-library.html">Lesson 10 — Modules and the standard library</a></p>
+  <div class="snippet">
+    <div class="lbl">Import styles &amp; __main__</div>
+    <pre><code>import math                    # math.sqrt(16)
+from math import sqrt          # sqrt(16)
+from math import sqrt as root  # root(16)
+
+# standard library (no install needed):
+#   math, random, datetime, json, os
+
+def main():
+    print("running")
+
+if __name__ == "__main__":     # only when run directly
+    main()
+
+# avoid: from math import *   (dumps every name)</code></pre>
+  </div>
+
+  <div class="lesson-foot">
+    <div class="links">
+      <a href="python-fundamentals-glossary.html">📖 Glossary</a>
+      <a href="../lessons/0001-running-your-first-program.html">📘 Lesson 01</a>
+      <a href="../lessons/0010-modules-and-the-standard-library.html">🏁 Lesson 10</a>
+      <a href="../course.html">🗺️ All lessons</a>
+      <a href="../../../index.html">🧩 All courses</a>
+    </div>
+    <span style="color:var(--muted);font-size:.8rem">Reference · print-friendly</span>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script>
+  TeachLesson.init({ course: "python-fundamentals", lessons: window.TeachLessons || [] });
+</script>
+</body>
+</html>

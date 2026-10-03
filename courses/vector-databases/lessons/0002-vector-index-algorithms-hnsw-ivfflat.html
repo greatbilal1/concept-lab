@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 02 — Vector Index Algorithms: Flat vs HNSW vs IVFFlat</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="vector-databases" data-lesson="2" data-lesson-id="vector-index-algorithms-hnsw-ivfflat">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 02</span> · Index Algorithms</span>
+
+  <h1 class="lesson-title">Vector Index Algorithms: Flat vs HNSW vs IVFFlat</h1>
+  <p class="lesson-lede">
+    The workhorses of vector search: Inverted File Index (IVFFlat) and Hierarchical Navigable Small World (HNSW).
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You understand the mechanics, trade-offs, and graph topology of HNSW and IVFFlat indexes.</span>
+    <span><b>Mission link</b> Mastering vector index algorithms: flat vs hnsw vs ivfflat across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Vector Index Algorithms: Flat vs HNSW vs IVFFlat</h2>
+  <p>Vector databases do not use magic to search millions of vectors in 2 milliseconds. They use sophisticated <strong>Approximate Nearest Neighbor (ANN) Index Algorithms</strong>. The two most important algorithms in production are <strong>IVFFlat</strong> and <strong>HNSW</strong>.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    The workhorses of vector search: Inverted File Index (IVFFlat) and Hierarchical Navigable Small World (HNSW).
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>HNSW Multi-Layer Skip Graph</h2>
+  <p><strong>1. IVFFlat (Inverted File Flat Index):</strong></p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>IVFFlat Voronoi Clustering</h2>
+  <ul><li><strong>Clustering:</strong> Partitions vector space into $C$ clusters (Voronoi cells) using K-Means.</li><li><strong>Querying:</strong> When a query arrives, find the nearest cluster centroids, and search only the vectors inside those specific clusters!</li><li><strong>Trade-off:</strong> Very fast build times and low memory usage, but lower recall if the query falls near cluster boundaries.</li></ul><p><strong>2. HNSW (Hierarchical Navigable Small World):</strong></p><ul><li><strong>Skip-List Graph:</strong> Builds a multi-layer graph inspired by skip-lists. Top layers have long-range connections between distant hubs; bottom layers have dense local connections.</li><li><strong>Greedy Graph Navigation:</strong> The search starts at the top layer, takes giant leaps toward the target region, drops down a layer, and zooms in with local fine-grained hops!</li><li><strong>Trade-off:</strong> <strong>Supreme query speed and 99%+ recall</strong>, but consumes more RAM to store graph edges and takes longer to build.</li></ul><pre><code># HNSW Navigation Metaphor:
+# Layer 2 (Expressway): San Francisco ----------> New York
+# Layer 1 (Highway):    New York ------> Manhattan
+# Layer 0 (Local St):   Manhattan -> 5th Avenue -> Exact Address (Found in 2ms!)</code></pre><div class="callout"><p><strong>The Production Standard:</strong> Default to <strong>HNSW</strong> for high-throughput, low-latency applications. Use <strong>IVFFlat</strong> when RAM is severely constrained and slow build times cannot be tolerated.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the vector index sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You understand the mechanics, trade-offs, and graph topology of HNSW and IVFFlat indexes.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where vector index algorithms: flat vs hnsw vs ivfflat applies.</li>
+    <li>Author a unit test or verification script exercising vector index algorithms: flat vs hnsw vs ivfflat.</li>
+    <li>Document team architectural conventions regarding vector index algorithms: flat vs hnsw vs ivfflat.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Vector Index Algorithms: Flat vs HNSW vs IVFFlat.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is the dominant, state-of-the-art vector indexing algorithm used by modern vector databases?",
+    a: ["HNSW (Hierarchical Navigable Small World)","B-Tree","Binary Search Tree","Linked List"],
+    c: 0,
+    why: "HNSW is the industry standard for fast, high-recall approximate nearest neighbor search."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Layer 2: Expressway (Sparse)",
+            "lines": [
+                  "Distant long-range connections",
+                  "Takes giant macro hops across space"
+            ]
+      },
+      {
+            "title": "Layer 1: Arterial (Medium)",
+            "lines": [
+                  "Regional neighborhood edges",
+                  "Zooms into target cluster"
+            ]
+      },
+      {
+            "title": "Layer 0: Local Street (Dense)",
+            "lines": [
+                  "Fine-grained nearest neighbors",
+                  "Pinpoints exact semantic matches in 2ms!"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Vector Index Algorithms: Flat vs HNSW vs IVFFlat",
+      "def execute_flow():",
+      "    # The workhorses of vector search: Inverted File Ind...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Vector Index Algorithms: Flat vs HNSW vs IVFFlat"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "K-Means Centroids"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Low RAM Footprint"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "HNSW navigates multi-layer {1} graphs to achieve 99% recall in milliseconds, while IVFFlat partitions space using K-Means {2}."
+],
+    blanks: [
+      {
+            "a": [
+                  "skip"
+            ],
+            "why": "Multi-tiered highway graph structure"
+      },
+      {
+            "a": [
+                  "clusters"
+            ],
+            "why": "Centroid-based spatial cells"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why does HNSW consume more RAM than IVFFlat?",
+      a: ["HNSW must store millions of graph edge connections (pointers between neighboring nodes) in memory alongside the vectors","HNSW uses uncompressed images","HNSW is written in Python","HNSW stores duplicate vectors"],
+      c: 0,
+      why: "Maintaining multi-layer graph topology requires storing bidirectional edge pointer arrays in RAM."
+    },
+    {
+      q: "What parameter in HNSW controls the trade-off between index build time and search accuracy?",
+      a: ["M (number of bi-directional links per node) and efSearch / efConstruction","The screen brightness","The database password","The room temperature"],
+      c: 0,
+      why: "M governs graph density; ef parameters dictate how many candidates to explore during construction and search."
+    },
+    {
+      q: "What happens if a query in IVFFlat falls directly on the boundary between two Voronoi cluster cells?",
+      a: ["It may miss the true nearest neighbor if that neighbor sits just across the boundary in an adjacent unsearched cluster","The query crashes","The database deletes the cell","The vectors turn into text"],
+      c: 0,
+      why: "Searching only one centroid cell risks boundary misses; increasing nprobe checks neighboring centroids to compensate."
+    },
+    {
+      q: "Why is HNSW considered the gold standard for real-time semantic search?",
+      a: ["It consistently delivers single-digit millisecond query latency with over 98-99% recall on multi-million vector collections","It is free on all cloud providers","It runs on paper","It was invented by Google in 1990"],
+      c: 0,
+      why: "HNSW provides the best empirical speed-recall Pareto frontier in modern vector search benchmarks."
+    }
+  ]);
+</script>
+</body>
+</html>

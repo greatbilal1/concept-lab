@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Debugging Code — Cheat Sheet</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+<style>
+  .ref-toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0 8px; }
+  .ref-toc a { font-size: .8rem; border: 1px solid var(--border); background: #111a30; padding: 5px 11px; border-radius: 999px; color: var(--muted); text-decoration: none; border-bottom: 1px solid var(--border); }
+  .ref-toc a:hover { color: #fff; border-color: #3d5488; }
+  .lesson-wrap h2 { scroll-margin-top: 20px; }
+  .snippet { margin: 14px 0 22px; }
+  .snippet .lbl { font-size: .72rem; font-weight: 800; letter-spacing: .7px; text-transform: uppercase; color: var(--accent2); margin-bottom: 6px; }
+  .see { font-size: .82rem; color: var(--muted); margin: -6px 0 12px; }
+  .see a { color: var(--accent2); border-bottom: 0; }
+  .see a:hover { color: #fff; }
+  .snippet pre { padding-top: 34px; }
+  @media print { .snippet pre { padding-top: 18px; } }
+</style>
+</head>
+<body class="lesson-body" data-course="debugging-code">
+
+<div class="lesson-wrap">
+
+  <span class="lesson-kicker">Reference · Cheat sheet</span>
+  <h1 class="lesson-title">Debugging Code — Cheat Sheet</h1>
+  <p class="lesson-lede">
+    The whole course on one page. Every snippet links back to the lesson that
+    teaches it.
+  </p>
+
+  <div class="ref-toc">
+    <a href="#sec-1">Reproduction & Isolation</a>
+    <a href="#sec-2">Bisecting Search</a>
+    <a href="#sec-3">Stack Inspection</a>
+    <a href="#sec-4">Verification & Regression</a>
+  </div>
+
+  <h2 id="sec-1"><span class="n">1</span>Reproduction & Isolation</h2>
+  <div class="snippet">
+    <div class="lbl">Minimize the reproduction case</div>
+    <pre><code># 1. Strip external dependencies and network calls
+# 2. Find the smallest input that triggers the failure
+python -c "from app import calc; print(calc(-1))"</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0002-making-bugs-reproducible.html">Lesson 02 — Making bugs reproducible</a>.</p>
+
+  <h2 id="sec-2"><span class="n">2</span>Bisecting Search</h2>
+  <div class="snippet">
+    <div class="lbl">Find the introducing commit</div>
+    <pre><code>git bisect start
+git bisect bad                 # current commit fails
+git bisect good v1.4.0         # known good release
+git bisect run pytest test_bug.py</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0004-binary-search-and-git-bisect.html">Lesson 04 — Binary search and git bisect</a>.</p>
+
+  <h2 id="sec-3"><span class="n">3</span>Stack Inspection</h2>
+  <div class="snippet">
+    <div class="lbl">Reading tracebacks and frame state</div>
+    <pre><code>import pdb; pdb.set_trace()
+# Navigation commands:
+# n (next line)
+# s (step into call)
+# c (continue execution)
+# p variable_name (print value)</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0006-using-breakpoints-and-inspectors.html">Lesson 06 — Using breakpoints and inspectors</a>.</p>
+
+  <h2 id="sec-4"><span class="n">4</span>Verification & Regression</h2>
+  <div class="snippet">
+    <div class="lbl">Preventing recurrence</div>
+    <pre><code>def test_negative_quantity_raises_value_error():
+    with pytest.raises(ValueError):
+        calculate_total(price=10, quantity=-1)</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0008-fixing-the-cause-not-the-symptom.html">Lesson 08 — Fixing the cause, not the symptom</a>.</p>
+
+  <div class="lesson-foot">
+    <div class="links">
+      <a href="debugging-code-glossary.html">📖 Glossary</a>
+      <a href="../course.html">← Course map</a>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

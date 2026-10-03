@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 01 — The Logits Vector and Softmax Probabilities</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="inference-sampling" data-lesson="1" data-lesson-id="logits-and-softmax-probabilities">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 01</span> · Logits & Softmax</span>
+
+  <h1 class="lesson-title">The Logits Vector and Softmax Probabilities</h1>
+  <p class="lesson-lede">
+    The mathematical foundation of sampling: how the Language Model Head produces raw logits and converts them to probabilities.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You understand the mathematical transformation from raw logits to Softmax probability distributions.</span>
+    <span><b>Mission link</b> Mastering the logits vector and softmax probabilities across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of The Logits Vector and Softmax Probabilities</h2>
+  <p>Every time a language model generates a token, the final transformer layer outputs a high-dimensional vector. The Language Model Head multiplies this vector by the vocabulary matrix, producing an unnormalized list of real numbers called <strong>Logits</strong> (one score for every token in the vocabulary, e.g. 128,000 numbers).</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    The mathematical foundation of sampling: how the Language Model Head produces raw logits and converts them to probabilities.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Logits to Probabilities Pipeline</h2>
+  <p>To turn raw logits into meaningful probabilities, the model passes them through the <strong>Softmax function</strong>:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Numerical Stability Trick</h2>
+  $$P(w_i) = \frac{e^{z_i / T}}{\sum_{j} e^{z_j / T}}$$<p>Softmax has two vital properties:</p><ul><li><strong>Exponentiation ($e^{z_i}$):</strong> Turns any real number (even negative numbers like $-5.2$) into a strictly positive number, while magnifying small differences between top contenders.</li><li><strong>Normalization ($\sum e^{z_j}$):</strong> Divides each score by the sum of all scores, guaranteeing that all probabilities add up to <strong>exactly $1.0$ ($100\%$)</strong>.</li></ul><pre><code># Computing Softmax Probabilities in Python:
+import numpy as np
+
+def logits_to_probabilities(logits, temperature=1.0):
+    # Scale logits by temperature
+    scaled = logits / temperature
+    # Subtract max for numerical stability (prevents overflow in exp)
+    exp_scores = np.exp(scaled - np.max(scaled))
+    # Normalize to probabilities
+    return exp_scores / np.sum(exp_scores)</code></pre><div class="callout"><p><strong>The Core Understanding:</strong> An LLM does not generate words; it generates a probability distribution over words. Sampling parameters dictate how you pick from this distribution.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the logits sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You understand the mathematical transformation from raw logits to Softmax probability distributions.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where the logits vector and softmax probabilities applies.</li>
+    <li>Author a unit test or verification script exercising the logits vector and softmax probabilities.</li>
+    <li>Document team architectural conventions regarding the logits vector and softmax probabilities.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for The Logits Vector and Softmax Probabilities.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What mathematical function transforms unnormalized raw model logits into a valid probability distribution?",
+    a: ["The Softmax function: p_i = exp(z_i) / sum(exp(z_j))","The Sigmoid function","A simple linear average","The square root function"],
+    c: 0,
+    why: "Softmax exponentiates and normalizes raw logits so that every probability is positive and the sum equals exactly 1.0."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1. Raw Logits (z)",
+            "lines": [
+                  "['cat': 12.4, 'dog': 11.8, 'car': 2.1]",
+                  "Unbounded real numbers (-inf to +inf)"
+            ]
+      },
+      {
+            "title": "2. Exponentiation (e^z)",
+            "lines": [
+                  "['cat': 242792, 'dog': 133255, 'car': 8.1]",
+                  "Magnifies differences, strictly positive"
+            ]
+      },
+      {
+            "title": "3. Softmax Normalization",
+            "lines": [
+                  "['cat': 64.5%, 'dog': 35.4%, 'car': 0.002%]",
+                  "Sums to 100% across all 128k tokens"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing The Logits Vector and Softmax Probabilities",
+      "def execute_flow():",
+      "    # The mathematical foundation of sampling: how the L...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "The Logits Vector and Softmax Probabilities"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Naive Softmax"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Stable Softmax"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The Language Model Head outputs raw {1} that are converted into a normalized probability distribution using the {2} function."
+],
+    blanks: [
+      {
+            "a": [
+                  "logits"
+            ],
+            "why": "Unnormalized raw scores"
+      },
+      {
+            "a": [
+                  "Softmax"
+            ],
+            "why": "Exponential normalization function"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the sum of all probabilities output by the Softmax function across the model's vocabulary?",
+      a: ["Exactly 1.0 (or 100%)","It varies depending on temperature","0.0","128,000"],
+      c: 0,
+      why: "By mathematical definition, Softmax normalizes all outputs into a valid probability distribution summing to 1.0."
+    },
+    {
+      q: "Why does Softmax use exponentiation (e^z) rather than simple linear normalization (z / sum(z))?",
+      a: ["Exponentiation ensures all values are strictly positive and magnifies small differences between the most competitive candidates","Exponentiation is faster on CPUs","Linear normalization is illegal in math","Linear normalization deletes negative numbers"],
+      c: 0,
+      why: "Exponentiation handles negative logits gracefully while sharpening separation between high-scoring tokens."
+    },
+    {
+      q: "What is the 'Log-Sum-Exp' trick in deep learning engineering?",
+      a: ["A numerical stability technique that subtracts the maximum logit before exponentiation to prevent floating-point overflow","A trick for hacking passwords","A method for compressing text","A tool for counting tokens"],
+      c: 0,
+      why: "Subtracting the max logit prevents e^x from overflowing standard 32-bit floating-point registers."
+    },
+    {
+      q: "What happens if all logits in a vocabulary are identical (e.g. all equal 5.0)?",
+      a: ["Softmax outputs a uniform distribution where every single token has an equal probability (1 / V)","The model crashes","The model outputs the first token","The probabilities are all zero"],
+      c: 0,
+      why: "Identical logits produce a completely flat, uniform probability distribution across the vocabulary."
+    }
+  ]);
+</script>
+</body>
+</html>

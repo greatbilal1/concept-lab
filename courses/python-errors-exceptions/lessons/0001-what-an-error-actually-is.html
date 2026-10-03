@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 01 — What an error actually is</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="python-errors-exceptions" data-lesson="1" data-lesson-id="what-an-error-actually-is">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 01</span> · Tracebacks</span>
+
+  <h1 class="lesson-title">What an error actually is</h1>
+  <p class="lesson-lede">
+    An error is not a punishment. It is Python telling you, precisely, that a
+    promise it made could not be kept. This lesson is about what that message is
+    made of — and why the two kinds of failure you will meet behave completely
+    differently.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Tell a syntax error from a runtime error</span>
+    <span><b>Mission link</b> The vocabulary every later lesson builds on</span>
+  </div>
+
+  <h2><span class="n">1</span>Two ways a program can fail</h2>
+
+  <p>
+    You have already seen both of these. Run a file with a missing bracket and
+    Python refuses to start. Run a file that divides by zero and Python starts
+    fine, then stops halfway through. Those feel similar when you are staring at
+    a red wall of text, but they are completely different events.
+  </p>
+
+  <p>
+    The first is a <b>syntax error</b>. Python reads your whole file before it
+    runs a single line, translating it into instructions. If the grammar is
+    broken, that translation fails and <b>nothing executes at all</b>. Not the
+    first line, not the imports, nothing.
+  </p>
+
+  <p>
+    The second is a <b>runtime error</b>. The file was valid, so Python began
+    running it. Somewhere in the middle, an operation could not be completed —
+    and Python stopped <i>at that line</i>, with everything before it already
+    done.
+  </p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    A syntax error means "I cannot understand this file." A runtime error means
+    "I understood it, I ran it, and this specific step was impossible."
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>An exception is an object</h2>
+
+  <p>
+    Here is the idea that makes the rest of this course click. When a runtime
+    error happens, Python does not just print a message and quit. It <b>creates
+    an object</b> — an instance of an exception class — and then starts moving it
+    up through your program.
+  </p>
+
+  <p>
+    That object has a type (<code>ZeroDivisionError</code>), a message
+    (<code>"division by zero"</code>), and a record of where it happened. Because
+    it is an object, you can catch it, inspect it, store it, and raise it again.
+    That is the entire mechanism behind <code>try</code>/<code>except</code>.
+  </p>
+
+  <div id="diagram1"></div>
+
+  <p>
+    The exception classes form a tree. <code>ZeroDivisionError</code> is a kind
+    of <code>ArithmeticError</code>, which is a kind of <code>Exception</code>,
+    which is a kind of <code>BaseException</code>. When you catch a type, you
+    catch everything beneath it — which is powerful, and also the source of the
+    most common mistake in this whole subject.
+  </p>
+
+  <h2><span class="n">3</span>Watch it travel</h2>
+
+  <p>
+    Trace this program. The exception is created deep inside <code>average</code>,
+    but nothing there handles it — so it travels up to <code>report</code>, and
+    then up to the top level, where Python finally prints it and stops.
+  </p>
+
+  <div id="trace1"></div>
+
+  <p>
+    Notice that the program did not "crash randomly". It stopped at exactly the
+    line that could not complete, and the exception walked up the call stack
+    looking for someone willing to handle it. Nobody was, so it reached the top.
+  </p>
+
+  <h2><span class="n">4</span>Practice</h2>
+
+  <p>Recall the key facts from memory before the quiz.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>
+      You can now look at a failure and say which of the two kinds it is — and
+      you know that a runtime error is a real object travelling up your call
+      stack, not just text on a screen. That object is what every remaining
+      lesson in this course is about.
+    </p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>
+      Write a file with a deliberate syntax error (delete a closing bracket) and
+      run it. Confirm that <b>no</b> <code>print</code> before the error appears.
+    </li>
+    <li>
+      Now write a file that prints three lines and then divides by zero. Confirm
+      that the first three lines <b>do</b> appear before the error.
+    </li>
+    <li>
+      In a Python shell, run <code>help(ZeroDivisionError)</code> and then
+      <code>ZeroDivisionError.__mro__</code>. Read the chain of parents — that is
+      the hierarchy you will catch against in Lesson 03.
+    </li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Read the Python tutorial's
+    <a href="https://docs.python.org/3/tutorial/errors.html">"Errors and Exceptions"</a>,
+    sections 8.1 and 8.2. It is short, and it is the exact behaviour this lesson
+    describes.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher (me) anything — "why does Python
+    check the whole file first?", "what is <code>BaseException</code> for?",
+    "can I create an exception without raising it?". There are no bad questions
+    here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  /* predict-then-reveal: the syntax vs runtime distinction */
+  TeachWidgets.predict("#predict1", {
+    q: "A file prints \"start\", then divides by zero. What do you see?",
+    a: ["Nothing at all prints", "Only the error message", "The word start, then an error"],
+    c: 2,
+    why: "The file was valid, so it ran. \"start\" printed, then the division failed at runtime. A syntax error would have printed nothing."
+  });
+
+  /* the exception hierarchy as a diagram */
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      { title: "BaseException", lines: ["the root", "of everything"] },
+      { title: "Exception", lines: ["normal errors", "you should catch"] },
+      { title: "ArithmeticError", lines: ["math failures", "grouped together"] },
+      { title: "ZeroDivisionError", lines: ["the actual", "object raised"] }
+    ],
+    vertical: true
+  });
+
+  /* step-through: the exception travelling up the stack */
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "def average(nums):",
+      "    return sum(nums) / len(nums)",
+      "",
+      "def report(nums):",
+      "    return average(nums)",
+      "",
+      "report([])"
+    ],
+    steps: [
+      { line: 6, vars: { call: "report([])", stack: "report" } },
+      { line: 4, vars: { call: "average([])", stack: "report → average" } },
+      { line: 1, vars: { nums: "[]", len: "0", problem: "divide by zero" } },
+      { line: 1, vars: { raised: "ZeroDivisionError", handled: "nobody", result: "program stops" } }
+    ]
+  });
+
+  /* recall from memory */
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the blanks",
+    lines: [
+      "A <0> error stops the file before any line runs.",
+      "A runtime error creates an <1> object and moves it up the stack.",
+      "The root of the exception tree is <2>."
+    ],
+    blanks: [
+      { a: ["syntax"], why: "Python parses the whole file first; broken grammar means nothing executes." },
+      { a: ["exception"], why: "The runtime error is an object with a type, a message, and a location." },
+      { a: ["BaseException"], why: "Every exception class descends from BaseException." }
+    ]
+  });
+
+  /* the quiz — every option in a question has the same word count */
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What happens when a file has a syntax error?",
+      a: ["Nothing in the file runs", "Only the first line runs", "The file runs then stops", "Python repairs the mistake here"],
+      c: 0,
+      why: "Python parses the entire file before executing anything, so a syntax error means zero lines run."
+    },
+    {
+      q: "What is a runtime error?",
+      a: ["A file that cannot parse", "An exception raised while running", "A warning printed by Python", "A missing import statement here"],
+      c: 1,
+      why: "The file was valid and started running; an operation failed partway through and raised an exception."
+    },
+    {
+      q: "What does Python create when an error happens?",
+      a: ["A plain text message", "A new source file", "An exception object here", "A system log entry"],
+      c: 2,
+      why: "Python instantiates an exception class. That object carries the type, message, and traceback."
+    },
+    {
+      q: "Where does an unhandled exception end up?",
+      a: ["At top of the stack", "Inside the first function here", "In a hidden log file", "At the line that raised"],
+      c: 0,
+      why: "It propagates up the call stack until something catches it, or it reaches the top and stops the program."
+    }
+  ]);
+</script>
+</body>
+</html>

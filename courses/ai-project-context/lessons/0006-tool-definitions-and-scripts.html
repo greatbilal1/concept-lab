@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 06 — Tool Definitions and Workflow Scripts</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="ai-project-context" data-lesson="6" data-lesson-id="tool-definitions-and-scripts">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 06</span> · Tooling & Scripts</span>
+
+  <h1 class="lesson-title">Tool Definitions and Workflow Scripts</h1>
+  <p class="lesson-lede">
+    Providing agents with explicit workflow scripts (make, npm, just) and custom tool configurations.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to provide standardized workflow scripts that streamline agent execution.</span>
+    <span><b>Mission link</b> Mastering tool definitions and workflow scripts across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Tool Definitions and Workflow Scripts</h2>
+  <p>Every software project has specific execution rituals: <em>'Before running tests, you must set PYTHONPATH=. and export TEST_DB_URL=...'</em>. If an agent tries to run `pytest` naively, it will fail with import errors or missing database connections.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Providing agents with explicit workflow scripts (make, npm, just) and custom tool configurations.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Workflow Scripts as Agent Interfaces</h2>
+  <p>The solution is to provide <strong>standardized workflow scripts</strong> using tools like `Makefile`, `justfile`, or `npm scripts`:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>The One-Command Verification Gate</h2>
+  <pre><code># Makefile / justfile: Project Workflow Contract
+test-unit:
+    @PYTHONPATH=. pytest -m unit --tb=short
+
+test-integration:
+    @docker compose up -d test-db
+    @PYTHONPATH=. pytest -m integration
+
+lint:
+    @ruff check src/ tests/
+    @mypy src/</code></pre><p>In your agent instructions, simply state: <em>'To run unit tests, execute `make test-unit`. To run linter, execute `make lint`.'</em> The agent now has zero friction, zero command guessing, and guaranteed environment parity.</p><div class="callout"><p><strong>One-Command Verification:</strong> Provide a single `make check` command that runs linters, type checks, and fast tests together. The agent can run this single command to verify all gates!</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the workflow script sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to provide standardized workflow scripts that streamline agent execution.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where tool definitions and workflow scripts applies.</li>
+    <li>Author a unit test or verification script exercising tool definitions and workflow scripts.</li>
+    <li>Document team architectural conventions regarding tool definitions and workflow scripts.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Tool Definitions and Workflow Scripts.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Why is giving an agent standardized workflow scripts (e.g. 'make test', 'npm run lint') safer than letting it guess terminal commands?",
+    a: ["Standard scripts encapsulate exact environment variables, flags, and paths required by your specific project setup","Terminal commands are illegal in commercial code","Agents cannot execute bash commands","Standard scripts run without CPU power"],
+    c: 0,
+    why: "Project scripts wrap complex environment flags and setup commands into predictable, reliable invocations."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Naive Terminal Guessing",
+            "lines": [
+                  "pytest -> Fails (missing PYTHONPATH)",
+                  "pytest -v -> Fails (no DB env var)",
+                  "Wasted turns debugging the runner"
+            ]
+      },
+      {
+            "title": "Standardized Workflow Script",
+            "lines": [
+                  "make test-unit",
+                  "Pre-configured flags & environment",
+                  "Executes cleanly in 1 turn"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Tool Definitions and Workflow Scripts",
+      "def execute_flow():",
+      "    # Providing agents with explicit workflow scripts (m...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Tool Definitions and Workflow Scripts"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "make check"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Standard workflow scripts like makefiles encapsulate {1} variables and flags into predictable {2} that agents can run cleanly."
+],
+    blanks: [
+      {
+            "a": [
+                  "environment"
+            ],
+            "why": "Configuration settings like PYTHONPATH"
+      },
+      {
+            "a": [
+                  "commands"
+            ],
+            "why": "Shell invocations like make test"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why is 'make check' or 'npm test' superior to having an agent compose raw shell commands?",
+      a: ["It prevents the agent from forgetting project-specific flags, environment variables, or path configurations","It speeds up the internet connection","It compiles Python into assembly language","It bypasses all failing tests"],
+      c: 0,
+      why: "Encapsulating flags and environment variables inside scripts ensures consistent, reproducible test execution."
+    },
+    {
+      q: "What happens if an agent tries to run integration tests without the required environment variables?",
+      a: ["The test runner fails immediately with connection or configuration errors, wasting time and turns","The computer restarts","The database automatically repairs itself","The agent invents new environment variables"],
+      c: 0,
+      why: "Missing environment variables cause confusing false failures that derail agent progress."
+    },
+    {
+      q: "What tool helps manage project workflow scripts on modern cross-platform development stacks?",
+      a: ["A Makefile, justfile, or npm package.json scripts","A Microsoft Word document","A spreadsheet","A PDF viewer"],
+      c: 0,
+      why: "Makefiles, justfiles, and npm scripts are standard execution runners recognized across all platforms."
+    },
+    {
+      q: "Where should the primary workflow commands be documented for the agent?",
+      a: ["In the repository's copilot-instructions.md or README.md","In the user's browser bookmarks","On a sticky note","In git commit messages"],
+      c: 0,
+      why: "Documenting build and test commands in instruction files primes the agent with the exact execution commands."
+    }
+  ]);
+</script>
+</body>
+</html>

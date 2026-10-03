@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 07 — Accessibility roles and ARIA basics</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="html-dom" data-lesson="7" data-lesson-id="accessibility-roles-and-aria-basics">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 07</span> · Accessibility & Inspection</span>
+
+  <h1 class="lesson-title">Accessibility roles and ARIA basics</h1>
+  <p class="lesson-lede">
+    Accessibility is not a feature; it is the web working as designed. Learn how the browser constructs the Accessibility Tree and when to use ARIA attributes.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Apply ARIA roles and labels to enhance accessibility without violating standard semantics</span>
+    <span><b>Mission link</b> Ensures applications are fully operable by users of assistive technology</span>
+  </div>
+
+  <h2><span class="n">1</span>The Accessibility Tree</h2>
+  <p>In parallel with the visual DOM, the browser builds an <b>Accessibility Tree</b> for operating system assistive technologies (screen readers, braille displays). Every accessibility node has four properties: <b>Role</b> (what is it?), <b>Name</b> (what is it called?), <b>Value</b>, and <b>State</b>.</p><p>The golden rule of accessibility: <b>The first rule of ARIA is do not use ARIA if a native HTML element exists</b>. A native <code>&lt;button&gt;</code> has keyboard focus, enter key submission, and role button built in; a <code>&lt;div role="button"&gt;</code> has none of these unless you implement them manually.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Native semantic HTML provides built-in accessibility roles, states, and keyboard navigation for free.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>When ARIA is required</h2>
+  <p>Use ARIA when building custom widgets (like modals or tabs) that native HTML does not natively provide.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing accessibility tree inspection</h2>
+  <p>Trace how a screen reader interprets an icon button with an aria-label.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your recall of accessibility fundamentals.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can build custom interactive components that communicate clear names, roles, and states to assistive technologies.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Inspect the Accessibility Tree of a website using the Accessibility tab in Chrome/Firefox DevTools.</li>
+    <li>Navigate your application using only the Tab and Enter keys on your keyboard.</li>
+    <li>Add an aria-label to any button that contains only a visual icon.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    W3C: *WAI-ARIA Authoring Practices Guide (APG)* (w3.org/WAI/ARIA/apg).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is the first rule of ARIA according to the W3C specification?",
+    a: ["If you can use a native HTML element or attribute with the semantics you need, do so instead of ARIA","Always add role='button' to every clickable div on the web page","ARIA must only be used on websites with government contracts","Every element on the page must have an aria-label attribute"],
+    c: 0,
+    why: "Native elements have keyboard interactions, focus management, and accessibility semantics built in."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "aria-label",
+            "lines": [
+                  "provides accessible name",
+                  "used when no visible text exists (e.g. icon buttons)"
+            ]
+      },
+      {
+            "title": "aria-hidden='true'",
+            "lines": [
+                  "hides decorative icons from screen reader",
+                  "prevents noise"
+            ]
+      },
+      {
+            "title": "aria-live='polite'",
+            "lines": [
+                  "announces dynamic notifications",
+                  "does not interrupt current speech"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Markup: <button aria-label='Close modal'><svg aria-hidden='true'>...</svg></button>",
+      "A11y Node: Role = 'button'",
+      "A11y Node: Accessible Name = 'Close modal'",
+      "A11y Node: Child SVG = ignored (hidden from accessibility tree)",
+      "# Screen reader announces: 'Close modal, button'"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "element": "HTMLButtonElement"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "role": "button (focusable via Tab)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "name": "'Close modal' extracted from aria-label"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "screen_reader": "concise, unambiguous announcement to user"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The tree created by browsers specifically for screen readers is the <0> tree.",
+      "The attribute providing an accessible name to an icon button is aria-<1>.",
+      "To announce dynamic content updates without interrupting speech, use aria-live='<2>'."
+],
+    blanks: [
+      {
+            "a": [
+                  "Accessibility",
+                  "a11y"
+            ],
+            "why": "The Accessibility Tree translates DOM semantics to assistive tools."
+      },
+      {
+            "a": [
+                  "label"
+            ],
+            "why": "aria-label supplies an accessible string name."
+      },
+      {
+            "a": [
+                  "polite"
+            ],
+            "why": "aria-live='polite' announces changes when the user is idle."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What does the attribute 'aria-hidden=\"true\"' do?",
+      a: ["Hides the element from the Accessibility Tree while keeping it visible on screen","Deletes the element from the DOM tree permanently","Hides the element visually from the screen but announces it to screen readers","Disables all CSS transitions on the element"],
+      c: 0,
+      why: "aria-hidden='true' hides elements (like decorative icons) from assistive technologies."
+    },
+    {
+      q: "Why is a native <button> superior to a <div onclick='...'>?",
+      a: ["Buttons have built-in keyboard focusability (Tab) and Enter/Space activation without extra code","Buttons load faster over high-latency cellular connections","Divs cannot execute JavaScript functions","Browsers charge royalty fees for div click handlers"],
+      c: 0,
+      why: "<div> has no keyboard support or accessibility role; reproducing button behavior by hand is error-prone."
+    },
+    {
+      q: "What does 'aria-expanded=\"true\"' communicate to a screen reader user on a menu button?",
+      a: ["That the associated dropdown menu or accordion panel is currently open and visible","That the button has been enlarged by CSS zoom styles","That the user has clicked the button more than ten times","That the website has completed loading"],
+      c: 0,
+      why: "aria-expanded communicates the collapsible state of associated dropdown or modal content."
+    },
+    {
+      q: "What is the purpose of 'tabindex=\"0\"' on an element?",
+      a: ["Inserts the element into the natural keyboard tab navigation order","Removes the element from keyboard tab order permanently","Forces the element to be focused immediately upon page load","Sets the element opacity to zero"],
+      c: 0,
+      why: "tabindex='0' makes a non-interactive element focusable in natural document sequence."
+    }
+  ]);
+</script>
+</body>
+</html>

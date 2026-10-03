@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 08 — Filtering groups with HAVING</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="sql-relational-databases" data-lesson="8" data-lesson-id="filtering-groups-with-having">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 08</span> · Aggregations & Analytics</span>
+
+  <h1 class="lesson-title">Filtering groups with HAVING</h1>
+  <p class="lesson-lede">
+    Why can't you use 'WHERE COUNT(*) > 5'? Learn the crucial difference between WHERE (filtering rows before grouping) and HAVING (filtering groups after aggregation).
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Filter aggregated datasets using HAVING clauses and optimize analytical queries</span>
+    <span><b>Mission link</b> Completes the logical SQL execution pipeline for advanced data analysis</span>
+  </div>
+
+  <h2><span class="n">1</span>WHERE filters rows; HAVING filters groups</h2>
+  <p>A common beginner mistake is writing <code>WHERE COUNT(*) > 5</code>. The database immediately throws an error: <i>'aggregate functions are not allowed in WHERE'</i>.</p><p>Why? Because the <code>WHERE</code> clause runs <b>before</b> rows are grouped! To filter aggregated buckets, SQL provides the <b>HAVING</b> clause. <code>WHERE</code> filters individual rows <i>before</i> grouping; <code>HAVING</code> filters summary groups <i>after</i> grouping.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    WHERE filters raw rows before grouping; HAVING filters aggregated groups after grouping.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The complete 6-clause pipeline</h2>
+  <p>Review the full logical execution order of an advanced SQL query.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing WHERE and HAVING together</h2>
+  <p>Trace how a query filters recent orders first with WHERE, then filters high-volume buyers with HAVING.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of WHERE versus HAVING.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can combine WHERE and HAVING clauses to author sophisticated analytical reporting queries without syntax errors.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Write a query finding departments with more than 5 employees using HAVING COUNT(*) > 5.</li>
+    <li>Combine WHERE (filter active accounts) with HAVING (filter high balances) in a single query.</li>
+    <li>Observe the error thrown when attempting to place an aggregate function in a WHERE clause.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Alan Beaulieu, *Learning SQL*, Chapter 8: 'Grouping Conditions with the HAVING Clause'.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Which clause filters out customers who have spent less than $1,000 total across all their orders?",
+    a: ["HAVING SUM(orders.total) >= 1000","WHERE SUM(orders.total) >= 1000","ORDER BY SUM(orders.total) >= 1000","GROUP BY total >= 1000"],
+    c: 0,
+    why: "Total spend is an aggregate calculation (SUM); filtering aggregates requires the HAVING clause."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1. FROM -> 2. WHERE",
+            "lines": [
+                  "gather source tables",
+                  "filter raw rows (active = true)"
+            ]
+      },
+      {
+            "title": "3. GROUP BY -> 4. HAVING",
+            "lines": [
+                  "partition into buckets (by user_id)",
+                  "filter aggregate buckets (COUNT(*) > 5)"
+            ]
+      },
+      {
+            "title": "5. SELECT -> 6. ORDER BY",
+            "lines": [
+                  "project columns and expressions",
+                  "sort final result set (LIMIT n)"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "SELECT customer_id, COUNT(*) AS recent_orders",
+      "FROM orders",
+      "WHERE order_date >= '2026-01-01'  # 1. Filter raw rows first",
+      "GROUP BY customer_id              # 2. Group by customer",
+      "HAVING COUNT(*) >= 3              # 3. Filter groups with >= 3 orders",
+      "ORDER BY recent_orders DESC;"
+],
+    steps: [
+      {
+            "line": 2,
+            "vars": {
+                  "where": "discards orders before 2026"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "group": "groups remaining 2026 orders by customer_id"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "having": "keeps only customers who placed at least 3 orders"
+            }
+      },
+      {
+            "line": 5,
+            "vars": {
+                  "sort": "presents top repeat customers in 2026"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "To filter individual rows before grouping, use the <0> clause.",
+      "To filter aggregated summary groups after grouping, use the <1> clause.",
+      "Aggregate functions like COUNT and SUM are forbidden inside the <2> clause."
+],
+    blanks: [
+      {
+            "a": [
+                  "WHERE"
+            ],
+            "why": "WHERE operates on raw un-grouped rows."
+      },
+      {
+            "a": [
+                  "HAVING"
+            ],
+            "why": "HAVING operates on aggregated groups."
+      },
+      {
+            "a": [
+                  "WHERE"
+            ],
+            "why": "WHERE cannot evaluate aggregate functions."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the primary difference between WHERE and HAVING in SQL?",
+      a: ["WHERE filters individual rows before grouping; HAVING filters aggregated groups after grouping","WHERE is for numbers; HAVING is for text strings","WHERE runs after SELECT; HAVING runs before FROM","There is no difference between them"],
+      c: 0,
+      why: "WHERE evaluates row-by-row before grouping; HAVING evaluates summary groups."
+    },
+    {
+      q: "Why can't you write 'WHERE COUNT(*) > 10'?",
+      a: ["Because the WHERE clause executes before rows are grouped, so the count does not exist yet","Because COUNT is not supported on modern databases","Because 10 is too large a number for SQL","Because WHERE can only be used with primary keys"],
+      c: 0,
+      why: "Aggregates are calculated after WHERE finishes; filtering aggregates must happen in HAVING."
+    },
+    {
+      q: "Can you use a non-aggregated column in a HAVING clause?",
+      a: ["Only if that column is included in the GROUP BY clause (otherwise filter it in WHERE instead)","Yes, any column from any table can be used in HAVING","No, HAVING can only contain numbers","Only on SQLite databases"],
+      c: 0,
+      why: "Raw row filters belong in WHERE; HAVING should only reference grouped columns or aggregates."
+    },
+    {
+      q: "Why is filtering rows with WHERE before grouping more efficient than filtering in HAVING?",
+      a: ["WHERE reduces the number of rows before grouping and aggregating, saving CPU and memory","WHERE automatically bypasses disk reads","HAVING causes database queries to time out","There is no performance difference"],
+      c: 0,
+      why: "Filtering early with WHERE reduces the volume of data that the engine must sort and aggregate."
+    }
+  ]);
+</script>
+</body>
+</html>

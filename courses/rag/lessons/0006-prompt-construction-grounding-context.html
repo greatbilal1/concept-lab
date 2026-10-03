@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 06 — Prompt Construction: Grounding the Model in Retrieved Context</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="rag" data-lesson="6" data-lesson-id="prompt-construction-grounding-context">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 06</span> · Grounding Prompts</span>
+
+  <h1 class="lesson-title">Prompt Construction: Grounding the Model in Retrieved Context</h1>
+  <p class="lesson-lede">
+    Synthesizing retrieved chunks into the prompt: grounding templates, system constraints, and the 'I don't know' fallback.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to construct strictly grounded RAG prompt templates.</span>
+    <span><b>Mission link</b> Mastering prompt construction: grounding the model in retrieved context across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Prompt Construction: Grounding the Model in Retrieved Context</h2>
+  <p>Retrieving the right chunks is only half the battle. If your prompt template is weak, the model might ignore the retrieved chunks entirely and hallucinate from its pre-training memory!</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Synthesizing retrieved chunks into the prompt: grounding templates, system constraints, and the 'I don't know' fallback.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Grounded RAG Prompt Architecture</h2>
+  <p>A production <strong>RAG Prompt Template</strong> enforces strict grounding:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Preventing Extrapolation</h2>
+  <ul><li><strong>1. Explicit Grounding Directive:</strong> State clearly in the system prompt: <em>'You are an assistant who answers questions using strictly the provided &lt;context&gt; documents. Do NOT extrapolate or assume.'</em></li><li><strong>2. The Honest Fallback Clause:</strong> <em>'If the provided context does not contain sufficient information to answer the question, state honestly: "I do not have enough information in the provided documentation to answer that question."'</em></li><li><strong>3. Structural Context Brackets:</strong> Enclose each retrieved chunk in clean XML tags with its source ID: `&lt;doc id="1" source="billing.md"&gt; ... &lt;/doc&gt;`.</li></ul><pre><code># Production RAG Prompt Construction in Python:
+context_str = "\n".join([
+    f'<doc id="{i+1}" source="{meta["source"]}">\n{chunk}\n</doc>'
+    for i, (chunk, meta) in enumerate(retrieved_pairs)
+])
+
+system_prompt = """You are a corporate knowledge assistant.
+Answer the user's question using ONLY the facts in the <context> below.
+If the answer cannot be deduced from the context, reply:
+"I am sorry, but the provided documentation does not contain that information."
+Do NOT use outside knowledge."""
+
+user_message = f"""<context>
+{context_str}
+</context>
+
+Question: {user_query}"""</code></pre><div class="callout"><p><strong>The Golden Grounding Rule:</strong> An AI system that honestly says 'I don't know' builds trust. An AI system that makes up plausible lies destroys trust.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the grounding prompt sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to construct strictly grounded RAG prompt templates.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where prompt construction: grounding the model in retrieved context applies.</li>
+    <li>Author a unit test or verification script exercising prompt construction: grounding the model in retrieved context.</li>
+    <li>Document team architectural conventions regarding prompt construction: grounding the model in retrieved context.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Prompt Construction: Grounding the Model in Retrieved Context.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What prompt instruction is essential in a RAG system to prevent the model from guessing when retrieved documents do not contain the answer?",
+    a: ["'Answer the question using ONLY the provided context. If the context does not contain the answer, reply: I do not have enough information.'","'Guess the answer if you don't know'","'Look up the answer on Google'","'Be as creative as possible'"],
+    c: 0,
+    why: "Explicitly instructing the model to reply 'I do not have enough information' stops it from falling back on hallucinations."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "System Directive",
+            "lines": [
+                  "'Answer using ONLY the provided <context>'",
+                  "'If absent, reply: I do not have enough info'"
+            ]
+      },
+      {
+            "title": "Context Block (<context>)",
+            "lines": [
+                  "<doc id='1' source='billing.md'> ... </doc>",
+                  "<doc id='2' source='faq.md'> ... </doc>"
+            ]
+      },
+      {
+            "title": "User Query",
+            "lines": [
+                  "'How do I cancel my subscription?'",
+                  "Model answers strictly from docs 1 and 2"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Prompt Construction: Grounding the Model in Retrieved Context",
+      "def execute_flow():",
+      "    # Synthesizing retrieved chunks into the prompt: gro...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Prompt Construction: Grounding the Model in Retrieved Context"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Ungrounded Prompt"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Strictly Grounded Prompt"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Grounding prompts prevent hallucinations by requiring models to answer using only the provided context and providing an explicit fallback when information is {1}."
+],
+    blanks: [
+      {
+            "a": [
+                  "absent"
+            ],
+            "why": "Missing from the retrieved documents"
+      },
+      {
+            "a": [
+                  "facts"
+            ],
+            "why": "Verified information pieces"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why is enclosing retrieved chunks in explicit tags like <doc id='1'> useful for both the model and the user?",
+      a: ["It allows the model to reference and cite specific document IDs directly in its answer (e.g. 'According to (Doc 1)...')","It makes the text colorful","It saves hard drive space","It compiles the text to HTML"],
+      c: 0,
+      why: "Tagged document chunks give the model explicit references to cite in its explanations."
+    },
+    {
+      q: "What happens if a RAG prompt omits an explicit 'I do not have enough information' instruction?",
+      a: ["The model will attempt to be helpful and fall back on its pre-training memory, frequently hallucinating plausible false answers","The API throws an error","The server crashes","The model shuts down"],
+      c: 0,
+      why: "Without a permitted fallback, models feel compelled to answer, leading to ungrounded hallucinations."
+    },
+    {
+      q: "Why should retrieved context documents be placed before the user query in the prompt?",
+      a: ["It provides the factual evidence first, ensuring the user query sits at the high-recall end of the context window","It is required by Python syntax","Queries cannot be at the top","To save internet bandwidth"],
+      c: 0,
+      why: "Placing the query last allows the model's generation to immediately address the user question with context in view."
+    },
+    {
+      q: "How does prompt grounding change how users perceive system reliability?",
+      a: ["Users trust the system because answers are consistent, verifiable, and the system admits when it does not know something","Users think the system is slow","Users stop using the software","Users demand refunds"],
+      c: 0,
+      why: "Honest admissions of ignorance build immense enterprise user trust."
+    }
+  ]);
+</script>
+</body>
+</html>

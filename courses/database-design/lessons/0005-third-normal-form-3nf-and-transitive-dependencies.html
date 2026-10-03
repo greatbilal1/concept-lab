@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 05 — Third normal form (3NF) and transitive dependencies</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="database-design" data-lesson="5" data-lesson-id="third-normal-form-3nf-and-transitive-dependencies">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 05</span> · Normalization Forms & Anomalies</span>
+
+  <h1 class="lesson-title">Third normal form (3NF) and transitive dependencies</h1>
+  <p class="lesson-lede">
+    Every non-key attribute must depend on the key, the whole key, and nothing but the key. Master 1NF, 2NF, and 3NF to eliminate duplicate data and design flaws.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Normalize messy relational schemas into Third Normal Form (3NF)</span>
+    <span><b>Mission link</b> The core mathematical discipline for durable relational schema design</span>
+  </div>
+
+  <h2><span class="n">1</span>The three normal forms in plain English</h2>
+  <p>Database normalization is a step-by-step process to eliminate redundant data. Bill Kent summarized it in one famous sentence: <i>'Every non-key attribute must provide a fact about the key, the whole key, and nothing but the key, so help me Codd.'</i></p><p><b>1NF (The Key):</b> All values are atomic; no repeating groups. <b>2NF (The Whole Key):</b> No partial dependencies on composite keys. <b>3NF (Nothing But the Key):</b> No transitive dependencies — columns cannot depend on other non-key columns.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    3NF ensures every non-key column depends solely on the primary key, eliminating redundancy.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Normalization Ladder</h2>
+  <p>Ascend the normalization ladder from unnormalized sheets to clean 3NF relations.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing a 3NF decomposition</h2>
+  <p>Trace how splitting a transitive dependency eliminates duplicate data across thousands of orders.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of normalization forms.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can audit and normalize any database schema into Third Normal Form to eliminate data redundancy.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit a table in your project to verify that no non-key column depends on another non-key column.</li>
+    <li>Refactor a table with comma-separated values into a clean 1NF relationship.</li>
+    <li>Recite the Bill Kent mnemonic: 'the key, the whole key, and nothing but the key'.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    William Kent, *A Simple Guide to Five Normal Forms in Relational Database Theory* (Communications of the ACM, 1983).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "A table has columns: (order_id, user_id, user_email). What normal form violation exists?",
+    a: ["3NF violation: user_email depends on user_id (a non-key), not on order_id","1NF violation: user_id is not a number","There is no violation; this schema is perfect","2NF violation because order_id is too short"],
+    c: 0,
+    why: "Transitive dependency: user_email depends on user_id; if user_id changes, email is duplicated."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1NF (Atomic)",
+            "lines": [
+                  "eliminate comma-separated lists",
+                  "ensure unique primary key"
+            ]
+      },
+      {
+            "title": "2NF (Whole Key)",
+            "lines": [
+                  "eliminate partial dependencies",
+                  "relevant for composite keys"
+            ]
+      },
+      {
+            "title": "3NF (Nothing But Key)",
+            "lines": [
+                  "eliminate transitive dependencies",
+                  "move user_email into users table!"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Un-normalized orders: (id, user_id, user_city, user_zip)",
+      "# If Ada moves from London to Paris, we must UPDATE 500 order rows!",
+      "# Decomposed into 3NF:",
+      "# users table: (id, city, zip) -> update ONCE!",
+      "# orders table: (id, user_id, total) -> zero redundant user data!"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "redundancy": "user_city repeated on every order"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "anomaly": "update anomaly risk if one row update fails"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "normalized_users": "city lives strictly in users table"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "normalized_orders": "orders references user_id only"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The requirement that all column values must be atomic is <0>NF.",
+      "When a column depends on another non-key column, it is a <1> dependency.",
+      "Third Normal Form is abbreviated as <2>NF."
+],
+    blanks: [
+      {
+            "a": [
+                  "1",
+                  "First"
+            ],
+            "why": "1NF mandates scalar atomic values."
+      },
+      {
+            "a": [
+                  "transitive"
+            ],
+            "why": "Transitive dependencies violate 3NF."
+      },
+      {
+            "a": [
+                  "3",
+                  "Third"
+            ],
+            "why": "3NF is the standard target for relational schemas."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What does First Normal Form (1NF) require?",
+      a: ["Every column must hold atomic (indivisible) scalar values with no repeating arrays or comma lists, and each row must be uniquely identifiable","Every table must have at least ten columns","All text must be written in uppercase","The database must run on a single computer"],
+      c: 0,
+      why: "1NF eliminates repeating groups and enforces atomic data values."
+    },
+    {
+      q: "What is a 'transitive dependency' in relational theory?",
+      a: ["When column C depends on column B, which in turn depends on primary key A (A -> B -> C)","When a query takes more than 10 seconds to execute","When a foreign key references a table on another physical server","When an SQL query contains more than three joins"],
+      c: 0,
+      why: "Transitive dependencies violate 3NF because attribute C does not depend directly on the primary key."
+    },
+    {
+      q: "What is the primary benefit of reaching Third Normal Form (3NF)?",
+      a: ["Every fact is stored in exactly ONE place, eliminating update, insertion, and deletion anomalies","The database uses fifty percent less internet bandwidth","SQL queries no longer require WHERE clauses","All numbers are automatically formatted as currency"],
+      c: 0,
+      why: "Single-source-of-truth storage ensures updates can never leave data in inconsistent states."
+    },
+    {
+      q: "Why does Second Normal Form (2NF) only matter for tables with composite primary keys?",
+      a: ["If a primary key consists of a single column, partial dependency on 'part of the key' is mathematically impossible","Because 2NF was deprecated in modern SQL","Because composite keys cannot be indexed","Because single-column keys violate 1NF"],
+      c: 0,
+      why: "Partial key dependencies can only exist when the primary key comprises multiple columns."
+    }
+  ]);
+</script>
+</body>
+</html>

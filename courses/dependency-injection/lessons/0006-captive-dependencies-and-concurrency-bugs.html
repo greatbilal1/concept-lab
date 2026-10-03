@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 06 — Captive dependencies and concurrency bugs</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="dependency-injection" data-lesson="6" data-lesson-id="captive-dependencies-and-concurrency-bugs">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 06</span> · Containers & Lifecycles</span>
+
+  <h1 class="lesson-title">Captive dependencies and concurrency bugs</h1>
+  <p class="lesson-lede">
+    The silent killer of dependency injection. Learn what happens when a long-lived Singleton accidentally holds onto a short-lived Scoped service: the Captive Dependency bug.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Detect and prevent captive dependency bugs across container lifecycle configurations</span>
+    <span><b>Mission link</b> Prevents subtle multi-threading and memory leak bugs in production servers</span>
+  </div>
+
+  <h2><span class="n">1</span>The captive trap</h2>
+  <p>A <b>Captive Dependency</b> is a severe lifecycle mismatch bug: it happens when <i>a service with a longer lifecycle holds onto a dependency with a shorter lifecycle</i>.</p><p>The classic disaster: you configure <code>CacheManager</code> as a <b>Singleton</b> (lives forever), but inject a <b>Scoped</b> <code>DatabaseSession</code> into it. The Singleton traps that database session forever! The session is never closed, memory leaks, and concurrent user requests end up sharing the exact same database connection!</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    A service must never depend on a service with a shorter lifetime (e.g. Singleton depending on Scoped).
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The lifecycle compatibility rule</h2>
+  <p>Dependencies can only point toward equal or LONGER lifecycles; pointing to shorter lifecycles is illegal.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing captive dependency corruption</h2>
+  <p>Trace how a captive dependency leaks User A's data to User B across requests.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of captive dependencies.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can audit dependency injection graphs and eliminate captive dependencies before they cause production memory leaks.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your DI configuration to verify that no Singleton depends on a Scoped service.</li>
+    <li>Enable container validation (e.g. ValidateScopes in .NET) to catch captive dependencies on startup.</li>
+    <li>Refactor a captive service by passing the scoped dependency as a method parameter rather than constructor field.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Mark Seemann: *Captive Dependency* (blog.ploeh.dk/2014/06/02/captive-dependency/).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What happens if a Singleton service receives a Scoped database connection in its constructor on application boot?",
+    a: ["The Singleton holds that single database connection forever (captive dependency), causing memory leaks and cross-request state pollution","The database automatically restarts every five minutes","The compiler rejects the application code","There is no negative consequence"],
+    c: 0,
+    why: "The singleton lives forever, keeping the scoped resource trapped and preventing its disposal."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Legal: Scoped -> Singleton",
+            "lines": [
+                  "Scoped RequestService depends on Singleton Pool",
+                  "Pool lives longer; completely safe!"
+            ]
+      },
+      {
+            "title": "Legal: Transient -> Scoped",
+            "lines": [
+                  "Transient Helper depends on Scoped DbSession",
+                  "Helper dies first; completely safe!"
+            ]
+      },
+      {
+            "title": "ILLEGAL: Singleton -> Scoped (Captive!)",
+            "lines": [
+                  "Singleton Manager depends on Scoped DbSession",
+                  "Traps scoped session forever! Memory leak & race conditions!"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Singleton Service: NotificationManager (created on boot)",
+      "# Captive bug: Injected with Scoped CurrentUserContext from Request 1 (User A)",
+      "# 5 minutes later, Request 2 arrives for User B:",
+      "NotificationManager.send_alert('Your balance changed')",
+      "# BUG: NotificationManager still holds User A's context! Sends alert to User A instead of User B!"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "singleton": "NotificationManager lives for entire server process"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "captive_leak": "trapped User A's scoped context in long-lived field"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "corruption": "stale captive context pollutes unrelated Request 2"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "When a longer-lived service traps a shorter-lived service, it is a <0> dependency.",
+      "A Singleton must never depend on a service with a <1> lifecycle.",
+      "Captive dependencies can cause severe memory <2>s and race conditions."
+],
+    blanks: [
+      {
+            "a": [
+                  "captive"
+            ],
+            "why": "Captive dependencies trap short-lived instances."
+      },
+      {
+            "a": [
+                  "scoped",
+                  "shorter"
+            ],
+            "why": "Dependencies must have equal or longer lifespans."
+      },
+      {
+            "a": [
+                  "leak",
+                  "leaks"
+            ],
+            "why": "Trapped instances are never garbage collected."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is a 'Captive Dependency' in dependency injection architecture?",
+      a: ["A dependency that is inadvertently kept alive longer than its intended lifetime because it was injected into a service with a longer lifecycle","A dependency held hostage by a computer virus","A dependency that can only be downloaded from GitHub","A database password that cannot be changed"],
+      c: 0,
+      why: "Longer-lived parent instances hold references to short-lived children, keeping them captive."
+    },
+    {
+      q: "Which lifecycle combination creates a dangerous Captive Dependency?",
+      a: ["A Singleton class depending on a Scoped class in its constructor","A Scoped class depending on a Singleton class","A Transient class depending on a Transient class","A Scoped class depending on a Scoped class"],
+      c: 0,
+      why: "Singletons live forever, trapping the scoped service and preventing its per-request teardown."
+    },
+    {
+      q: "How can you safely provide a Scoped dependency to a Singleton service without creating a captive dependency?",
+      a: ["Pass the scoped dependency as a parameter to the specific method call (Method Injection), or inject a factory that creates a scope","Make all services in the application Singletons","Store the scoped dependency in a global text file","Delete the Singleton service"],
+      c: 0,
+      why: "Method injection or factory scopes resolve the dependency dynamically without storing a persistent reference."
+    },
+    {
+      q: "What feature in modern DI containers (like ASP.NET Core DI) detects captive dependencies automatically?",
+      a: ["Scope Validation (ValidateScopes = true), which throws an exception on startup if a Singleton resolves a Scoped service","Automated unit test generators","The operating system firewall","The hard drive defragmenter"],
+      c: 0,
+      why: "Scope validation checks the dependency graph at startup and fails fast if captive dependencies exist."
+    }
+  ]);
+</script>
+</body>
+</html>

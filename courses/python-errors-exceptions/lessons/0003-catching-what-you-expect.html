@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 03 — Catching what you expect</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="python-errors-exceptions" data-lesson="3" data-lesson-id="catching-what-you-expect">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 03</span> · Catching</span>
+
+  <h1 class="lesson-title">Catching what you expect</h1>
+  <p class="lesson-lede">
+    You can now read a traceback. The next step is to stop the program from
+    dying when a failure is predictable. <code>try</code> and
+    <code>except</code> let you say "I know this can fail, and here is what to do
+    instead" — but only if you name the exception you actually expect.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Handle a specific exception without hiding others</span>
+    <span><b>Mission link</b> Control over failure, not fear of it</span>
+  </div>
+
+  <h2><span class="n">1</span>From crash to choice</h2>
+
+  <p>
+    Suppose you ask the user for a number and convert it with
+    <code>int()</code>. If they type "hello", Python raises
+    <code>ValueError</code> and your program stops. But this failure is
+    <i>expected</i> — users type the wrong thing all the time. You want to
+    respond, not crash.
+  </p>
+
+  <pre><code>try:
+    age = int(input("Age: "))
+except ValueError:
+    print("That was not a number.")
+    age = 0</code></pre>
+
+  <p>
+    The <code>try</code> block holds the risky line. The
+    <code>except ValueError</code> block runs <i>only</i> if a
+    <code>ValueError</code> is raised inside it. If the conversion succeeds, the
+    handler is skipped entirely.
+  </p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    <code>except</code> names the exception you expect. Anything else keeps
+    propagating, exactly as it did in Lesson 01.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Only the first match runs</h2>
+
+  <p>
+    You can list several handlers, and Python checks them top to bottom. The
+    <b>first</b> one whose type matches runs; the rest are ignored. This matters
+    because exception types form the tree you met in Lesson 01 — a handler for a
+    parent also matches every child.
+  </p>
+
+  <div id="diagram1"></div>
+
+  <p>
+    So order matters. Put specific types first and general ones last, or a broad
+    handler will swallow the cases you meant to treat separately.
+  </p>
+
+  <h2><span class="n">3</span>Watch the handler fire</h2>
+
+  <p>
+    Step through this program. The <code>try</code> block raises, Python looks
+    for a matching <code>except</code>, finds it, and continues after the whole
+    statement.
+  </p>
+
+  <div id="trace1"></div>
+
+  <p>
+    Notice that the line after the <code>try</code>/<code>except</code> still
+    runs. Catching does not end the program — it redirects it.
+  </p>
+
+  <h2><span class="n">4</span>Practice</h2>
+
+  <p>Recall the key facts from memory before the quiz.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>
+      You can wrap a risky operation in <code>try</code>, name the exact
+      exception you expect in <code>except</code>, and know that every other
+      exception still travels up the stack untouched.
+    </p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>
+      Write a <code>try</code>/<code>except ValueError</code> around
+      <code>int(input())</code> and test it with both a number and a word.
+    </li>
+    <li>
+      Add a second handler for <code>ZeroDivisionError</code> and confirm only
+      the matching one runs.
+    </li>
+    <li>
+      Swap the order of a specific and a general handler and predict which one
+      fires. Then run it to check.
+    </li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Read the Python tutorial's
+    <a href="https://docs.python.org/3/tutorial/errors.html">"Errors and Exceptions"</a>,
+    section 8.3, "Handling Exceptions", which introduces <code>try</code> and
+    <code>except</code>.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher (me) anything — "can I catch two
+    types at once?", "what if no handler matches?", "does the try block have to
+    be one line?". There are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  /* predict-then-reveal: does the handler run? */
+  TeachWidgets.predict("#predict1", {
+    q: "The try block succeeds with no error. What happens to the except block?",
+    a: ["It runs anyway", "It is skipped", "It raises an error"],
+    c: 1,
+    why: "The handler only runs when a matching exception is raised. Success means the except block is skipped."
+  });
+
+  /* matching order */
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      { title: "try", lines: ["risky code", "may raise"] },
+      { title: "except A", lines: ["checked first", "specific type"] },
+      { title: "except B", lines: ["checked second", "general type"] }
+    ],
+    vertical: true
+  });
+
+  /* step-through: a handler catching the exception */
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "try:",
+      "    n = int(\"hello\")",
+      "except ValueError:",
+      "    n = 0",
+      "print(n)"
+    ],
+    steps: [
+      { line: 1, vars: { call: "int(\"hello\")", state: "inside try" } },
+      { line: 1, vars: { raised: "ValueError", handled: "searching handlers" } },
+      { line: 3, vars: { matched: "except ValueError", n: "0" } },
+      { line: 4, vars: { n: "0", result: "program continues" } }
+    ]
+  });
+
+  /* recall from memory */
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the blanks",
+    lines: [
+      "The <0> block holds the code that might raise.",
+      "The <1> block runs only when a matching exception is raised.",
+      "Python runs the <2> matching handler and ignores the rest."
+    ],
+    blanks: [
+      { a: ["try"], why: "try marks the risky region Python watches." },
+      { a: ["except"], why: "except names the type it is willing to handle." },
+      { a: ["first"], why: "Handlers are checked top to bottom; the first match wins." }
+    ]
+  });
+
+  /* the quiz — every option in a question has the same word count */
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "When does an except block run?",
+      a: ["When a matching exception raises", "When the try block succeeds", "When the program starts up", "When the file is imported"],
+      c: 0,
+      why: "The handler runs only if an exception of the named type is raised inside the try block."
+    },
+    {
+      q: "What happens if no handler matches?",
+      a: ["The exception keeps propagating", "The exception is discarded", "The program restarts itself", "The try block reruns"],
+      c: 0,
+      why: "An unmatched exception is not caught, so it continues up the stack as in Lesson 01."
+    },
+    {
+      q: "Which handler runs when several match?",
+      a: ["The first matching one", "The last matching one", "All matching ones here", "A random matching one"],
+      c: 0,
+      why: "Python checks handlers top to bottom and runs only the first whose type matches."
+    },
+    {
+      q: "Why put specific types before general ones?",
+      a: ["A general handler matches children", "A specific handler matches parents", "Order never actually matters here", "General handlers run much faster"],
+      c: 0,
+      why: "A parent type also matches its subclasses, so a broad handler placed first would swallow specific cases."
+    }
+  ]);
+</script>
+</body>
+</html>

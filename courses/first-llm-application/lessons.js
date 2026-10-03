@@ -1,0 +1,57 @@
+/* ============================================================
+   Building Your First LLM Application — lesson manifest
+   ------------------------------------------------------------
+   The single source of truth for this course's order. Every
+   lesson page, the course map, the gating logic and the lesson
+   hub all read from this list.
+   ============================================================ */
+window.TeachLessons = [
+  { n: 1, id: "anatomy-of-an-llm-app", file: "lessons/0001-anatomy-of-an-llm-app.html", title: "Anatomy of an LLM Application", topic: "Architecture", anim: "Generic" },
+  { n: 2, id: "sdk-setup-and-secure-api-keys", file: "lessons/0002-sdk-setup-and-secure-api-keys.html", title: "Setting Up the SDK and API Keys Securely", topic: "Security & Config", anim: "Generic" },
+  { n: 3, id: "system-prompt-and-user-messages", file: "lessons/0003-system-prompt-and-user-messages.html", title: "Crafting the System Prompt and User Message", topic: "Message Roles", anim: "Generic" },
+  { n: 4, id: "streaming-responses-sse", file: "lessons/0004-streaming-responses-sse.html", title: "Streaming Responses for Fast User Experience (SSE)", topic: "Streaming", anim: "Generic" },
+  { n: 5, id: "error-handling-rate-limits-timeouts", file: "lessons/0005-error-handling-rate-limits-timeouts.html", title: "Error Handling: Rate Limits, Timeouts, and API Outages", topic: "Error Handling", anim: "Generic" },
+  { n: 6, id: "sanitizing-validating-responses", file: "lessons/0006-sanitizing-validating-responses.html", title: "Sanitizing and Validating Model Responses", topic: "Validation", anim: "Generic" },
+  { n: 7, id: "logging-cost-tracking-auditing", file: "lessons/0007-logging-cost-tracking-auditing.html", title: "Logging, Cost Tracking, and Usage Auditing", topic: "Observability", anim: "Generic" },
+  { n: 8, id: "shipping-production-endpoint", file: "lessons/0008-shipping-production-endpoint.html", title: "Shipping a Production-Ready Node/Python Endpoint", topic: "Production Deployment", anim: "Generic" }
+];
+
+/* ============================================================
+   Building Your First LLM Application — glossary
+   ------------------------------------------------------------
+   The vocabulary of this course, grouped into sections.
+   ============================================================ */
+window.TeachGlossary = [
+  {
+    id: "architecture", title: "Architecture & Roles",
+    terms: [
+      { term: "LLM Application Pipeline", def: "The multi-stage software flow: input sanitization, prompt assembly, API call, schema validation, and delivery.", lesson: 1, tags: ["architecture","llms"] },
+      { term: "System Prompt", def: "A high-authority message setting global identity, behavioral rules, constraints, and output formatting for an AI session.", lesson: 3, tags: ["prompting","roles"] },
+      { term: "Client Singleton", def: "An architectural pattern instantiating the SDK client once to reuse underlying HTTP keep-alive connection pools.", lesson: 2, tags: ["networking","patterns"] }
+    ]
+  },
+  {
+    id: "streaming", title: "Streaming & Transport",
+    terms: [
+      { term: "Server-Sent Events", def: "An HTTP transport protocol allowing servers to stream incremental token deltas in real time to web clients.", lesson: 4, tags: ["streaming","http"] },
+      { term: "Time-to-First-Token", def: "The elapsed duration from sending a request until the first generated token arrives at the client.", lesson: 4, tags: ["latency","ux"] },
+      { term: "Token Delta", def: "An incremental fragment of text emitted during an active streaming generation chunk.", lesson: 4, tags: ["streaming","tokens"] }
+    ]
+  },
+  {
+    id: "resilience", title: "Resilience & Security",
+    terms: [
+      { term: "Exponential Backoff", def: "A retry algorithm that doubles wait times between attempts to absorb rate limits and network spikes.", lesson: 5, tags: ["resilience","algorithms"] },
+      { term: "Jitter", def: "Small random time variations added to retry intervals to prevent thundering herd collisions on recovering servers.", lesson: 5, tags: ["networking","resilience"] },
+      { term: "Output Sanitization", def: "Defensive cleaning of model text (stripping markdown fences, sanitizing HTML, parameterizing SQL) before ingestion.", lesson: 6, tags: ["security","validation"] }
+    ]
+  },
+  {
+    id: "operations", title: "Operations & Economics",
+    terms: [
+      { term: "Token Quota", def: "A monthly or hourly usage budget capping the maximum tokens a specific tenant or user can consume.", lesson: 7, tags: ["economics","saas"] },
+      { term: "LLM Observability", def: "The practice of logging, tracing, and monitoring model token spend, latency, and quality across production systems.", lesson: 7, tags: ["mlops","monitoring"] },
+      { term: "Unit Economics", def: "The financial cost of serving a single customer transaction compared against the revenue generated by that action.", lesson: 7, tags: ["business","finance"] }
+    ]
+  }
+];

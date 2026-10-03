@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 03 — Threat Modeling with STRIDE and Attack Trees</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="cybersecurity-fundamentals" data-lesson="3" data-lesson-id="threat-modeling-stride-attack-trees">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 03</span> · Threat Modeling</span>
+
+  <h1 class="lesson-title">Threat Modeling with STRIDE and Attack Trees</h1>
+  <p class="lesson-lede">
+    Proactive risk assessment: the STRIDE methodology (Spoofing, Tampering, Repudiation, Info Disclosure, DoS, Elevation of Privilege) and attack trees.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to discover and mitigate security threats using STRIDE and attack trees.</span>
+    <span><b>Mission link</b> Mastering threat modeling with stride and attack trees across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Threat Modeling with STRIDE and Attack Trees</h2>
+  <p>Finding security vulnerabilities after software is deployed to production costs 30x more than finding them during architecture design. <strong>Threat Modeling</strong> is the structured practice of analyzing an architecture diagram to ask: <em>'What can go wrong, and what are we going to do about it?'</em></p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Proactive risk assessment: the STRIDE methodology (Spoofing, Tampering, Repudiation, Info Disclosure, DoS, Elevation of Privilege) and attack trees.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The STRIDE Threat Categories</h2>
+  <p>The Microsoft <strong>STRIDE Framework</strong> decomposes threats into 6 categories:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Attack Tree Visualization</h2>
+  <ul><li><strong>S — Spoofing Identity:</strong> Pretending to be someone else (stolen tokens, fake headers). <em>Defense:</em> Strong authentication, MFA, signed JWTs.</li><li><strong>T — Tampering with Data:</strong> Modifying data in transit or memory. <em>Defense:</em> TLS encryption, SHA-256 hashes, input validation.</li><li><strong>R — Repudiation:</strong> Claiming an action was never taken ('I didn't transfer that money!'). <em>Defense:</em> Immutable audit logging, digital signatures.</li><li><strong>I — Information Disclosure:</strong> Leaking private data (stack traces, PII, API keys). <em>Defense:</em> Encryption at rest, secret scrubbers.</li><li><strong>D — Denial of Service:</strong> Crashing or starving system resources. <em>Defense:</em> Rate limiters, circuit breakers, autoscaling.</li><li><strong>E — Elevation of Privilege:</strong> A regular user gaining admin privileges. <em>Defense:</em> Least privilege, strict RBAC authorization.</li></ul><pre><code># Threat Modeling Table Example (Payment Microservice):
+# Element        | Threat Category    | Vulnerability Identified               | Mitigation
+# --------------------------------------------------------------------------------------------------
+# /api/pay       | Spoofing           | Attacker sends forged user_id header   | Validate cryptographically signed JWT
+# DB Connection  | Information Leak   | Plaintext database password in repo    | Use AWS Secrets Manager
+# /checkout      | Denial of Service  | Script floods checkout with 10k calls  | Enforce Redis Token Bucket rate limit</code></pre><div class="callout"><p><strong>The Design Rule:</strong> Conduct a STRIDE threat model on every major feature before writing a single line of code. Catching architectural flaws on a whiteboard saves months of triage.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the threat modeling sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to discover and mitigate security threats using STRIDE and attack trees.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where threat modeling with stride and attack trees applies.</li>
+    <li>Author a unit test or verification script exercising threat modeling with stride and attack trees.</li>
+    <li>Document team architectural conventions regarding threat modeling with stride and attack trees.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Threat Modeling with STRIDE and Attack Trees.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is 'STRIDE' in software security engineering?",
+    a: ["A threat modeling mnemonic developed by Microsoft to identify six categories of security threats during system design","A brand of running shoes","A network routing protocol","A programming language"],
+    c: 0,
+    why: "STRIDE categorizes threats into Spoofing, Tampering, Repudiation, Information Disclosure, Denial of Service, and Elevation of Privilege."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Spoofing (Identity)",
+            "lines": [
+                  "Pretending to be someone else",
+                  "Defense: MFA, signed JWT tokens"
+            ]
+      },
+      {
+            "title": "Tampering (Data)",
+            "lines": [
+                  "Modifying data or payloads",
+                  "Defense: TLS 1.3, cryptographic hashes"
+            ]
+      },
+      {
+            "title": "Repudiation (Denial)",
+            "lines": [
+                  "Denying having taken an action",
+                  "Defense: Immutable audit logs"
+            ]
+      },
+      {
+            "title": "Information Disclosure",
+            "lines": [
+                  "Leaking secrets or personal data",
+                  "Defense: Encryption at rest, PII scrubbing"
+            ]
+      },
+      {
+            "title": "Denial of Service",
+            "lines": [
+                  "Crashing or starving availability",
+                  "Defense: Rate limiting, circuit breakers"
+            ]
+      },
+      {
+            "title": "Elevation of Privilege",
+            "lines": [
+                  "Unauthorized administrative access",
+                  "Defense: Least privilege, strict RBAC"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Threat Modeling with STRIDE and Attack Trees",
+      "def execute_flow():",
+      "    # Proactive risk assessment: the STRIDE methodology ...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Threat Modeling with STRIDE and Attack Trees"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Goal: Steal Customer Data"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The STRIDE framework systematically discovers threats across Spoofing, Tampering, Repudiation, Information Disclosure, Denial of Service, and {1} of {2}."
+],
+    blanks: [
+      {
+            "a": [
+                  "Elevation"
+            ],
+            "why": "Unauthorized escalation of user rights"
+      },
+      {
+            "a": [
+                  "Privilege"
+            ],
+            "why": "Administrative security clearance"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What STRIDE threat category does a hacker impersonating an administrator using a stolen session cookie represent?",
+      a: ["Spoofing (and potentially Elevation of Privilege)","Denial of Service","Repudiation","Tampering"],
+      c: 0,
+      why: "Impersonating another user or system entity represents a Spoofing threat."
+    },
+    {
+      q: "How does an immutable, append-only audit log defend against the 'Repudiation' threat?",
+      a: ["It creates a tamper-proof historical record proving exactly which user executed an action and at what timestamp","It makes servers run faster","It encrypts the hard drive","It deletes old customer data"],
+      c: 0,
+      why: "Immutable audit trails provide non-repudiation evidence that cannot be denied or altered."
+    },
+    {
+      q: "What is an 'Attack Tree' in cybersecurity engineering?",
+      a: ["A conceptual diagram representing an attacker's goal as the root and branching pathways of sub-attacks required to achieve it","A physical tree outside a data center","A computer virus that spreads through trees","A type of binary search tree in C++"],
+      c: 0,
+      why: "Attack trees hierarchically map out the different attack vectors leading to a compromise."
+    },
+    {
+      q: "When is the most cost-effective stage of software development to perform threat modeling?",
+      a: ["During the architecture and design phase before any application code is written","After a major data breach occurs","During production deployment","Right before shutting down the company"],
+      c: 0,
+      why: "Remediating security flaws at the whiteboard design phase is vastly cheaper and faster than post-deployment fixes."
+    }
+  ]);
+</script>
+</body>
+</html>

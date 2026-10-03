@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 06 — Cascade rules and orphan removal</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="orms" data-lesson="6" data-lesson-id="cascade-rules-and-orphan-removal">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 06</span> · Unit of Work & Identity Map</span>
+
+  <h1 class="lesson-title">Cascade rules and orphan removal</h1>
+  <p class="lesson-lede">
+    What happens when you delete an order from memory? Master ORM cascade options (save-update, delete, all) and orphan removal without corrupting relationships.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Configure ORM cascade options and orphan removal to manage dependent object lifecycles</span>
+    <span><b>Mission link</b> Prevents in-memory object graphs from drifting out of sync with database foreign keys</span>
+  </div>
+
+  <h2><span class="n">1</span>Cascading operations through the object graph</h2>
+  <p>In an object model, entities contain collections of other entities: an <code>Order</code> contains a list of <code>LineItems</code>. When you add a new LineItem to <code>order.items</code>, should you have to explicitly call <code>session.add(line_item)</code>?</p><p><b>ORM Cascades</b> propagate operations from parents to children across the in-memory object graph. With <code>cascade="all, delete-orphan"</code>, adding an item to the collection saves it automatically, and removing an item from the collection <b>deletes it from the database</b>!</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    ORM cascades propagate persist, merge, and delete operations across in-memory object relationships.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Standard ORM cascade options</h2>
+  <p>Understand the standard cascade behaviors available in modern ORM mapping configurations.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing orphan removal execution</h2>
+  <p>Trace how removing an item from a Python list translates to an SQL DELETE statement.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of cascade configurations.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can configure relationship cascades and orphan removal rules to maintain pristine object-relational consistency.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Configure cascade='all, delete-orphan' on a parent-child relationship in your ORM.</li>
+    <li>Remove an item from a parent's collection and verify in query logs that a DELETE is emitted.</li>
+    <li>Distinguish between database ON DELETE CASCADE and ORM delete cascade.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    SQLAlchemy Documentation: *Cascades* (docs.sqlalchemy.org/en/20/orm/cascades.html).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "If an order has 'delete-orphan' cascade, what happens in the database when you run 'order.items.pop(0); session.commit();'?",
+    a: ["The removed line item is automatically DELETED from the database table","The item remains in the database with user_id set to NULL","An error is thrown because items cannot be removed from lists","The entire order is deleted"],
+    c: 0,
+    why: "delete-orphan detects when a child is disowned by its parent and issues a DELETE statement automatically."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "save-update",
+            "lines": [
+                  "adding child to parent collection",
+                  "marks child for INSERT automatically"
+            ]
+      },
+      {
+            "title": "delete",
+            "lines": [
+                  "deleting parent entity",
+                  "propagates DELETE to all child entities"
+            ]
+      },
+      {
+            "title": "delete-orphan",
+            "lines": [
+                  "removing child from parent collection",
+                  "deletes child from database!"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Relationship: items = relationship('Item', cascade='all, delete-orphan')",
+      "order = session.get(Order, 1);",
+      "order.items.remove(unwanted_item); # item disowned in memory",
+      "session.commit();",
+      "# ORM generates: DELETE FROM items WHERE id = unwanted_item.id;"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "order_loaded": "order with 3 items loaded into session"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "disowned": "unwanted_item removed from list"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "sql_emitted": "DELETE statement executed automatically for orphaned item"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The setting that automatically deletes a child when removed from a parent list is delete-<0>.",
+      "Propagating parent actions down to child entities is called <1>.",
+      "Database foreign key cascades happen on disk; ORM cascades happen in <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "orphan"
+            ],
+            "why": "delete-orphan purges disowned children."
+      },
+      {
+            "a": [
+                  "cascade",
+                  "cascading"
+            ],
+            "why": "Cascades propagate operations through object graphs."
+      },
+      {
+            "a": [
+                  "memory",
+                  "ORM"
+            ],
+            "why": "ORM cascades evaluate in-memory collections before flushing."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the difference between database-level 'ON DELETE CASCADE' and ORM-level 'delete cascade'?",
+      a: ["Database ON DELETE CASCADE is executed by the SQL engine on disk; ORM cascade is managed in application memory by loading and deleting objects","Database cascades only work on numbers; ORM cascades only work on text","ORM cascades are fifty times faster","There is no difference between them"],
+      c: 0,
+      why: "ORM cascades load children into memory to trigger events and hooks; DB cascades execute directly in SQL."
+    },
+    {
+      q: "What does 'delete-orphan' accomplish that standard 'delete' cascade does NOT?",
+      a: ["It deletes a child record when it is disassociated/removed from its parent collection, even if the parent itself is not deleted","It deletes the parent table from disk","It deletes all users with unverified emails","It converts child rows into JSON files"],
+      c: 0,
+      why: "Standard delete cascade only fires when the parent is deleted; orphan removal fires when items are unlinked."
+    },
+    {
+      q: "Why can naive ORM delete cascades cause unexpected performance collapse on large datasets?",
+      a: ["The ORM may load thousands of child objects into memory one by one to delete them individually, instead of running one fast SQL query","It turns off the database server","It causes computer monitors to turn off","It corrupts B-tree index files"],
+      c: 0,
+      why: "Loading 50,000 children into memory just to issue 50,000 DELETE statements melts server RAM."
+    },
+    {
+      q: "What happens if a child entity in a 1:N relationship has a NOT NULL foreign key, but lacks orphan removal?",
+      a: ["Removing the child from the list attempts to set foreign_key = NULL on flush, causing a database constraint violation error","The child is deleted automatically","The parent entity is deleted","The database server crashes"],
+      c: 0,
+      why: "Without delete-orphan, the ORM disowns by setting FK=NULL, which fails on NOT NULL columns."
+    }
+  ]);
+</script>
+</body>
+</html>

@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 06 — Failure Mode Diagnosis: Triaging Broken Answers</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="rag-evaluation" data-lesson="6" data-lesson-id="failure-mode-diagnosis-triaging">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 06</span> · RAG Triage</span>
+
+  <h1 class="lesson-title">Failure Mode Diagnosis: Triaging Broken Answers</h1>
+  <p class="lesson-lede">
+    Systematic triage: diagnosing retrieval misses, rank position failures, prompt dilution, and context hallucination.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to systematically triage and resolve RAG pipeline failure modes.</span>
+    <span><b>Mission link</b> Mastering failure mode diagnosis: triaging broken answers across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Failure Mode Diagnosis: Triaging Broken Answers</h2>
+  <p>When a RAG system answers poorly, engineers often waste hours rewriting prompt templates, only to discover that the vector database never retrieved the relevant document in the first place! <strong>Systematic RAG Triage</strong> isolates the broken component with precision.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Systematic triage: diagnosing retrieval misses, rank position failures, prompt dilution, and context hallucination.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The 4 Classic RAG Failure Modes</h2>
+  <p>The RAG Triage Diagnostic Matrix:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Root Cause Decision Flowchart</h2>
+  <ul><li><strong>Failure Mode 1: Empty or Irrelevant Retrieval:</strong> Retrieved chunks contain zero relevant facts. <em>Root Cause:</em> Bad chunk size, vocabulary mismatch, or low embedding similarity. <em>Fix:</em> Implement hybrid BM25 search or tune chunking.</li><li><strong>Failure Mode 2: Buried in the Middle:</strong> Relevant chunk is retrieved, but ranked at position #8 under 7 noisy chunks. <em>Root Cause:</em> Context dilution / Lost in the Middle. <em>Fix:</em> Reduce Top-K from 10 to 3, or add a Cross-Encoder re-ranker.</li><li><strong>Failure Mode 3: Grounded Hallucination:</strong> Chunks contain the right answer, but the model hallucinated anyway. <em>Root Cause:</em> Weak prompt grounding, temperature too high. <em>Fix:</em> Set temperature=0.0, use quotes-first prompt.</li><li><strong>Failure Mode 4: Chunk Boundary Severance:</strong> Half the explanation is in Chunk 1, and the other half is in Chunk 2. <em>Fix:</em> Increase chunk overlap from 0% to 20%.</li></ul><pre><code># The RAG Triage Decision Flowchart:
+# 1. Did Top-K chunks contain the ground truth?
+#    ├── NO  -> RETRIEVAL BUG: Check embedding model, add BM25, fix chunk size.
+#    └── YES -> Check chunk ranking position:
+#         ├── Ranked #5-#10 -> RANKING BUG: Add Cross-Encoder Re-Ranker, reduce K.
+#         └── Ranked #1-#2  -> GENERATION BUG: Set temp=0.0, enforce quotes-first!</code></pre><div class="callout"><p><strong>The Triage Rule:</strong> Never touch the prompt until you have physically inspected the retrieved chunks. Fix retrieval first, then fix generation.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the failure diagnosis sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to systematically triage and resolve RAG pipeline failure modes.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where failure mode diagnosis: triaging broken answers applies.</li>
+    <li>Author a unit test or verification script exercising failure mode diagnosis: triaging broken answers.</li>
+    <li>Document team architectural conventions regarding failure mode diagnosis: triaging broken answers.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Failure Mode Diagnosis: Triaging Broken Answers.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What should an engineer do first when a RAG pipeline returns an incorrect answer to a user query?",
+    a: ["Inspect the retrieved context chunks to verify whether the correct factual information was present in the Top-K results","Rewrite the system prompt completely","Switch to a different model provider","Restart the database server"],
+    c: 0,
+    why: "Inspecting the retrieved chunks immediately reveals whether the failure was a Retrieval error or a Generation error."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1. Retrieval Miss (0 Facts)",
+            "lines": [
+                  "Chunks are completely irrelevant",
+                  "Fix: Hybrid BM25, tune chunk size"
+            ]
+      },
+      {
+            "title": "2. Buried in Noise (Rank #8)",
+            "lines": [
+                  "Fact present, but buried under clutter",
+                  "Fix: Add Cross-Encoder re-ranker, reduce K"
+            ]
+      },
+      {
+            "title": "3. Hallucination Despite Facts",
+            "lines": [
+                  "Model ignores context facts",
+                  "Fix: Quotes-first prompt, temperature 0.0"
+            ]
+      },
+      {
+            "title": "4. Severed Boundary",
+            "lines": [
+                  "Fact split across chunk seams",
+                  "Fix: Increase chunk overlap to 20%"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Failure Mode Diagnosis: Triaging Broken Answers",
+      "def execute_flow():",
+      "    # Systematic triage: diagnosing retrieval misses, ra...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Failure Mode Diagnosis: Triaging Broken Answers"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Step 1: Check Context"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "NO -> Fix Search Layer"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "step": "YES -> Fix Model Layer"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Systematic RAG triage inspects retrieved chunks to determine whether errors stem from a {1} miss, rank position {2}, or prompt hallucination."
+],
+    blanks: [
+      {
+            "a": [
+                  "retrieval"
+            ],
+            "why": "Search engine failure"
+      },
+      {
+            "a": [
+                  "dilution"
+            ],
+            "why": "Facts buried in context noise"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is 'Context Dilution' in RAG generation?",
+      a: ["Flooding the prompt with too many low-relevance chunks, which distracts the model's attention away from the single golden chunk","Deleting words from the prompt","A database memory leak","Water damage to a server"],
+      c: 0,
+      why: "Excessive irrelevant chunks dilute transformer attention, causing the model to miss the target fact."
+    },
+    {
+      q: "How does adding a Cross-Encoder Re-Ranker solve the 'Buried in the Middle' failure mode?",
+      a: ["It re-scores retrieved candidates using deep cross-attention, elevating the single most relevant chunk directly to Rank #1","It deletes the other chunks","It runs tests in parallel","It converts text to numbers"],
+      c: 0,
+      why: "Cross-encoders place the most relevant evidence at the top of the context where attention is highest."
+    },
+    {
+      q: "What symptom indicates that chunk overlap is set too low (e.g. 0%)?",
+      a: ["Queries seeking multi-sentence explanations fail because the explanation was severed in half across two adjacent chunks","The database runs out of RAM","The server crashes","The text turns into HTML"],
+      c: 0,
+      why: "Zero overlap severs concepts that cross chunk boundaries, breaking semantic continuity."
+    },
+    {
+      q: "If a user query contains a typo in a product name (e.g. 'Iphne' instead of 'iPhone'), why does vector search often succeed while BM25 fails?",
+      a: ["Dense embeddings capture fuzzy semantic proximity and character embedding similarity, while BM25 requires exact token matching","BM25 is broken","Vector search uses human eyes","Vector search is illegal for typos"],
+      c: 0,
+      why: "Dense vector spaces place misspelled words close to their correct counterparts."
+    }
+  ]);
+</script>
+</body>
+</html>

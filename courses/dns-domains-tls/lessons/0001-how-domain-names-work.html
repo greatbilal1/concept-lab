@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 01 — How domain names work</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="dns-domains-tls" data-lesson="1" data-lesson-id="how-domain-names-work">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 01</span> · Domain Names & Resolution</span>
+
+  <h1 class="lesson-title">How domain names work</h1>
+  <p class="lesson-lede">
+    Computers talk in numbers; humans think in words. Discover the distributed tree hierarchy that turns human names into network coordinates.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Explain the domain name tree structure from root dot to top-level domains</span>
+    <span><b>Mission link</b> The starting point for understanding all internet identity</span>
+  </div>
+
+  <h2><span class="n">1</span>The inverted tree of names</h2>
+  <p>A domain name like <code>blog.example.com</code> is not a flat string. It is a hierarchical path read from right to left, rooted at an invisible trailing dot: <code>blog.example.com.</code></p><p>At the top sits the <b>Root Zone</b> (<code>.</code>), managed by ICANN. Below the root are <b>Top-Level Domains (TLDs)</b> like <code>.com</code>, <code>.org</code>, and country codes like <code>.uk</code>. Below TLDs are <b>Second-Level Domains (SLDs)</b> like <code>example</code>, followed by subdomains like <code>blog</code>.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Domain names are hierarchical trees read from right to left, starting at the root dot.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The domain name hierarchy</h2>
+  <p>Observe the administrative levels that divide authority across the global domain name tree.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing domain label splitting</h2>
+  <p>Trace how a resolver parses the labels of a domain from right to left.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of domain hierarchy labels.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can dissect any domain name into its constituent labels and identify the administrative hierarchy responsible for it.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Notice the trailing dot when running dig example.com..</li>
+    <li>List three country-code TLDs (ccTLDs) and three generic TLDs (gTLDs).</li>
+    <li>Look up who operates the .com registry (Verisign).</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    IETF RFC 1034: *Domain Names — Concepts and Facilities*, Section 3: 'Domain Name Space and Resource Records'.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is the true technical root of the domain 'github.com'?",
+    a: ["The invisible trailing root dot (github.com.)","The 'git' prefix","The .com top-level domain","The world wide web (www)"],
+    c: 0,
+    why: "Every Fully Qualified Domain Name (FQDN) is officially rooted at the trailing dot representing the DNS root."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Root ( . )",
+            "lines": [
+                  "13 root server clusters",
+                  "operated by 12 organizations"
+            ]
+      },
+      {
+            "title": "Top-Level Domain (.com)",
+            "lines": [
+                  "TLD registry (e.g. Verisign)",
+                  "manages all .com domains"
+            ]
+      },
+      {
+            "title": "Second-Level (example)",
+            "lines": [
+                  "domain registrant (you)",
+                  "authoritative nameservers"
+            ]
+      },
+      {
+            "title": "Subdomain (api)",
+            "lines": [
+                  "delegated prefix",
+                  "points to specific server"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "fqdn = 'api.staging.example.com.'",
+      "labels = fqdn.strip('.').split('.').reverse()",
+      "# Resolution order: com -> example -> staging -> api"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "fqdn": "api.staging.example.com."
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "parsed_labels": "['com', 'example', 'staging', 'api']"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "hierarchy": "query delegates downward step by step"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The invisible symbol at the absolute root of the DNS tree is a <0>.",
+      "A domain suffix like .com or .org is a <1>-Level Domain.",
+      "The non-profit organization coordinating global root DNS is <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  ".",
+                  "dot"
+            ],
+            "why": "The root zone is designated by a dot."
+      },
+      {
+            "a": [
+                  "Top",
+                  "TLD"
+            ],
+            "why": "Top-Level Domains sit directly beneath the root."
+      },
+      {
+            "a": [
+                  "ICANN"
+            ],
+            "why": "ICANN oversees global IP allocations and root DNS management."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why are domain names resolved from right to left rather than left to right?",
+      a: ["Because the hierarchy delegates from the broadest scope (TLD) to the specific host (subdomain)","Because internet cables only transmit letters in reverse order","To make domain names harder for automated scripts to guess","Because original DNS servers were programmed in Arabic"],
+      c: 0,
+      why: "Right-to-left resolution mirrors the hierarchical delegation tree from root to leaf."
+    },
+    {
+      q: "What is a registrar in the domain name ecosystem?",
+      a: ["An accredited commercial company that sells domain name registrations to end users","The physical computer chip inside an internet router","A web browser that translates domain names into bookmarks","A government agency that taxes website traffic"],
+      c: 0,
+      why: "Registrars (like Namecheap or Cloudflare) register domains with top-level registries on your behalf."
+    },
+    {
+      q: "What is an FQDN?",
+      a: ["A Fully Qualified Domain Name specifying an unambiguous position in the DNS tree","A Fast Query Data Network used by financial banks","A Fiber Quantum Distribution Node for transoceanic cables","A File Quality Diagnostic Number in operating systems"],
+      c: 0,
+      why: "An FQDN includes all domain labels up to the root, leaving zero ambiguity."
+    },
+    {
+      q: "Who operates the 13 root nameserver IP addresses?",
+      a: ["12 independent global organizations including NASA, ICANN, and universities using Anycast","A single computer server located in Silicon Valley","The United Nations security council","Every consumer Wi-Fi router on earth"],
+      c: 0,
+      why: "13 logical IP addresses are served by hundreds of distributed Anycast nodes across 12 institutions."
+    }
+  ]);
+</script>
+</body>
+</html>

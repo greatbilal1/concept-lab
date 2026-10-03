@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 06 — Foreign keys and referential integrity</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="sql-relational-databases" data-lesson="6" data-lesson-id="foreign-keys-and-referential-integrity">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 06</span> · Data Manipulation & Constraints</span>
+
+  <h1 class="lesson-title">Foreign keys and referential integrity</h1>
+  <p class="lesson-lede">
+    How do tables link together without creating orphan records? Master foreign keys, referential integrity, and CASCADE versus RESTRICT deletion behaviors.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Enforce referential integrity using foreign keys and configure cascade deletion rules</span>
+    <span><b>Mission link</b> Prevents orphaned records and keeps relational models consistent across deletions</span>
+  </div>
+
+  <h2><span class="n">1</span>The relational glue: Foreign Keys</h2>
+  <p>A database is not just independent tables: it is a web of relationships. A <b>Foreign Key</b> is a column in a child table that stores the Primary Key value of a parent table (e.g. <code>orders.user_id</code> references <code>users.id</code>).</p><p>The database enforces <b>Referential Integrity</b>: you cannot insert an order for a <code>user_id</code> that does not exist, and you cannot delete a user if they have orders, unless you specify an automated rule like <code>ON DELETE CASCADE</code>.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Foreign keys enforce referential integrity, preventing invalid references and orphan records.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>ON DELETE actions compared</h2>
+  <p>Understand the four options for handling child records when a parent record is deleted.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing foreign key validation</h2>
+  <p>Trace how the database validates foreign key references before accepting an INSERT.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of foreign key rules.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can design relational models with explicit foreign key constraints that eliminate orphan records permanently.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Create a foreign key linking an orders table to a users table in SQL.</li>
+    <li>Configure ON DELETE CASCADE on a comments table linked to an articles table.</li>
+    <li>Observe an integrity violation error when attempting to insert an invalid parent ID.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    PostgreSQL Documentation: *Foreign Keys* (postgresql.org/docs/current/ddl-constraints.html#DDL-CONSTRAINTS-FK).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What happens by default if you attempt to DELETE a parent user who has existing child orders?",
+    a: ["The database rejects the delete with a foreign key constraint violation error","The database silently deletes the user and all orders without warning","The orders are converted into user records","The database crashes"],
+    c: 0,
+    why: "Default RESTRICT / NO ACTION prevents parent deletion to protect child rows from becoming orphans."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "RESTRICT / NO ACTION",
+            "lines": [
+                  "default behavior",
+                  "rejects delete if child records exist"
+            ]
+      },
+      {
+            "title": "CASCADE",
+            "lines": [
+                  "automatically deletes child records",
+                  "danger: deleting 1 parent might erase 10,000 rows!"
+            ]
+      },
+      {
+            "title": "SET NULL",
+            "lines": [
+                  "sets child foreign key column to NULL",
+                  "disowns record without deleting it"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Table: users (id=1, id=2)",
+      "# Command: INSERT INTO orders (user_id, total) VALUES (99, 500);",
+      "# Engine checks users table for id = 99 -> NOT FOUND!",
+      "# Error: insert or update on table 'orders' violates foreign key constraint 'orders_user_id_fkey'"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "existing_users": "[id: 1, id: 2]"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "attempted_insert": "order referencing non-existent user_id: 99"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "integrity_check": "database checks parent table via index"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "rejected": "transaction aborted; orphan order prevented"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "A column referencing another table's primary key is a <0> key.",
+      "The rule that references must point to existing rows is referential <1>.",
+      "The action that automatically deletes child rows with parents is ON DELETE <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "foreign"
+            ],
+            "why": "Foreign keys bind child rows to parent rows."
+      },
+      {
+            "a": [
+                  "integrity"
+            ],
+            "why": "Referential integrity guarantees reference validity."
+      },
+      {
+            "a": [
+                  "CASCADE"
+            ],
+            "why": "CASCADE propagates deletions down to child rows."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is an 'orphan record' in database terminology?",
+      a: ["A child row whose foreign key references a parent row that no longer exists in the database","A record that has never been queried by a user","A record that contains negative numbers","A database table with zero columns"],
+      c: 0,
+      why: "Orphans occur when parents are deleted without cleaning up referencing child rows."
+    },
+    {
+      q: "What does 'ON DELETE CASCADE' do on a foreign key definition?",
+      a: ["Automatically deletes all child rows when their referenced parent row is deleted","Prevents the parent row from being deleted forever","Backs up child rows to an external cloud archive","Converts the foreign key column into a primary key"],
+      c: 0,
+      why: "CASCADE propagates parent deletions automatically to all dependent child rows."
+    },
+    {
+      q: "When is 'ON DELETE SET NULL' an appropriate foreign key strategy?",
+      a: ["When child records should be preserved even if the parent is removed (e.g. keeping audit logs when an admin user is deleted)","When the foreign key column has a NOT NULL constraint","When the database runs low on disk storage space","Only on mobile SQLite databases"],
+      c: 0,
+      why: "SET NULL disassociates the child from the deleted parent while preserving the child record."
+    },
+    {
+      q: "Should foreign key columns typically have an index created on them?",
+      a: ["Yes, indexing foreign keys speeds up joins and prevents slow table scans during parent deletes","No, indexing foreign keys is illegal in SQL standards","Only if the column contains text characters","No, foreign keys are automatically indexed in all databases"],
+      c: 0,
+      why: "Postgres and MySQL do not auto-index foreign keys; indexing them is essential for JOIN performance."
+    }
+  ]);
+</script>
+</body>
+</html>

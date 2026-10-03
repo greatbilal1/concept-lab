@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 07 — CSV and tabular data</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="python-files-json-data" data-lesson="7" data-lesson-id="csv-and-tabular-data">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 07</span> · Formats</span>
+
+  <h1 class="lesson-title">CSV and tabular data</h1>
+  <p class="lesson-lede">
+    CSV looks like the simplest format in the world until a value contains a comma.
+    The <code>csv</code> module exists precisely because splitting on commas is not
+    enough.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Read and write rows safely</span>
+    <span><b>Mission link</b> Handle real-world messy data</span>
+  </div>
+
+  <h2><span class="n">1</span>Rows, not lines</h2>
+
+  <p>
+    A CSV file is a table: the first row is usually the header, and every row after
+    it is a record. The <code>csv</code> module reads it as lists of strings.
+  </p>
+
+  <div id="intro1"></div>
+
+  <p>
+    Every value comes back as a <b>string</b>. <code>"42"</code> is not the number
+    <code>42</code>, and <code>"3.14"</code> is not a float. Converting is your
+    job, and forgetting it is the classic CSV bug.
+  </p>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>reader and writer</h2>
+
+  <p>
+    The basic pair works on lists. Note the <code>newline=""</code> argument — it
+    is required on the file handle, not optional:
+  </p>
+
+  <pre><code>import csv
+
+with open("rows.csv", newline="") as f:
+    reader = csv.reader(f)
+    header = next(reader)          # consume the header row
+    for row in reader:
+        print(row)                 # ['Ada', '42', 'London']
+
+with open("out.csv", "w", newline="") as f:
+    writer = csv.writer(f)
+    writer.writerow(["name", "score"])
+    writer.writerow(["Ada", 42])</code></pre>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">3</span>DictReader and DictWriter</h2>
+
+  <p>
+    Working with column names is far less error-prone than counting positions.
+    <code>DictReader</code> gives you a dictionary per row, keyed by the header:
+  </p>
+
+  <pre><code>with open("rows.csv", newline="") as f:
+    for row in csv.DictReader(f):
+        print(row["name"], row["score"])</code></pre>
+
+  <div id="diagram1"></div>
+
+  <p>
+    <code>DictWriter</code> is the mirror: you declare the field names once and
+    write dictionaries. It will raise if you forget a field, which is a feature.
+  </p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Never split CSV on commas yourself. Quoting, embedded commas and embedded
+    newlines are all legal, and only the <code>csv</code> module handles them.
+  </div>
+
+  <h2><span class="n">4</span>Quoting and dialects</h2>
+
+  <p>
+    When a value contains a comma, the writer wraps it in quotes. When it contains
+    a quote, it doubles it. This is automatic — and it is exactly what a naive
+    <code>split(",")</code> gets wrong.
+  </p>
+
+  <pre><code>writer.writerow(["Ada, Jr.", 'He said "hi"'])
+# -> "Ada, Jr.","He said ""hi"""</code></pre>
+
+  <div class="note good">
+    <span class="note-label">Why this matters later</span>
+    Real exports from spreadsheets and databases contain quoted fields, stray
+    whitespace and inconsistent headers. Using the <code>csv</code> module means
+    you inherit correct parsing instead of reimplementing it badly.
+  </div>
+
+  <h2><span class="n">5</span>Check yourself</h2>
+
+  <p>
+    Answer from memory — do not scroll back up. Each option has the same number of
+    words, so nothing gives the answer away.
+  </p>
+
+  <div id="fill1"></div>
+  <div id="quiz"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>
+      You can now read and write CSV rows safely, use column names instead of
+      positions, and explain why splitting on commas is a bug waiting to happen.
+    </p>
+  </div>
+
+  <h2><span class="n">6</span>Do this next</h2>
+
+  <ol>
+    <li>
+      Write a CSV with a value containing a comma, then read it back and confirm it
+      survived intact.
+    </li>
+    <li>
+      Read the same file with <code>DictReader</code> and access a column by name.
+    </li>
+    <li>
+      Convert a numeric column from string to int and sum it.
+    </li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Read the Python docs on the
+    <a href="https://docs.python.org/3/library/csv.html">csv module</a>,
+    especially the note about <code>newline=""</code>.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher (me) anything — "what is a dialect?",
+    "why newline=''?", "how do I handle a semicolon file?". There are no bad
+    questions here.
+  </div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  /* csv essentials */
+  TeachWidgets.introCards("#intro1", {
+    cards: [
+      { ico: "📄", title: "csv.reader", body: "Yields each row as a list of strings." },
+      { ico: "🏷️", title: "csv.DictReader", body: "Yields each row keyed by the header names." },
+      { ico: "✍️", title: "csv.writer", body: "Writes rows and handles quoting for you." }
+    ]
+  });
+
+  /* predict-then-reveal */
+  TeachWidgets.predict("#predict1", {
+    q: "What type is a value read from CSV?",
+    a: ["Its original type", "Always a string", "Always a number"],
+    c: 1,
+    why: "CSV has no types — every field comes back as a string and must be converted."
+  });
+
+  /* step-through trace of reading rows */
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "reader = csv.reader(f)",
+      "header = next(reader)",
+      "  -> ['name', 'score']",
+      "for row in reader:",
+      "  -> ['Ada', '42']"
+    ],
+    steps: [
+      { line: 0, vars: { reader: "iterator" } },
+      { line: 1, vars: { header: "consumed" } },
+      { line: 2, vars: { header: "list of str" } },
+      { line: 3, vars: { iterating: "data rows" } },
+      { line: 4, vars: { row: "list of str" } }
+    ]
+  });
+
+  /* reader vs DictReader */
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      { title: "csv.reader", lines: ["row[0], row[1]", "position based"] },
+      { title: "csv.DictReader", lines: ["row[\"name\"]", "header based"] },
+      { title: "csv.DictWriter", lines: ["fieldnames declared", "missing field raises"] }
+    ]
+  });
+
+  /* recall from memory */
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — the csv module",
+    lines: [
+      "Rows as lists come from <code>csv.<0>()</code>",
+      "Rows as dictionaries come from <code>csv.<1>()</code>",
+      "The file handle needs <code>newline=\"<2>\"</code>"
+    ],
+    blanks: [
+      { a: ["reader"], why: "csv.reader yields each row as a list of strings." },
+      { a: ["DictReader"], why: "csv.DictReader yields each row keyed by the header names." },
+      { a: ["", "empty"], why: "newline='' stops Python from translating line endings inside quoted fields." }
+    ]
+  });
+
+  /* the quiz — every option is exactly three words */
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What type are CSV values?",
+      a: ["Their original types", "Always plain strings", "Always floating numbers", "Mixed automatic types"],
+      c: 1,
+      why: "CSV stores text only, so every field is read back as a string."
+    },
+    {
+      q: "Why not split on commas?",
+      a: ["It is much slower", "Quoted commas break it", "It needs extra imports", "It loses the header"],
+      c: 1,
+      why: "Values may contain quoted commas or newlines, which only the csv module parses correctly."
+    },
+    {
+      q: "What does DictReader give?",
+      a: ["A list of rows", "A dictionary per row", "A single dictionary", "A tuple per row"],
+      c: 1,
+      why: "DictReader keys each row by the header names, avoiding positional indexing."
+    }
+    {
+      q: "What does DictWriter need?",
+      a: ["A list of rows", "The field names declared", "A JSON schema file", "A sorted header row"],
+      c: 1,
+      why: "DictWriter requires fieldnames so it knows the column order and can catch missing fields."
+    }
+  ]);
+</script>
+</body>
+</html>

@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 05 — One job per procedure</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="procedural-programming" data-lesson="5" data-lesson-id="one-job-per-procedure">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 05</span> · Structure</span>
+
+  <h1 class="lesson-title">One job per procedure</h1>
+  <p class="lesson-lede">
+    This is the hinge of the course. Everything before it was about a single step;
+    everything after it is about a program of steps. The rule that makes that
+    possible is simple: each procedure does one job.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Split a do-everything procedure into named steps</span>
+    <span><b>Mission link</b> Split a script into named procedures</span>
+  </div>
+
+  <h2><span class="n">1</span>The do-everything procedure</h2>
+
+  <p>
+    Here is a procedure that does three jobs at once: it reads the data, it computes
+    a total, and it prints a report. It works — but you cannot reuse any part of it,
+    and you cannot test any part of it.
+  </p>
+
+  <pre><code>def process():
+    prices = [4, 8, 15]
+    total = 0
+    for p in prices:
+        total = total + p
+    print("Total:", total)
+
+process()</code></pre>
+
+  <p>
+    The name <code>process</code> is a confession: it does not describe a job,
+    because there is no single job. That is the signal to split it.
+  </p>
+
+  <div id="diagram1"></div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Extract the steps</h2>
+
+  <p>
+    Splitting a procedure into smaller ones is called <b>extracting</b>. Each new
+    procedure gets a name that describes its one job, and the original becomes a
+    short sequence of calls.
+  </p>
+
+  <pre><code>def load_prices():
+    return [4, 8, 15]
+
+def total(prices):
+    result = 0
+    for p in prices:
+        result = result + p
+    return result
+
+def print_report(total):
+    print("Total:", total)
+
+print_report(total(load_prices()))</code></pre>
+
+  <p>
+    The last line reads like a sentence: print the report of the total of the loaded
+    prices. Each step can now be reused, tested, and understood on its own.
+  </p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    A procedure should do one job, so its name can describe it completely. If the
+    name needs an "and", it is two procedures.
+  </div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">3</span>Cohesion: does it belong together?</h2>
+
+  <p>
+    <b>Cohesion</b> is how closely the statements inside a procedure belong together.
+    High cohesion means every line serves the one job. Low cohesion means the
+    procedure is a grab-bag.
+  </p>
+
+  <pre><code># high cohesion — every line serves one job
+def total(prices):
+    result = 0
+    for p in prices:
+        result = result + p
+    return result
+
+# low cohesion — three unrelated jobs
+def setup():
+    connect()
+    load_config()
+    print_banner()</code></pre>
+
+  <p>
+    The test is the name. If you can name the procedure in a few words and every
+    line serves that name, cohesion is high. If you cannot, split it.
+  </p>
+
+  <div id="intro1"></div>
+
+  <h2><span class="n">4</span>Split a procedure</h2>
+
+  <p>
+    Here is the win for today. The lab below starts as one do-everything procedure.
+    Split it into three named steps and call them in order.
+  </p>
+
+  <div id="lab1"></div>
+
+  <div id="fill1"></div>
+
+  <h2><span class="n">5</span>Check yourself</h2>
+
+  <p>
+    Answer from memory — do not scroll back up. Each option has the same number of
+    words, so nothing gives the answer away.
+  </p>
+
+  <div id="quiz"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>
+      You can take a do-everything procedure and split it into named steps, each
+      doing one job. This is the single most important habit in procedural
+      programming — and it is the rule that the rest of the course builds on. The
+      next lesson is about the data those steps share.
+    </p>
+  </div>
+
+  <h2><span class="n">6</span>Do this next</h2>
+
+  <ol>
+    <li>
+      Take a procedure from your own code whose name contains "and" or "process" and
+      split it into two.
+    </li>
+    <li>
+      Rewrite the split version so the top level reads as a short sequence of calls,
+      like a sentence.
+    </li>
+    <li>
+      For each new procedure, write a one-line docstring and check that every line
+      of the body serves it.
+    </li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Read <a href="https://peps.python.org/pep-0008/#function-and-variable-names">PEP 8 — Function and Variable Names</a>.
+    It is short, and it is the closest official guidance on naming a step after its
+    one job.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher (me) anything — "how small is too
+    small?", "should every procedure return something?", "what is a helper
+    function?". There are no bad questions here.
+  </div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  /* one job, split into three */
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      { title: "before", lines: ["process()", "does everything"] },
+      { title: "step 1", lines: ["load_prices()"] },
+      { title: "step 2", lines: ["total(prices)"] },
+      { title: "step 3", lines: ["print_report(total)"] }
+    ]
+  });
+
+  /* predict-then-reveal */
+  TeachWidgets.predict("#predict1", {
+    q: "What does a name needing an \"and\" signal?",
+    a: ["Two procedures", "A faster procedure", "A tested procedure", "A private procedure"],
+    c: 0,
+    why: "If the name needs an \"and\", the procedure is doing two jobs and should be split."
+  });
+
+  /* step through the split version */
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "def load_prices():",
+      "    return [4, 8, 15]",
+      "def total(prices):",
+      "    ...",
+      "print_report(total(load_prices()))"
+    ],
+    steps: [
+      { line: 0, vars: { action: "define load_prices" } },
+      { line: 2, vars: { action: "define total" } },
+      { line: 4, vars: { action: "call load_prices" } },
+      { line: 1, vars: { returned: "[4, 8, 15]" } },
+      { line: 4, vars: { action: "call total", prices: "[4, 8, 15]" } },
+      { line: 4, vars: { action: "call print_report", total: "27" } }
+    ]
+  });
+
+  /* three things one-job procedures give you */
+  TeachWidgets.introCards("#intro1", {
+    cards: [
+      { ico: "🎯", title: "A clear name", body: "One job means the name can describe the whole procedure completely." },
+      { ico: "♻️", title: "Reuse", body: "A single-job step can be called from anywhere, not just the original script." },
+      { ico: "🧪", title: "Testability", body: "A step that does one thing can be checked on its own, in isolation." }
+    ]
+  });
+
+  /* the tiny interpreter */
+  TeachWidgets.lab("#lab1", {
+    label: "Run it — split process() into three named steps",
+    starter: "def process():\n    prices = [4, 8, 15]\n    total = 0\n    for p in prices:\n        total = total + p\n    print(\"Total:\", total)\n\nprocess()"
+  });
+
+  /* recall from memory */
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the blanks",
+    lines: [
+      "A procedure should do <0> job",
+      "Pulling a block out into a procedure is <1>",
+      "How well a body's lines belong together is <2>"
+    ],
+    blanks: [
+      { a: ["one"], why: "One job per procedure, so its name can describe it completely." },
+      { a: ["extracting", "extraction", "refactoring"], why: "Extracting pulls a block of statements out into a named procedure." },
+      { a: ["cohesion"], why: "Cohesion is how closely the statements inside a procedure belong together." }
+    ]
+  });
+
+  /* the quiz — every option is exactly three words */
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "How many jobs per procedure?",
+      a: ["Exactly one job", "Two related jobs", "As many needed", "One per parameter"],
+      c: 0,
+      why: "One job per procedure, so its name can describe it completely."
+    },
+    {
+      q: "What does a name needing \"and\" signal?",
+      a: ["Two separate procedures", "A faster procedure", "A tested procedure", "A private procedure"],
+      c: 0,
+      why: "If the name needs an \"and\", the procedure is doing two jobs and should be split."
+    },
+    {
+      q: "What is cohesion?",
+      a: ["How lines belong together", "How fast code runs", "How many parameters exist", "How long the name"],
+      c: 0,
+      why: "Cohesion is how closely the statements inside a procedure belong together."
+    },
+    {
+      q: "What is extracting?",
+      a: ["Pulling out a named step", "Deleting an unused line here", "Renaming a parameter here now", "Importing another module here now"],
+      c: 0,
+      why: "Extracting pulls a block of statements out into a named procedure."
+    }
+  ]);
+</script>
+</body>
+</html>

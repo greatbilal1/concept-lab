@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 08 — Instrumenting a Production AI Service End-to-End</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="llm-observability" data-lesson="8" data-lesson-id="instrumenting-production-ai-service">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 08</span> · Production Instrumentation</span>
+
+  <h1 class="lesson-title">Instrumenting a Production AI Service End-to-End</h1>
+  <p class="lesson-lede">
+    Synthesizing observability: building a fully instrumented production service with tracing, cost attribution, and alerting.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You have completed the LLM Observability & Tracing course.</span>
+    <span><b>Mission link</b> Mastering instrumenting a production ai service end-to-end across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Instrumenting a Production AI Service End-to-End</h2>
+  <p>We have explored the full discipline of LLM Observability: moving beyond flat logs, OpenTelemetry and OpenInference semantic standards, token cost accounting, latency profiling, PII scrubbing, anomaly alerting, and open-source stacks like Langfuse.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Synthesizing observability: building a fully instrumented production service with tracing, cost attribution, and alerting.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Complete Instrumented Service Stack</h2>
+  <p>Now, we synthesize these into a <strong>Fully Instrumented Production Service</strong>:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>From Black Box to Glass Box</h2>
+  <ul><li><strong>1. Traced Entrypoint:</strong> Every incoming HTTP request starts a root trace with `trace_id`, `user_id`, and `tenant_id`.</li><li><strong>2. Nested Spans:</strong> Every RAG retrieval, tool execution, and LLM call creates a child span with standardized attributes (`llm.model_name`, `tokens`).</li><li><strong>3. PII Sanitization:</strong> All prompt text and responses are scrubbed before export.</li><li><strong>4. Real-Time Metrics:</strong> Emits latency histograms (TTFT, total) and cost metrics to Prometheus/Datadog.</li><li><strong>5. Automated Incident Gates:</strong> Fallback invocations and schema parse errors trigger alert webhooks.</li></ul><pre><code># The Complete Instrumented Endpoint Pattern (FastAPI + Langfuse):
+@router.post("/api/v1/research-agent")
+async def research_agent_endpoint(request: AgentRequest, user: User = Depends(get_user)):
+    # 1. Initialize root trace with metadata
+    trace = langfuse.trace(name="ResearchAgent", user_id=user.id, metadata={"tenant": user.org_id})
+    
+    # 2. Instrument RAG span
+    with trace.span(name="RetrieveDocs") as span:
+        docs = await vector_db.search(request.query)
+        span.set_attribute("docs_retrieved", len(docs))
+        
+    # 3. Instrument LLM generation
+    with trace.generation(name="SynthesizeAnswer", model="gpt-4o-mini") as gen:
+        response = await llm_client.generate(request.query, docs)
+        gen.end(usage=response.usage, output=scrub_pii(response.text))
+        
+    return {"answer": response.text}</code></pre><div class="callout"><p><strong>The Final Triumph:</strong> Your AI service is no longer a scary black box. You have complete, real-time visibility into every thought, tool call, token, and dollar spent.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the production instrumentation sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You have completed the LLM Observability & Tracing course.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where instrumenting a production ai service end-to-end applies.</li>
+    <li>Author a unit test or verification script exercising instrumenting a production ai service end-to-end.</li>
+    <li>Document team architectural conventions regarding instrumenting a production ai service end-to-end.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Instrumenting a Production AI Service End-to-End.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is the ultimate definition of an observable AI system?",
+    a: ["A system where engineers can inspect any customer transaction, see the complete trace tree, identify latency bottlenecks, and audit costs instantly","A system with a lot of print statements","A system where all code is open source","A system that runs on paper"],
+    c: 0,
+    why: "Observability means having complete visibility into internal execution, latency, and costs from external outputs."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1. Ingress Root Trace",
+            "lines": [
+                  "Captures user_id & tenant_id",
+                  "Initializes OpenTelemetry context"
+            ]
+      },
+      {
+            "title": "2. Nested Execution Spans",
+            "lines": [
+                  "RAG retrieval span (latency & chunks)",
+                  "LLM generation span (tokens & cost)"
+            ]
+      },
+      {
+            "title": "3. Telemetry Exporter",
+            "lines": [
+                  "PII scrubbed at boundary",
+                  "Shipped to private Langfuse / Phoenix cluster"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Instrumenting a Production AI Service End-to-End",
+      "def execute_flow():",
+      "    # Synthesizing observability: building a fully instr...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Instrumenting a Production AI Service End-to-End"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Unmonitored Black Box"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Observable Glass Box"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "A fully instrumented AI service provides complete operational transparency by wrapping workflows in root {1} containing nested {2} for retrieval, tools, and model calls."
+],
+    blanks: [
+      {
+            "a": [
+                  "traces"
+            ],
+            "why": "Parent execution trees"
+      },
+      {
+            "a": [
+                  "spans"
+            ],
+            "why": "Individual timed execution units"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What happens when an engineer searches for a specific 'trace_id' in a dashboard like Langfuse?",
+      a: ["They can inspect the complete execution tree, view exact prompts and outputs, examine token costs, and see latency for that single query","The database is deleted","The model weights update","The query is rerun automatically"],
+      c: 0,
+      why: "Trace IDs provide the unique handle to inspect the complete lifecycle of a single request."
+    },
+    {
+      q: "Why is separating the 'generation' span type from a generic 'span' valuable in AI observability?",
+      a: ["Generation spans specifically record model names, token usage, temperature, and prompt/completion pairs for cost accounting","Generation spans run faster","Generation spans are written in C","Generic spans cannot measure time"],
+      c: 0,
+      why: "Generation spans capture domain-specific LLM parameters and token metrics."
+    },
+    {
+      q: "How does end-to-end tracing accelerate debugging production customer complaints?",
+      a: ["Engineers can lookup the exact prompt and tool outputs that produced the flawed response within seconds, identifying root causes immediately","It eliminates the need for software engineering","It makes servers completely free","It turns off all logging"],
+      c: 0,
+      why: "Exact trace inspection eliminates guesswork, allowing engineers to see the exact input that triggered the bug."
+    },
+    {
+      q: "What is the ultimate mark of an enterprise-grade AI architecture?",
+      a: ["Robust observability, transparent cost accounting, automated quality evals, and resilient fallback safety gates","Using the largest model available regardless of cost","Writing code without tests","Refusing to measure latency"],
+      c: 0,
+      why: "Observability, cost governance, and automated testing define enterprise operational excellence."
+    }
+  ]);
+</script>
+</body>
+</html>

@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 08 — Converting between formats</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="python-files-json-data" data-lesson="8" data-lesson-id="converting-between-formats">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 08</span> · Together</span>
+
+  <h1 class="lesson-title">Converting between formats</h1>
+  <p class="lesson-lede">
+    CSV and JSON describe the same data in different shapes. Converting between
+    them is the first genuinely useful thing you can build with everything so far.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~12 min</span>
+    <span><b>Win</b> Move data between shapes</span>
+    <span><b>Mission link</b> Data that fits its destination</span>
+  </div>
+
+  <h2><span class="n">1</span>Two shapes, one dataset</h2>
+
+  <p>
+    CSV is <b>tabular</b>: rows and columns, every row the same shape. JSON is
+    <b>nested</b>: objects can contain objects, and rows can differ. Converting
+    means choosing a shape, not just changing punctuation.
+  </p>
+
+  <div id="intro1"></div>
+
+  <p>
+    The most common conversion is a list of records: CSV rows become a JSON array
+    of objects, one object per row, keyed by the header.
+  </p>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>CSV to JSON</h2>
+
+  <p>
+    <code>DictReader</code> does most of the work — it already gives you one
+    dictionary per row, which is exactly the JSON shape you want:
+  </p>
+
+  <pre><code>import csv, json
+
+with open("rows.csv", newline="") as f:
+    records = list(csv.DictReader(f))
+
+with open("rows.json", "w") as f:
+    json.dump(records, f, indent=2)</code></pre>
+
+  <p>
+    Two lines of real work. The header row became the keys, and the file became an
+    array of objects.
+  </p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">3</span>JSON to CSV</h2>
+
+  <p>
+    Going back needs one decision: which keys become columns. You must declare
+    them, because JSON objects are allowed to differ from each other.
+  </p>
+
+  <pre><code>with open("rows.json") as f:
+    records = json.load(f)
+
+fields = ["name", "score", "city"]
+
+with open("out.csv", "w", newline="") as f:
+    writer = csv.DictWriter(f, fieldnames=fields)
+    writer.writeheader()
+    writer.writerows(records)</code></pre>
+
+  <div id="diagram1"></div>
+
+  <p>
+    If a record is missing a field, <code>DictWriter</code> raises. That is the
+    format telling you the data is not as uniform as you assumed — which is
+    information you want, not an obstacle.
+  </p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Converting formats is really <b>choosing a shape</b>. CSV forces uniformity;
+    JSON allows variation. Pick the one your consumer can actually handle.
+  </div>
+
+  <h2><span class="n">4</span>Verify the round trip</h2>
+
+  <p>
+    After any conversion, read the output back and compare it to the input. If the
+    round trip is not identical, you have lost data — and you want to know now, not
+    in production.
+  </p>
+
+  <pre><code>assert json.load(open("rows.json")) == records</code></pre>
+
+  <div class="note good">
+    <span class="note-label">Why this matters later</span>
+    Every pipeline you build from here on is a chain of conversions. Checking the
+    round trip at each step is what turns a script that usually works into one you
+    can trust.
+  </div>
+
+  <h2><span class="n">5</span>Check yourself</h2>
+
+  <p>
+    Answer from memory — do not scroll back up. Each option has the same number of
+    words, so nothing gives the answer away.
+  </p>
+
+  <div id="fill1"></div>
+  <div id="quiz"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>
+      You can now convert between CSV and JSON in both directions, choose the right
+      shape for the consumer, and verify that nothing was lost on the way.
+    </p>
+  </div>
+
+  <h2><span class="n">6</span>Do this next</h2>
+
+  <ol>
+    <li>
+      Convert a CSV file to a JSON array of objects and inspect the output.
+    </li>
+    <li>
+      Convert it back to CSV and diff the two files.
+    </li>
+    <li>
+      Add a record with a missing field and watch <code>DictWriter</code> complain.
+    </li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Read the Python docs on
+    <a href="https://docs.python.org/3/library/csv.html#csv.DictWriter">DictWriter</a>
+    and the
+    <a href="https://docs.python.org/3/library/json.html">json module</a>.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher (me) anything — "what about nested
+    JSON?", "how do I flatten it?", "what is NDJSON?". There are no bad questions
+    here.
+  </div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  /* the two shapes */
+  TeachWidgets.introCards("#intro1", {
+    cards: [
+      { ico: "📊", title: "CSV is tabular", body: "Every row has the same columns, always." },
+      { ico: "🌳", title: "JSON is nested", body: "Objects can contain objects and vary in shape." },
+      { ico: "🔁", title: "Converting", body: "Means choosing a shape, not just punctuation." }
+    ]
+  });
+
+  /* predict-then-reveal */
+  TeachWidgets.predict("#predict1", {
+    q: "What is the natural JSON shape for CSV rows?",
+    a: ["A single flat object", "An array of objects", "A nested tree object"],
+    c: 1,
+    why: "One object per row, keyed by the header, is the standard CSV-to-JSON mapping."
+  });
+
+  /* step-through trace of CSV to JSON */
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "records = list(csv.DictReader(f))",
+      "  -> [{'name': 'Ada', 'score': '42'}]",
+      "json.dump(records, f, indent=2)",
+      "  -> [",
+      "       {\"name\": \"Ada\", \"score\": \"42\"} ]"
+    ],
+    steps: [
+      { line: 0, vars: { records: "list of dicts" } },
+      { line: 1, vars: { keys: "from header" } },
+      { line: 2, vars: { writing: "to file" } },
+      { line: 3, vars: { shape: "array" } },
+      { line: 4, vars: { shape: "of objects" } }
+    ]
+  });
+
+  /* both directions */
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      { title: "CSV to JSON", lines: ["DictReader", "list of dicts"] },
+      { title: "JSON to CSV", lines: ["declare fieldnames", "DictWriter"] },
+      { title: "Verify", lines: ["read it back", "compare to input"] }
+    ]
+  });
+
+  /* recall from memory */
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — conversion",
+    lines: [
+      "CSV rows become JSON objects keyed by the <0> row",
+      "JSON to CSV needs the column names declared as <1>",
+      "Checking the output against the input is a <2> trip test"
+    ],
+    blanks: [
+      { a: ["header"], why: "DictReader uses the header row as the keys of each object." },
+      { a: ["fieldnames"], why: "DictWriter requires fieldnames to know the column order." },
+      { a: ["round"], why: "A round-trip test reads the output back and compares it to the input." }
+    ]
+  });
+
+  /* the quiz — every option is exactly three words */
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What shape is CSV?",
+      a: ["Nested and variable", "Tabular and uniform", "Hierarchical and deep", "Unstructured and free"],
+      c: 1,
+      why: "CSV is strictly tabular — every row has the same columns."
+    },
+    {
+      q: "What does DictReader give?",
+      a: ["A list of rows", "A dictionary per row", "A single dictionary", "A tuple per row"],
+      c: 1,
+      why: "DictReader yields one dictionary per row, keyed by the header names."
+    },
+    {
+      q: "Why declare fieldnames?",
+      a: ["To speed up writing", "To fix the column order", "To validate the header", "To enable quoting"],
+      c: 1,
+      why: "JSON objects may differ, so DictWriter needs the column set declared explicitly."
+    }
+    {
+      q: "What does CSV force?",
+      a: ["Nested structures", "Uniform row shapes", "Optional column names", "Binary encoding"],
+      c: 1,
+      why: "CSV requires every row to have the same columns, unlike nested JSON."
+    }
+  ]);
+</script>
+</body>
+</html>

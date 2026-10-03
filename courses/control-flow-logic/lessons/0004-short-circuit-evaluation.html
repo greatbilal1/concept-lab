@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 04 — Short-circuit evaluation</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="control-flow-logic" data-lesson="4" data-lesson-id="short-circuit-evaluation">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 04</span> · Logic</span>
+
+  <h1 class="lesson-title">Short-circuit evaluation</h1>
+  <p class="lesson-lede">
+    Python does not always evaluate both sides of <code>and</code> and
+    <code>or</code>. It stops the moment the answer is certain — and that is not an
+    optimisation detail, it is a tool you will use deliberately for the rest of your
+    career.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Write a guard clause that prevents a crash</span>
+    <span><b>Mission link</b> Why condition order is a design choice</span>
+  </div>
+
+  <h2><span class="n">1</span>Stopping early</h2>
+
+  <p>
+    Consider <code>a and b</code>. If <code>a</code> is false, the whole expression
+    is false no matter what <code>b</code> is. So Python never looks at
+    <code>b</code>. The same happens with <code>a or b</code> when <code>a</code> is
+    true: the answer is already true, so <code>b</code> is skipped.
+  </p>
+
+  <div id="diagram1"></div>
+
+  <p>
+    This behaviour is called <b>short-circuit evaluation</b>. The expression is
+    evaluated left to right, and it stops as soon as the result is decided.
+  </p>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>You can see it happen</h2>
+
+  <p>
+    The easiest way to prove it is with a function that prints when it runs. If the
+    print never appears, the function was never called.
+  </p>
+
+  <pre><code>def noisy():
+    print("called!")
+    return True
+
+False and noisy()   # prints nothing — noisy() never runs
+True  or  noisy()   # prints nothing — noisy() never runs
+True  and noisy()   # prints "called!" — the right side was needed</code></pre>
+
+  <div id="trace1"></div>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    <code>and</code> stops at the first <b>false</b> value.
+    <code>or</code> stops at the first <b>true</b> value.
+    Anything to the right of that point never runs.
+  </div>
+
+  <h2><span class="n">3</span>The guard clause</h2>
+
+  <p>
+    Short-circuiting is what makes it safe to check a value and use it in the same
+    expression. This is the single most useful pattern in the whole lesson:
+  </p>
+
+  <pre><code>if items and items[0] == "start":
+    ...</code></pre>
+
+  <p>
+    If <code>items</code> is empty, the left side is falsy, so Python stops — and
+    <code>items[0]</code> is never evaluated. Without short-circuiting, that
+    expression would raise an <code>IndexError</code> on every empty list. The
+    condition that protects the rest of the expression is called a <b>guard
+    clause</b>.
+  </p>
+
+  <div id="intro1"></div>
+
+  <div class="note warn">
+    <span class="note-label">Watch out</span>
+    Order matters, and the wrong order crashes. <code>items[0] == "start" and
+    items</code> raises on an empty list, because the dangerous part runs first.
+    Put the guard on the left, always.
+  </div>
+
+  <h2><span class="n">4</span>Precedence, and why you should use brackets</h2>
+
+  <p>
+    When several operators appear together, Python applies them in a fixed order:
+    comparisons bind tightest, then <code>not</code>, then <code>and</code>, then
+    <code>or</code>. So <code>a or b and c</code> means <code>a or (b and c)</code>.
+  </p>
+
+  <p>
+    Here is the win for today: you can now read any mixed condition correctly, and
+    you know that adding brackets costs nothing and removes all doubt. When in
+    doubt, bracket it.
+  </p>
+
+  <div id="fill1"></div>
+
+  <h2><span class="n">5</span>Check yourself</h2>
+
+  <p>
+    Answer from memory — do not scroll back up. Each option has the same number of
+    words, so nothing gives the answer away.
+  </p>
+
+  <div id="quiz"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>
+      You can now write a condition that checks a value and uses it safely in one
+      line, and you know exactly which parts of a mixed expression run. That is the
+      difference between a condition that works and one that crashes on the edge
+      case.
+    </p>
+  </div>
+
+  <h2><span class="n">6</span>Do this next</h2>
+
+  <ol>
+    <li>
+      Write a function that prints when called, then use it to prove that
+      <code>True or noisy()</code> never calls it.
+    </li>
+    <li>
+      Fix this condition so it is safe on an empty list:
+      <code>data[0] &gt; 0 and data</code>.
+    </li>
+    <li>
+      Add brackets to <code>a or b and not c</code> so the meaning is obvious, then
+      check your version against Python's default.
+    </li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Read <a href="https://docs.python.org/3/reference/expressions.html#boolean-operations">Python — Expressions: Boolean Operations</a>.
+    It states the short-circuit rule explicitly, and it also explains what
+    <code>and</code> and <code>or</code> return when their operands are not
+    booleans.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher (me) anything — "what does
+    <code>0 or \"x\"</code> return?", "is short-circuiting guaranteed?",
+    "can I use it to set defaults?". There are no bad questions here.
+  </div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  /* where each operator stops */
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      { title: "a and b", lines: ["stops if a is false"] },
+      { title: "a or b", lines: ["stops if a is true"] },
+      { title: "not a", lines: ["always evaluates a"] }
+    ]
+  });
+
+  /* predict-then-reveal */
+  TeachWidgets.predict("#predict1", {
+    q: "In False and noisy(), does the function noisy() ever run?",
+    a: ["Yes, always", "No, never", "Only sometimes"],
+    c: 1,
+    why: "and stops at the first false value. Since the left side is already false, the right side is never evaluated."
+  });
+
+  /* step through short-circuiting */
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "False and noisy()",
+      "True  or  noisy()",
+      "True  and noisy()"
+    ],
+    steps: [
+      { line: 0, vars: { left: "False", right: "skipped", result: "False" } },
+      { line: 1, vars: { left: "True", right: "skipped", result: "True" } },
+      { line: 2, vars: { left: "True", right: "called", result: "True" } }
+    ]
+  });
+
+  /* three things short-circuiting gives you */
+  TeachWidgets.introCards("#intro1", {
+    cards: [
+      { ico: "🛡️", title: "Safe access", body: "items and items[0] never indexes an empty list, because the guard runs first." },
+      { ico: "⚡", title: "Less work", body: "Skipped operands are never evaluated, so expensive checks can be placed last." },
+      { ico: "🎛️", title: "Defaults", body: "name or \"anonymous\" returns the fallback when name is falsy." }
+    ]
+  });
+
+  /* recall from memory */
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in what runs",
+    lines: [
+      "In False and f(), the call to f() is <0>",
+      "In True or f(), the call to f() is <1>",
+      "In True and f(), the call to f() is <2>"
+    ],
+    blanks: [
+      { a: ["skipped"], why: "and stops at the first false value, so the right side never runs." },
+      { a: ["skipped"], why: "or stops at the first true value, so the right side never runs." },
+      { a: ["made"], why: "The left side is true, so and must check the right side to decide." }
+    ]
+  });
+
+  /* the quiz — every option is exactly three words */
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "When does and stop evaluating?",
+      a: ["At the first true", "At the first false", "After both sides here", "Before the first here"],
+      c: 1,
+      why: "One false operand settles an and, so Python stops there and skips the rest."
+    },
+    {
+      q: "When does or stop evaluating?",
+      a: ["At the first true", "At the first false", "After both sides here", "Before the first here"],
+      c: 0,
+      why: "One true operand settles an or, so the remaining operands are never evaluated."
+    },
+    {
+      q: "Why is items and items[0] safe?",
+      a: ["Lists never raise errors", "The guard runs first", "Python checks the length", "Indexing is always safe"],
+      c: 1,
+      why: "An empty list is falsy, so and short-circuits and never evaluates items[0]."
+    },
+    {
+      q: "What does a or b and c mean?",
+      a: ["a or (b and c)", "(a or b) and c", "a and (b or c)", "(a and b) or c"],
+      c: 0,
+      why: "and binds tighter than or, so the and is grouped first — but brackets are clearer."
+    }
+  ]);
+</script>
+</body>
+</html>

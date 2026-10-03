@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 04 — The Training Phase vs The Inference Phase</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="what-is-ai" data-lesson="4" data-lesson-id="training-vs-inference">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 04</span> · Lifecycle</span>
+
+  <h1 class="lesson-title">The Training Phase vs The Inference Phase</h1>
+  <p class="lesson-lede">
+    The critical distinction between training (gradient descent, massive compute) and inference (evaluation, frozen weights).
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You understand the vital architectural distinction between training and inference.</span>
+    <span><b>Mission link</b> Mastering the training phase vs the inference phase across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of The Training Phase vs The Inference Phase</h2>
+  <p>A widespread misconception among users is that when you chat with an AI model, it is 'learning' from your conversation in real time. In reality, modern deep learning has an absolute separation between two distinct lifecycles: <strong>Training</strong> and <strong>Inference</strong>.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    The critical distinction between training (gradient descent, massive compute) and inference (evaluation, frozen weights).
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Training vs Inference Lifecycle</h2>
+  <ul><li><strong>1. The Training Phase (Creation & Optimization):</strong> Thousands of high-end GPUs (NVIDIA H100s) run for months. Billions of text tokens pass through the model. Gradients are computed, backpropagation runs, and weights are adjusted continuously. This phase costs tens of millions of dollars.</li><li><strong>2. The Inference Phase (Serving & Execution):</strong> The trained weights are <strong>frozen</strong>. The model acts as a giant static mathematical formula: $y = f(x; W)$. Given an input prompt, it performs forward-pass matrix multiplications and emits tokens. Zero weights change!</li></ul>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>In-Context Memory vs Weight Learning</h2>
+  <pre><code># Training vs Inference Specs:
+# TRAINING:
+# Compute:   16,000 H100 GPUs for 90 days
+# State:     Weights MUTATE continuously via gradient descent
+# Output:    Final checkpoint file (.safetensors, 140GB)
+
+# INFERENCE:
+# Compute:   1 to 8 GPUs serving API calls
+# State:     Weights FROZEN (Read-Only in RAM)
+# Output:    Next-token probability distributions in milliseconds</code></pre><p>When an agent appears to 'remember' things in a conversation, that is not weight updates; that is simply the conversation history being passed into its active context window on every prompt.</p><div class="callout"><p><strong>Read-Only Physics:</strong> A model deployed to production does not learn from its mistakes on its own. To update its knowledge permanently, you must fine-tune or re-train its weights in a separate training run.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the training vs inference sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You understand the vital architectural distinction between training and inference.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where the training phase vs the inference phase applies.</li>
+    <li>Author a unit test or verification script exercising the training phase vs the inference phase.</li>
+    <li>Document team architectural conventions regarding the training phase vs the inference phase.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for The Training Phase vs The Inference Phase.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What happens to a model's internal weights during the inference phase when serving user queries?",
+    a: ["Nothing; weights are completely frozen and static; the model does not learn or remember from standard queries","Weights update after every message","Weights are deleted to save RAM","Weights are re-trained from scratch"],
+    c: 0,
+    why: "Inference is strictly read-only evaluation. Weights are frozen; the model does not update its parameters during inference."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Training Phase (Write)",
+            "lines": [
+                  "Compute: 10,000 GPUs, 3 months",
+                  "Gradients update billions of weights",
+                  "Produces static weight checkpoint"
+            ]
+      },
+      {
+            "title": "Inference Phase (Read)",
+            "lines": [
+                  "Compute: 1-8 GPUs, milliseconds",
+                  "Weights FROZEN (read-only)",
+                  "Evaluates forward pass: y = f(x; W)"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing The Training Phase vs The Inference Phase",
+      "def execute_flow():",
+      "    # The critical distinction between training (gradien...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "The Training Phase vs The Inference Phase"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Conversation Context"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Weight Knowledge"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "While training updates model weights via gradient descent, inference is a {1} operation where weights are completely {2}."
+],
+    blanks: [
+      {
+            "a": [
+                  "read-only"
+            ],
+            "why": "Non-mutating evaluation"
+      },
+      {
+            "a": [
+                  "frozen"
+            ],
+            "why": "Static and unchanging parameters"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why does a model not permanently remember a correction you gave it yesterday in a new chat session?",
+      a: ["Model weights are frozen during inference; corrections only exist in the transient context window of that specific session","The model deliberately ignores users","The computer hard drive erases user chats","Models can only remember numbers"],
+      c: 0,
+      why: "Inference does not mutate weights; context memory is ephemeral to the active session."
+    },
+    {
+      q: "What is the primary computational operation performed during LLM inference?",
+      a: ["Forward-pass matrix multiplications across model layers to calculate token probabilities","Running git commits in the cloud","Compiling Python source code to C","Searching Google in the background"],
+      c: 0,
+      why: "Inference executes forward matrix multiplications through transformer layers."
+    },
+    {
+      q: "What is 'Fine-Tuning' in the model lifecycle?",
+      a: ["Taking an existing pre-trained model and running an additional targeted training pass on a domain dataset to adjust weights","Adjusting the monitor brightness","Tuning the guitar strings","Renaming the model file on disk"],
+      c: 0,
+      why: "Fine-tuning continues training on specific domain data to update weights for a target task."
+    },
+    {
+      q: "Why is training an LLM drastically more expensive than running inference?",
+      a: ["Training requires processing trillions of tokens and calculating gradients for billions of parameters across thousands of GPUs","Training requires paying royalty fees to English authors","Training requires buying physical books","Inference is subsidized by governments"],
+      c: 0,
+      why: "Gradient calculation and optimizer state across trillions of tokens requires massive distributed supercomputers."
+    }
+  ]);
+</script>
+</body>
+</html>

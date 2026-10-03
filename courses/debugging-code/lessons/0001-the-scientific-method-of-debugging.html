@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 01 — The scientific method of debugging</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="debugging-code" data-lesson="1" data-lesson-id="the-scientific-method-of-debugging">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 01</span> · The Debugging Mindset</span>
+
+  <h1 class="lesson-title">The scientific method of debugging</h1>
+  <p class="lesson-lede">
+    Stop guessing and start observing. Software behaves deterministically; this lesson introduces the loop of observation, hypothesis, and experiment.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Distinguish defect, infection, and failure in any bug report</span>
+    <span><b>Mission link</b> The foundation of all systematic diagnostic craft</span>
+  </div>
+
+  <h2><span class="n">1</span>The defect-infection-failure chain</h2>
+  <p>A bug is not a single point in time. It is a chain of three distinct events. First, a human writes a <b>defect</b> in the code. Second, when executed with certain inputs, the defect causes an internal <b>infection</b> of variable state. Third, that infected state eventually surfaces as an observable <b>failure</b>.</p><p>When users file a bug report, they are reporting the final failure. If you try to fix the failure where it appears, you will likely mask the symptom rather than cure the infection.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    A defect creates an infection in state, which later explodes as a visible failure.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The diagnostic cycle</h2>
+  <p>Rather than randomly changing lines of code, systematic engineers follow an empirical loop: observe the failure, formulate a hypothesis about what state is infected, devise an experiment to test that hypothesis, and observe the result.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Traces of infected state</h2>
+  <p>Walk through an example of a discount calculation where a defect in price normalization corrupts the running balance.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your understanding of the defect chain before testing your knowledge.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can articulate the complete chain from source defect to state infection to final failure, keeping your investigation focused on the true root cause.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Take a recent bug in your code and identify where the defect became an infection.</li>
+    <li>Write down the three stages on paper before touching the editor on your next issue.</li>
+    <li>Explain to a colleague why treating the failure location rarely fixes the bug.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Read Chapter 1 of *Why Programs Fail* by Andreas Zeller for a rigorous mathematical treatment of state infection.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "A program prints 'NaN' when displaying an invoice total. What is this visible string?",
+    a: ["The original code defect","The program failure","The compiler error","The variable infection"],
+    c: 1,
+    why: "The printed string 'NaN' is the outward, observable failure resulting from corrupted earlier state."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Observe",
+            "lines": [
+                  "note the exact failure",
+                  "record inputs and outputs"
+            ]
+      },
+      {
+            "title": "Hypothesise",
+            "lines": [
+                  "propose cause of infection",
+                  "predict outcome of test"
+            ]
+      },
+      {
+            "title": "Experiment",
+            "lines": [
+                  "run targeted check",
+                  "confirm or refute idea"
+            ]
+      },
+      {
+            "title": "Remediate",
+            "lines": [
+                  "fix the defect at source",
+                  "add regression check"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "price = 100",
+      "discount_pct = 20",
+      "discount = price * discount_pct  # bug: forgot / 100",
+      "total = price - discount"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "price": "100"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "discount_pct": "20"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "discount": "2000 (infected)"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "total": "-1900 (failure)"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The flaw in source code is the <0>.",
+      "The corrupted internal program state is the <1>.",
+      "The external observable misbehavior is the <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "defect",
+                  "bug"
+            ],
+            "why": "Defect is the error written in the source code."
+      },
+      {
+            "a": [
+                  "infection"
+            ],
+            "why": "Infection is the corrupted internal variable state."
+      },
+      {
+            "a": [
+                  "failure"
+            ],
+            "why": "Failure is the visible manifestation of the bug."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the primary danger of fixing code at the point of failure?",
+      a: ["It usually masks symptoms without curing root cause","It automatically breaks the project compilation immediately","It permanently deletes git commit history forever","It causes database engines to reject connections"],
+      c: 0,
+      why: "Touching the failure point often just silences the error while leaving bad data in the system."
+    },
+    {
+      q: "What defines a scientific debugging hypothesis?",
+      a: ["It is a hunch that requires no verification","It makes testable predictions that can be falsified","It is accepted by the majority of team members","It always blames external network infrastructure"],
+      c: 1,
+      why: "A useful hypothesis must make a concrete prediction that a targeted test can disprove."
+    },
+    {
+      q: "When does an infection become a failure?",
+      a: ["When the compiler builds binary executable code","When corrupted state impacts external observable output","Immediately upon typing an error into the editor","Only after the program terminates completely"],
+      c: 1,
+      why: "An infection remains latent until it affects output, causes an exception, or corrupts persistence."
+    },
+    {
+      q: "What should you do before altering code to fix a bug?",
+      a: ["Deploy the code directly into production systems","Formulate and test a hypothesis about the defect","Rewrite the entire application in another language","Delete the integration test suite completely"],
+      c: 1,
+      why: "Systematic debugging requires verifying the cause before committing any code alterations."
+    }
+  ]);
+</script>
+</body>
+</html>

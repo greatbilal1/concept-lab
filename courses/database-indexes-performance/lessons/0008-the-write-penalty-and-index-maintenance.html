@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 08 — The write penalty and index maintenance</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="database-indexes-performance" data-lesson="8" data-lesson-id="the-write-penalty-and-index-maintenance">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 08</span> · Specialized Indexes & Maintenance</span>
+
+  <h1 class="lesson-title">The write penalty and index maintenance</h1>
+  <p class="lesson-lede">
+    Indexes are not free. Every index imposes a tax on every INSERT, UPDATE, and DELETE. Learn how to audit unused indexes, detect index bloat, and perform online reindexing.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Audit database systems to identify and drop unused indexes and manage write overhead</span>
+    <span><b>Mission link</b> Protects database write throughput and memory cache efficiency</span>
+  </div>
+
+  <h2><span class="n">1</span>The index write tax</h2>
+  <p>If a table has 10 indexes, every single <code>INSERT</code> must write to the table heap AND update all 10 physical B-tree indexes across disk. Every single <code>UPDATE</code> that touches indexed columns must modify those indexes, triggering B-tree page splits and write amplification.</p><p>Furthermore, indexes consume RAM in the buffer pool. If you have 20 gigabytes of unused indexes, they push active table pages out of memory, slowing down your entire database. <b>Unused indexes are pure overhead with zero benefit.</b></p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Every index adds write latency and memory overhead; audit and drop unused indexes regularly.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The index lifecycle balance</h2>
+  <p>Balance read acceleration against write penalties and storage overhead.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing online concurrent reindexing</h2>
+  <p>Trace how REINDEX CONCURRENTLY rebuilds bloated index pages without locking out production traffic.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of index maintenance practices.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can audit and prune unused database indexes and maintain production performance through concurrent reindexing.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Query pg_stat_user_indexes in PostgreSQL to check scan counts on your indexes.</li>
+    <li>Drop an unused index to speed up write operations on a busy table.</li>
+    <li>Create an index concurrently in production using CREATE INDEX CONCURRENTLY.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    PostgreSQL Documentation: *Monitoring Database Activity — pg_stat_user_indexes* (postgresql.org/docs/current/monitoring-stats.html).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What query in PostgreSQL identifies indexes that have had zero scans and are wasting write performance?",
+    a: ["Querying pg_stat_user_indexes for idx_scan = 0","Running SELECT * FROM pg_unused_indexes","Checking the computer error log file","There is no way to know if an index is used"],
+    c: 0,
+    why: "pg_stat_user_indexes tracks every index scan; idx_scan = 0 reveals completely unused indexes."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Read Speed (+)",
+            "lines": [
+                  "accelerates WHERE filters",
+                  "satisfies ORDER BY",
+                  "speeds up JOINs"
+            ]
+      },
+      {
+            "title": "Write Penalty (-)",
+            "lines": [
+                  "slows down INSERT/UPDATE/DELETE",
+                  "B-tree page splits on disk"
+            ]
+      },
+      {
+            "title": "Memory Tax (-)",
+            "lines": [
+                  "eats shared_buffers RAM",
+                  "pushes table pages to disk"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Bloated index: idx_orders_date has 50% empty pages from heavy updates",
+      "# Running standard REINDEX locks table against writes! (Outage risk)",
+      "# Safe modern command:",
+      "REINDEX INDEX CONCURRENTLY idx_orders_date;",
+      "# Engine builds new index in background, swaps pointers, drops old index safely!"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "problem": "index bloat degradation"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "safe_execution": "CONCURRENTLY builds replacement index in background"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "outcome": "zero downtime; read/write traffic unaffected during rebuild"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The performance overhead on writes caused by indexes is the write <0>.",
+      "The PostgreSQL system view tracking index usage counts is pg_stat_user_<1>.",
+      "To rebuild an index without locking out table writes, add the keyword <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "penalty",
+                  "tax"
+            ],
+            "why": "Write penalty describes index update overhead."
+      },
+      {
+            "a": [
+                  "indexes"
+            ],
+            "why": "pg_stat_user_indexes tracks scan statistics."
+      },
+      {
+            "a": [
+                  "CONCURRENTLY"
+            ],
+            "why": "CONCURRENTLY builds indexes in the background without exclusive locks."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why should you always use 'CREATE INDEX CONCURRENTLY' in a production database?",
+      a: ["Standard CREATE INDEX acquires an exclusive lock that blocks all INSERT, UPDATE, and DELETE operations until finished; CONCURRENTLY does not lock writes","CONCURRENTLY makes the index twice as fast forever","CONCURRENTLY is required on SSD drives","Standard CREATE INDEX deletes the table data"],
+      c: 0,
+      why: "CONCURRENTLY prevents production downtime by building the index without acquiring an exclusive table lock."
+    },
+    {
+      q: "What causes 'index bloat' in PostgreSQL B-trees?",
+      a: ["Frequent UPDATE and DELETE operations leave dead space in index leaf pages that cannot be reclaimed immediately","Storing long strings in the index","Running more than ten queries per minute","Using numbers larger than 1,000"],
+      c: 0,
+      why: "Updates and deletes create dead versions; over time, index pages become partially empty (bloated)."
+    },
+    {
+      q: "What is HOT (Heap-Only Tuples) optimization in PostgreSQL?",
+      a: ["An optimization where an UPDATE avoids updating indexes if the indexed columns did not change and space exists on the same heap page","A tool that increases processor clock speed","A method to stream database logs over HTTP","An encrypted index format"],
+      c: 0,
+      why: "HOT eliminates index update overhead when updates modify only non-indexed columns."
+    },
+    {
+      q: "What should you do with an index that shows 'idx_scan = 0' after months of production traffic?",
+      a: ["Investigate if it is a foreign key or disaster recovery check, and if not, safely drop it to eliminate write overhead","Double the size of the index immediately","Rename the index to 'used'","Reboot the database server"],
+      c: 0,
+      why: "Unused indexes waste memory and disk I/O on every write; dropping them reclaims write throughput."
+    }
+  ]);
+</script>
+</body>
+</html>

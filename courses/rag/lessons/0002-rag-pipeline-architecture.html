@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 02 — The RAG Pipeline Architecture: Ingest, Embed, Retrieve, Generate</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="rag" data-lesson="2" data-lesson-id="rag-pipeline-architecture">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 02</span> · Pipeline Architecture</span>
+
+  <h1 class="lesson-title">The RAG Pipeline Architecture: Ingest, Embed, Retrieve, Generate</h1>
+  <p class="lesson-lede">
+    The four foundational phases of RAG: Ingestion (parsing), Embedding (vectorization), Retrieval (search), and Generation (synthesis).
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You understand the complete four-stage RAG pipeline architecture.</span>
+    <span><b>Mission link</b> Mastering the rag pipeline architecture: ingest, embed, retrieve, generate across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of The RAG Pipeline Architecture: Ingest, Embed, Retrieve, Generate</h2>
+  <p>A production Retrieval-Augmented Generation system operates across two separate operational timelines: the <strong>Offline Ingestion Pipeline</strong> and the <strong>Online Query Pipeline</strong>.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    The four foundational phases of RAG: Ingestion (parsing), Embedding (vectorization), Retrieval (search), and Generation (synthesis).
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Complete RAG Architecture</h2>
+  <p><strong>1. The Offline Ingestion Pipeline (Document Preparation):</strong></p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Embedding Model Symmetry</h2>
+  <ul><li><strong>Parse:</strong> Extract clean raw text from diverse formats (PDFs, Markdown, Word docs, HTML).</li><li><strong>Chunk:</strong> Split long documents into small, cohesive passages (e.g. 300 to 500 tokens).</li><li><strong>Embed:</strong> Convert each chunk into a vector using an embedding model (e.g. `text-embedding-3-small`).</li><li><strong>Index:</strong> Store the vectors and chunk text in a Vector Database with metadata tags.</li></ul><p><strong>2. The Online Query Pipeline (Runtime Inference):</strong></p><ul><li><strong>Embed Query:</strong> When a user asks a question, embed their query using the <em>exact same embedding model</em>.</li><li><strong>Retrieve (Top-K):</strong> Query the vector database for the top $K$ chunks (e.g. $K=5$) with the highest cosine similarity.</li><li><strong>Synthesize (Generate):</strong> Inject the retrieved chunks into a prompt template alongside the user's question, instructing the LLM to generate a grounded answer!</li></ul><pre><code># The Complete RAG Flow in Pseudocode:
+# OFFLINE:
+chunks = chunk_document(raw_pdf)
+vectors = embedding_model.encode(chunks)
+vector_db.insert(vectors, chunks)
+
+# ONLINE:
+query_vector = embedding_model.encode(user_query)
+top_chunks = vector_db.search(query_vector, top_k=3)
+prompt = f"Answer using these facts:\n{top_chunks}\n\nQuestion: {user_query}"
+final_answer = llm.generate(prompt)</code></pre><div class="callout"><p><strong>The Symmetry Rule:</strong> You must always use the <em>exact same embedding model</em> for querying that you used for indexing. If you index with BGE and query with OpenAI, the vector spaces are incompatible!</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the RAG pipeline sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You understand the complete four-stage RAG pipeline architecture.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where the rag pipeline architecture: ingest, embed, retrieve, generate applies.</li>
+    <li>Author a unit test or verification script exercising the rag pipeline architecture: ingest, embed, retrieve, generate.</li>
+    <li>Document team architectural conventions regarding the rag pipeline architecture: ingest, embed, retrieve, generate.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for The RAG Pipeline Architecture: Ingest, Embed, Retrieve, Generate.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What are the two major operational phases of any RAG architecture?",
+    a: ["The Offline Ingestion Pipeline (preparing documents) and the Online Query Pipeline (retrieving and answering)","The Input Phase and the Delete Phase","The Python Phase and the C Phase","The Training Phase and the Testing Phase"],
+    c: 0,
+    why: "RAG divides into an offline ingestion pipeline (parse, chunk, embed, index) and an online query loop (embed query, search, prompt, generate)."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Offline Ingestion Pipeline",
+            "lines": [
+                  "PDF / Markdown -> Chunking -> Embedding Model",
+                  "Stored in Vector DB (pgvector / Chroma)"
+            ]
+      },
+      {
+            "title": "Online Query Pipeline",
+            "lines": [
+                  "User Query -> Embed Query -> Vector Search",
+                  "Top-K Chunks + Prompt -> LLM -> Grounded Answer"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing The RAG Pipeline Architecture: Ingest, Embed, Retrieve, Generate",
+      "def execute_flow():",
+      "    # The four foundational phases of RAG: Ingestion (pa...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "The RAG Pipeline Architecture: Ingest, Embed, Retrieve, Generate"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Symmetric (Correct)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Asymmetric (Broken!)"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The RAG architecture consists of an offline {1} pipeline to chunk and embed documents, and an online {2} pipeline to retrieve and synthesize answers."
+],
+    blanks: [
+      {
+            "a": [
+                  "ingestion"
+            ],
+            "why": "Document processing and indexing"
+      },
+      {
+            "a": [
+                  "query"
+            ],
+            "why": "Real-time user search and generation"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What happens if a developer indexes documents using OpenAI text-embedding-3 but queries the database using Cohere embed?",
+      a: ["Search fails completely because the two models use different coordinate dimensions and incompatible semantic vector spaces","It works with 50% accuracy","The database automatically translates vectors","The computer restarts"],
+      c: 0,
+      why: "Different embedding models construct incompatible geometric spaces; query and index models must match."
+    },
+    {
+      q: "Why must large documents be broken into chunks before indexing in a vector database?",
+      a: ["Embedding a 100-page book as one vector blurs distinct topics into an indistinct average; chunks isolate specific facts","Vector databases only store 10 words","PDF files cannot be read without chunking","To save hard drive space"],
+      c: 0,
+      why: "Chunking preserves localized semantic specificity, enabling precise retrieval."
+    },
+    {
+      q: "What is 'Top-K' in a vector database query?",
+      a: ["The number of most similar candidate document chunks returned by the vector search (e.g. top 3 or top 5)","The top-ranked developer on the team","The temperature setting of the database","The number of CPU cores used"],
+      c: 0,
+      why: "Top-K specifies how many nearest-neighbor chunks to retrieve for prompt context."
+    },
+    {
+      q: "What role does the LLM play in the final stage of the RAG pipeline?",
+      a: ["It reads the retrieved context passages, synthesizes the relevant information, and composes a fluent answer answering the user's query","It indexes the PDF files","It computes the cosine similarity matrix","It calculates database storage fees"],
+      c: 0,
+      why: "The LLM acts as the linguistic synthesizer and reasoning engine over the retrieved context."
+    }
+  ]);
+</script>
+</body>
+</html>

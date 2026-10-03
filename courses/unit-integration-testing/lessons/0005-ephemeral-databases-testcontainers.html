@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 05 — Testing with Ephemeral Databases and Testcontainers</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="unit-integration-testing" data-lesson="5" data-lesson-id="ephemeral-databases-testcontainers">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 05</span> · Database Testing</span>
+
+  <h1 class="lesson-title">Testing with Ephemeral Databases and Testcontainers</h1>
+  <p class="lesson-lede">
+    Using ephemeral databases, SQLite in-memory, and Docker Testcontainers for realistic, isolated integration testing.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to run realistic integration tests against ephemeral databases.</span>
+    <span><b>Mission link</b> Mastering testing with ephemeral databases and testcontainers across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Testing with Ephemeral Databases and Testcontainers</h2>
+  <p>For years, developers tested database code by swapping their production PostgreSQL engine for an in-memory SQLite database. While SQLite is fast, it differs from PostgreSQL in crucial ways: different date/time functions, no native `JSONB` support, and lenient type checking.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Using ephemeral databases, SQLite in-memory, and Docker Testcontainers for realistic, isolated integration testing.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Database Isolation Strategies</h2>
+  <p>Today, the gold standard for integration testing is <strong>Testcontainers</strong>. Testcontainers allows your test runner to spin up a genuine, throwaway Docker container running the exact version of PostgreSQL, Redis, or Kafka used in production.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Transaction Rollback Trick</h2>
+  <pre><code># Integration testing with Testcontainers (Python)
+import pytest
+from testcontainers.postgres import PostgresContainer
+import psycopg2
+
+@pytest.fixture(scope="session")
+def postgres_container():
+    # Spin up ephemeral container on Docker
+    with PostgresContainer("postgres:16-alpine") as postgres:
+        yield postgres
+
+@pytest.fixture
+def db_connection(postgres_container):
+    conn = psycopg2.connect(postgres_container.get_connection_url())
+    # Run migrations...
+    yield conn
+    conn.close()</code></pre><p>When the test session finishes, the container is destroyed automatically. Every test run starts with a pristine database instance, eliminating state leakage across machines and continuous integration runners.</p><div class="callout"><p><strong>Optimization:</strong> Spin up the container once per test session (session scope), and wrap each test in a database transaction that rolls back at teardown. This gives you native PostgreSQL realism in milliseconds per test!</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the ephemeral database sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to run realistic integration tests against ephemeral databases.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where testing with ephemeral databases and testcontainers applies.</li>
+    <li>Author a unit test or verification script exercising testing with ephemeral databases and testcontainers.</li>
+    <li>Document team architectural conventions regarding testing with ephemeral databases and testcontainers.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Testing with Ephemeral Databases and Testcontainers.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Why is testing PostgreSQL code against an in-memory SQLite database potentially risky?",
+    a: ["SQLite lacks PostgreSQL-specific features like JSONB, specific concurrency locks, and array column types","SQLite is too slow for automated tests","SQLite only runs on mobile devices","SQLite does not support SQL SELECT statements"],
+    c: 0,
+    why: "Database engines have subtle differences in dialects, constraints, and data types that can mask bugs."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "SQLite In-Memory",
+            "lines": [
+                  "Ultra-fast (RAM)",
+                  "Risk of dialect & feature mismatches"
+            ]
+      },
+      {
+            "title": "Shared Test DB",
+            "lines": [
+                  "Real PostgreSQL",
+                  "Risk of state collision across test runs"
+            ]
+      },
+      {
+            "title": "Testcontainers",
+            "lines": [
+                  "Real PostgreSQL container",
+                  "Pristine, disposable, 100% parity"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Testing with Ephemeral Databases and Testcontainers",
+      "def execute_flow():",
+      "    # Using ephemeral databases, SQLite in-memory, and D...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Testing with Ephemeral Databases and Testcontainers"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "1. Begin Transaction"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "2. Run Test Logic"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "step": "3. Rollback Teardown"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Using {1} provides exact production engine parity by running disposable {2} containers during tests."
+],
+    blanks: [
+      {
+            "a": [
+                  "testcontainers"
+            ],
+            "why": "Framework for containerized test dependencies"
+      },
+      {
+            "a": [
+                  "docker"
+            ],
+            "why": "Containerization platform"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the primary advantage of Testcontainers over mocking databases?",
+      a: ["It runs tests against the genuine production database engine inside a throwaway container","It eliminates the need to write test assertions","It makes tests run without Docker","It converts SQL to Python automatically"],
+      c: 0,
+      why: "Testcontainers provides 100% engine fidelity, verifying real SQL features like JSONB and indexes."
+    },
+    {
+      q: "How does wrapping test operations in a transaction rollback speed up database tests?",
+      a: ["It reverts all changes instantly without dropping and recreating tables between tests","It saves queries to disk asynchronously","It disables foreign key constraint checks","It runs tests in parallel without threads"],
+      c: 0,
+      why: "Transaction rollbacks clean up test mutations in milliseconds without expensive schema rebuilding."
+    },
+    {
+      q: "Why is a shared staging database an anti-pattern for automated CI test suites?",
+      a: ["Concurrent CI runs collide and overwrite each other's data, causing intermittent test failures","Staging databases are illegal under software licenses","Staging databases only accept read-only queries","Staging databases cannot store passwords"],
+      c: 0,
+      why: "Shared databases introduce cross-test coupling and race conditions across concurrent CI pipelines."
+    },
+    {
+      q: "What happens to a Testcontainer when the test session completes?",
+      a: ["The container and its volumes are automatically stopped and removed","It continues running forever on the host machine","It is pushed to Docker Hub","It is converted into a virtual machine image"],
+      c: 0,
+      why: "Testcontainers lifecycle managers guarantee container termination upon process exit."
+    }
+  ]);
+</script>
+</body>
+</html>

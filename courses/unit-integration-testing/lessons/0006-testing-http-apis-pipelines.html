@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 06 — Testing HTTP APIs and Request Pipelines</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="unit-integration-testing" data-lesson="6" data-lesson-id="testing-http-apis-pipelines">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 06</span> · API Testing</span>
+
+  <h1 class="lesson-title">Testing HTTP APIs and Request Pipelines</h1>
+  <p class="lesson-lede">
+    Testing REST APIs and web frameworks using ASGI/WSGI test clients without network overhead.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to test HTTP endpoints and request pipelines thoroughly.</span>
+    <span><b>Mission link</b> Mastering testing http apis and request pipelines across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Testing HTTP APIs and Request Pipelines</h2>
+  <p>Testing web APIs does not require launching a real HTTP server on port 8000 and making network requests with curl. Modern web frameworks (FastAPI, Flask, Django, Express) provide <strong>in-process test clients</strong>.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Testing REST APIs and web frameworks using ASGI/WSGI test clients without network overhead.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>In-Process ASGI Pipeline</h2>
+  <p>In FastAPI and Starlette, the `TestClient` uses the ASGI interface to pass simulated HTTP request scopes directly into the application pipeline in memory. You test routing, middleware, authentication, status codes, and JSON response bodies with zero network latency.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Testing Matrix for Endpoints</h2>
+  <pre><code># FastAPI TestClient example
+from fastapi.testclient import TestClient
+from my_app.main import app
+
+client = TestClient(app)
+
+def test_create_item_endpoint():
+    # Make in-memory simulated HTTP POST
+    response = client.post(
+        "/items",
+        json={"name": "Mechanical Keyboard", "price": 120.00},
+        headers={"Authorization": "Bearer test_token"}
+    )
+
+    assert response.status_code == 201
+    data = response.json()
+    assert data["name"] == "Mechanical Keyboard"
+    assert "id" in data</code></pre><p>This approach tests the complete web stack—Pydantic validation, dependency injection, routing, headers, and serialization—in under 10 milliseconds per request.</p><div class="callout"><p><strong>Tip:</strong> Always write test cases for invalid input payloads (e.g. negative prices, missing fields) to verify that your API returns 422 Unprocessable Entity or 400 Bad Request with informative validation messages.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Fill in the HTTP test client concepts</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to test HTTP endpoints and request pipelines thoroughly.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where testing http apis and request pipelines applies.</li>
+    <li>Author a unit test or verification script exercising testing http apis and request pipelines.</li>
+    <li>Document team architectural conventions regarding testing http apis and request pipelines.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Testing HTTP APIs and Request Pipelines.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Why is using an in-process ASGI/WSGI test client faster than launching a real web server and calling requests?",
+    a: ["Test clients call the application handler function directly in memory without TCP sockets or port binding","Test clients run on the GPU","Test clients skip Python execution","Test clients disable JSON parsing"],
+    c: 0,
+    why: "In-process test clients execute the entire HTTP middleware and routing stack directly in memory."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "TestClient.get('/items')",
+            "lines": [
+                  "Synthesizes HTTP scope",
+                  "No TCP socket allocation"
+            ]
+      },
+      {
+            "title": "Middleware & Routing",
+            "lines": [
+                  "Auth, CORS, Rate Limiting",
+                  "Path resolution in RAM"
+            ]
+      },
+      {
+            "title": "Response Object",
+            "lines": [
+                  "Status: 200 OK",
+                  "JSON parsed payload in μs"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Testing HTTP APIs and Request Pipelines",
+      "def execute_flow():",
+      "    # Testing REST APIs and web frameworks using ASGI/WS...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Testing HTTP APIs and Request Pipelines"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Success (200 / 201)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Client Error (400 / 422)"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "step": "Auth Error (401 / 403)"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "An ASGI test client executes the full HTTP pipeline in {1} without binding to a physical {2}."
+],
+    blanks: [
+      {
+            "a": [
+                  "memory"
+            ],
+            "why": "Pure RAM execution without sockets"
+      },
+      {
+            "a": [
+                  "network port"
+            ],
+            "why": "TCP port on localhost like 8000"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What layers of the web stack are exercised by an in-process TestClient?",
+      a: ["Routing, middleware, request validation, authentication, and JSON serialization","Only database SQL queries","Browser DOM rendering and CSS stylesheets","Operating system firewall rules"],
+      c: 0,
+      why: "In-process test clients execute the entire backend request-response pipeline."
+    },
+    {
+      q: "Why is testing HTTP status codes crucial for REST APIs?",
+      a: ["Status codes form the foundational contract that client applications and frontend code rely upon","Status codes change the color of terminal logs","Status codes speed up network bandwidth","Status codes are required by web hosting providers"],
+      c: 0,
+      why: "Clients use status codes (200, 201, 400, 401, 404, 500) to branch logic reliably."
+    },
+    {
+      q: "How should an API handle a POST request with missing required JSON fields?",
+      a: ["Return HTTP 400 Bad Request or 422 Unprocessable Entity with details on missing fields","Crash the server with an uncaught exception","Return HTTP 200 OK with null values","Redirect to the homepage"],
+      c: 0,
+      why: "Standard REST practices require returning 4xx client error status codes for invalid payloads."
+    },
+    {
+      q: "What is the execution speed advantage of TestClient over running a real web server?",
+      a: ["It avoids network socket overhead and process management, running hundreds of requests per second","It runs without installing Python","It requires no CPU cycles","It compiles HTML directly to WebAssembly"],
+      c: 0,
+      why: "Executing directly in memory eliminates socket creation and network stack overhead."
+    }
+  ]);
+</script>
+</body>
+</html>

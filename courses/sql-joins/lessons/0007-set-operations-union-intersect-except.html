@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 07 — Set operations: UNION, INTERSECT, EXCEPT</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="sql-joins" data-lesson="7" data-lesson-id="set-operations-union-intersect-except">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 07</span> · Advanced Joins & Windows</span>
+
+  <h1 class="lesson-title">Set operations: UNION, INTERSECT, EXCEPT</h1>
+  <p class="lesson-lede">
+    Joins combine columns horizontally; set operators combine rows vertically. Master UNION, UNION ALL, INTERSECT, and EXCEPT.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Combine and compare query results vertically using UNION ALL, INTERSECT, and EXCEPT</span>
+    <span><b>Mission link</b> The fundamental set-theoretic tools for combining multi-table row sets</span>
+  </div>
+
+  <h2><span class="n">1</span>Horizontal versus vertical combination</h2>
+  <p>A <code>JOIN</code> combines tables <b>horizontally</b>: it adds columns from Table B onto rows from Table A. In contrast, <b>Set Operations</b> combine queries <b>vertically</b>: they stack rows from Query B on top of rows from Query A.</p><p>SQL provides four standard set operations: <b>UNION</b> (combines rows, removing duplicates), <b>UNION ALL</b> (combines all rows rapidly without deduplication), <b>INTERSECT</b> (returns rows present in both), and <b>EXCEPT / MINUS</b> (returns rows in A but not B).</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Joins append columns horizontally; set operations stack rows vertically.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The four set operations</h2>
+  <p>Visualise how set operations combine and filter rows vertically.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing UNION ALL merging</h2>
+  <p>Trace how customer emails and vendor emails are combined into a single unified contact list.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of SQL set operators.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can combine and compare query result sets vertically using performant UNION ALL and set difference operators.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Combine active and archived orders into a unified view using UNION ALL.</li>
+    <li>Compare the query plan of UNION versus UNION ALL using EXPLAIN.</li>
+    <li>Find users who bought Product A but never Product B using EXCEPT.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Alan Beaulieu, *Learning SQL*, Chapter 6: 'Working with Sets'.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Why is 'UNION ALL' significantly faster than 'UNION' on large query results?",
+    a: ["UNION ALL simply stacks rows without sorting to eliminate duplicate records; UNION performs an expensive deduplication sort","UNION ALL compresses the data before saving","UNION ALL is written in C++ while UNION is written in Python","UNION ALL only returns the first ten rows"],
+    c: 0,
+    why: "UNION forces an expensive sorting pass to strip duplicate rows; UNION ALL streams rows instantly."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "UNION ALL",
+            "lines": [
+                  "stacks all rows",
+                  "fastest, preserves duplicates"
+            ]
+      },
+      {
+            "title": "UNION",
+            "lines": [
+                  "stacks rows + deduplicates",
+                  "requires sorting pass"
+            ]
+      },
+      {
+            "title": "INTERSECT & EXCEPT",
+            "lines": [
+                  "INTERSECT: rows in A AND B",
+                  "EXCEPT: rows in A but NOT in B"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "SELECT email, 'Customer' AS role FROM customers",
+      "UNION ALL",
+      "SELECT email, 'Vendor' AS role FROM vendors;",
+      "# Stacks 500 customer rows on top of 200 vendor rows -> 700 rows total"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "query_1": "extracts 500 customer emails with role tag"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "operator": "UNION ALL merges streams without sorting"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "query_2": "extracts 200 vendor emails with role tag"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "output": "700 combined rows delivered in single result set"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The set operator that stacks rows without removing duplicates is UNION <0>.",
+      "The set operator returning only rows present in both query results is <1>.",
+      "The set operator returning rows in query A that are missing from query B is <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "ALL"
+            ],
+            "why": "UNION ALL retains all duplicate rows."
+      },
+      {
+            "a": [
+                  "INTERSECT"
+            ],
+            "why": "INTERSECT calculates the intersection of two queries."
+      },
+      {
+            "a": [
+                  "EXCEPT",
+                  "MINUS"
+            ],
+            "why": "EXCEPT (or MINUS in Oracle) calculates set difference."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What requirement must two queries satisfy to be combined with UNION?",
+      a: ["Both queries must have the exact same number of columns with compatible data types in corresponding positions","Both queries must query the exact same database table","Both queries must contain identical WHERE clauses","Both queries must be written by the same developer"],
+      c: 0,
+      why: "Union compatibility requires matching column counts and compatible data types in positional order."
+    },
+    {
+      q: "When should you use 'UNION ALL' instead of 'UNION'?",
+      a: ["Whenever you know results are already distinct, or when preserving duplicate occurrences is acceptable/desired","Only when querying fewer than 5 rows","Whenever the database is running on a battery-powered laptop","Never; UNION ALL is considered bad practice"],
+      c: 0,
+      why: "UNION ALL avoids the heavy CPU/disk cost of sorting and deduplicating result rows."
+    },
+    {
+      q: "What column names appear in the final result set header of a UNION query?",
+      a: ["The column names declared in the first SELECT query","The column names from the second SELECT query","A concatenation of both column names","Column names are stripped and replaced with numbers"],
+      c: 0,
+      why: "The first SELECT statement establishes the result set schema, including column names."
+    },
+    {
+      q: "Where must the ORDER BY clause be placed in a UNION query?",
+      a: ["At the very end of the entire statement, after the final SELECT query","Inside each individual SELECT query","Directly after the word UNION","ORDER BY is forbidden in UNION queries"],
+      c: 0,
+      why: "ORDER BY applies to the combined result set and must sit at the end of the full statement."
+    }
+  ]);
+</script>
+</body>
+</html>

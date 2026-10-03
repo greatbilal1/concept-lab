@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 07 — Benchmarking Embedding Models and Chunking Strategies</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="rag-evaluation" data-lesson="7" data-lesson-id="benchmarking-embeddings-chunking-matrix">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 07</span> · Matrix Benchmarks</span>
+
+  <h1 class="lesson-title">Benchmarking Embedding Models and Chunking Strategies</h1>
+  <p class="lesson-lede">
+    Running matrix experiments: testing combinations of embedding models (OpenAI, BGE, Cohere) and chunk sizes (200, 500, 1000).
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to run comparative matrix experiments across embedding models and chunking strategies.</span>
+    <span><b>Mission link</b> Mastering benchmarking embedding models and chunking strategies across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Benchmarking Embedding Models and Chunking Strategies</h2>
+  <p>How do you know whether a 300-token chunk size is better than 800 tokens for your specific documentation? How do you know whether Cohere Embed beats OpenAI `text-embedding-3-large` on your technical vocabulary? <strong>You don't guess; you run an empirical Matrix Benchmark</strong>.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Running matrix experiments: testing combinations of embedding models (OpenAI, BGE, Cohere) and chunk sizes (200, 500, 1000).
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The RAG Optimization Matrix</h2>
+  <p>The RAG Configuration Grid Search:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Empirical Evidence vs Intuition</h2>
+  <ul><li><strong>1. Dimension 1: Chunk Sizes:</strong> Test [200 tokens, 500 tokens, 1,000 tokens].</li><li><strong>2. Dimension 2: Chunk Overlap:</strong> Test [0% overlap, 10% overlap, 20% overlap].</li><li><strong>3. Dimension 3: Embedding Models:</strong> Test [OpenAI text-embedding-3-small, BGE-Large, Cohere v3].</li><li><strong>4. Dimension 4: Hybrid Search:</strong> Test [Pure Vector vs Hybrid (Vector + BM25)].</li></ul><pre><code># The RAG Benchmark Experiment Matrix:
+# Config | Embedding Model    | Chunk | Overlap | Hybrid? | Context Recall | Cost/1k
+# ----------------------------------------------------------------------------------
+# C1     | text-embed-3-small | 200   | 0%      | NO      | 78.4%          | $0.02
+# C2     | text-embed-3-small | 500   | 15%     | NO      | 89.2%          | $0.02
+# C3     | bge-large-en-v1.5  | 500   | 15%     | YES     | 96.5% (WINNER!)| $0.00 (Local!)
+# C4     | text-embed-3-large | 1000  | 20%     | YES     | 95.8%          | $0.13</code></pre><p>Notice that Configuration C3 (BGE-Large with 500-token chunks, 15% overlap, and Hybrid BM25) delivered the highest recall (96.5%) at zero API cost!</p><div class="callout"><p><strong>The Empirical Proof:</strong> Stop debating architecture in meetings. Run the benchmark matrix over your golden dataset and let the data settle the debate.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the benchmark matrix sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to run comparative matrix experiments across embedding models and chunking strategies.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where benchmarking embedding models and chunking strategies applies.</li>
+    <li>Author a unit test or verification script exercising benchmarking embedding models and chunking strategies.</li>
+    <li>Document team architectural conventions regarding benchmarking embedding models and chunking strategies.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Benchmarking Embedding Models and Chunking Strategies.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is a 'Grid Search Matrix' in RAG pipeline optimization?",
+    a: ["Evaluating combinations of different chunk sizes, overlaps, and embedding models against a benchmark dataset to find the winning configuration","A movie streaming service","A 3D graphics rendering tool","A spreadsheet of company salaries"],
+    c: 0,
+    why: "Grid search evaluates permutations of chunk sizes, overlaps, and embedding models empirically."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Chunk Size Axis",
+            "lines": [
+                  "Test 200 vs 500 vs 1,000 tokens",
+                  "Balances specificity vs context depth"
+            ]
+      },
+      {
+            "title": "Embedding Model Axis",
+            "lines": [
+                  "Test OpenAI vs BGE vs Cohere",
+                  "Evaluates domain vocabulary representation"
+            ]
+      },
+      {
+            "title": "Search Mode Axis",
+            "lines": [
+                  "Test Pure Vector vs Hybrid BM25",
+                  "Measures keyword capture lift"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Benchmarking Embedding Models and Chunking Strategies",
+      "def execute_flow():",
+      "    # Running matrix experiments: testing combinations o...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Benchmarking Embedding Models and Chunking Strategies"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Team Assumption"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Benchmark Discovery"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "A RAG configuration matrix evaluates permutations of chunk sizes, overlap percentages, and {1} models to discover the configuration with highest context {2}."
+],
+    blanks: [
+      {
+            "a": [
+                  "embedding"
+            ],
+            "why": "Vectorization models"
+      },
+      {
+            "a": [
+                  "recall"
+            ],
+            "why": "Retrieval completeness metric"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why is testing 1,000-token chunks sometimes worse for retrieval than 500-token chunks?",
+      a: ["Larger chunks contain multiple different topics, diluting the embedding vector and lowering similarity scores for specific queries","1,000 tokens is illegal in RAG","Vector databases refuse to store large chunks","Computers run out of RAM"],
+      c: 0,
+      why: "Topic dilution in large chunks reduces cosine similarity on specific, granular queries."
+    },
+    {
+      q: "What metric should serve as the primary objective when optimizing the retrieval configuration matrix?",
+      a: ["Context Recall: verifying that the correct factual chunks are successfully captured in Top-K","The number of lines of Python code","The color of the terminal output","The speed of the developer's laptop"],
+      c: 0,
+      why: "Context Recall is the prerequisite of downstream success; if recall is low, generation cannot succeed."
+    },
+    {
+      q: "Why does adding BM25 hybrid search almost always improve the benchmark score of pure vector search?",
+      a: ["It rescues exact keyword, acronym, and serial number queries that vector embeddings fail to match","It makes the database free","It eliminates the need for embeddings","It runs without a CPU"],
+      c: 0,
+      why: "BM25 captures exact lexical tokens that dense semantic vectors blur."
+    },
+    {
+      q: "How often should an enterprise re-run its RAG benchmark matrix?",
+      a: ["Whenever new frontier embedding models are released or when a major new documentation corpus is ingested","Every 5 seconds","Never; the configuration is frozen forever","Only on holidays"],
+      c: 0,
+      why: "Benchmarking new embedding releases ensures the stack adopts state-of-the-art retrieval improvements."
+    }
+  ]);
+</script>
+</body>
+</html>

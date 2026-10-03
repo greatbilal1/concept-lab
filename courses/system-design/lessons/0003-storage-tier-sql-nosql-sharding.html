@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 03 — The Storage Tier: Relational, NoSQL, and Sharded Databases</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="system-design" data-lesson="3" data-lesson-id="storage-tier-sql-nosql-sharding">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 03</span> · Storage Tier</span>
+
+  <h1 class="lesson-title">The Storage Tier: Relational, NoSQL, and Sharded Databases</h1>
+  <p class="lesson-lede">
+    Database selection and scaling: Relational (Postgres/MySQL) vs NoSQL (Document, Key-Value, Columnar), Read Replicas, and Horizontal Sharding.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to select, scale, and partition relational and NoSQL databases for high-throughput systems.</span>
+    <span><b>Mission link</b> Mastering the storage tier: relational, nosql, and sharded databases across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of The Storage Tier: Relational, NoSQL, and Sharded Databases</h2>
+  <p>Choosing a database is one of the most consequential decisions in system design. Replacing a database in a live production system handling 100M users is like performing open-heart surgery on a marathon runner mid-race.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Database selection and scaling: Relational (Postgres/MySQL) vs NoSQL (Document, Key-Value, Columnar), Read Replicas, and Horizontal Sharding.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>SQL vs NoSQL Comparison</h2>
+  <p>The Database Selection Spectrum:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Database Horizontal Sharding</h2>
+  <ul><li><strong>1. Relational / SQL (PostgreSQL, MySQL):</strong> Structured schemas, relational JOINs, strict ACID transactions. Ideal for: <strong>Banking, user billing, e-commerce orders, and CRM systems</strong>. <em>Scaling Strategy:</em> Vertical scaling $\rightarrow$ Read Replicas (for 90% read traffic) $\rightarrow$ Horizontal Sharding.</li><li><strong>2. NoSQL Key-Value / Wide-Column (Cassandra, DynamoDB):</strong> Key-value lookups (`get(user_id)`). Massive write throughput, scales horizontally across hundreds of nodes with consistent hashing. Ideal for: <strong>High-volume telemetry, shopping carts, session stores, and IoT metrics</strong>.</li><li><strong>3. Document Stores (MongoDB):</strong> Flexible, semi-structured JSON documents. Ideal for: Content management systems, dynamic user profiles, catalog data.</li><li><strong>4. Horizontal Sharding:</strong> Partitioning a database across multiple machines based on a <strong>Shard Key</strong> (`user_id`). Shard 1 holds users 0-1M; Shard 2 holds users 1M-2M. Solves the physical write limit of single databases!</li></ul><pre><code># The Database Decision Flowchart:
+# 1. Do you need strict ACID transactions & complex relational JOINs?
+#    ├── YES -> Relational (PostgreSQL / MySQL)
+#    └── NO  -> Check data access patterns:
+#         ├── High-throughput key lookup (Millions QPS) -> DynamoDB / Cassandra
+#         ├── Fast in-memory caching / Sliding windows -> Redis
+#         ├── Full-text search & logs                   -> Elasticsearch / OpenSearch
+#         └── Vector similarity search                  -> Qdrant / pgvector</code></pre><div class="callout"><p><strong>The Shard Key Trap:</strong> Choosing a bad shard key (like `created_at` timestamp) routes all new writes to the single active shard, creating a catastrophic <strong>Hot Shard bottleneck</strong>. Always pick high-cardinality keys with uniform distribution (like `user_id`).</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the storage tier sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to select, scale, and partition relational and NoSQL databases for high-throughput systems.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where the storage tier: relational, nosql, and sharded databases applies.</li>
+    <li>Author a unit test or verification script exercising the storage tier: relational, nosql, and sharded databases.</li>
+    <li>Document team architectural conventions regarding the storage tier: relational, nosql, and sharded databases.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for The Storage Tier: Relational, NoSQL, and Sharded Databases.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "When should an architecture choose a Relational (SQL) database over a NoSQL database?",
+    a: ["When the application requires strict ACID transactions, complex multi-table JOINs, and structured relational integrity (e.g. financial ledgers)","When storing petabytes of unstructured video files","When queries never use relationships","Relational databases should never be used"],
+    c: 0,
+    why: "Relational SQL databases excel at complex relationships, structured queries, and strict ACID transaction guarantees."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Relational (PostgreSQL / MySQL)",
+            "lines": [
+                  "Structured tables, foreign keys, ACID",
+                  "Complex JOINs, strict data integrity",
+                  "Scales reads via replicas; writes via sharding"
+            ]
+      },
+      {
+            "title": "NoSQL (DynamoDB / Cassandra)",
+            "lines": [
+                  "Key-value / Wide-column, schemaless",
+                  "Zero JOINs; denormalized access patterns",
+                  "Linear horizontal write scaling across 100+ nodes"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing The Storage Tier: Relational, NoSQL, and Sharded Databases",
+      "def execute_flow():",
+      "    # Database selection and scaling: Relational (Postgr...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "The Storage Tier: Relational, NoSQL, and Sharded Databases"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Shard 1 (DB Node 1)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Shard 2 (DB Node 2)"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "step": "Shard 3 (DB Node 3)"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Relational databases guarantee strict ACID transactions and relational JOINs, while distributed NoSQL databases scale horizontally by partitioning data across {1} based on a {2} key."
+],
+    blanks: [
+      {
+            "a": [
+                  "shards"
+            ],
+            "why": "Horizontal database partitions"
+      },
+      {
+            "a": [
+                  "shard"
+            ],
+            "why": "Partition routing key (e.g. user_id)"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is a 'Hot Shard' in distributed database systems?",
+      a: ["A single shard that receives a disproportionate majority of traffic because of an unevenly distributed shard key, overwhelming that single database node","A database server that is overheating physically","A database running on an SSD","A fast database query"],
+      c: 0,
+      why: "Hot shards occur when poor partition keys concentrate traffic onto one specific node, degrading cluster performance."
+    },
+    {
+      q: "Why is sharding by a sequential timestamp (e.g. 'created_at') an anti-pattern for write-heavy systems?",
+      a: ["All current incoming writes have the current timestamp, routing 100% of write traffic to the single active shard holding the latest time window","Timestamps cannot be hashed","Databases cannot read dates","Timestamps are illegal in SQL"],
+      c: 0,
+      why: "Time-based keys route all active writes to the latest partition, negating horizontal load distribution."
+    },
+    {
+      q: "How do Database Read Replicas scale read-heavy applications?",
+      a: ["Read queries are distributed across multiple read-only replica nodes, freeing the primary leader database to focus exclusively on writes","Read replicas make writes faster","Read replicas encrypt the database","Read replicas run without RAM"],
+      c: 0,
+      why: "Read replicas offload read volume, allowing the primary database to handle write transactions without contention."
+    },
+    {
+      q: "When is an append-only distributed log (like Apache Kafka) used instead of a traditional database?",
+      a: ["For high-throughput, sequential event streaming (clickstreams, financial trades, audit logs) where events are immutable and ordered","For storing user passwords","For editing spreadsheets","For serving static HTML pages"],
+      c: 0,
+      why: "Kafka provides partitioned, append-only sequential log storage optimized for massive event streaming throughput."
+    }
+  ]);
+</script>
+</body>
+</html>

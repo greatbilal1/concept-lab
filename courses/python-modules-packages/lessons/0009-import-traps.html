@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 09 — Import traps and how to escape them</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="python-modules-packages" data-lesson="9" data-lesson-id="import-traps">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 09</span> · Together</span>
+
+  <h1 class="lesson-title">Import traps and how to escape them</h1>
+  <p class="lesson-lede">
+    Three failures account for almost every confusing import bug you will ever hit.
+    Each one has a name, a cause, and a fix — and once you can name them, they stop
+    being mysterious.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Name and fix three traps</span>
+    <span><b>Mission link</b> Debugging beats guessing</span>
+  </div>
+
+  <h2><span class="n">1</span>Trap one: the circular import</h2>
+
+  <p>
+    Module A imports B, and B imports A. Python starts loading A, hits the import
+    of B, starts loading B, which hits the import of A — and A is only half-built.
+    The name B needs may not exist yet.
+  </p>
+
+  <pre><code># a.py
+import b
+def helper(): return b.value
+
+# b.py
+import a
+value = a.helper()   # ImportError: partially initialised</code></pre>
+
+  <p>
+    The fix is almost never "add more imports". It is to break the cycle: move the
+    shared piece into a third module both can import, or import inside the function
+    that needs it so the load happens later.
+  </p>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Trap two: shadowing</h2>
+
+  <p>
+    You create <code>json.py</code> next to your script. Now
+    <code>import json</code> finds your file first, because the script's directory
+    is at the front of <code>sys.path</code>. The standard library loses silently.
+  </p>
+
+  <div id="intro1"></div>
+
+  <p>
+    The symptom is bizarre: a library that worked yesterday now raises
+    <code>AttributeError: module 'json' has no attribute 'dumps'</code>. The cause
+    is a filename. Rename the file and the error vanishes.
+  </p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Never name a file after a module you import. The classic offenders are
+    <code>json.py</code>, <code>random.py</code>, <code>types.py</code>,
+    <code>email.py</code> and <code>logging.py</code>.
+  </div>
+
+  <h2><span class="n">3</span>Trap three: the star import</h2>
+
+  <p>
+    <code>from helpers import *</code> dumps every public name from the module into
+    your namespace. It looks convenient and it destroys traceability.
+  </p>
+
+  <pre><code>from helpers import *
+
+clean(rows)   # where did clean come from? no idea.</code></pre>
+
+  <p>
+    Worse, a star import can silently overwrite a name you already had. If
+    <code>helpers</code> defines <code>clean</code> and so do you, the import wins
+    and your function disappears with no warning.
+  </p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>The escape pattern</h2>
+
+  <p>
+    All three traps share one root cause: <b>the origin of a name is not visible</b>.
+    The fix is the same in every case — make the origin explicit.
+  </p>
+
+  <div id="diagram1"></div>
+
+  <p>
+    Name the module, name the symbol, and keep the dependency graph acyclic. That
+    is the whole discipline, and it is why the earlier lessons pushed plain imports
+    so hard.
+  </p>
+
+  <div class="note good">
+    <span class="note-label">Why this matters later</span>
+    These three traps are the ones that cost real hours. A circular import in a
+    large codebase can take a day to untangle; a shadowed module can look like a
+    broken library. Recognising the shape of the failure is most of the fix.
+  </div>
+
+  <h2><span class="n">5</span>Check yourself</h2>
+
+  <p>
+    Answer from memory — do not scroll back up. Each option has the same number of
+    words, so nothing gives the answer away.
+  </p>
+
+  <div id="fill1"></div>
+  <div id="quiz"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>
+      You can now name all three classic import traps, explain the mechanism behind
+      each, and apply the fix. When one of them bites you in a real project, you
+      will recognise it in seconds instead of hours.
+    </p>
+  </div>
+
+  <h2><span class="n">6</span>Do this next</h2>
+
+  <ol>
+    <li>
+      Deliberately build a circular import between two small modules. Read the
+      error, then fix it by extracting a third module.
+    </li>
+    <li>
+      Create a <code>types.py</code> next to a script that imports
+      <code>types</code>. Watch the standard library lose, then rename it.
+    </li>
+    <li>
+      Find a star import in any codebase you have access to and replace it with
+      explicit names. Count how many names were actually used.
+    </li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Read the Python docs on
+    <a href="https://docs.python.org/3/reference/import.html">the import system</a>,
+    especially the section on circular imports, and PEP 8's guidance on
+    <a href="https://peps.python.org/pep-0008/#imports">imports</a>, which bans
+    wildcard imports outright.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher (me) anything — "can a circular
+    import ever be fine?", "how do I find a shadowing file fast?", "what is
+    __all__ for?". There are no bad questions here.
+  </div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  /* the three traps */
+  TeachWidgets.introCards("#intro1", {
+    cards: [
+      { ico: "🔄", title: "Circular import", body: "Two modules import each other; one sees a half-built module." },
+      { ico: "👥", title: "Shadowing", body: "A local file beats a standard-library module on sys.path." },
+      { ico: "⭐", title: "Star import", body: "from x import * hides where every name came from." }
+    ]
+  });
+
+  /* predict-then-reveal */
+  TeachWidgets.predict("#predict1", {
+    q: "Module A imports B, and B imports A. What usually happens?",
+    a: ["Python resolves it fine", "One module is half built", "Both modules load twice"],
+    c: 1,
+    why: "Python loads A, which starts loading B, which asks for A — but A has not finished executing, so its names may not exist yet."
+  });
+
+  /* step-through trace of a circular import */
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "import a",
+      "  -> start loading a",
+      "  -> a imports b",
+      "  -> start loading b",
+      "  -> b imports a (already in progress)",
+      "  -> a.helper not defined yet -> ImportError"
+    ],
+    steps: [
+      { line: 0, vars: { statement: "import a" } },
+      { line: 1, vars: { loading: "a" } },
+      { line: 2, vars: { a_needs: "b" } },
+      { line: 3, vars: { loading: "b" } },
+      { line: 4, vars: { b_needs: "a", state: "partial" } },
+      { line: 5, vars: { error: "ImportError" } }
+    ]
+  });
+
+  /* the escape pattern */
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      { title: "Name the module", lines: ["import helpers", "not from helpers import *"] },
+      { title: "Name the symbol", lines: ["helpers.clean", "origin visible"] },
+      { title: "Break the cycle", lines: ["extract a third module", "or import late"] }
+    ]
+  });
+
+  /* recall from memory */
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — name the traps",
+    lines: [
+      "Two modules importing each other is a <0> import.",
+      "A local file beating a standard-library module is called <1>.",
+      "The import form PEP 8 bans outright is <code>from x import <2></code>."
+    ],
+    blanks: [
+      { a: ["circular"], why: "A cycle in the import graph leaves one module partially initialised." },
+      { a: ["shadowing"], why: "The script directory is first on sys.path, so a local file can shadow a library." },
+      { a: ["*"], why: "Wildcard imports hide origins and can silently overwrite names." }
+    ]
+  });
+
+  /* the quiz — every option is exactly three words */
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What causes a circular import?",
+      a: ["Two modules import each other", "A file is named badly", "A package lacks __init__", "A version is pinned wrong"],
+      c: 0,
+      why: "A cycle in the import graph means one module is loaded while still partially initialised."
+    },
+    {
+      q: "What is shadowing?",
+      a: ["A local file wins", "A module loads twice", "A name is renamed", "A package is nested"],
+      c: 0,
+      why: "A local file whose name matches a library module is found first on sys.path and replaces it."
+    },
+    {
+      q: "Why avoid star imports?",
+      a: ["They run much slower", "They hide name origins", "They break the module cache", "They need extra config"],
+      c: 1,
+      why: "from x import * gives no clue where a name came from and can silently overwrite existing names."
+    },
+    {
+      q: "What is the common fix?",
+      a: ["Add more import lines", "Make origins explicit", "Rename the whole package", "Disable the module cache"],
+      c: 1,
+      why: "All three traps come from invisible origins; naming the module and symbol fixes them."
+    }
+  ]);
+</script>
+</body>
+</html>

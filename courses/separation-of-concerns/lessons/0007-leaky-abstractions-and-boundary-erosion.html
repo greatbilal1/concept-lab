@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 07 — Leaky abstractions and boundary erosion</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="separation-of-concerns" data-lesson="7" data-lesson-id="leaky-abstractions-and-boundary-erosion">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 07</span> · Boundaries & Abstractions</span>
+
+  <h1 class="lesson-title">Leaky abstractions and boundary erosion</h1>
+  <p class="lesson-lede">
+    All non-trivial abstractions, to some degree, are leaky. Discover Joel Spolsky's Law of Leaky Abstractions and the Law of Demeter to prevent boundary erosion.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Detect and repair leaky abstractions and eliminate Law of Demeter violations</span>
+    <span><b>Mission link</b> Protects architectural abstractions from breaking down under edge-case pressures</span>
+  </div>
+
+  <h2><span class="n">1</span>The Law of Leaky Abstractions</h2>
+  <p>Joel Spolsky coined the famous <b>Law of Leaky Abstractions</b>: <i>All non-trivial abstractions, to some degree, are leaky.</i> Abstractions save us time by hiding complexity, but the underlying implementation details always leak through eventually.</p><p>An example: TCP abstracts unreliable networks into a clean, ordered byte stream. But if someone unplugs the cable, the abstraction collapses into latency spikes and timeouts. In software architecture, a <b>leaky abstraction</b> happens when a low-level detail (like an SQL exception or HTTP header) leaks into your high-level domain services.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Abstractions save time, but implementation details leak; defend boundaries with explicit exception mapping.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Law of Demeter (Principle of Least Knowledge)</h2>
+  <p>A method should only call methods on its immediate parameters, created objects, or direct fields — never strangers.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing leaky exception translation</h2>
+  <p>Trace how an infrastructure repository catches database-specific errors and maps them to clean domain exceptions.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of leaky abstractions.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can identify leaky abstractions and enforce the Law of Demeter to keep interfaces resilient and decoupled.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your service layer to verify that no psycopg2, sqlalchemy, or prisma exceptions bubble into business logic.</li>
+    <li>Refactor a train wreck method chain (a.b.c.d()) into a single encapsulated method call.</li>
+    <li>Read Joel Spolsky's classic essay *The Law of Leaky Abstractions*.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Joel Spolsky: *The Law of Leaky Abstractions* (joelonsoftware.com, 2002).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is a violation of the Law of Demeter in 'order.getCustomer().getAddress().getZipCode().getTaxRate()'?",
+    a: ["The code traverses through multiple strangers, coupling the caller to the entire internal object navigation structure of four classes","It uses too many dots","Zip codes cannot have tax rates in SQL","The code runs in reverse order"],
+    c: 0,
+    why: "Train wreck method chaining couples the caller to internal object hierarchies, violating Demeter."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Violation (Train Wreck)",
+            "lines": [
+                  "a.getB().getC().getD().doSomething()",
+                  "couples 'a' to internal details of B, C, and D!"
+            ]
+      },
+      {
+            "title": "Law of Demeter Compliant",
+            "lines": [
+                  "a.doSomething()",
+                  "tells 'a' what to do directly;",
+                  "encapsulates internal navigation internally!"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Leaky Repository (BAD): lets psycopg2.IntegrityError bubble to domain logic!",
+      "# Encapsulated Repository (GOOD):",
+      "try:",
+      "    cursor.execute('INSERT INTO users...')",
+      "except psycopg2.IntegrityError as err:",
+      "    # Translate low-level driver error into clean domain exception:",
+      "    raise DuplicateUserException('User already exists') from err"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "leak_risk": "raw database driver error breaks domain abstraction"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "boundary_catch": "repository catches low-level SQL error"
+            }
+      },
+      {
+            "line": 6,
+            "vars": {
+                  "translated": "emits clean domain-specific exception; abstraction preserved"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The rule that all non-trivial abstractions leak is the Law of Leaky <0>.",
+      "The principle of least knowledge is the Law of <1>.",
+      "Repositories should translate low-level SQL errors into clean <2> exceptions."
+],
+    blanks: [
+      {
+            "a": [
+                  "Abstractions"
+            ],
+            "why": "Joel Spolsky coined the Law of Leaky Abstractions."
+      },
+      {
+            "a": [
+                  "Demeter"
+            ],
+            "why": "The Law of Demeter discourages train wreck calls."
+      },
+      {
+            "a": [
+                  "domain"
+            ],
+            "why": "Domain exceptions isolate services from driver libraries."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is a 'Leaky Abstraction' in software architecture?",
+      a: ["An abstraction that fails to completely hide its underlying implementation mechanics, forcing developers to understand the details it was meant to hide","A memory leak in a computer processor","A database table that loses records","A computer monitor that leaks liquid crystal display"],
+      c: 0,
+      why: "When abstractions leak, developers must understand the underlying plumbing to fix bugs."
+    },
+    {
+      q: "What is the 'Law of Demeter' (Principle of Least Knowledge)?",
+      a: ["A unit should have only limited knowledge about other units: only talk to your immediate friends, not strangers","All variables must be declared as constants","Databases can only hold Greek characters","Every class must be named after a Roman god"],
+      c: 0,
+      why: "Demeter avoids tight structural coupling by forbidding long method-chain navigations across strangers."
+    },
+    {
+      q: "Why should a database repository translate raw SQL exceptions into domain exceptions?",
+      a: ["To prevent database driver details from leaking into domain services, keeping business logic independent of storage technology","Because SQL exceptions crash the computer processor","To make error messages fifty percent shorter","Domain exceptions run twice as fast"],
+      c: 0,
+      why: "Domain services shouldn't know which database engine or driver library is running underneath."
+    },
+    {
+      q: "What is a 'Train Wreck' in code refactoring?",
+      a: ["A long chain of method calls (e.g. getA().getB().getC().getD()) that tightly couples the caller to intermediate object structures","A fatal compile-time syntax error","A server crash caused by electrical failure","An infinite while loop"],
+      c: 0,
+      why: "Method chains that navigate through object graphs like a line of train cars violate encapsulation."
+    }
+  ]);
+</script>
+</body>
+</html>

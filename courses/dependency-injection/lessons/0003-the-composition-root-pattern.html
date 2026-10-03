@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 03 — The Composition Root pattern</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="dependency-injection" data-lesson="3" data-lesson-id="the-composition-root-pattern">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 03</span> · Wiring & Composition Root</span>
+
+  <h1 class="lesson-title">The Composition Root pattern</h1>
+  <p class="lesson-lede">
+    If classes don't create their own dependencies, who does? Discover Mark Seemann's Composition Root pattern: the single unified place where your entire application graph is wired.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Implement the Composition Root pattern to centralize dependency instantiation and wiring</span>
+    <span><b>Mission link</b> Prevents dependency wiring logic from contaminating business classes</span>
+  </div>
+
+  <h2><span class="n">1</span>Where do objects get created?</h2>
+  <p>If classes are forbidden from using <code>new</code> internally, where does object creation happen? If you create dependencies all over the codebase, you have simply scattered the mess.</p><p>Mark Seemann formalized the answer: <b>The Composition Root</b>. A Composition Root is <i>a single, unified location in the application as close as possible to the entry point (e.g. main.py or index.js) where the entire dependency graph is wired together</i>.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    The Composition Root is the single place near the application entry point where the object graph is assembled.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Composition Root wiring diagram</h2>
+  <p>Observe how the entire tree of services, repositories, and adapters is assembled in one place.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing Pure DI wiring in a Composition Root</h2>
+  <p>Trace how a complete application dependency graph is constructed in 6 lines of pure Python.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of the Composition Root pattern.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can assemble clean, modular object graphs in a centralized Composition Root without scattering wiring logic.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your application to identify where objects are constructed with 'new'.</li>
+    <li>Centralize object instantiation into a dedicated main.py or bootstrap.ts file.</li>
+    <li>Verify that your business service classes contain zero object wiring code.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Mark Seemann: *Composition Root* (blog.ploeh.dk/2011/07/28/CompositionRoot/).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Where should the Composition Root live in a standard backend application?",
+    a: ["In the main entry point file (e.g. main.py, server.ts, or Program.cs) during startup","Inside the database driver","Inside each individual controller file","In the browser cookie jar"],
+    c: 0,
+    why: "The Composition Root belongs as close as possible to the application startup entry point."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Entry Point: main.py (Composition Root)",
+            "lines": [
+                  "db = PostgresDatabase(URL)",
+                  "repo = SqlUserRepository(db)",
+                  "service = UserService(repo)",
+                  "app.include_router(UserController(service))"
+            ]
+      },
+      {
+            "title": "Runtime Execution",
+            "lines": [
+                  "HTTP requests arrive -> invoke pre-wired graph",
+                  "zero dependency creation during request handling!"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# main.py - The Composition Root",
+      "db_pool = create_postgres_pool(config.DB_URL)",
+      "user_repo = SqlAlchemyUserRepository(db_pool)",
+      "mailer = SendGridEmailAdapter(config.API_KEY)",
+      "register_service = RegisterUserUseCase(user_repo, mailer)",
+      "app = create_web_server(register_service)"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "infrastructure": "database connection pool initialized"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "adapters": "repositories and mailers instantiated with infrastructure"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "use_case": "business services wired with adapters"
+            }
+      },
+      {
+            "line": 5,
+            "vars": {
+                  "server": "application fully wired and ready to receive traffic"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The unified location where the object graph is wired is the <0> Root.",
+      "The author who coined the Composition Root term is Mark <1>.",
+      "The Composition Root should be placed as close as possible to the <2> point."
+],
+    blanks: [
+      {
+            "a": [
+                  "Composition"
+            ],
+            "why": "Composition Root assembles all application objects."
+      },
+      {
+            "a": [
+                  "Seemann"
+            ],
+            "why": "Mark Seemann authored Dependency Injection in .NET."
+      },
+      {
+            "a": [
+                  "entry"
+            ],
+            "why": "The entry point (main.py) bootstraps the application."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is a 'Composition Root' in software architecture?",
+      a: ["A single, centralized location in an application near the entry point where the entire dependency graph is wired together","The root directory of the hard drive","The top-level table in a database schema","A special type of CSS stylesheet"],
+      c: 0,
+      why: "It is the unified bootstrap location responsible for assembling all application objects."
+    },
+    {
+      q: "Why is scattering object construction across 50 different service classes harmful?",
+      a: ["It couples classes to concrete implementations, making it impossible to reconfigure or test them in isolation","It causes the computer screen to flicker","It is forbidden by Python language syntax","It deletes git commit history"],
+      c: 0,
+      why: "Scattered construction breaks modularity; centralizing wiring isolates dependencies."
+    },
+    {
+      q: "Do business logic classes inside the domain layer need to know about the Composition Root?",
+      a: ["No, the Composition Root lives in the outermost infrastructure layer; domain classes have zero knowledge of it","Yes, domain classes must import the Composition Root directly","Only on Windows operating systems","Only if the domain classes contain numbers"],
+      c: 0,
+      why: "The Composition Root is in the outermost entry layer; domain logic remains completely decoupled."
+    },
+    {
+      q: "How does the Composition Root pattern simplify switching from a mock database to a real database?",
+      a: ["You only change a single line of code in the Composition Root to pass the real database adapter instead of the mock","It automatically writes SQL queries for you","It deletes old database tables","It restarts the server computer"],
+      c: 0,
+      why: "Because all wiring is in one place, swapping adapters touches exactly one bootstrap line."
+    }
+  ]);
+</script>
+</body>
+</html>

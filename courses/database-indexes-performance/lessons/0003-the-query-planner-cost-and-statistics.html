@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 03 — The query planner: cost and statistics</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="database-indexes-performance" data-lesson="3" data-lesson-id="the-query-planner-cost-and-statistics">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 03</span> · Query Plans & Execution</span>
+
+  <h1 class="lesson-title">The query planner: cost and statistics</h1>
+  <p class="lesson-lede">
+    How does the database choose between an index and a table scan? Discover the cost-based query optimizer, table statistics, and the EXPLAIN command.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Inspect query execution plans using EXPLAIN and understand planner cost calculations</span>
+    <span><b>Mission link</b> Reveals how the database optimizer makes physical execution decisions</span>
+  </div>
+
+  <h2><span class="n">1</span>The cost-based optimizer</h2>
+  <p>When you send an SQL query, the database does not execute it immediately. The <b>Query Optimizer (Planner)</b> analyzes multiple candidate execution strategies, calculates an estimated <b>Cost</b> for each, and picks the cheapest plan.</p><p>Cost is measured in arbitrary units modeling disk I/O page fetches and CPU computations. The planner bases its estimates on internal <b>Table Statistics</b> (tracked by <code>ANALYZE</code>), such as row counts, null fractions, and data distribution histograms.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    The query planner uses statistical histograms to estimate cost and select the optimal plan.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The cost formula components</h2>
+  <p>How the planner balances sequential I/O, random I/O, and CPU operator costs.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing EXPLAIN output format</h2>
+  <p>Deconstruct the anatomy of an estimated cost tuple in standard EXPLAIN output.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of query planning concepts.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can run EXPLAIN and interpret cost metrics, node types, and estimated row counts.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Run EXPLAIN on a SELECT query and locate the cost=X..Y numbers.</li>
+    <li>Update database statistics using the ANALYZE command.</li>
+    <li>Observe how the planner switches from Index Scan to Seq Scan when querying 90% of a table.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    PostgreSQL Documentation: *Using EXPLAIN* (postgresql.org/docs/current/using-explain.html).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Does running 'EXPLAIN SELECT ...' actually execute the query and mutate data?",
+    a: ["No, EXPLAIN only displays the planned execution strategy without running the query","Yes, it runs the query and deletes matching rows","Yes, it executes the query in slow motion","It depends on the time of day"],
+    c: 0,
+    why: "EXPLAIN prints the optimizer's estimated plan without executing the query."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "seq_page_cost (1.0)",
+            "lines": [
+                  "sequential disk page read",
+                  "baseline reference unit"
+            ]
+      },
+      {
+            "title": "random_page_cost (4.0)",
+            "lines": [
+                  "random disk seek cost",
+                  "higher on spinning rust, lower on SSD"
+            ]
+      },
+      {
+            "title": "cpu_tuple_cost (0.01)",
+            "lines": [
+                  "CPU cost to evaluate",
+                  "one row against WHERE filter"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# EXPLAIN SELECT * FROM users WHERE id = 42;",
+      "Index Scan using users_pkey on users  (cost=0.43..8.45 rows=1 width=128)",
+      "  Index Cond: (id = 42)"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "plan_node": "Index Scan using primary key B-tree"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "startup_cost": "0.43 (cost to fetch the very first row)"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "total_cost": "8.45 (estimated total cost to complete execution)"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "rows_estimate": "rows=1 (planner anticipates exactly 1 matching row)"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The SQL command to inspect a query plan without running it is <0>.",
+      "The database command used to refresh table statistics is <1>.",
+      "In (cost=0.43..8.45), 8.45 represents the estimated <2> cost."
+],
+    blanks: [
+      {
+            "a": [
+                  "EXPLAIN"
+            ],
+            "why": "EXPLAIN displays estimated execution plans."
+      },
+      {
+            "a": [
+                  "ANALYZE"
+            ],
+            "why": "ANALYZE updates planner table statistics."
+      },
+      {
+            "a": [
+                  "total"
+            ],
+            "why": "Total cost is the second number in the cost tuple."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What do the numbers in '(cost=0.28..8.29 rows=1 width=64)' represent?",
+      a: ["0.28 is startup cost; 8.29 is total estimated cost; rows=1 is estimated rows; width=64 is average row byte size","The price in US dollars and cents to run the query","The memory addresses in server RAM","The CPU temperature during execution"],
+      c: 0,
+      why: "Cost tuples report startup cost, total cost, estimated rows, and average width in bytes."
+    },
+    {
+      q: "Why might a query planner choose a Sequential Scan even when an index exists on the column?",
+      a: ["If the planner estimates that the query will match a large fraction of the table, sequential I/O is cheaper than thousands of random index seeks","Because the index is broken and needs to be deleted","Because the computer has run out of memory","Because SQL standards require a sequential scan every 10 queries"],
+      c: 0,
+      why: "When fetching a large portion of a table, sequential reading beats random heap pointer lookups."
+    },
+    {
+      q: "What happens if a database's table statistics are completely stale or out of date?",
+      a: ["The optimizer may pick disastrously slow execution plans based on incorrect row count estimates","The database will automatically delete all tables","Queries will return corrupted data values","The SQL compiler will throw syntax errors"],
+      c: 0,
+      why: "Stale statistics mislead the optimizer into choosing terrible physical scan strategies."
+    },
+    {
+      q: "What is 'random_page_cost' in database configuration?",
+      a: ["A planner cost weight representing the cost of a non-sequential random disk page seek relative to sequential reads","A fee charged by cloud hosting providers for random queries","The number of random rows returned by a query","The maximum number of indexes allowed on a table"],
+      c: 0,
+      why: "random_page_cost models the latency penalty of random I/O (often lowered to 1.1 on fast NVMe SSDs)."
+    }
+  ]);
+</script>
+</body>
+</html>

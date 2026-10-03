@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 06 — Positional Encodings: Giving Sequences a Sense of Order</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="transformers-attention" data-lesson="6" data-lesson-id="positional-encodings-order">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 06</span> · Positional Encoding</span>
+
+  <h1 class="lesson-title">Positional Encodings: Giving Sequences a Sense of Order</h1>
+  <p class="lesson-lede">
+    Why transformers are permutation invariant without positional encodings, and how RoPE (Rotary Position Embeddings) works.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how positional encodings solve permutation invariance and how RoPE powers modern LLMs.</span>
+    <span><b>Mission link</b> Mastering positional encodings: giving sequences a sense of order across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Positional Encodings: Giving Sequences a Sense of Order</h2>
+  <p>Consider these two sentences: <em>'The dog bit the man'</em> and <em>'The man bit the dog'</em>. They contain the exact same words. Yet to a human, their meanings are completely opposite!</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Why transformers are permutation invariant without positional encodings, and how RoPE (Rotary Position Embeddings) works.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Permutation Invariance vs Positional Awareness</h2>
+  <p>Because self-attention computes dot products across all pairs simultaneously, it is <strong>Permutation Invariant</strong>: if you shuffle the input tokens, the attention values shuffle identically. Without a mechanism to encode sequence order, a Transformer cannot tell who bit whom!</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Evolution of Positional Encodings</h2>
+  <p>To give the model a sense of order, we inject <strong>Positional Information</strong>:</p><ul><li><strong>1. Sinusoidal Encodings (Original 2017 Transformer):</strong> Added fixed mathematical sine and cosine waves of varying frequencies directly to the input embeddings: $x_{pos} = x + PE_{pos}$.</li><li><strong>2. Learned Absolute Positional Embeddings (BERT / GPT-2):</strong> Trained a dedicated embedding lookup table for positions $0, 1, 2, \dots, 2047$. (Limited because the model could not generalize past 2,048 tokens!).</li><li><strong>3. RoPE (Rotary Position Embedding) (Llama 3, Mistral, Modern LLMs):</strong> Instead of adding vectors, RoPE <strong>rotates the Query and Key vectors in the complex plane</strong> by an angle proportional to their position index!</li></ul><pre><code># The RoPE (Rotary Position Embedding) Revolution:
+# Instead of: Q_pos = Q + pos_vector
+# RoPE rotates: Q_rotated = Q * exp(i * m * theta)
+# Key property: dot_product(Q_m, K_n) depends ONLY on relative distance (m - n)!
+# This enables models to generalize effortlessly to 128k+ long contexts!</code></pre><div class="callout"><p><strong>The RoPE Advantage:</strong> Rotary Position Embedding represents relative distance naturally through rotation angles, making modern context window scaling (YaRN, LongLoRA) possible.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the positional encoding sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how positional encodings solve permutation invariance and how RoPE powers modern LLMs.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where positional encodings: giving sequences a sense of order applies.</li>
+    <li>Author a unit test or verification script exercising positional encodings: giving sequences a sense of order.</li>
+    <li>Document team architectural conventions regarding positional encodings: giving sequences a sense of order.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Positional Encodings: Giving Sequences a Sense of Order.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Why is a self-attention layer without positional information completely blind to word order?",
+    a: ["Self-attention is a set operation (permutation invariant): it computes pairwise dot products regardless of where words sit in the sequence","Transformers can only read words backwards","Computers forget word order when sorting","Position is illegal in linear algebra"],
+    c: 0,
+    why: "Self-attention treats input tokens as an unordered set (bag of words) unless explicit position vectors are added."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Unaugmented Self-Attention",
+            "lines": [
+                  "'Dog bit man' == 'Man bit dog'",
+                  "Bag of words: zero order awareness"
+            ]
+      },
+      {
+            "title": "With Positional Injection",
+            "lines": [
+                  "Tokens tagged with position indices",
+                  "Model knows exactly who bit whom"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Positional Encodings: Giving Sequences a Sense of Order",
+      "def execute_flow():",
+      "    # Why transformers are permutation invariant without...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Positional Encodings: Giving Sequences a Sense of Order"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Sinusoidal (2017)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Learned Absolute (GPT-2)"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "step": "RoPE (Llama / Modern)"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Because self-attention is permutation invariant, models use {1} to encode sequence order, with modern LLMs using {2} position embeddings."
+],
+    blanks: [
+      {
+            "a": [
+                  "positional encodings"
+            ],
+            "why": "Order injection mechanisms"
+      },
+      {
+            "a": [
+                  "rotary"
+            ],
+            "why": "RoPE rotation in complex plane"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is 'Permutation Invariance' in self-attention?",
+      a: ["Shuffling the input sequence order produces the exact same shuffled output without any change in relationship calculations","A mathematical error in GPUs","Permutations cannot be calculated","A feature in sorting algorithms"],
+      c: 0,
+      why: "Self-attention computes set relationships; without position tags, order is irrelevant to the math."
+    },
+    {
+      q: "Why did modern LLMs (like Llama 3) replace learned absolute position embeddings with RoPE?",
+      a: ["RoPE naturally captures relative token distance through rotation and extrapolates to much longer context windows","RoPE uses no computer memory","Learned embeddings were banned by standards committees","RoPE compiles code faster"],
+      c: 0,
+      why: "RoPE models relative position differences (m - n), enabling dynamic context window extension."
+    },
+    {
+      q: "What happens if a model with learned absolute positional embeddings trained on 2,048 tokens receives a prompt of 4,000 tokens?",
+      a: ["It fails or crashes because position indices 2049 to 4000 have no learned embedding weights in the lookup table","It automatically summarizes the text","It doubles the prompt speed","It converts the text to Spanish"],
+      c: 0,
+      why: "Absolute tables cannot index positions beyond their fixed pre-allocated size."
+    },
+    {
+      q: "In RoPE, how does the dot product between a Query at position m and a Key at position n reflect distance?",
+      a: ["The rotation math causes their inner product to depend strictly on the relative distance (m - n) rather than absolute coordinates","It measures the physical length of the cable","It deletes words that are too far apart","It sets distant scores to zero"],
+      c: 0,
+      why: "Rotating by m*theta and n*theta makes the resulting dot product a function of the angle difference (m - n)*theta."
+    }
+  ]);
+</script>
+</body>
+</html>

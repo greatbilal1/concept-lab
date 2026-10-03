@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 02 — Reading a traceback</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="python-errors-exceptions" data-lesson="2" data-lesson-id="reading-a-traceback">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 02</span> · Tracebacks</span>
+
+  <h1 class="lesson-title">Reading a traceback</h1>
+  <p class="lesson-lede">
+    Last lesson you learned that an exception is an object travelling up your
+    call stack. When nobody catches it, Python prints a report of that journey.
+    This lesson teaches you to read that report from the bottom up — because the
+    last line is the answer, and everything above it is the route.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Find the failing line in any traceback in seconds</span>
+    <span><b>Mission link</b> Debugging starts with reading, not guessing</span>
+  </div>
+
+  <h2><span class="n">1</span>The report has a shape</h2>
+
+  <p>
+    Here is a traceback you have probably seen. It looks like noise, but it has
+    three distinct parts, and each one answers a different question.
+  </p>
+
+  <pre><code>Traceback (most recent call last):
+  File "app.py", line 12, in &lt;module&gt;
+    report([])
+  File "app.py", line 8, in report
+    return average(nums)
+  File "app.py", line 4, in average
+    return sum(nums) / len(nums)
+ZeroDivisionError: division by zero</code></pre>
+
+  <p>
+    The <b>first line</b> is a header. The <b>middle</b> is a list of frames —
+    one per function call, oldest first. The <b>last line</b> names the exception
+    type and its message. That last line is the single most important line on
+    your screen.
+  </p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Read a traceback bottom-up: the last line tells you <i>what</i> went wrong,
+    and the frame just above it tells you <i>where</i>.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Frames are a call stack</h2>
+
+  <p>
+    Each block in the middle is a <b>frame</b>: a file, a line number, a function
+    name, and the source line that was executing. The frames are printed in the
+    order the calls happened, so the <i>last</i> frame is the deepest call — the
+    one that actually raised.
+  </p>
+
+  <p>
+    That is why the header says "most recent call last". The list reads like a
+    stack of plates: the bottom plate was placed first, and the top plate is the
+    one you touch. The top of the stack is where the exception was born.
+  </p>
+
+  <div id="diagram1"></div>
+
+  <p>
+    In Lesson 01 you watched an exception travel up this exact stack. The
+    traceback is simply the receipt for that journey, printed after the fact.
+  </p>
+
+  <h2><span class="n">3</span>Watch the frames build</h2>
+
+  <p>
+    Step through this program. Each call pushes a new frame; when the division
+    fails, the traceback is the list of frames still on the stack.
+  </p>
+
+  <div id="trace1"></div>
+
+  <p>
+    Notice that the failing line is the deepest frame, and the entry point is the
+    shallowest. When you read a real traceback, start at the bottom and walk up
+    only as far as you need to understand the cause.
+  </p>
+
+  <h2><span class="n">4</span>Practice</h2>
+
+  <p>Recall the key facts from memory before the quiz.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>
+      You can now open any traceback and go straight to the last line for the
+      exception type and message, then read the frame above it for the exact file
+      and line. No more scrolling through red text hoping to spot the problem.
+    </p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>
+      Run the <code>average([])</code> example yourself and count the frames.
+      Confirm the deepest frame is the line that divides.
+    </li>
+    <li>
+      Deliberately misspell a variable name and read the
+      <code>NameError</code> traceback. Find the line number it points at.
+    </li>
+    <li>
+      Take a traceback from a program with three nested functions and write down,
+      in order, the function names from shallowest to deepest.
+    </li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Read the Python tutorial's
+    <a href="https://docs.python.org/3/tutorial/errors.html">"Errors and Exceptions"</a>,
+    section 8.2, which shows a traceback and explains the "most recent call last"
+    ordering.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher (me) anything — "why is the order
+    reversed?", "what is <code>&lt;module&gt;</code>?", "can I print a traceback
+    without crashing?". There are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  /* predict-then-reveal: where to look first */
+  TeachWidgets.predict("#predict1", {
+    q: "A traceback has ten lines. Which line names the actual error?",
+    a: ["The very first line", "The very last line", "The middle frame line"],
+    c: 1,
+    why: "The last line holds the exception type and message. The lines above it are the frames that led there."
+  });
+
+  /* the three parts of a traceback */
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      { title: "Header", lines: ["says the order", "most recent last"] },
+      { title: "Frames", lines: ["one per call", "file, line, function"] },
+      { title: "Last line", lines: ["exception type", "and its message"] }
+    ],
+    vertical: true
+  });
+
+  /* step-through: frames accumulating on the stack */
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "def average(nums):",
+      "    return sum(nums) / len(nums)",
+      "",
+      "def report(nums):",
+      "    return average(nums)",
+      "",
+      "report([])"
+    ],
+    steps: [
+      { line: 6, vars: { frame: "module", stack: "module" } },
+      { line: 4, vars: { frame: "report", stack: "module → report" } },
+      { line: 1, vars: { frame: "average", stack: "module → report → average" } },
+      { line: 1, vars: { raised: "ZeroDivisionError", deepest: "average", result: "traceback printed" } }
+    ]
+  });
+
+  /* recall from memory */
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the blanks",
+    lines: [
+      "The last line of a traceback names the exception <0>.",
+      "Each block in the middle is called a <1>.",
+      "The deepest frame is the one that actually <2>."
+    ],
+    blanks: [
+      { a: ["type"], why: "The final line is the exception class and its message." },
+      { a: ["frame"], why: "A frame records a file, a line number, a function, and the source line." },
+      { a: ["raised"], why: "The last frame printed is the deepest call, where the exception was created." }
+    ]
+  });
+
+  /* the quiz — every option in a question has the same word count */
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Which line of a traceback names the exception?",
+      a: ["The very first line", "The very last line", "The middle frame line", "The blank separator line"],
+      c: 1,
+      why: "The final line holds the exception type and message; everything above it is the call path."
+    },
+    {
+      q: "What does one frame in a traceback record?",
+      a: ["A file, line, and function", "A variable and its value", "A module and its version", "A warning and its level"],
+      c: 0,
+      why: "Each frame names the file, the line number, the function, and the source line that ran."
+    },
+    {
+      q: "Why does the header say most recent call last?",
+      a: ["Frames print oldest call first", "Frames print newest call first", "Frames print in random order", "Frames print in file order"],
+      c: 0,
+      why: "The list is printed in call order, so the deepest and most recent call appears at the bottom."
+    },
+    {
+      q: "Where is the exception actually created?",
+      a: ["In the shallowest frame", "In the deepest frame", "In the header line", "In the last message"],
+      c: 1,
+      why: "The deepest frame is the innermost call, and that is the line where the exception was raised."
+    }
+  ]);
+</script>
+</body>
+</html>

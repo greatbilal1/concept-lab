@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 04 — Data Partitioning and Consistent Hashing</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="distributed-systems" data-lesson="4" data-lesson-id="data-partitioning-consistent-hashing">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 04</span> · Consistent Hashing</span>
+
+  <h1 class="lesson-title">Data Partitioning and Consistent Hashing</h1>
+  <p class="lesson-lede">
+    Horizontal scaling: Range Partitioning vs Hash Partitioning, the mod-N reshuffling disaster, and the Consistent Hashing Ring.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to design scalable horizontal data partitioning using consistent hashing rings and virtual nodes.</span>
+    <span><b>Mission link</b> Mastering data partitioning and consistent hashing across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Data Partitioning and Consistent Hashing</h2>
+  <p>When a dataset exceeds the storage capacity of a single server (e.g. 50 Terabytes of user profiles), you must <strong>partition (shard)</strong> the data across multiple machines. But how do you decide which server holds User #849,201?</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Horizontal scaling: Range Partitioning vs Hash Partitioning, the mod-N reshuffling disaster, and the Consistent Hashing Ring.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Modulo Hashing vs Consistent Hashing</h2>
+  <p>The Disaster of Naive Modulo Hashing (`node = hash(key) % N`):</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Virtual Nodes (Vnodes) Balance</h2>
+  <ul><li>Suppose you have 4 cache servers ($N=4$). Everything works.</li><li>You add a 5th server ($N=5$) to handle traffic.</li><li>Because the divisor changed from 4 to 5, <strong>nearly 100% of all existing keys now hash to the wrong server!</strong></li><li>Result: A <strong>100% Cache Stampede</strong>! All cache lookups miss simultaneously, flooding downstream databases and crashing your entire enterprise!</li></ul><p>The Solution: <strong>Consistent Hashing (Karger et al., MIT)</strong>:</p><ul><li><strong>1. The Hash Ring ($0$ to $2^{32}-1$):</strong> Map the output range of a hash function (SHA-256) onto an abstract circular ring.</li><li><strong>2. Nodes Placed on Ring:</strong> Hash server identifiers (`hash("server_1")`) and place them at positions on the ring.</li><li><strong>3. Keys Mapped Clockwise:</strong> Hash a key (`hash("user_102")`), place it on the ring, and walk clockwise until you hit the first server node!</li><li><strong>4. Minimal Reshuffling ($K/N$):</strong> When adding a node, <strong>only keys belonging to that node's immediate neighbor are moved!</strong> All other nodes keep their keys intact!</li><li><strong>5. Virtual Nodes (Vnodes):</strong> Assign each physical server 100+ virtual points on the ring to guarantee balanced, uniform data distribution.</li></ul><pre><code># The Consistent Hashing Ring in Action:
+# Ring Range: 0 ----------- 1,000,000,000 (Wraps around to 0)
+# Node A: at 250,000 | Node B: at 500,000 | Node C: at 750,000 | Node D: at 1,000,000
+# Key "user_42" hashes to 320,000 -> Walks clockwise to Node B (at 500,000)!
+#
+# If Node E is added at 400,000:
+# ONLY keys between 250,000 and 400,000 move to Node E.
+# Nodes A, C, and D remain 100% untouched! Zero cache stampede!</code></pre><div class="callout"><p><strong>The Distributed Superpower:</strong> Consistent Hashing is the foundational architectural pillar of Amazon DynamoDB, Apache Cassandra, Akamai CDN, and Discord's stateful voice servers.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the consistent hashing sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to design scalable horizontal data partitioning using consistent hashing rings and virtual nodes.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where data partitioning and consistent hashing applies.</li>
+    <li>Author a unit test or verification script exercising data partitioning and consistent hashing.</li>
+    <li>Document team architectural conventions regarding data partitioning and consistent hashing.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Data Partitioning and Consistent Hashing.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Why does naive modulo hashing (`hash(key) % N`) fail catastrophically when scaling distributed caching clusters?",
+    a: ["Adding or removing a single node changes N, causing nearly 100% of all keys to re-hash to new nodes, triggering a massive cache wipeout and database collapse","Modulo math is illegal in Python","Modulo hashing deletes the keys","Modulo only works with odd numbers"],
+    c: 0,
+    why: "Changing N in modulo hashing forces almost all keys to move, invalidating caches and overwhelming databases."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Naive Modulo (hash % N)",
+            "lines": [
+                  "Adding 1 server changes N",
+                  "Nearly 100% of keys move to wrong nodes!",
+                  "Massive cache wipeout & database collapse"
+            ]
+      },
+      {
+            "title": "Consistent Hashing Ring",
+            "lines": [
+                  "Keys and nodes mapped onto circular ring",
+                  "Adding 1 node moves only K/N keys",
+                  "99% of cache hits preserved safely!"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Data Partitioning and Consistent Hashing",
+      "def execute_flow():",
+      "    # Horizontal scaling: Range Partitioning vs Hash Par...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Data Partitioning and Consistent Hashing"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Single Point per Server"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "150 Vnodes per Server"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Consistent hashing maps nodes and keys onto a circular ring, ensuring that adding or removing a server relocates only a tiny fraction of {1} without causing a cache {2}."
+],
+    blanks: [
+      {
+            "a": [
+                  "keys"
+            ],
+            "why": "Data records or cache items"
+      },
+      {
+            "a": [
+                  "stampede"
+            ],
+            "why": "Mass simultaneous cache miss and database overload"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What proportion of keys must be moved when a new node is added to a consistent hashing ring with N nodes?",
+      a: ["Approximately 1/N of the total keys (only keys belonging to the immediate neighbor segment)","100% of all keys","Zero keys","Half of all keys"],
+      c: 0,
+      why: "Consistent hashing bounds re-mapping to $K/N$ keys, moving only data adjacent to the new node."
+    },
+    {
+      q: "What problem do 'Virtual Nodes' (Vnodes) solve in consistent hashing implementations?",
+      a: ["They solve non-uniform data distribution and 'hot spots' by mapping each physical machine to multiple distributed positions across the ring","They make servers virtual machines","They eliminate the need for memory","They encrypt the keys"],
+      c: 0,
+      why: "Virtual nodes distribute load uniformly by interleaving physical server points throughout the ring."
+    },
+    {
+      q: "What major distributed databases rely on consistent hashing for data partitioning?",
+      a: ["Amazon DynamoDB and Apache Cassandra","SQLite and Microsoft Access","Redis in standalone mode only","Flat CSV files"],
+      c: 0,
+      why: "DynamoDB and Cassandra use consistent hashing rings to partition data across horizontal clusters."
+    },
+    {
+      q: "What is a 'Cache Stampede' that consistent hashing prevents during node scaling?",
+      a: ["When massive cache invalidation forces thousands of concurrent requests to hit the underlying database simultaneously, causing an outage","When animals run through a data center","A computer virus","A sound effect in a game"],
+      c: 0,
+      why: "Cache stampedes overwhelm backend databases when distributed caches are abruptly invalidated."
+    }
+  ]);
+</script>
+</body>
+</html>

@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 03 — Tokenization: Byte-Pair Encoding (BPE) and SentencePiece</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="llms" data-lesson="3" data-lesson-id="tokenization-bpe-sentencepiece">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 03</span> · Tokenization</span>
+
+  <h1 class="lesson-title">Tokenization: Byte-Pair Encoding (BPE) and SentencePiece</h1>
+  <p class="lesson-lede">
+    How text becomes tokens: Byte-Pair Encoding (BPE), subword tokenization, vocabulary sizes, and tokenization quirks.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You understand the mechanics of Byte-Pair Encoding and subword tokenization.</span>
+    <span><b>Mission link</b> Mastering tokenization: byte-pair encoding (bpe) and sentencepiece across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Tokenization: Byte-Pair Encoding (BPE) and SentencePiece</h2>
+  <p>A language model does not read English words, nor does it read individual characters. It reads <strong>Tokens</strong>. The algorithm that converts text strings into lists of integer token IDs is the <strong>Tokenizer</strong>, typically using <strong>Byte-Pair Encoding (BPE)</strong> or <strong>SentencePiece</strong>.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    How text becomes tokens: Byte-Pair Encoding (BPE), subword tokenization, vocabulary sizes, and tokenization quirks.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Byte-Pair Encoding (BPE) Merge Process</h2>
+  <p>The BPE algorithm works through iterative frequency merging:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tokenization Artifacts</h2>
+  <ul><li><strong>1. Base Vocabulary:</strong> Start with individual bytes (256 raw byte characters). Any Unicode character can be expressed!</li><li><strong>2. Count Pairs:</strong> Scan the corpus and find the most frequent adjacent character pair (e.g. <code>'t' + 'h'</code> $\rightarrow$ <code>'th'</code>). Merge them into a new token!</li><li><strong>3. Iterate:</strong> Repeat 50,000 to 128,000 times! Common words (<code>'the'</code>, <code>'apple'</code>) become single tokens. Rare or compound words are split into subword pieces (<code>'un' + 'break' + 'able'</code>).</li></ul><pre><code># Tokenizing with tiktoken (GPT-4 Tokenizer):
+import tiktoken
+
+enc = tiktoken.get_encoding("cl100k_base")
+text = "Tokenization is fascinating!"
+tokens = enc.encode(text)
+print(tokens)  # [48234, 1634, 374, 45247, 0]
+print([enc.decode([t]) for t in tokens])
+# Output: ['Token', 'ization', ' is', ' fascinating', '!']</code></pre><p>Notice that common words have leading spaces attached (<code>' is'</code>). Because numbers and non-English scripts are often split into smaller byte pieces, non-English languages consume 2-3x more tokens per sentence!</p><div class="callout"><p><strong>Tokenization Quirks:</strong> Models struggle to count letters in words (e.g. <em>'How many r's in strawberry?'</em>) because the model never sees individual letters; it sees the atomic token <code>'strawberry'</code>!</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the tokenization sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You understand the mechanics of Byte-Pair Encoding and subword tokenization.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where tokenization: byte-pair encoding (bpe) and sentencepiece applies.</li>
+    <li>Author a unit test or verification script exercising tokenization: byte-pair encoding (bpe) and sentencepiece.</li>
+    <li>Document team architectural conventions regarding tokenization: byte-pair encoding (bpe) and sentencepiece.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Tokenization: Byte-Pair Encoding (BPE) and SentencePiece.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Why do Large Language Models use subword tokenization (like BPE) instead of character-level or whole-word tokenization?",
+    a: ["Whole words create infinite vocabularies with out-of-vocabulary errors, while characters create excessively long sequences; subwords offer the optimal sweet spot","Subwords run faster on Python","Characters are illegal in neural networks","Subwords use no computer memory"],
+    c: 0,
+    why: "Subwords balance compact sequence lengths with finite, reusable vocabularies that handle any word."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Step 1: Characters",
+            "lines": [
+                  "['l', 'o', 'w', 'e', 'r']",
+                  "Frequency scan: 'e'+'r' is most common"
+            ]
+      },
+      {
+            "title": "Step 2: First Merge",
+            "lines": [
+                  "['l', 'o', 'w', 'er']",
+                  "Adds 'er' to vocabulary"
+            ]
+      },
+      {
+            "title": "Step 3: Vocabulary Build",
+            "lines": [
+                  "Iterates 100,000 times",
+                  "Common words become single tokens"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Tokenization: Byte-Pair Encoding (BPE) and SentencePiece",
+      "def execute_flow():",
+      "    # How text becomes tokens: Byte-Pair Encoding (BPE),...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Tokenization: Byte-Pair Encoding (BPE) and SentencePiece"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Spelling Blindness"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Multilingual Tax"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Byte-Pair Encoding iteratively merges frequent character pairs into {1} tokens, balancing vocabulary size with {2} length."
+],
+    blanks: [
+      {
+            "a": [
+                  "subword"
+            ],
+            "why": "Word fragments like 'un' + 'able'"
+      },
+      {
+            "a": [
+                  "sequence"
+            ],
+            "why": "Total count of tokens in context"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why does an LLM struggle to answer 'How many letters are in the word apple?' without chain of thought?",
+      a: ["The model receives the word as a single atomic token ID rather than a list of five separate letters","The model does not know the alphabet","Apple is a copyrighted word","The model cannot count to five"],
+      c: 0,
+      why: "Tokenization collapses multi-letter words into single atomic integers, hiding character details."
+    },
+    {
+      q: "What is the typical vocabulary size of modern tokenizers like cl100k_base or Llama 3?",
+      a: ["Between 100,000 and 128,000 tokens","Exactly 26 tokens (A-Z)","1 billion tokens","8 tokens"],
+      c: 0,
+      why: "100k-128k tokens provides compact encoding for diverse multilingual text and code."
+    },
+    {
+      q: "What is the 'Multilingual Token Tax'?",
+      a: ["Languages with non-Latin scripts (like Arabic, Hindi, or Japanese) require more tokens per sentence, increasing API cost and latency","A tax paid to international governments","A fee charged for translating code","A currency conversion fee"],
+      c: 0,
+      why: "Vocabularies are biased toward English; other scripts are fragmented into multiple byte tokens."
+    },
+    {
+      q: "How does SentencePiece handle spaces compared to older tokenizers?",
+      a: ["It treats whitespace as a normal character (using a special symbol like _), allowing reversible lossless detokenization","It deletes all spaces from the text","It doubles every space","It replaces spaces with numbers"],
+      c: 0,
+      why: "Treating whitespace as a standard symbol makes tokenization fully reversible without heuristics."
+    }
+  ]);
+</script>
+</body>
+</html>

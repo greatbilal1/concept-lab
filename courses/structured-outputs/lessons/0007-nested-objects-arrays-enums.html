@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 07 — Nested Objects, Arrays, and Enums in Output Schemas</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="structured-outputs" data-lesson="7" data-lesson-id="nested-objects-arrays-enums">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 07</span> · Complex Schemas</span>
+
+  <h1 class="lesson-title">Nested Objects, Arrays, and Enums in Output Schemas</h1>
+  <p class="lesson-lede">
+    Authoring complex hierarchical schemas: nested sub-models, typed arrays, polymorphic unions, and categorical enums.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to author complex hierarchical schemas with nested objects, arrays, and enums.</span>
+    <span><b>Mission link</b> Mastering nested objects, arrays, and enums in output schemas across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Nested Objects, Arrays, and Enums in Output Schemas</h2>
+  <p>Real enterprise data is rarely flat. A single customer order contains shipping addresses, billing addresses, lists of purchased line items, tax breakdowns, and payment status enums. To capture this complexity, engineers use <strong>Hierarchical Nested Schemas</strong>.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Authoring complex hierarchical schemas: nested sub-models, typed arrays, polymorphic unions, and categorical enums.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Hierarchical Schema Architecture</h2>
+  <p>Key patterns for complex schema composition in Pydantic v2:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Nesting Depth Guideline</h2>
+  <ul><li><strong>1. Nested Child Models:</strong> Break complexity into reusable sub-models (`Address`, `LineItem`, `TaxDetails`) and compose them inside the top-level entity.</li><li><strong>2. Typed Array Collections:</strong> Use `list[ChildModel]` with `min_length` constraints: `items: list[LineItem] = Field(min_length=1)`.</li><li><strong>3. Enums for State:</strong> Use Python standard `Enum` or `Literal` for finite status fields: `status: OrderStatus = OrderStatus.PENDING`.</li><li><strong>4. Constrained Primitives:</strong> Use specialized types like `EmailStr`, `HttpUrl`, and `PositiveInt` to guarantee valid primitive formats.</li></ul><pre><code># Complex Hierarchical Schema Composition:
+from pydantic import BaseModel, Field, EmailStr
+from typing import Literal
+
+class LineItem(BaseModel):
+    sku: str = Field(description="Product SKU")
+    quantity: int = Field(gt=0, description="Quantity purchased")
+    price_cents: int = Field(ge=0, description="Unit price in integer cents")
+
+class CompleteOrder(BaseModel):
+    order_id: str
+    customer_email: EmailStr
+    status: Literal["pending", "paid", "shipped", "cancelled"]
+    items: list[LineItem] = Field(min_length=1, description="List of purchased items")
+    subtotal_cents: int = Field(ge=0)</code></pre><p>When compiled to JSON Schema, this provides a complete hierarchical blueprint that constrained decoding engines follow with mathematical precision.</p><div class="callout"><p><strong>Hierarchy Depth Limit:</strong> Keep nesting under 3-4 levels deep. Excessively deep nesting (8+ levels) strains model attention and increases decoding latency.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the complex schema sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to author complex hierarchical schemas with nested objects, arrays, and enums.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where nested objects, arrays, and enums in output schemas applies.</li>
+    <li>Author a unit test or verification script exercising nested objects, arrays, and enums in output schemas.</li>
+    <li>Document team architectural conventions regarding nested objects, arrays, and enums in output schemas.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Nested Objects, Arrays, and Enums in Output Schemas.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "How does Pydantic represent a 1-to-many relationship (like an Invoice with multiple Line Items) in a structured output schema?",
+    a: ["A parent BaseModel containing an attribute typed as a list of child BaseModels: items: list(LineItem)","A giant flat string separated by commas","A separate SQL database table file","A while loop"],
+    c: 0,
+    why: "Hierarchical data is represented cleanly by composing child BaseModel classes inside parent lists."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Child Model: LineItem",
+            "lines": [
+                  "sku: str, quantity: int, price_cents: int",
+                  "Encapsulates single product item"
+            ]
+      },
+      {
+            "title": "Parent Model: CompleteOrder",
+            "lines": [
+                  "order_id, email, status enum",
+                  "items: list[LineItem] (1-to-many relationship)"
+            ]
+      },
+      {
+            "title": "Generated JSON Output",
+            "lines": [
+                  "Cleanly nested JSON tree structure",
+                  "100% type-safe across all levels"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Nested Objects, Arrays, and Enums in Output Schemas",
+      "def execute_flow():",
+      "    # Authoring complex hierarchical schemas: nested sub...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Nested Objects, Arrays, and Enums in Output Schemas"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Optimal Depth (1-3 levels)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Excessive Depth (6+ levels)"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Hierarchical schemas model 1-to-many relationships by composing child {1} inside parent models as typed {2} collections."
+],
+    blanks: [
+      {
+            "a": [
+                  "models"
+            ],
+            "why": "BaseModel classes like LineItem"
+      },
+      {
+            "a": [
+                  "list"
+            ],
+            "why": "Array collections like list[LineItem]"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What happens when an LLM is constrained by a schema containing 'items: list[LineItem] = Field(min_length=1)'?",
+      a: ["The grammar requires the model to emit a valid JSON array containing at least one valid LineItem object before closing the array","The model crashes on empty lists","The model runs in reverse","The list is deleted"],
+      c: 0,
+      why: "min_length=1 grammatically prevents the model from returning an empty array."
+    },
+    {
+      q: "Why is using Pydantic's EmailStr type safer than a generic str for email fields?",
+      a: ["EmailStr automatically validates that the string contains a valid email format with an @ symbol and a valid domain","EmailStr encrypts the email","EmailStr sends an email automatically","EmailStr uses less RAM"],
+      c: 0,
+      why: "EmailStr enforces strict email syntax validation at runtime."
+    },
+    {
+      q: "How does defining an enum (e.g. Status = Literal['active', 'inactive']) prevent downstream bugs?",
+      a: ["It prevents the model from returning synonyms like 'enabled', 'running', or 'live' that would break downstream if-statements","It translates text into French","It makes the database free","It turns off logging"],
+      c: 0,
+      why: "Enums restrict model outputs strictly to approved canonical string tokens."
+    },
+    {
+      q: "What is the recommended maximum nesting depth for production LLM schemas?",
+      a: ["Around 3 to 4 levels of nesting to maintain fast generation and high attention focus","100 levels","Exactly 1 level (no nesting allowed)","Infinity"],
+      c: 0,
+      why: "Keeping nesting under 4 levels preserves low decoding latency and high reasoning accuracy."
+    }
+  ]);
+</script>
+</body>
+</html>

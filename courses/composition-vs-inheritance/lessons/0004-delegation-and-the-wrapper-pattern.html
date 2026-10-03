@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 04 — Delegation and the wrapper pattern</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="composition-vs-inheritance" data-lesson="4" data-lesson-id="delegation-and-the-wrapper-pattern">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 04</span> · Delegation & Wrapper Patterns</span>
+
+  <h1 class="lesson-title">Delegation and the wrapper pattern</h1>
+  <p class="lesson-lede">
+    How do you reuse code without inheriting? Master Delegation and the Wrapper (Decorator) pattern: containing an instance and forwarding calls cleanly.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Replace fragile inheritance with delegation and the wrapper pattern</span>
+    <span><b>Mission link</b> The primary structural alternative to class subclassing for behavior reuse</span>
+  </div>
+
+  <h2><span class="n">1</span>Contain and delegate</h2>
+  <p>Instead of subclassing a class to add a feature, use <b>Delegation</b>: contain the object inside your class (composition) and <b>forward calls to it</b>. Your class acts as a <b>Wrapper</b>.</p><p>Remember Joshua Bloch's broken <code>CustomSet</code> from Lesson 2? The cure is delegation: <code>class InstrumentedSet { constructor(set) { this.set = set; } }</code>. When <code>add()</code> is called, it increments its counter and calls <code>this.set.add()</code>. It has zero dependency on whether <code>HashSet</code>'s internal <code>addAll</code> calls <code>add</code>!</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Delegation contains an instance and forwards calls to it, preserving encapsulation completely.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Subclassing versus Wrapping</h2>
+  <p>Contrast the tight coupling of subclassing with the black-box safety of the Wrapper pattern.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing the robust InstrumentedSet</h2>
+  <p>Trace how the wrapper pattern counts items accurately without double-counting bugs.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of delegation patterns.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can apply delegation and the wrapper pattern to extend class behavior safely without touching inheritance.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Implement a LoggingList wrapper that prints every item added before forwarding to a real list.</li>
+    <li>Refactor an inheritance-based class into a delegation-based wrapper class.</li>
+    <li>Notice how your wrapper can wrap ANY object that satisfies the interface, not just one class.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Joshua Bloch, *Effective Java*, Item 18: 'Favor composition over inheritance' (The Wrapper Pattern / Forwarding).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Why is the Wrapper pattern completely immune to the Fragile Base Class problem?",
+    a: ["It interacts with the underlying instance strictly through its public interface; it has zero dependency on internal self-use methods","It converts the underlying object into a string","It runs on a separate physical server","It eliminates the need for software testing"],
+    c: 0,
+    why: "Wrappers treat collaborators as black boxes, immune to internal superclass implementation changes."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Subclassing (Fragile)",
+            "lines": [
+                  "class Child extends Parent",
+                  "tight coupling to parent internals",
+                  "breaks when parent self-use changes!"
+            ]
+      },
+      {
+            "title": "Wrapper / Delegation (Robust)",
+            "lines": [
+                  "class Wrapper { constructor(inner) { this.inner = inner } }",
+                  "calls this.inner.method()",
+                  "pure black-box reuse!"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "class InstrumentedSet:",
+      "    def __init__(self, s): self.s = s; self.count = 0",
+      "    def add(self, item): self.count += 1; return self.s.add(item)",
+      "    def addAll(self, items): self.count += len(items); return self.s.addAll(items)",
+      "# Calling addAll([1, 2, 3]) increments count by exactly 3, regardless of HashSet's internals!"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "wrapper": "InstrumentedSet wraps any underlying Set implementation"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "forwarding": "addAll increments count by 3 and forwards directly to inner set"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "outcome": "final count is exactly 3; zero double-counting bugs!"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Passing a call to an internal collaborator object is <0>.",
+      "An object that encloses another object to add functionality is a <1>.",
+      "Delegation treats collaborators as <2>-box abstractions."
+],
+    blanks: [
+      {
+            "a": [
+                  "delegation"
+            ],
+            "why": "Delegation hands off execution to an internal object."
+      },
+      {
+            "a": [
+                  "wrapper"
+            ],
+            "why": "Wrappers enclose underlying instances."
+      },
+      {
+            "a": [
+                  "black"
+            ],
+            "why": "Black-box reuse interacts strictly through public APIs."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is 'Delegation' in object-oriented programming?",
+      a: ["A design pattern where an object handles a method call by forwarding the operation to a helper or collaborator object","Assigning coding tasks to junior developers","A database replication technique","A compiler optimization for loops"],
+      c: 0,
+      why: "Delegation passes responsibility to an internal contained object."
+    },
+    {
+      q: "What is the primary benefit of the Wrapper pattern (also known as the Decorator pattern)?",
+      a: ["It allows adding new responsibilities to an object dynamically without modifying the original class or relying on subclassing","It reduces the size of the computer screen","It converts Python code into JavaScript","It turns off database security"],
+      c: 0,
+      why: "Wrappers extend functionality dynamically by wrapping instances rather than modifying classes."
+    },
+    {
+      q: "Why can an InstrumentedSet wrapper wrap HashSet, TreeSet, or ANY Set implementation seamlessly?",
+      a: ["Because it depends on the generic Set interface/protocol, not a single hardcoded concrete class","Because Java converts all sets to arrays","Because sets are stored in the cloud","Only on Linux computers"],
+      c: 0,
+      why: "Polymorphic delegation works with any object satisfying the interface, maximizing reuse."
+    },
+    {
+      q: "What is the only disadvantage of the Wrapper pattern compared to inheritance?",
+      a: ["Forwarding methods can involve minor boilerplate (forwarding calls) and wrappers are not well-suited for callback identity checks (the SELF problem)","Wrappers use 100 times more memory","Wrappers are illegal in modern programming languages","Wrappers delete database records"],
+      c: 0,
+      why: "Boilerplate forwarding methods and the 'SELF problem' (wrapped objects don't know their wrapper) are the trade-offs."
+    }
+  ]);
+</script>
+</body>
+</html>

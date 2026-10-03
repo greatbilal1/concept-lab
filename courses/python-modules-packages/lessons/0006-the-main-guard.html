@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 06 — The __main__ guard</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="python-modules-packages" data-lesson="6" data-lesson-id="the-main-guard">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 06</span> · Packages</span>
+
+  <h1 class="lesson-title">The __main__ guard</h1>
+  <p class="lesson-lede">
+    A file can be two things at once: a library other code imports, and a program
+    you run. The <code>__main__</code> guard is the one line that lets it be both
+    without the two roles interfering.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Make a file importable and runnable</span>
+    <span><b>Mission link</b> One file, two honest jobs</span>
+  </div>
+
+  <h2><span class="n">1</span>The problem: import runs everything</h2>
+
+  <p>
+    You learned in lesson 1 that importing a module runs its top-level code. That
+    is fine until the top-level code is a program — a <code>print</code>, a
+    <code>main()</code> call, a network request. Now importing the file to reuse one
+    function also fires the whole script.
+  </p>
+
+  <pre><code># report.py
+def build(rows):
+    return {"count": len(rows)}
+
+print(build([1, 2, 3]))   # runs on import. bad.</code></pre>
+
+  <p>
+    Import <code>report</code> from anywhere and you get a stray
+    <code>{"count": 3}</code> in your output. The fix is to make that line
+    conditional.
+  </p>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>__name__ tells you how you were loaded</h2>
+
+  <p>
+    Every module has a built-in variable called <code>__name__</code>. Its value
+    depends entirely on <b>how the file was reached</b>:
+  </p>
+
+  <div id="intro1"></div>
+
+  <p>
+    That is the entire mechanism. When you run a file directly, Python sets its
+    <code>__name__</code> to the string <code>"__main__"</code>. When you import it,
+    Python sets <code>__name__</code> to the module's dotted path. One variable,
+    two values, and you can branch on it.
+  </p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    <code>__name__</code> is not a flag you set. It is a fact Python reports about
+    how this file entered the program.
+  </div>
+
+  <h2><span class="n">3</span>The guard, line by line</h2>
+
+  <p>
+    The idiom is a single <code>if</code> that reads almost like English: "if this
+    file is the main program, run it".
+  </p>
+
+  <pre><code>def build(rows):
+    return {"count": len(rows)}
+
+def main():
+    print(build([1, 2, 3]))
+
+if __name__ == "__main__":
+    main()</code></pre>
+
+  <p>
+    Now <code>import report</code> defines <code>build</code> and <code>main</code>
+    and stops. Running <code>python report.py</code> defines them and then calls
+    <code>main()</code>. Same file, two behaviours, no conflict.
+  </p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Why the main() function matters</h2>
+
+  <p>
+    You could put the program directly inside the <code>if</code> block. Wrapping it
+    in a <code>main()</code> function is better for three reasons:
+  </p>
+
+  <div id="diagram1"></div>
+
+  <p>
+    The last one is the quiet winner. A <code>main()</code> function can be called
+    from a test, from another script, or from a console-script entry point. Code
+    buried in an <code>if</code> block can only be run one way.
+  </p>
+
+  <div class="note good">
+    <span class="note-label">Why this matters later</span>
+    Every command-line tool you will ever write uses this shape. Every package that
+    ships a CLI uses it. When you get to packaging in lesson 10, the entry point you
+    declare will point at exactly this <code>main</code> function.
+  </div>
+
+  <h2><span class="n">5</span>Check yourself</h2>
+
+  <p>
+    Answer from memory — do not scroll back up. Each option has the same number of
+    words, so nothing gives the answer away.
+  </p>
+
+  <div id="fill1"></div>
+  <div id="quiz"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>
+      You can now write a file that is a clean library when imported and a working
+      program when run, and you can explain the mechanism in one sentence. That is
+      the difference between a script and a module.
+    </p>
+  </div>
+
+  <h2><span class="n">6</span>Do this next</h2>
+
+  <ol>
+    <li>
+      Take a script with a top-level <code>print</code> and wrap the program in a
+      <code>main()</code> plus the guard. Import it and confirm silence.
+    </li>
+    <li>
+      Add <code>print(__name__)</code> at the top of a file. Run it directly, then
+      import it. Watch the value change.
+    </li>
+    <li>
+      Write a test that imports your module and calls <code>main()</code> directly.
+      Notice that this is only possible because the code is in a function.
+    </li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Read the Python tutorial's
+    <a href="https://docs.python.org/3/tutorial/modules.html">Modules chapter</a>,
+    section 6.1.1 ("Executing modules as scripts"), which introduces this idiom in
+    four sentences.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher (me) anything — "why is the string
+    literally __main__?", "can I have two main files?", "what is
+    <code>python -m</code> doing?". There are no bad questions here.
+  </div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  /* the two values of __name__ */
+  TeachWidgets.introCards("#intro1", {
+    cards: [
+      { ico: "▶️", title: "Run directly", body: "python report.py sets __name__ to \"__main__\"." },
+      { ico: "📦", title: "Imported", body: "import report sets __name__ to \"report\"." },
+      { ico: "🔀", title: "Branch on it", body: "The guard runs code only in the first case." }
+    ]
+  });
+
+  /* predict-then-reveal */
+  TeachWidgets.predict("#predict1", {
+    q: "You run `python report.py`. What is `__name__` inside that file?",
+    a: ["The string report", "The string __main__", "The file path string"],
+    c: 1,
+    why: "Python sets __name__ to \"__main__\" for the file you execute directly. Imported modules get their dotted path instead."
+  });
+
+  /* step-through trace of the guard */
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "def build(rows): ...",
+      "def main(): ...",
+      "if __name__ == \"__main__\":",
+      "    main()",
+      "# imported: __name__ == 'report' -> block skipped"
+    ],
+    steps: [
+      { line: 0, vars: { defined: "build" } },
+      { line: 1, vars: { defined: "main" } },
+      { line: 2, vars: { name: "__main__", test: "True" } },
+      { line: 3, vars: { ran: "main()" } },
+      { line: 4, vars: { name: "report", test: "False" } }
+    ]
+  });
+
+  /* why main() */
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      { title: "Testable", lines: ["call main()", "from a test"] },
+      { title: "Reusable", lines: ["call main()", "from a script"] },
+      { title: "Entry point", lines: ["console_scripts", "points here"] }
+    ]
+  });
+
+  /* recall from memory */
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — the guard",
+    lines: [
+      "When run directly, <code>__name__</code> equals <0>",
+      "When imported, <code>__name__</code> equals the module's <1>",
+      "The guard is written <code>if __name__ == \"<2>\":</code>"
+    ],
+    blanks: [
+      { a: ["__main__"], why: "Python sets __name__ to the literal string \"__main__\" for the executed file." },
+      { a: ["dotted path", "name", "path"], why: "An imported module's __name__ is its dotted path, e.g. \"report\" or \"myapp.report\"." },
+      { a: ["__main__"], why: "The comparison is against the same literal string." }
+    ]
+  });
+
+  /* the quiz — every option is exactly three words */
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is __name__?",
+      a: ["A user set flag", "A built in variable", "A function you call", "A file naming rule"],
+      c: 1,
+      why: "__name__ is a built-in variable Python sets on every module."
+    },
+    {
+      q: "What is it when run?",
+      a: ["The string report", "The string __main__", "The file path string", "The string module"],
+      c: 1,
+      why: "The directly executed file gets __name__ == \"__main__\"."
+    },
+    {
+      q: "What does the guard do?",
+      a: ["Speeds up the import", "Runs code only directly", "Hides the main function", "Prevents all top level code"],
+      c: 1,
+      why: "The guard runs its block only when the file is executed directly, not when imported."
+    },
+    {
+      q: "Why wrap code in main()?",
+      a: ["It runs much faster", "It becomes callable elsewhere", "It avoids the guard entirely", "It hides the function name"],
+      c: 1,
+      why: "A main() function can be called from tests, scripts, or a console-script entry point."
+    }
+  ]);
+</script>
+</body>
+</html>

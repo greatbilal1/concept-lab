@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 04 — Broker versus mediator event topologies</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="software-architecture-patterns" data-lesson="4" data-lesson-id="broker-versus-mediator-event-topologies">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 04</span> · Event-Driven Architecture</span>
+
+  <h1 class="lesson-title">Broker versus mediator event topologies</h1>
+  <p class="lesson-lede">
+    Should services coordinate themselves, or should a central conductor direct the workflow? Compare the Broker topology (choreography) with the Mediator topology (orchestration).
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Select between Broker and Mediator topologies based on workflow complexity and visibility</span>
+    <span><b>Mission link</b> Prevents loss of business workflow visibility in complex event-driven systems</span>
+  </div>
+
+  <h2><span class="n">1</span>Choreography versus Orchestration</h2>
+  <p>In Event-Driven Architecture, how do services coordinate multi-step workflows? There are two primary topologies: <b>Broker (Choreography)</b> and <b>Mediator (Orchestration)</b>.</p><p>In the <b>Broker Topology</b>, there is no central boss: services act like dancers in a choreography. OrderService publishes an event; PaymentService reacts and publishes its own event; ShippingService reacts to that. It is highly decoupled. In the <b>Mediator Topology</b>, a central <b>Workflow Orchestrator</b> acts like an orchestra conductor, explicitly directing each step and handling failures.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Broker topology is decentralized choreography; Mediator topology is centralized orchestration.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Broker versus Mediator comparison</h2>
+  <p>Contrast decentralized event ping-pong with centralized workflow coordination.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing a Mediator workflow coordinator</h2>
+  <p>Trace how a mediator orchestrator manages steps, retries, and compensations in an onboarding workflow.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of event topologies.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can choose between Broker and Mediator topologies based on whether you need extreme decoupling or centralized workflow visibility.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Map a multi-step checkout workflow as an event-driven choreography diagram.</li>
+    <li>Refactor the same workflow using a centralized workflow mediator.</li>
+    <li>Evaluate which topology makes handling timeouts and compensation easier.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Mark Richards & Neal Ford, *Fundamentals of Software Architecture*, Chapter 14: 'Event-Driven Architecture Style' (Broker vs Mediator).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is the primary drawback of a pure Broker (choreography) topology as an application grows to 50 events?",
+    a: ["Workflow visibility is lost: business logic is scattered across 50 independent consumers, making it nearly impossible to trace the full end-to-end process","The message broker runs out of memory","The computer turns off","It is forbidden by software standards"],
+    c: 0,
+    why: "Decentralized choreography scatters workflow logic, making it difficult to understand the big picture."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Broker (Choreography)",
+            "lines": [
+                  "no central conductor",
+                  "services react to events independently",
+                  "high decoupling, poor end-to-end visibility"
+            ]
+      },
+      {
+            "title": "Mediator (Orchestration)",
+            "lines": [
+                  "central workflow orchestrator",
+                  "directs steps: step 1 -> step 2 -> step 3",
+                  "clear visibility, error handling, state tracking!"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "class UserOnboardingMediator:",
+      "    def process(self, user):",
+      "        self.auth.create_credentials(user)",
+      "        self.billing.create_stripe_customer(user)",
+      "        self.mailer.send_welcome_email(user)",
+      "        # All orchestration rules and timeout fallbacks live in ONE centralized place!"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "orchestrator": "mediator drives workflow sequence"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step_1": "invokes auth service"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "step_2": "invokes billing service"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "step_3": "invokes mailer service; end-to-end flow is completely visible in 4 lines"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "A decentralized event topology without a central conductor is the <0> topology.",
+      "A topology coordinated by a central workflow engine is the <1> topology.",
+      "Choreography is decentralized; orchestration is <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "broker"
+            ],
+            "why": "Broker topology relies on decentralized pub/sub."
+      },
+      {
+            "a": [
+                  "mediator"
+            ],
+            "why": "Mediator topology coordinates via a central hub."
+      },
+      {
+            "a": [
+                  "centralized"
+            ],
+            "why": "Orchestration centralizes workflow decision-making."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "When is the Mediator (Orchestration) topology superior to the Broker (Choreography) topology?",
+      a: ["When the business workflow is complex, requires strict step sequencing, conditional branching, timeouts, and centralized error recovery","When you want to build the simplest possible system","When the application has only one user","Only on mobile applications"],
+      c: 0,
+      why: "Complex workflows with compensations and timeouts require centralized coordination to stay manageable."
+    },
+    {
+      q: "What is the primary advantage of the Broker (Choreography) topology?",
+      a: ["High decoupling, high responsiveness, and independent scalability with zero central bottleneck","It eliminates the need for software testing","It turns off database backups","It runs on client web browsers"],
+      c: 0,
+      why: "Broker choreography has no single point of coordination, allowing maximum throughput and autonomy."
+    },
+    {
+      q: "What modern tools are commonly used as Workflow Orchestrators in Mediator architectures?",
+      a: ["Temporal.io, AWS Step Functions, and Camunda","Nginx and Apache","PostgreSQL and SQLite","React and Vue"],
+      c: 0,
+      why: "Temporal and Step Functions are purpose-built stateful workflow orchestrators."
+    },
+    {
+      q: "What is an event 'dead-letter queue' (DLQ)?",
+      a: ["A dedicated queue where messages that repeatedly fail processing are routed for inspection, preventing poison messages from blocking queues","A queue that deletes all messages after five seconds","A queue used for sending physical paper letters","A queue that has run out of memory"],
+      c: 0,
+      why: "DLQs isolate malformed or unprocessable messages so standard queues continue processing."
+    }
+  ]);
+</script>
+</body>
+</html>

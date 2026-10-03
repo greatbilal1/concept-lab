@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 02 — Detecting Hallucinations: Entailment, Self-Check, and Consistency</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="hallucination-reliability" data-lesson="2" data-lesson-id="detecting-hallucinations-entailment-consistency">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 02</span> · Detection</span>
+
+  <h1 class="lesson-title">Detecting Hallucinations: Entailment, Self-Check, and Consistency</h1>
+  <p class="lesson-lede">
+    Automated hallucination detection: Natural Language Inference (NLI), self-consistency checks, and token log-probability entropy.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to detect hallucinations using NLI entailment, self-consistency, and token entropy.</span>
+    <span><b>Mission link</b> Mastering detecting hallucinations: entailment, self-check, and consistency across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Detecting Hallucinations: Entailment, Self-Check, and Consistency</h2>
+  <p>Before you can eliminate hallucinations, you must be able to <strong>detect them automatically</strong>. You cannot have human editors review every paragraph emitted by a customer-facing bot. You need automated, programmatic hallucination detection.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Automated hallucination detection: Natural Language Inference (NLI), self-consistency checks, and token log-probability entropy.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Hallucination Detection Methodologies</h2>
+  <p>Three proven methods for automated hallucination detection:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>The NLI Verification Gate</h2>
+  <ul><li><strong>1. Natural Language Inference (NLI) / Entailment:</strong> Small specialized models (like DeBERTa-v3) evaluate each generated sentence against the retrieved source context. It outputs three probabilities: <em>Entailment</em> (proven by source), <em>Contradiction</em> (refuted by source), or <em>Neutral</em> (unsupported claim = Hallucination!).</li><li><strong>2. Self-Consistency / Sampling Agreement:</strong> Sample 5 responses to the same prompt at temperature 0.7. If the model says 'Born in 1984' in all 5 samples, confidence is high. If it outputs 5 different years across samples, it is confabulating!</li><li><strong>3. Token Log-Probability Entropy:</strong> Inspect the model's output token logprobs. When generating hallucinations, token entropy spikes—the model expresses high uncertainty during token selection.</li></ul><pre><code># Detecting Hallucinations via NLI in Python:
+from transformers import pipeline
+
+nli_pipeline = pipeline("text-classification", model="cross-encoder/nli-deberta-v3-base")
+
+def check_claim_grounded(source_doc, generated_claim):
+    result = nli_pipeline({"text": source_doc, "text_pair": generated_claim})
+    # Label is 'entailment', 'neutral', or 'contradiction'
+    if result["label"] == "contradiction":
+        return "HALLUCINATION_CONTRADICTION"
+    if result["label"] == "neutral":
+        return "HALLUCINATION_UNSUPPORTED"
+    return "VERIFIED_GROUNDED"</code></pre><div class="callout"><p><strong>The Detection Guardrail:</strong> Run fast NLI checks in your response pipeline. If a claim is flagged as 'neutral' or 'contradiction', block the response before it reaches the user!</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the hallucination detection sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to detect hallucinations using NLI entailment, self-consistency, and token entropy.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where detecting hallucinations: entailment, self-check, and consistency applies.</li>
+    <li>Author a unit test or verification script exercising detecting hallucinations: entailment, self-check, and consistency.</li>
+    <li>Document team architectural conventions regarding detecting hallucinations: entailment, self-check, and consistency.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Detecting Hallucinations: Entailment, Self-Check, and Consistency.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "How does Natural Language Inference (NLI) detect hallucinations in a generated response against source context?",
+    a: ["By checking whether each generated claim mathematically logically follows (Entailment) or contradicts the provided source documents","By counting words in the response","By checking if the text has vowels","By running an SQL query"],
+    c: 0,
+    why: "NLI classifies premise-hypothesis pairs into Entailment, Neutral, or Contradiction to detect ungrounded claims."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Natural Language Inference (NLI)",
+            "lines": [
+                  "Classifies claim against source document",
+                  "Entailment (True) vs Neutral (Hallucinated!)",
+                  "Fast, deterministic, zero-LLM needed"
+            ]
+      },
+      {
+            "title": "Self-Consistency (Ensemble)",
+            "lines": [
+                  "Samples 5 responses at T=0.7",
+                  "Measures factual agreement across samples",
+                  "Disagreement signals hallucination"
+            ]
+      },
+      {
+            "title": "Token Entropy (Logprobs)",
+            "lines": [
+                  "Analyzes token probability variance",
+                  "Spikes when model is guessing"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Detecting Hallucinations: Entailment, Self-Check, and Consistency",
+      "def execute_flow():",
+      "    # Automated hallucination detection: Natural Languag...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Detecting Hallucinations: Entailment, Self-Check, and Consistency"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Generated Sentence"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Source Document"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "step": "NLI Verdict"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Natural Language Inference detects hallucinations by verifying whether generated claims are logically {1} by source context or represent unsupported {2}."
+],
+    blanks: [
+      {
+            "a": [
+                  "entailed"
+            ],
+            "why": "Logically proven by premise"
+      },
+      {
+            "a": [
+                  "neutral"
+            ],
+            "why": "Unsupported claims lacking source proof"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What does a 'Neutral' classification in an NLI hallucination check mean?",
+      a: ["The generated statement is neither proven nor directly contradicted by the source text; it is an unsupported extrinsic hallucination","The model has no opinion","The text is written in neutral tone","The check failed"],
+      c: 0,
+      why: "Neutral indicates the statement contains claims not substantiated by the provided source documents."
+    },
+    {
+      q: "How does Self-Consistency sampling reveal that a model is hallucinating a date or number?",
+      a: ["The model outputs inconsistent, fluctuating dates across different random sampling runs, proving it lacks factual certainty","The model crashes on the second run","The model deletes the date","The text turns into numbers"],
+      c: 0,
+      why: "High variance across stochastic samples is a reliable empirical indicator of confabulation."
+    },
+    {
+      q: "Why is using a small specialized NLI model (like DeBERTa) faster and cheaper than using GPT-4 to check hallucinations?",
+      a: ["DeBERTa runs locally on CPU/GPU in 10ms with zero API token costs, making it viable for high-throughput gateway filtering","DeBERTa is written in C++","GPT-4 is forbidden from checking facts","DeBERTa uses no memory"],
+      c: 0,
+      why: "Dedicated cross-encoders provide rapid, low-cost verification at the application boundary."
+    },
+    {
+      q: "What are 'Token Logprobs' and how do they signal uncertainty?",
+      a: ["Logarithms of token probabilities; high entropy (flat distribution across choices) indicates the model is uncertain and guessing","Log files saved to disk","Login credentials","A type of database index"],
+      c: 0,
+      why: "Flat probability distributions indicate the model lacks high confidence in its continuation."
+    }
+  ]);
+</script>
+</body>
+</html>

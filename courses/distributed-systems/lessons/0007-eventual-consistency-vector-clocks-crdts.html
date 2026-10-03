@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 07 — Eventual Consistency, Vector Clocks, and CRDTs</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="distributed-systems" data-lesson="7" data-lesson-id="eventual-consistency-vector-clocks-crdts">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 07</span> · Eventual Consistency</span>
+
+  <h1 class="lesson-title">Eventual Consistency, Vector Clocks, and CRDTs</h1>
+  <p class="lesson-lede">
+    Embracing concurrency: Eventual Consistency, logical time vs physical clocks, Vector Clocks, and Conflict-Free Replicated Data Types (CRDTs).
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to reason about distributed causality using Vector Clocks and implement conflict-free merging with CRDTs.</span>
+    <span><b>Mission link</b> Mastering eventual consistency, vector clocks, and crdts across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Eventual Consistency, Vector Clocks, and CRDTs</h2>
+  <p>Physical computer clocks drift: using system time (`datetime.now()`) to order events across distributed nodes is guaranteed to corrupt data due to <strong>clock skew</strong>. To reason about causality, distributed systems use <strong>Logical Clocks and CRDTs</strong>.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Embracing concurrency: Eventual Consistency, logical time vs physical clocks, Vector Clocks, and Conflict-Free Replicated Data Types (CRDTs).
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Physical Clocks vs Vector Clocks</h2>
+  <p>The Mechanics of Distributed Causality:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>CRDT Mathematical Invariants</h2>
+  <ul><li><strong>1. Eventual Consistency:</strong> If no new updates are made, all replicas will eventually converge to identical values. Replicas accept temporary divergence to provide blazing local write speeds.</li><li><strong>2. Lamport & Vector Clocks:</strong> Instead of physical seconds, time is measured in <strong>logical ticks</strong>. A <strong>Vector Clock</strong> is an array of counters tracking the causal history across all nodes ($[V_A, V_B, V_C]$). It mathematically proves whether Event 1 <em>happened before</em> Event 2, or if they occurred <em>concurrently</em>!</li><li><strong>3. CRDTs (Conflict-Free Replicated Data Types):</strong> Mathematical data structures where the merge operation is <strong>Commutative, Associative, and Idempotent</strong>: $A \cup B = B \cup A$. Edits can arrive in any order, be duplicated, and yet <strong>every node converges to the exact same state automatically!</strong></li><li><strong>4. Real-World CRDTs:</strong> Powers Google Docs collaborative editing, Figma multiplayer canvas, and Apple Notes synchronization!</li></ul><pre><code># The G-Counter (Grow-Only Counter) CRDT in Python:
+class GCounter:
+    def __init__(self, node_id, num_nodes=3):
+        self.node_id = node_id
+        self.counts = [0] * num_nodes
+
+    def increment(self):
+        self.counts[self.node_id] += 1
+
+    def value(self):
+        return sum(self.counts)
+
+    def merge(self, other_counter):
+        # Mathematical union: take pairwise maximum of all counters!
+        # Commutative, Associative, & Idempotent! Zero merge conflicts!
+        self.counts = [max(a, b) for a, b in zip(self.counts, other_counter.counts)]</code></pre><div class="callout"><p><strong>The Multiplayer Miracle:</strong> CRDTs eliminate the need for centralized lock coordinators. Every client edits locally in offline mode, and merges cleanly when reconnected.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the eventual consistency sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to reason about distributed causality using Vector Clocks and implement conflict-free merging with CRDTs.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where eventual consistency, vector clocks, and crdts applies.</li>
+    <li>Author a unit test or verification script exercising eventual consistency, vector clocks, and crdts.</li>
+    <li>Document team architectural conventions regarding eventual consistency, vector clocks, and crdts.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Eventual Consistency, Vector Clocks, and CRDTs.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is a 'Conflict-Free Replicated Data Type' (CRDT) in collaborative distributed systems?",
+    a: ["A mathematical data structure that can be replicated and modified concurrently across multiple nodes and merged deterministically without conflict","A database that has no data","A tool for resolving employee disputes","An encrypted computer file"],
+    c: 0,
+    why: "CRDTs provide mathematically provable, conflict-free merging of concurrent edits across distributed nodes."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Physical Clock (Clock Skew Hazard)",
+            "lines": [
+                  "Server A clock is 50ms ahead of Server B",
+                  "Last-Write-Wins overwrites newer data!"
+            ]
+      },
+      {
+            "title": "Vector Clocks (Causality Array)",
+            "lines": [
+                  "[1, 0, 0] -> [1, 1, 0] -> [1, 2, 0]",
+                  "Proves mathematical 'happens-before' causality"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Eventual Consistency, Vector Clocks, and CRDTs",
+      "def execute_flow():",
+      "    # Embracing concurrency: Eventual Consistency, logic...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Eventual Consistency, Vector Clocks, and CRDTs"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Commutative (Order Independent)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Associative (Grouping Independent)"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "step": "Idempotent (Duplicate Safe)"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Conflict-Free Replicated Data Types (CRDTs) enable seamless multi-user collaboration by using {1} merge operations that guarantee deterministic state {2} without locks."
+],
+    blanks: [
+      {
+            "a": [
+                  "commutative"
+            ],
+            "why": "Order-independent mathematical property"
+      },
+      {
+            "a": [
+                  "convergence"
+            ],
+            "why": "Replicas reaching identical values"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is 'Clock Skew' and why does it make physical timestamps unreliable for ordering distributed events?",
+      a: ["Physical quartz crystal clocks in servers drift by milliseconds due to heat and manufacturing variations, making timestamps between machines inconsistent","Clocks run backwards at night","Digital clocks cannot display milliseconds","NTP protocols are illegal"],
+      c: 0,
+      why: "Physical clock drift makes comparing wall-clock timestamps across independent servers dangerous."
+    },
+    {
+      q: "What mathematical properties must a CRDT merge function satisfy to guarantee convergence?",
+      a: ["Commutative (order doesn't matter), Associative (grouping doesn't matter), and Idempotent (duplicates don't change state)","Addition, Subtraction, and Multiplication","Linear, Quadratic, and Exponential","Public, Private, and Protected"],
+      c: 0,
+      why: "These algebraic properties ensure that data merges identically regardless of network arrival order or duplicate deliveries."
+    },
+    {
+      q: "What real-world collaborative applications rely heavily on CRDTs for real-time multiplayer editing?",
+      a: ["Figma (collaborative design), Apple Notes, and collaborative rich-text editors","Static PDF readers","Single-player offline games","Command-line calculators"],
+      c: 0,
+      why: "CRDTs power modern multiplayer editing where multiple users edit local state concurrently."
+    },
+    {
+      q: "What does a Vector Clock prove about two distributed events?",
+      a: ["Whether Event A causally happened before Event B, or whether they occurred concurrently without causal knowledge of each other","The exact second the event happened","How fast the network cable was","The identity of the user"],
+      c: 0,
+      why: "Vector clocks determine causal relationships (happened-before vs concurrent) without relying on physical clocks."
+    }
+  ]);
+</script>
+</body>
+</html>

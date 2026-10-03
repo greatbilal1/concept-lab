@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 06 — Workload Identity Federation (IAM Roles for Service Accounts)</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="secrets-identity" data-lesson="6" data-lesson-id="workload-identity-federation-irsa">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 06</span> · Workload Identity</span>
+
+  <h1 class="lesson-title">Workload Identity Federation (IAM Roles for Service Accounts)</h1>
+  <p class="lesson-lede">
+    Keyless cloud access: OpenID Connect (OIDC), AWS IRSA (IAM Roles for Service Accounts), GCP Workload Identity, and GitHub Actions keyless deploys.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to eliminate static cloud keys using Workload Identity Federation and OIDC.</span>
+    <span><b>Mission link</b> Mastering workload identity federation (iam roles for service accounts) across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Workload Identity Federation (IAM Roles for Service Accounts)</h2>
+  <p>Historically, to deploy code from GitHub Actions to AWS, developers generated a permanent `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` and saved them in GitHub Secrets. If those secrets leaked, attackers gained permanent access to your cloud infrastructure.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Keyless cloud access: OpenID Connect (OIDC), AWS IRSA (IAM Roles for Service Accounts), GCP Workload Identity, and GitHub Actions keyless deploys.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Workload Identity Federation Flow</h2>
+  <p><strong>Workload Identity Federation (OIDC)</strong> eliminates static cloud keys forever:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Static Keys vs Workload Identity</h2>
+  <ul><li><strong>1. The Keyless Handshake:</strong> When a GitHub Actions workflow runs, GitHub's internal OpenID Connect (OIDC) provider signs an ephemeral identity token proving: <em>'This request is from repository:company/app, branch:main'</em>.</li><li><strong>2. Trust Relationship in AWS:</strong> AWS IAM is configured to trust GitHub's OIDC certificate authority.</li><li><strong>3. Token Exchange:</strong> GitHub Actions sends the signed OIDC token to `sts:AssumeRoleWithWebIdentity`. AWS verifies GitHub's cryptographic signature and returns <strong>temporary 1-hour credentials</strong>!</li><li><strong>4. Zero Stored Secrets:</strong> There is <strong>no static API key</strong> stored in GitHub Secrets. There is nothing to leak, nothing to steal, and nothing to rotate!</li></ul><pre><code># Keyless GitHub Actions Deployment to AWS (OIDC YAML):
+name: Deploy to Production
+on:
+  push:
+    branches: [main]
+permissions:
+  id-token: write # Mandatory: Allows requesting OIDC JWT from GitHub!
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Authenticate with AWS via OIDC (ZERO STATIC SECRETS!)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::123456789012:role/GitHubDeployerRole
+          aws-region: us-east-1
+      - name: Deploy to Cloud
+        run: aws s3 sync ./dist s3://company-production-assets</code></pre><div class="callout"><p><strong>The Keyless Cloud Revolution:</strong> Never create long-lived IAM user access keys for CI/CD or Kubernetes. Use Workload Identity Federation with OIDC.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the workload identity sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to eliminate static cloud keys using Workload Identity Federation and OIDC.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where workload identity federation (iam roles for service accounts) applies.</li>
+    <li>Author a unit test or verification script exercising workload identity federation (iam roles for service accounts).</li>
+    <li>Document team architectural conventions regarding workload identity federation (iam roles for service accounts).</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Workload Identity Federation (IAM Roles for Service Accounts).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "How does 'Workload Identity Federation' allow a GitHub Actions CI runner or Kubernetes pod to access AWS without storing permanent secret keys?",
+    a: ["The workload exchanges a short-lived cryptographically signed OpenID Connect (OIDC) token for temporary cloud IAM credentials dynamically","By emailing the password to AWS","By hardcoding the password in the YAML file","By disabling authentication"],
+    c: 0,
+    why: "Workload Identity exchanges short-lived OIDC tokens for temporary IAM credentials, eliminating static access keys entirely."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1. GitHub Actions Runs",
+            "lines": [
+                  "GitHub signs ephemeral OIDC JWT token",
+                  "Token contains: repo, branch, workflow"
+            ]
+      },
+      {
+            "title": "2. AWS STS Verifies",
+            "lines": [
+                  "AWS validates GitHub's digital signature",
+                  "Checks repository & branch trust policy"
+            ]
+      },
+      {
+            "title": "3. Temporary Access Granted",
+            "lines": [
+                  "Returns 1-hour ephemeral AWS credentials",
+                  "ZERO static API keys stored anywhere!"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Workload Identity Federation (IAM Roles for Service Accounts)",
+      "def execute_flow():",
+      "    # Keyless cloud access: OpenID Connect (OIDC), AWS I...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Workload Identity Federation (IAM Roles for Service Accounts)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Static AWS Secret in GitHub"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Workload Identity (OIDC)"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Workload Identity Federation eliminates permanent cloud credentials by using {1} tokens to authenticate dynamic workloads directly with cloud {2} roles."
+],
+    blanks: [
+      {
+            "a": [
+                  "OIDC"
+            ],
+            "why": "OpenID Connect cryptographic identity token"
+      },
+      {
+            "a": [
+                  "IAM"
+            ],
+            "why": "Identity and Access Management"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the primary security advantage of using OIDC Workload Identity Federation in GitHub Actions?",
+      a: ["Developers no longer need to generate, copy, store, or rotate permanent AWS access keys in repository secrets","It speeds up git commit times","It eliminates the need for unit tests","It makes cloud storage free"],
+      c: 0,
+      why: "Eliminating static credentials prevents credential leaks and eliminates manual key rotation overhead."
+    },
+    {
+      q: "What is 'IRSA' (IAM Roles for Service Accounts) in Amazon EKS (Kubernetes)?",
+      a: ["A mechanism allowing individual Kubernetes pods to assume dedicated AWS IAM roles via OIDC without sharing node credentials","An internet routing algorithm","A brand of computer server","A database query language"],
+      c: 0,
+      why: "IRSA scopes cloud permissions granularly to specific Kubernetes pods rather than broad EC2 instances."
+    },
+    {
+      q: "How does an AWS IAM Trust Policy restrict which GitHub Actions workflows can assume a role?",
+      a: ["By checking the 'sub' (subject) claim in the OIDC token to ensure it matches the exact repository name and branch (e.g. repo:org/repo:ref:refs/heads/main)","By asking for a password","By checking the time of day","By verifying the user's email"],
+      c: 0,
+      why: "Trust policies evaluate OIDC token claims to restrict role assumption to specific branches and repos."
+    },
+    {
+      q: "What happens if someone forks a public repository that uses Workload Identity Federation?",
+      a: ["They cannot assume the target AWS role because the OIDC token emitted by GitHub will contain their forked repository name, which fails the IAM trust policy","They steal all cloud credentials","They get administrative access","The cloud account shuts down"],
+      c: 0,
+      why: "The cryptographic subject claim in the OIDC token prevents unauthorized forks from assuming target roles."
+    }
+  ]);
+</script>
+</body>
+</html>

@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 08 — Shell scripting and aliases</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="command-line-shell" data-lesson="8" data-lesson-id="shell-scripting-and-aliases">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 08</span> · Environment & Scripting</span>
+
+  <h1 class="lesson-title">Shell scripting and aliases</h1>
+  <p class="lesson-lede">
+    If you run a command sequence more than twice, automate it. Learn to create aliases, write shell scripts with shebang lines, and handle exit codes.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Write repeatable shell automation scripts and custom workflow aliases</span>
+    <span><b>Mission link</b> Transforms manual command-line tasks into robust automation</span>
+  </div>
+
+  <h2><span class="n">1</span>From interactive commands to scripts</h2>
+  <p>A shell script is simply a text file containing the exact same commands you would type into a terminal prompt. The first line is the <b>shebang</b> (<code>#!/bin/bash</code> or <code>#!/usr/bin/env bash</code>), telling the operating system which interpreter to execute.</p><p>Every command exits with an integer <b>exit code</b> stored in <code>$?</code>. An exit code of 0 signals success; any non-zero value signals an error. Using <code>set -e</code> ensures your script halts immediately if any command fails.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    A script is a sequence of terminal commands with automatic error checking and a shebang.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Conditionals and chaining</h2>
+  <p>Chain commands using logical operators based on exit codes: <code>&&</code> runs on success; <code>||</code> runs on failure.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing a backup automation script</h2>
+  <p>Trace how a shell script validates a directory exists before creating a compressed tar archive.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of shell automation conventions.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can write safe, robust shell scripts and custom aliases to automate repetitive developer workflows.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Create an alias in ~/.zshrc or ~/.bashrc for a command you type frequently.</li>
+    <li>Write a 5-line bash script with a shebang, make it executable, and run it.</li>
+    <li>Inspect the exit code of successful and failing commands using echo $?.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Shotts, *The Linux Command Line*, Chapter 24: 'Writing Your First Script'.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What does 'set -e' at the top of a bash script do?",
+    a: ["It forces the script to exit immediately if any command returns a non-zero exit code","It prints every variable value to standard output in real time","It enables experimental language features in the shell interpreter","It converts all uppercase text in the script into lowercase"],
+    c: 0,
+    why: "'set -e' prevents scripts from blindly continuing after an intermediate failure."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "cmd1 && cmd2",
+            "lines": [
+                  "logical AND",
+                  "cmd2 runs only if cmd1 returns 0"
+            ]
+      },
+      {
+            "title": "cmd1 || cmd2",
+            "lines": [
+                  "logical OR",
+                  "cmd2 runs only if cmd1 fails"
+            ]
+      },
+      {
+            "title": "alias ll='ls -la'",
+            "lines": [
+                  "command shortcut",
+                  "expands interactively in shell"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "#!/usr/bin/env bash",
+      "set -e",
+      "TARGET=\"$1\"",
+      "[ -d \"$TARGET\" ] || { echo 'Not a dir'; exit 1; }",
+      "tar -czf backup.tar.gz \"$TARGET\""
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "interpreter": "bash"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "flag": "fail-fast on errors enabled"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "target": "docs"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "check": "passed: docs is a valid directory"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "archive": "backup.tar.gz created successfully"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The first line of a script starting with #! is the <0>.",
+      "The special variable holding the exit code of the last command is $<1>.",
+      "The operator that runs the second command only if the first succeeded is <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "shebang",
+                  "hashbang"
+            ],
+            "why": "The shebang tells the kernel which interpreter binary to launch."
+      },
+      {
+            "a": [
+                  "?"
+            ],
+            "why": "$? captures the return status of the preceding command."
+      },
+      {
+            "a": [
+                  "&&"
+            ],
+            "why": "&& executes the right-hand command only if the left-hand command returns exit code 0."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What does an exit code of 0 mean in UNIX command execution?",
+      a: ["The command completed successfully with zero errors","The command produced zero lines of text output","The program crashed immediately upon launching","The operating system terminated the command forcibly"],
+      c: 0,
+      why: "POSIX standard: return code 0 indicates clean, successful execution."
+    },
+    {
+      q: "What is the purpose of the shebang (#!/bin/bash) on line 1 of a script?",
+      a: ["It specifies which interpreter the operating system should use to execute the script","It gives administrator root permissions to the executing user","It imports standard library math functions into the script environment","It prevents unauthorized users from opening the script in a text editor"],
+      c: 0,
+      why: "The kernel reads the shebang path to launch the appropriate execution interpreter."
+    },
+    {
+      q: "How does the '&&' operator behave between two commands?",
+      a: ["It runs the second command only if the first command succeeds (exit code 0)","It runs both commands simultaneously in parallel threads","It ignores any errors generated by the first command","It redirects output from the first command into the second command"],
+      c: 0,
+      why: "&& acts as a short-circuit guard, halting if the first command fails."
+    },
+    {
+      q: "What does an alias do in an interactive shell session?",
+      a: ["Creates a shorthand name that expands to a full command with predefined flags","Renames a file on the physical disk partition","Creates a symbolic link in the /usr/bin folder","Compresses repetitive text in terminal output streams"],
+      c: 0,
+      why: "Aliases substitute a short string with a full command sequence for quick interactive typing."
+    }
+  ]);
+</script>
+</body>
+</html>

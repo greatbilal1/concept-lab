@@ -1,0 +1,3 @@
+# Mission — What Is AI?
+
+Demystify the scientific and engineering realities of artificial intelligence. Master the paradigm shift from handcrafted rules to learned weights, navigate deterministic vs probabilistic software physics, explore the three learning paradigms, separate training from inference, recognize the boundaries of statistical pattern matching, understand the causes of hallucination, and adopt robust mental models for probabilistic software.

@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 03 — Temperature: Controlling Sharpness of the Distribution</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="inference-sampling" data-lesson="3" data-lesson-id="temperature-controlling-sharpness">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 03</span> · Temperature</span>
+
+  <h1 class="lesson-title">Temperature: Controlling Sharpness of the Distribution</h1>
+  <p class="lesson-lede">
+    The mechanics of temperature: dividing logits before Softmax to control the entropy and sharpness of the distribution.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You understand the mathematical and behavioral mechanics of the temperature parameter.</span>
+    <span><b>Mission link</b> Mastering temperature: controlling sharpness of the distribution across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Temperature: Controlling Sharpness of the Distribution</h2>
+  <p><strong>Temperature ($T$)</strong> is the most widely used knob in generative AI. It is borrowed directly from statistical thermodynamics (the Boltzmann distribution). Temperature controls the <strong>entropy (randomness)</strong> of token sampling by scaling logits <em>before</em> they enter the Softmax function:</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    The mechanics of temperature: dividing logits before Softmax to control the entropy and sharpness of the distribution.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Temperature Logit Scaling Effect</h2>
+  $$P(w_i) = \frac{e^{z_i / T}}{\sum_j e^{z_j / T}}$$
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>The Temperature Dial</h2>
+  <p>Let us observe how temperature alters the exact same logits $[10.0, 5.0, 1.0]$:</p><ul><li><strong>Low Temperature ($T = 0.2$ - Cold & Sharp):</strong> Scaled logits: $[50.0, 25.0, 5.0]$. The difference is magnified astronomically! Softmax probability for token 1 is $99.99999\%$. The model becomes nearly deterministic, confident, and factual.</li><li><strong>Standard Temperature ($T = 1.0$ - Natural):</strong> Scaled logits: $[10.0, 5.0, 1.0]$. The model reflects its true unvarnished training probabilities ($99.3\%$, $0.7\%$).</li><li><strong>High Temperature ($T = 2.0$ - Hot & Flat):</strong> Scaled logits: $[5.0, 2.5, 0.5]$. The peak is flattened! Token 1 drops to $88\%$, and lower-ranked tokens get a fighting chance. The model becomes creative, diverse—and eventually hallucinatory gibberish at $T > 1.5$.</li></ul><pre><code># The Temperature Spectrum:
+# T = 0.0:  Deterministic, analytical, exact (Code, Math, JSON)
+# T = 0.3:  Focused, conservative, low hallucination (Technical docs)
+# T = 0.7:  Balanced creativity and coherence (Standard chat, blogging)
+# T = 1.2+: High variance, poetic, unpredictable (Brainstorming, wild fiction)</code></pre><div class="callout"><p><strong>The Temperature Rule:</strong> As temperature approaches $0$, the distribution becomes a single sharp spike (Argmax). As temperature approaches $\infty$, the distribution flattens into pure uniform noise.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the temperature sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You understand the mathematical and behavioral mechanics of the temperature parameter.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where temperature: controlling sharpness of the distribution applies.</li>
+    <li>Author a unit test or verification script exercising temperature: controlling sharpness of the distribution.</li>
+    <li>Document team architectural conventions regarding temperature: controlling sharpness of the distribution.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Temperature: Controlling Sharpness of the Distribution.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What happens mathematically to the probability distribution when temperature is set very low (e.g. T = 0.2)?",
+    a: ["The distribution becomes extremely sharp and peaked: the highest logit dominates, approaching greedy decoding","The distribution flattens into complete uniform randomness","All probabilities become negative","The model outputs zero tokens"],
+    c: 0,
+    why: "Low temperature sharpens the distribution, concentrating almost all probability mass on the top token."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Low Temperature (T = 0.2)",
+            "lines": [
+                  "Logits divided by 0.2 (Multiplied by 5)",
+                  "Probability spike on #1 candidate",
+                  "Conservative, focused, deterministic"
+            ]
+      },
+      {
+            "title": "Default Temperature (T = 1.0)",
+            "lines": [
+                  "Logits unchanged",
+                  "Natural language distribution",
+                  "Balanced coherence and diversity"
+            ]
+      },
+      {
+            "title": "High Temperature (T = 2.0)",
+            "lines": [
+                  "Logits divided by 2 (Flattened)",
+                  "Probability spread across many tokens",
+                  "Creative, diverse, but prone to gibberish"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Temperature: Controlling Sharpness of the Distribution",
+      "def execute_flow():",
+      "    # The mechanics of temperature: dividing logits befo...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Temperature: Controlling Sharpness of the Distribution"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "0.0 - 0.2 (Cold)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "0.5 - 0.7 (Warm)"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "step": "1.0 - 1.5 (Hot)"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Lowering temperature divides logits to make the probability distribution {1}, while raising temperature flattens it toward {2} noise."
+],
+    blanks: [
+      {
+            "a": [
+                  "sharp"
+            ],
+            "why": "Concentrated peak on top tokens"
+      },
+      {
+            "a": [
+                  "uniform"
+            ],
+            "why": "Equal probability across all choices"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What setting of temperature is recommended when writing code or compiling SQL queries with an LLM?",
+      a: ["Low temperature (0.0 to 0.2) to ensure precise syntax and eliminate creative hallucinations","High temperature (1.8)","Negative temperature (-1.0)","Temperature does not affect code"],
+      c: 0,
+      why: "Code requires rigid syntactic precision and deterministic logic; low temperature prevents creative errors."
+    },
+    {
+      q: "What happens if you set temperature to 3.0 or higher during generation?",
+      a: ["The probability distribution becomes almost completely flat, resulting in bizarre, nonsensical, and ungrammatical token salad","The model becomes a superintelligence","The model runs in reverse","The computer processor melts"],
+      c: 0,
+      why: "Excessive temperature flattens probabilities, making random low-frequency tokens just as likely as sensible words."
+    },
+    {
+      q: "Does temperature change the order of token rankings (does token #2 ever have higher probability than token #1)?",
+      a: ["No; temperature scales logits monotonically, so the relative ranking of tokens never changes, only their relative probabilities","Yes; high temperature reverses the order","Yes; temperature shuffles tokens","Only on odd-numbered tokens"],
+      c: 0,
+      why: "Dividing all logits by a positive scalar preserves the monotonic order: if z1 > z2, then z1/T > z2/T."
+    },
+    {
+      q: "Where did the concept of 'Temperature' in Softmax originate?",
+      a: ["Statistical physics and thermodynamics (the Boltzmann distribution modeling energy states of gas molecules)","Meteorology weather forecasting","Cooking ovens","Automobile engines"],
+      c: 0,
+      why: "The Softmax temperature formulation is mathematically identical to the Boltzmann distribution in thermal physics."
+    }
+  ]);
+</script>
+</body>
+</html>

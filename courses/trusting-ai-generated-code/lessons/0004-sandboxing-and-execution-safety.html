@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 04 — Sandboxing and Execution Safety: Guarding Against Malicious Code</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="trusting-ai-generated-code" data-lesson="4" data-lesson-id="sandboxing-and-execution-safety">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 04</span> · Sandboxing</span>
+
+  <h1 class="lesson-title">Sandboxing and Execution Safety: Guarding Against Malicious Code</h1>
+  <p class="lesson-lede">
+    Securing agent execution environments: sandboxing file writes, restricting shell access, and guarding against prompt injection.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to sandbox AI agent execution environments safely.</span>
+    <span><b>Mission link</b> Mastering sandboxing and execution safety: guarding against malicious code across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Sandboxing and Execution Safety: Guarding Against Malicious Code</h2>
+  <p>Giving an AI coding agent unrestricted access to your personal laptop's terminal with full administrative privileges is an immense security vulnerability. An agent is one prompt injection attack or confused command away from running `rm -rf ~`, leaking SSH keys, or dropping tables on a staging server.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Securing agent execution environments: sandboxing file writes, restricting shell access, and guarding against prompt injection.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Sandboxed Agent Architecture</h2>
+  <p>Professional engineering environments enforce <strong>Execution Sandboxing</strong>:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Unconstrained vs Sandboxed Risk</h2>
+  <ul><li><strong>1. Ephemeral Docker Containers:</strong> Agents run inside lightweight, disposable containers. If an agent corrupts files or deletes system libraries, the container is destroyed and recreated in seconds.</li><li><strong>2. Network Egress Filtering:</strong> Restrict outbound network access. An agent editing code does not need access to the open internet; block outbound sockets to prevent secret exfiltration.</li><li><strong>3. Restricted Shell Commands:</strong> Blacklist dangerous commands (`sudo`, `rm -rf /`, `mkfs`, `dd`) or require explicit human approval prompts before shell execution.</li><li><strong>4. Credential Isolation:</strong> Never mount your personal `~/.aws/` or `~/.ssh/` directories into an agent's container environment!</li></ul><pre><code># Secure Agent Container Sandbox (docker-compose.agent.yml):
+services:
+  agent-sandbox:
+    image: python:3.12-slim
+    volumes:
+      - ./src:/workspace/src:rw          # Only mount the active project code!
+      - ./tests:/workspace/tests:rw
+    # ~/.ssh and ~/.aws are NOT mounted! Zero credential exposure!
+    cap_drop: [ALL]                     # Drop all Linux root privileges
+    read_only: false</code></pre><div class="callout"><p><strong>The Golden Rule of Sandboxing:</strong> Treat every agent execution environment as untrusted. Never give an agent access to secrets, credentials, or systems it does not strictly need to solve the task.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the execution safety sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to sandbox AI agent execution environments safely.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where sandboxing and execution safety: guarding against malicious code applies.</li>
+    <li>Author a unit test or verification script exercising sandboxing and execution safety: guarding against malicious code.</li>
+    <li>Document team architectural conventions regarding sandboxing and execution safety: guarding against malicious code.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Sandboxing and Execution Safety: Guarding Against Malicious Code.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Why must AI coding agents with terminal access be constrained inside isolated sandboxes or containers?",
+    a: ["An unconstrained agent can execute destructive commands (like rm -rf, dropping production databases, or exfiltrating credentials)","Agents consume too much physical electricity","Containers make Python run in parallel","Sandboxing is required by git"],
+    c: 0,
+    why: "Agents have environmental agency; sandboxing limits the blast radius of runaway commands or prompt injection attacks."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Agent Host (Isolated)",
+            "lines": [
+                  "Runs inside Docker container",
+                  "Dropped root privileges (non-root)"
+            ]
+      },
+      {
+            "title": "Volume Mounting",
+            "lines": [
+                  "Mounts strictly /workspace/src",
+                  "Host ~/.ssh & ~/.aws NEVER mounted"
+            ]
+      },
+      {
+            "title": "Egress Filtering",
+            "lines": [
+                  "Outbound internet blocked",
+                  "Zero risk of data exfiltration"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Sandboxing and Execution Safety: Guarding Against Malicious Code",
+      "def execute_flow():",
+      "    # Securing agent execution environments: sandboxing ...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Sandboxing and Execution Safety: Guarding Against Malicious Code"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Unconstrained Host Execution"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Containerized Sandbox"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Agent execution environments must be isolated inside {1} containers with dropped privileges to prevent accidental damage or data {2}."
+],
+    blanks: [
+      {
+            "a": [
+                  "sandboxed"
+            ],
+            "why": "Isolated, protected environment"
+      },
+      {
+            "a": [
+                  "exfiltration"
+            ],
+            "why": "Unauthorized leaking of credentials or data"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why should personal SSH keys and AWS credentials never be mounted into an agent's execution container?",
+      a: ["A hallucinated command or prompt injection attack could transmit those credentials to an unauthorized external server","SSH keys make Python run slower","Credentials take too much disk space","Containers cannot read SSH keys"],
+      c: 0,
+      why: "Isolating credentials eliminates the risk of credential leakage through agent tool execution."
+    },
+    {
+      q: "What is an indirect prompt injection attack in a coding agent?",
+      a: ["Malicious instructions hidden inside a third-party README, issue ticket, or web page that trick the agent into executing rogue commands","A bug in the terminal font","A git merge conflict","A compiler error"],
+      c: 0,
+      why: "Attackers can hide instructions in external data that hijack the agent's reasoning loop."
+    },
+    {
+      q: "How does dropping Linux capabilities (cap_drop: ALL) protect a containerized agent host?",
+      a: ["It prevents processes inside the container from escalating privileges or modifying the host kernel even if root access is gained","It turns off the CPU fan","It speeds up internet downloads","It deletes all unit tests"],
+      c: 0,
+      why: "Dropping kernel capabilities prevents container breakout attacks."
+    },
+    {
+      q: "What should happen when an agent attempts to run an unapproved destructive command like 'drop database'?",
+      a: ["The execution tool must halt and prompt the human engineer for explicit interactive confirmation before proceeding","The command should execute silently","The computer should shut down","The database should be deleted"],
+      c: 0,
+      why: "Human-in-the-loop confirmation gates stop irreversible, high-consequence operations."
+    }
+  ]);
+</script>
+</body>
+</html>

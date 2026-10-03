@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 05 — TCP versus UDP</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="how-the-internet-works" data-lesson="5" data-lesson-id="tcp-versus-udp">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 05</span> · Transport Layer & Protocols</span>
+
+  <h1 class="lesson-title">TCP versus UDP</h1>
+  <p class="lesson-lede">
+    Reliable stream versus fast datagrams: understand why the web runs on TCP, while voice calls, streaming, and gaming choose UDP.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Contrast TCP and UDP trade-offs and explain the TCP three-way handshake</span>
+    <span><b>Mission link</b> Guides protocol selection when architecting network applications</span>
+  </div>
+
+  <h2><span class="n">1</span>The two fundamental transport protocols</h2>
+  <p>The IP layer provides only 'best effort' packet delivery: packets can be dropped, duplicated, delayed, or arrive completely out of order. Layer 4 protocols decide what to do about this.</p><p><b>TCP (Transmission Control Protocol)</b> builds a reliable, in-order byte stream: it tracks sequence numbers, retransmits lost packets, and manages flow control. <b>UDP (User Datagram Protocol)</b> is a bare-bones wrapper: it fires packets with zero guarantees, minimizing latency and overhead.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    TCP guarantees reliable in-order delivery through acknowledgments; UDP delivers raw speed with zero guarantees.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The TCP 3-way handshake</h2>
+  <p>Before any application data can travel over TCP, client and server must establish sequence synchronisation.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing TCP packet loss retransmission</h2>
+  <p>Trace how TCP automatically detects an unacknowledged packet and retransmits it without user intervention.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your recall of transport protocol differences.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can evaluate application requirements to select between reliable TCP streams and real-time UDP datagrams.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Identify which applications on your computer use TCP versus UDP using ss -tulpn or netstat.</li>
+    <li>Explain why DNS queries typically use UDP while file downloads use TCP.</li>
+    <li>Observe the 3-way handshake packets in a local Wireshark capture.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    IETF RFC 793: *Transmission Control Protocol Specification*.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Why do multiplayer real-time games use UDP instead of TCP for player movement updates?",
+    a: ["Waiting for lost movement packets to be retransmitted causes visible lag and gameplay stutter","TCP cannot transmit integer numbers over internet connections","UDP automatically encrypts all player passwords with military encryption","Game consoles are forbidden from opening TCP connections"],
+    c: 0,
+    why: "In fast games, stale coordinates are useless; you only care about the freshest current position."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1. SYN (Client -> Server)",
+            "lines": [
+                  "'Let us synchronize sequence numbers'",
+                  "client initial seq = X"
+            ]
+      },
+      {
+            "title": "2. SYN-ACK (Server -> Client)",
+            "lines": [
+                  "'Acknowledged X+1; my seq is Y'",
+                  "server allocates socket buffer"
+            ]
+      },
+      {
+            "title": "3. ACK (Client -> Server)",
+            "lines": [
+                  "'Acknowledged Y+1; connected!'",
+                  "application data can now flow"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "sender: sends packet seq=100 (dropped by congested router)",
+      "receiver: sends ACK=100 (still waiting for byte 100)",
+      "sender: retransmission timer expires (RTO)",
+      "sender: retransmits packet seq=100 -> receiver sends ACK=200"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "status": "packet lost in transit"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "receiver": "notifies sender byte 100 missing"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "sender": "timer triggered"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "recovered": "data delivered reliably without data loss"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The connection-oriented, reliable transport protocol is <0>.",
+      "The connectionless, low-overhead transport protocol is <1>.",
+      "The three steps of opening a TCP connection are SYN, SYN-ACK, and <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "TCP"
+            ],
+            "why": "TCP ensures reliable, ordered, error-checked stream delivery."
+      },
+      {
+            "a": [
+                  "UDP"
+            ],
+            "why": "UDP transmits lightweight independent datagrams."
+      },
+      {
+            "a": [
+                  "ACK"
+            ],
+            "why": "SYN -> SYN-ACK -> ACK completes the three-way handshake."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the primary trade-off of TCP compared to UDP?",
+      a: ["TCP provides guaranteed reliability and ordering at the expense of higher latency and overhead","TCP only works over wired cables, whereas UDP only works over Wi-Fi","TCP limits maximum file downloads to 10 megabytes","TCP cannot be used to transmit text characters"],
+      c: 0,
+      why: "TCP guarantees delivery via acknowledgments, handshakes, and retransmissions, adding latency."
+    },
+    {
+      q: "What sequence of packets establishes a TCP connection?",
+      a: ["SYN, SYN-ACK, ACK","PING, PONG, PING","HELLO, VERIFY, ACCEPT","OPEN, READ, CLOSE"],
+      c: 0,
+      why: "The classic 3-way handshake synchronizes sequence numbers between both endpoints."
+    },
+    {
+      q: "Why is UDP well-suited for live voice over IP (VoIP) audio calls?",
+      a: ["A dropped 20ms audio packet is better skipped than delayed by retransmissions","UDP automatically increases microphone audio volume","UDP requires less battery power on cell phones","VoIP protocols are legally required to use UDP"],
+      c: 0,
+      why: "Retransmitting stale audio creates distracting echo and lag; dropping it is imperceptible."
+    },
+    {
+      q: "What is TCP Head-of-Line Blocking?",
+      a: ["When one lost packet halts the delivery of all subsequent arrived packets until retransmitted","When the router CPU queue reaches 100 percent capacity","When a web server blocks incoming connections from unknown IP addresses","When the physical network cable is unplugged from the wall"],
+      c: 0,
+      why: "TCP guarantees strict in-order delivery; later packets must wait in buffer for lost predecessors."
+    }
+  ]);
+</script>
+</body>
+</html>

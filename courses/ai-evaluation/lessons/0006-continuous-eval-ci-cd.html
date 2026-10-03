@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 06 — Continuous Evaluation in CI/CD Pipelines</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="ai-evaluation" data-lesson="6" data-lesson-id="continuous-eval-ci-cd">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 06</span> · CI/CD Evals</span>
+
+  <h1 class="lesson-title">Continuous Evaluation in CI/CD Pipelines</h1>
+  <p class="lesson-lede">
+    Automating evaluations: embedding eval suites into GitHub Actions, regression gates, and blocking PRs that degrade accuracy.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to automate continuous AI evaluations in CI/CD pipelines.</span>
+    <span><b>Mission link</b> Mastering continuous evaluation in ci/cd pipelines across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Continuous Evaluation in CI/CD Pipelines</h2>
+  <p>In traditional software engineering, you never merge a pull request if unit tests are red. In modern AI engineering, the exact same law applies: <strong>Never merge a prompt or model change if the Eval Suite fails</strong>.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Automating evaluations: embedding eval suites into GitHub Actions, regression gates, and blocking PRs that degrade accuracy.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Continuous Evaluation Pipeline</h2>
+  <p>A production <strong>Continuous Evaluation CI/CD Pipeline</strong> (GitHub Actions):</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>PR Markdown Metric Comment</h2>
+  <ul><li><strong>1. PR Trigger:</strong> Developer modifies `prompts/system_v2.txt` or updates a model parameter in a pull request.</li><li><strong>2. Automated Eval Runner:</strong> GitHub Actions spins up an ephemeral runner, executes the candidate prompt across the 50-example golden dataset.</li><li><strong>3. Delta Comparison:</strong> Compares accuracy, schema compliance, latency, and cost against the `main` baseline branch.</li><li><strong>4. Hard CI Gate:</strong> If accuracy drops by more than 1.0% or schema validity drops below 100%, <strong>the build turns RED and blocks merging!</strong></li></ul><pre><code># GitHub Actions CI Workflow (.github/workflows/evals.yml):
+name: AI Evaluation Suite
+on: [pull_request]
+jobs:
+  run-evals:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run Prompt Benchmarks
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          python -m evals.run_suite --baseline=main --candidate=HEAD --threshold=0.95
+      - name: Post Eval Summary to PR
+        uses: actions/github-script@v7
+        with:
+          script: post_eval_table_comment()</code></pre><div class="callout"><p><strong>The Pull Request Table:</strong> Configure CI to post a markdown comparison table directly as a PR comment, showing reviewers exact accuracy and cost deltas at a glance!</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the continuous evaluation sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to automate continuous AI evaluations in CI/CD pipelines.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where continuous evaluation in ci/cd pipelines applies.</li>
+    <li>Author a unit test or verification script exercising continuous evaluation in ci/cd pipelines.</li>
+    <li>Document team architectural conventions regarding continuous evaluation in ci/cd pipelines.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Continuous Evaluation in CI/CD Pipelines.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Why should AI evaluation suites be integrated directly into automated Continuous Integration (CI) pipelines?",
+    a: ["To mathematically prevent any prompt, model, or code change that degrades accuracy from being merged into production","To slow down the deployment process","To make GitHub bills higher","It is required by computer hardware"],
+    c: 0,
+    why: "Continuous evaluation in CI enforces automated quality gates, blocking regressions before they reach users."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1. Prompt Edit PR",
+            "lines": [
+                  "Developer updates prompt template",
+                  "Opens pull request on GitHub"
+            ]
+      },
+      {
+            "title": "2. CI Eval Suite Runs",
+            "lines": [
+                  "Executes 50 golden benchmark cases",
+                  "Calculates accuracy, latency, & cost deltas"
+            ]
+      },
+      {
+            "title": "3. The Binary Gate",
+            "lines": [
+                  "Accuracy >= Baseline: GREEN (Merge allowed)",
+                  "Accuracy drops > 1%: RED (Blocked!)"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Continuous Evaluation in CI/CD Pipelines",
+      "def execute_flow():",
+      "    # Automating evaluations: embedding eval suites into...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Continuous Evaluation in CI/CD Pipelines"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Metric Comparison Table"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Continuous evaluation integrates benchmark suites into CI pipelines, using automated {1} gates to block pull requests that introduce accuracy {2}."
+],
+    blanks: [
+      {
+            "a": [
+                  "quality"
+            ],
+            "why": "Mandatory pass/fail criteria"
+      },
+      {
+            "a": [
+                  "regressions"
+            ],
+            "why": "Performance drops and failures"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What happens in a mature AI engineering workflow when a prompt change increases accuracy on one task but drops it by 5% on another?",
+      a: ["The automated CI eval gate fails, alerting the author to the regression before the code can be merged to production","The PR is merged anyway","The computer restarts","The developer is fired"],
+      c: 0,
+      why: "CI evaluation gates catch cross-task regressions that manual checking overlooks."
+    },
+    {
+      q: "Why is posting an automated eval comparison table directly to the PR comment valuable?",
+      a: ["Reviewers can inspect empirical performance, latency, and cost deltas immediately without running tests locally","It makes the PR look colorful","It saves hard drive space","It is required by git"],
+      c: 0,
+      why: "Transparent evaluation tables give code reviewers immediate quantitative evidence of impact."
+    },
+    {
+      q: "What threshold is standard for JSON schema validation in production eval suites?",
+      a: ["100% pass rate (zero schema validation errors permitted)","50% pass rate","75% pass rate","Schema validation is not tested"],
+      c: 0,
+      why: "In production backends, schema compliance is non-negotiable; even 1% errors crash pipelines."
+    },
+    {
+      q: "How can you protect API keys during automated evaluation runs in GitHub Actions?",
+      a: ["Store them in GitHub Actions Encrypted Secrets, injecting them strictly into the ephemeral test runner environment","Hardcode them in the YAML file","Post them in the PR comment","Save them in the README"],
+      c: 0,
+      why: "Repository secrets keep API keys secure and hidden from public git history."
+    }
+  ]);
+</script>
+</body>
+</html>

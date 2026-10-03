@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 08 — When to use an ORM and when to use raw SQL</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="orms" data-lesson="8" data-lesson-id="when-to-use-an-orm-and-when-to-use-raw-sql">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 08</span> · Migrations & Trade-offs</span>
+
+  <h1 class="lesson-title">When to use an ORM and when to use raw SQL</h1>
+  <p class="lesson-lede">
+    ORMs are great for OLTP CRUD, but terrible for bulk analytics and complex reports. Master the pragmatic spectrum: ORMs, Query Builders, and raw parameterized SQL.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Select between ORMs, Query Builders, and raw SQL based on performance and complexity</span>
+    <span><b>Mission link</b> Fosters pragmatic engineering judgment over dogmatic tool loyalty</span>
+  </div>
+
+  <h2><span class="n">1</span>The pragmatic spectrum</h2>
+  <p>Junior developers argue over ORM versus raw SQL as an all-or-nothing religious war. Senior engineers treat them as a spectrum of tools suited for different jobs.</p><p><b>ORMs excel at:</b> Interactive OLTP web apps, single-row CRUD, form validation, and schema migrations. <b>Raw SQL / Query Builders excel at:</b> Bulk updates (updating 100,000 rows in one query), complex analytical reporting with window functions, performance-critical hot paths, and multi-table aggregations.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Use ORMs for transactional CRUD; drop to raw SQL or query builders for bulk operations and analytics.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The database interaction spectrum</h2>
+  <p>Choose the right level of abstraction for each specific database requirement.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing the memory cost of object inflation</h2>
+  <p>Trace why instantiating 100,000 ORM class instances consumes 800 MB of RAM while raw tuples use 15 MB.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of database tool trade-offs.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can wield ORMs effectively for domain logic while fluently dropping to raw SQL for high-throughput batch operations.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Benchmark the memory usage of loading 10,000 rows via an ORM versus raw database driver tuples.</li>
+    <li>Refactor an inefficient loop of individual ORM updates into a single bulk UPDATE query.</li>
+    <li>Experiment with a modern lightweight query builder like Kysely or SQLAlchemy Core.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Martin Fowler: *OrmHate* (martinfowler.com/bliki/OrmHate.html).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "You need to increase the price of 500,000 products by 5%. Which approach is vastly faster and uses 99% less memory?",
+    a: ["A single raw SQL statement: UPDATE products SET price = price * 1.05;","Loading all 500,000 Product ORM objects into Python memory, updating product.price in a loop, and calling session.commit()","Exporting the table to CSV, editing in Excel, and re-importing","Both take the exact same time"],
+    c: 0,
+    why: "A single SQL update executes on disk in 100ms; instantiating 500k ORM objects exhausts gigabytes of RAM."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Full ORM (High Abstraction)",
+            "lines": [
+                  "SQLAlchemy, Prisma, Hibernate",
+                  "ideal for web app CRUD & validation",
+                  "trade-off: object inflation overhead"
+            ]
+      },
+      {
+            "title": "Query Builder (Mid-Level)",
+            "lines": [
+                  "Kysely, Knex, SQLAlchemy Core",
+                  "type-safe composable SQL generation",
+                  "zero object inflation!"
+            ]
+      },
+      {
+            "title": "Raw SQL (Zero Abstraction)",
+            "lines": [
+                  "psycopg3, pgx, Dapper",
+                  "maximum performance, full SQL power",
+                  "trade-off: manual schema mapping"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Scenario: Fetch 100,000 rows for export",
+      "# Approach A (ORM): Product.query.all()",
+      "# Engine allocates 100,000 heavy Python class objects with tracking state -> 800 MB RAM!",
+      "# Approach B (Raw SQL): cursor.execute('SELECT id, name, price FROM products')",
+      "# Engine streams raw tuples directly -> 15 MB RAM (50x less memory!)"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "dataset": "100,000 rows"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "orm_cost": "object inflation allocates 800 MB memory"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "raw_sql": "streaming tuples uses 15 MB; finishes 10x faster"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The CPU and memory cost of allocating classes from rows is object <0>.",
+      "A library providing type-safe chainable SQL without full ORM tracking is a query <1>.",
+      "High-volume single-statement modifications across tables are <2> updates."
+],
+    blanks: [
+      {
+            "a": [
+                  "inflation"
+            ],
+            "why": "Object inflation consumes memory for heavy classes."
+      },
+      {
+            "a": [
+                  "builder"
+            ],
+            "why": "Query builders generate SQL without entity tracking."
+      },
+      {
+            "a": [
+                  "bulk"
+            ],
+            "why": "Bulk updates execute in one query on the database engine."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is 'Object Inflation' in ORM performance analysis?",
+      a: ["The CPU and RAM overhead required to convert raw database byte rows into fully-featured in-memory class instances with change tracking","The monetary cost of buying database server hardware","The expansion of table files on physical disk storage","An error that happens when database column names are too long"],
+      c: 0,
+      why: "Creating thousands of complex class instances with identity maps consumes massive CPU and memory."
+    },
+    {
+      q: "What is the primary advantage of a Query Builder (like Kysely or Knex) over a full ORM?",
+      a: ["It provides programmatic, type-safe SQL query construction without the memory bloat and hidden behaviors of an ORM session","It eliminates the need for SQL syntax completely","It turns off database security firewalls","It allows databases to run without an operating system"],
+      c: 0,
+      why: "Query builders give you type-safety and composability while staying close to explicit SQL."
+    },
+    {
+      q: "Why is an ORM ideal for typical web application CRUD operations?",
+      a: ["It handles validation, input mapping, relationship hydration, and database portability for individual records rapidly","It makes the web server immune to power outages","It speeds up network data transmission speeds","It eliminates the need to create database indexes"],
+      c: 0,
+      why: "For single-record web transactions, ORM developer velocity and validation benefits far outweigh minor overhead."
+    },
+    {
+      q: "When dropping to raw SQL, how should user-supplied input values be passed to avoid SQL injection?",
+      a: ["Always pass inputs as parameterized query arguments (for example, cursor.execute with a params tuple)","Use string formatting (e.g. f'SELECT * FROM users WHERE id = {user_id}')","Concatenate strings with the '+' operator","Encrypt the user input with Base64"],
+      c: 0,
+      why: "Parameterized arguments ensure the database driver treats input strictly as data, defeating SQL injection."
+    }
+  ]);
+</script>
+</body>
+</html>

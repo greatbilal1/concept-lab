@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 05 — Edge Cases, Invariants, and Non-Goals</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="prompting-vs-specification" data-lesson="5" data-lesson-id="edge-cases-invariants-non-goals">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 05</span> · Edge Cases</span>
+
+  <h1 class="lesson-title">Edge Cases, Invariants, and Non-Goals</h1>
+  <p class="lesson-lede">
+    Anticipating boundary conditions, preserving system invariants, and enforcing strict non-goals.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to define invariants, edge cases, and non-goals to safeguard system integrity.</span>
+    <span><b>Mission link</b> Mastering edge cases, invariants, and non-goals across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Edge Cases, Invariants, and Non-Goals</h2>
+  <p>When human developers write code, they rely on unspoken domain assumptions: <em>'Obviously we don't allow negative inventory'</em>, or <em>'Obviously passwords are hashed with salt'</em>. An AI agent, however, lacks your institutional context. Without explicit guidance, it will take the path of least resistance—often violating core system invariants.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Anticipating boundary conditions, preserving system invariants, and enforcing strict non-goals.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Invariants and Edge Boundaries</h2>
+  <p>A rock-solid specification explicitly details three critical boundaries:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Concurrency Invariant Protection</h2>
+  <ul><li><strong>1. System Invariants:</strong> Universal truths that must survive the change. <em>'Invariant: An Order can never transition to SHIPPED unless its Payment status is PAID.'</em></li><li><strong>2. Boundary Edge Cases:</strong> What happens at limits? (Empty collections, zero amounts, concurrent updates, Unicode emojis in names, null values).</li><li><strong>3. Explicit Non-Goals:</strong> What is deliberately left out. <em>'Non-Goal: Do not support cryptocurrency payments in this PR.'</em></li></ul><pre><code># Explicit Edge Cases & Invariants in Spec:
+### System Invariants
+- Total discount across all coupons can NEVER exceed 50% of subtotal.
+- User credits cannot become negative under any circumstance.
+
+### Edge Cases to Handle
+- Empty cart: return 400 Bad Request with code 'EMPTY_CART'.
+- Expired coupon code: return 422 with code 'COUPON_EXPIRED'.
+- Concurrency: Use database row locking (SELECT ... FOR UPDATE) to prevent double-spending.</code></pre><div class="callout"><p><strong>The Rule of Invariants:</strong> State your invariants upfront, and demand that the agent write a unit test for every single invariant before touching production code.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the invariant sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to define invariants, edge cases, and non-goals to safeguard system integrity.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where edge cases, invariants, and non-goals applies.</li>
+    <li>Author a unit test or verification script exercising edge cases, invariants, and non-goals.</li>
+    <li>Document team architectural conventions regarding edge cases, invariants, and non-goals.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Edge Cases, Invariants, and Non-Goals.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is a 'system invariant' in software architecture?",
+    a: ["A condition or truth that must remain valid across all state transitions and operations","A variable that cannot be renamed","A function that has no parameters","A database query that takes 0 seconds"],
+    c: 0,
+    why: "Invariants are universal rules (e.g. account balances cannot drop below zero) that must never be violated."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Core Invariants",
+            "lines": [
+                  "Balance >= 0 at all times",
+                  "Shipped requires Paid status",
+                  "Tenant isolation preserved"
+            ]
+      },
+      {
+            "title": "Boundary Edge Cases",
+            "lines": [
+                  "Zero amounts & empty lists",
+                  "Special characters & Unicode",
+                  "Timezone date roll-overs"
+            ]
+      },
+      {
+            "title": "Non-Goals",
+            "lines": [
+                  "Out-of-scope features",
+                  "Prohibited dependencies"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Edge Cases, Invariants, and Non-Goals",
+      "def execute_flow():",
+      "    # Anticipating boundary conditions, preserving syste...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Edge Cases, Invariants, and Non-Goals"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Naive Logic"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Specified Invariant"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "step": "Protected State"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "A system invariant is a universal rule that must never be {1}, while edge cases define behavior at system {2}."
+],
+    blanks: [
+      {
+            "a": [
+                  "violated"
+            ],
+            "why": "Broken or corrupted"
+      },
+      {
+            "a": [
+                  "boundaries"
+            ],
+            "why": "Extreme limits like zero, empty, or max values"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why are AI agents prone to introducing subtle business invariant bugs?",
+      a: ["They optimize for satisfying the immediate prompt text and may overlook unspoken domain rules","They lack CPU processing power","They cannot read SQL queries","They always generate random numbers"],
+      c: 0,
+      why: "Agents satisfy the literal prompt; without stated invariants, business constraints are missed."
+    },
+    {
+      q: "What is an example of a financial system invariant?",
+      a: ["The sum of debits must equal the sum of credits across all double-entry ledger transactions","All accounts have passwords","Transactions take 2 seconds","Users have email addresses"],
+      c: 0,
+      why: "Double-entry equality is a mathematical invariant that must never be broken."
+    },
+    {
+      q: "How should an agent handle an unexpected edge case like an empty list?",
+      a: ["Return an explicit, documented error response or safe empty default as specified in the contract","Throw an unhandled IndexError and crash the server","Delete the database record","Hang the network connection"],
+      c: 0,
+      why: "Graceful handling of empty or edge states prevents unexpected server crashes."
+    },
+    {
+      q: "Why should you mandate that tests verify invariants directly?",
+      a: ["Tests lock in the invariants as automated regression gates that protect the system forever","It makes the test files larger","It compiles code into assembly","It satisfies cloud hosting requirements"],
+      c: 0,
+      why: "Automated invariant tests guarantee that future changes cannot break critical domain truths."
+    }
+  ]);
+</script>
+</body>
+</html>

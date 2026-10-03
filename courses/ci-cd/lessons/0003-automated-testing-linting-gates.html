@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 03 — Automated Testing & Linting Gates in CI</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="ci-cd" data-lesson="3" data-lesson-id="automated-testing-linting-gates">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 03</span> · CI Quality Gates</span>
+
+  <h1 class="lesson-title">Automated Testing & Linting Gates in CI</h1>
+  <p class="lesson-lede">
+    Gating code quality: linters (Ruff, ESLint), type checkers (MyPy, Pyright), test runners (pytest), and GitHub Branch Protection Rules.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to enforce automated linting, typing, test gates, and branch protection rules.</span>
+    <span><b>Mission link</b> Mastering automated testing & linting gates in ci across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Automated Testing & Linting Gates in CI</h2>
+  <p>Code reviews by human engineers are vital for architecture, readability, and design. But human reviewers should <strong>never spend time checking for missing semicolons, unused imports, or broken formatting</strong>. Automated CI gates handle trivial mechanical verification in seconds.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Gating code quality: linters (Ruff, ESLint), type checkers (MyPy, Pyright), test runners (pytest), and GitHub Branch Protection Rules.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Four Automated CI Quality Gates</h2>
+  <p>The Four Automated CI Quality Gates:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Human Review vs Machine Verification</h2>
+  <ul><li><strong>1. Code Formatting & Linting Gate (Ruff / Black):</strong> Verifies that code conforms to formatting standards in under 1 second. Fast feedback on stylistic consistency!</li><li><strong>2. Static Type Checking Gate (MyPy / Pyright):</strong> Proves type safety across function calls, return types, and schema boundaries without executing the code.</li><li><strong>3. Automated Unit & Integration Tests (pytest / Vitest):</strong> Executes hundreds of test cases covering edge cases, business logic, and error handlers. Must exit with code 0!</li><li><strong>4. GitHub Branch Protection:</strong> Protect `main`! Require: <em>1. Pull Request required before merging</em>, <em>2. Require status checks to pass (test-and-lint)</em>, <em>3. Require at least 1 approved code review</em>.</li></ul><pre><code># The Complete CI Quality Gate Step Sequence:
+      - name: Run Linter (Ruff)
+        run: ruff check . # Fast: 0.2s
+
+      - name: Verify Code Formatting (Ruff Format)
+        run: ruff format --check .
+
+      - name: Static Type Checking (Pyright / MyPy)
+        run: pyright src/
+
+      - name: Execute Pytest Suite with Coverage Gate
+        run: pytest --cov=src --cov-fail-under=85 # Blocks PR if test coverage < 85%!</code></pre><div class="callout"><p><strong>The Gatekeeper Rule:</strong> If the CI build is red, the pull request cannot be merged. Zero exceptions, zero bypasses. A green build is the minimum entry price for production.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the CI quality gates sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to enforce automated linting, typing, test gates, and branch protection rules.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where automated testing & linting gates in ci applies.</li>
+    <li>Author a unit test or verification script exercising automated testing & linting gates in ci.</li>
+    <li>Document team architectural conventions regarding automated testing & linting gates in ci.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Automated Testing & Linting Gates in CI.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Why should an engineering team enforce 'Branch Protection Rules' in GitHub requiring CI checks to pass before merging?",
+    a: ["To mathematically guarantee that no broken code, syntax error, or failing test can ever be merged into the production branch","To slow down engineering velocity","To charge developers for pull requests","It is required by the computer operating system"],
+    c: 0,
+    why: "Branch protection rules enforce that PRs must pass automated CI quality gates before code can be merged."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Gate 1: Lint & Format (Ruff)",
+            "lines": [
+                  "Checks syntax & style in 0.2s",
+                  "Zero bike-shedding in PR reviews"
+            ]
+      },
+      {
+            "title": "Gate 2: Static Types (Pyright)",
+            "lines": [
+                  "Proves type safety across functions",
+                  "Catches NoneType bugs at compile time"
+            ]
+      },
+      {
+            "title": "Gate 3: Unit Tests (pytest)",
+            "lines": [
+                  "Executes full test suite",
+                  "Enforces 85%+ code coverage threshold"
+            ]
+      },
+      {
+            "title": "Gate 4: Branch Protection",
+            "lines": [
+                  "GitHub blocks the 'Merge' button",
+                  "Strictly requires all 3 checks to be GREEN!"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Automated Testing & Linting Gates in CI",
+      "def execute_flow():",
+      "    # Gating code quality: linters (Ruff, ESLint), type ...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Automated Testing & Linting Gates in CI"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "What Machines Check (CI)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "What Humans Review"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "CI pipelines enforce automated quality gates using linters, type checkers, and test suites, backed by GitHub branch {1} rules to block failing code from {2}."
+],
+    blanks: [
+      {
+            "a": [
+                  "protection"
+            ],
+            "why": "Repository settings guarding branches"
+      },
+      {
+            "a": [
+                  "merging"
+            ],
+            "why": "Integrating pull requests into main"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What happens in GitHub when a status check fails on a pull request protected by Branch Protection Rules?",
+      a: ["The 'Merge' button is disabled, physically preventing any engineer from merging the failing code into the protected branch","The pull request is automatically deleted","The developer's account is suspended","The computer restarts"],
+      c: 0,
+      why: "Branch protection rules enforce that all status checks must pass before merging is permitted."
+    },
+    {
+      q: "Why is 'Ruff' widely adopted as the modern linter and formatter for Python CI pipelines?",
+      a: ["Written in Rust, Ruff executes 10x to 100x faster than legacy Python linters (Flake8, Black), finishing in milliseconds in CI","Ruff writes code automatically","Ruff replaces Python with C","Ruff eliminates the need for tests"],
+      c: 0,
+      why: "Ruff's extreme speed slashes CI feedback loops from minutes to fractions of a second."
+    },
+    {
+      q: "What does a test coverage gate like '--cov-fail-under=85' enforce?",
+      a: ["The test runner fails the CI build if the automated tests execute less than 85% of the codebase's statements","It checks if the computer has 85% battery","It requires 85 developers to approve","It runs 85 tests only"],
+      c: 0,
+      why: "Coverage gates ensure new code includes corresponding automated tests before merging."
+    },
+    {
+      q: "Why is automating formatting checks in CI superior to discussing code style in human pull request reviews?",
+      a: ["It eliminates subjective debates and interpersonal friction over stylistic choices, allowing human reviewers to focus on architecture and logic","Humans cannot see code formatting","Style guides are illegal in Git","It makes servers run for free"],
+      c: 0,
+      why: "Automating stylistic rules frees human reviewers to focus on business logic and architecture."
+    }
+  ]);
+</script>
+</body>
+</html>

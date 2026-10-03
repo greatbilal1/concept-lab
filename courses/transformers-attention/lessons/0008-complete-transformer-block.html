@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 08 — Residual Connections, LayerNorm, and Feed-Forward Networks</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="transformers-attention" data-lesson="8" data-lesson-id="complete-transformer-block">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 08</span> · Transformer Block</span>
+
+  <h1 class="lesson-title">Residual Connections, LayerNorm, and Feed-Forward Networks</h1>
+  <p class="lesson-lede">
+    Assembling the complete Transformer block: Multi-Head Attention, Residual Shortcuts, LayerNorm, and MLP Feed-Forward layers.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You have completed the Transformers & Attention course.</span>
+    <span><b>Mission link</b> Mastering residual connections, layernorm, and feed-forward networks across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Residual Connections, LayerNorm, and Feed-Forward Networks</h2>
+  <p>We have explored every individual component: QKV projections, scaled dot-product attention, multi-head splitting, and positional encodings. Now, we assemble the complete, unified <strong>Transformer Block</strong>.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Assembling the complete Transformer block: Multi-Head Attention, Residual Shortcuts, LayerNorm, and MLP Feed-Forward layers.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Complete Transformer Block</h2>
+  <p>A standard Transformer layer consists of two cooperating stages:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Pre-LN vs Post-LN Architecture</h2>
+  <ul><li><strong>Stage 1: Multi-Head Self-Attention (Communication):</strong> Tokens exchange information with each other across the sequence. Tokens ask: <em>'Who in this sentence relates to me?'</em> Wrapped in a <strong>Residual Shortcut</strong> and <strong>Layer Normalization</strong>: $x = \text{LayerNorm}(x + \text{Attention}(x))$.</li><li><strong>Stage 2: Feed-Forward Network / MLP (Computation & Memory):</strong> Each token processes its information individually in isolation through a 2-layer MLP (expanding dimension by $4\times$, applying non-linearity like SwiGLU, and projecting back). Research shows that <strong>factual knowledge is stored in these feed-forward weights!</strong> Wrapped in another residual connection: $x = \text{LayerNorm}(x + \text{FFN}(x))$.</li></ul><pre><code># The Anatomy of a Modern Transformer Block (PyTorch):
+class TransformerBlock(nn.Module):
+    def __init__(self, d_model, num_heads):
+        super().__init__()
+        self.attention = MultiHeadAttention(d_model, num_heads)
+        self.norm1 = RMSNorm(d_model)
+        self.feed_forward = FeedForward(d_model, hidden_dim=d_model * 4)
+        self.norm2 = RMSNorm(d_model)
+
+    def forward(self, x):
+        # 1. Communication Sub-Layer (with Pre-Norm Residual Shortcut)
+        x = x + self.attention(self.norm1(x))
+        # 2. Computation Sub-Layer (with Pre-Norm Residual Shortcut)
+        x = x + self.feed_forward(self.norm2(x))
+        return x</code></pre><div class="callout"><p><strong>The Complete Pipeline:</strong> A model like Llama 3 70B simply stacks 80 of these identical Transformer blocks sequentially. Communication $\rightarrow$ Computation $\rightarrow$ Communication $\rightarrow$ Computation!</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the transformer block sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You have completed the Transformers & Attention course.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where residual connections, layernorm, and feed-forward networks applies.</li>
+    <li>Author a unit test or verification script exercising residual connections, layernorm, and feed-forward networks.</li>
+    <li>Document team architectural conventions regarding residual connections, layernorm, and feed-forward networks.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Residual Connections, LayerNorm, and Feed-Forward Networks.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What two primary sub-layers make up a standard Transformer Decoder block?",
+    a: ["A Multi-Head Self-Attention sub-layer and a point-wise Feed-Forward (MLP) sub-layer, both wrapped in residual connections and LayerNorm","A database connection and an HTTP server","A convolutional filter and a pooling layer","A while loop and an if statement"],
+    c: 0,
+    why: "Every transformer block pairs self-attention (token communication) with a feed-forward MLP (memory & facts)."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Sub-Layer 1: Self-Attention",
+            "lines": [
+                  "Tokens communicate across sequence",
+                  "Wrapped in residual: x = x + Attn(Norm(x))"
+            ]
+      },
+      {
+            "title": "Sub-Layer 2: Feed-Forward MLP",
+            "lines": [
+                  "Tokens process facts individually",
+                  "Wrapped in residual: x = x + FFN(Norm(x))"
+            ]
+      },
+      {
+            "title": "Stacked Depth (80 layers)",
+            "lines": [
+                  "Repeated across network depth",
+                  "Builds deep hierarchical understanding"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Residual Connections, LayerNorm, and Feed-Forward Networks",
+      "def execute_flow():",
+      "    # Assembling the complete Transformer block: Multi-H...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Residual Connections, LayerNorm, and Feed-Forward Networks"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Post-LN (Original 2017)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Pre-LN / RMSNorm (Modern)"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "A transformer block alternates between multi-head attention for token {1} and feed-forward MLP networks for factual {2}, wrapped in residual shortcuts."
+],
+    blanks: [
+      {
+            "a": [
+                  "communication"
+            ],
+            "why": "Tokens exchanging information"
+      },
+      {
+            "a": [
+                  "computation"
+            ],
+            "why": "Individual token processing & memory"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What role do the Feed-Forward Network (FFN) layers play in a transformer according to interpretability research (Geva et al., 2020)?",
+      a: ["They act as key-value associative memories that store factual knowledge and world information","They format the text into HTML","They calculate the user's internet bill","They connect the model to the physical keyboard"],
+      c: 0,
+      why: "Research demonstrates that factual associations are stored as key-value pairs in MLP weights."
+    },
+    {
+      q: "Why is Pre-Layer Normalization (Pre-LN or RMSNorm) preferred over the original Post-LN in modern LLMs?",
+      a: ["Pre-LN keeps the residual gradient highway completely unobstructed, allowing deep networks to train stably without warm-up failures","Pre-LN uses no memory","Post-LN is copyrighted","Pre-LN makes models run in browsers"],
+      c: 0,
+      why: "Normalizing inputs before the sub-layer preserves an unobstructed identity gradient highway."
+    },
+    {
+      q: "By what factor does the hidden dimension of the Feed-Forward sub-layer typically expand compared to d_model?",
+      a: ["Typically 4x (e.g. from 4,096 to 11,008 or 16,384 dimensions) before projecting back down","Exactly 1x","100x","It shrinks by half"],
+      c: 0,
+      why: "A 4x expansion in the MLP provides high-dimensional space for non-linear feature processing."
+    },
+    {
+      q: "How does stacking dozens of transformer blocks create fluent language generation?",
+      a: ["Each layer progressively refines token representations, moving from local syntax to semantic reasoning and final next-token logits","Layers vote on the answer using democracy","The last layer does all the work","Layers run on separate computers"],
+      c: 0,
+      why: "Layer depth constructs a deep computational ladder that transforms raw tokens into contextual predictions."
+    }
+  ]);
+</script>
+</body>
+</html>

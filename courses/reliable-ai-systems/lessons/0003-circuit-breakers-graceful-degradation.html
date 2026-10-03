@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 03 — Circuit Breakers and Graceful Degradation</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="reliable-ai-systems" data-lesson="3" data-lesson-id="circuit-breakers-graceful-degradation">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 03</span> · Resilience Patterns</span>
+
+  <h1 class="lesson-title">Circuit Breakers and Graceful Degradation</h1>
+  <p class="lesson-lede">
+    Architecting graceful degradation: cascading failure protection, fallback responses, cached answers, and user-facing degradation notices.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to design multi-tiered graceful degradation architectures for five-nines uptime.</span>
+    <span><b>Mission link</b> Mastering circuit breakers and graceful degradation across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Circuit Breakers and Graceful Degradation</h2>
+  <p>When an upstream model provider goes down, a fragile application displays a broken red error box: <code>HTTP 500 Internal Server Error</code>. The user cannot work, and customer support is overwhelmed. A <strong>Reliable Application Degrades Gracefully</strong>.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Architecting graceful degradation: cascading failure protection, fallback responses, cached answers, and user-facing degradation notices.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Degradation Pyramid</h2>
+  <p>The Four Levels of Graceful AI Degradation:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>User Experience Under Outage</h2>
+  <ul><li><strong>Level 1 (Full AI Capability):</strong> Frontier model generates rich, real-time personalized synthesis with dynamic tool execution.</li><li><strong>Level 2 (Fallback Provider):</strong> Primary model fails; secondary model provider (Anthropic or Gemini) steps in seamlessly. User notices zero change.</li><li><strong>Level 3 (Semantic Cache / Pre-Computed Answers):</strong> Both cloud providers are degraded; system serves verified pre-computed answers from Redis semantic cache with a subtle badge: <em>'Served from knowledge base'</em>.</li><li><strong>Level 4 (Deterministic Rule Fallback):</strong> All LLM APIs offline; system reverts to classic keyword search and static FAQ links: <em>'AI synthesis is temporarily resting, but here are the exact documentation articles for your query.'</em></li></ul><pre><code># Graceful Degradation Fallback Pyramid in Python:
+async def resilient_customer_assistant(query: str) -> dict:
+    # Level 1 & 2: Multi-Provider LLM Call
+    try:
+        return await execute_llm_with_failover(query)
+    except AllLLMsDownException:
+        logger.error("All LLMs offline! Engaging Level 3 Degradation.")
+        
+    # Level 3: Semantic Cache Lookup
+    cached = await semantic_cache.lookup(query)
+    if cached:
+        return {"text": cached.text, "source": "CACHED_KNOWLEDGE_BASE"}
+        
+    # Level 4: Deterministic ElasticSearch Keyword Links
+    articles = await keyword_search(query)
+    return {
+        "text": "Our interactive assistant is temporarily offline for maintenance. "
+                "Here are the top documentation articles matching your request:",
+        "articles": articles,
+        "source": "DETERMINISTIC_FALLBACK"
+    }</code></pre><div class="callout"><p><strong>The Resilience Standard:</strong> An AI outage should never result in a blank screen. Always provide deterministic fallback answers to keep users productive.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the graceful degradation sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to design multi-tiered graceful degradation architectures for five-nines uptime.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where circuit breakers and graceful degradation applies.</li>
+    <li>Author a unit test or verification script exercising circuit breakers and graceful degradation.</li>
+    <li>Document team architectural conventions regarding circuit breakers and graceful degradation.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Circuit Breakers and Graceful Degradation.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is 'Graceful Degradation' when an upstream AI service experiences an unexpected outage?",
+    a: ["The system maintains core application functionality using cached answers or simplified heuristics rather than displaying a total crash screen","The system shuts down completely","The application displays a blue screen of death","The computer deletes its operating system"],
+    c: 0,
+    why: "Graceful degradation ensures users can still accomplish core tasks even when advanced AI models are temporarily unavailable."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Level 1: Primary Frontier LLM",
+            "lines": [
+                  "Full dynamic reasoning & tools"
+            ]
+      },
+      {
+            "title": "Level 2: Fallback Cloud LLM",
+            "lines": [
+                  "Secondary provider failover"
+            ]
+      },
+      {
+            "title": "Level 3: Semantic Cache",
+            "lines": [
+                  "Pre-computed verified answers"
+            ]
+      },
+      {
+            "title": "Level 4: Deterministic Search",
+            "lines": [
+                  "Classic keyword search & FAQ links"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Circuit Breakers and Graceful Degradation",
+      "def execute_flow():",
+      "    # Architecting graceful degradation: cascading failu...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Circuit Breakers and Graceful Degradation"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Fragile System (Broken)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Resilient System (Helpful)"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Graceful degradation ensures that when all model providers fail, applications maintain user productivity by serving cached answers or {1} keyword {2}."
+],
+    blanks: [
+      {
+            "a": [
+                  "deterministic"
+            ],
+            "why": "Predictable rule-based search"
+      },
+      {
+            "a": [
+                  "search"
+            ],
+            "why": "Document retrieval matching"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the primary objective of graceful degradation in enterprise software?",
+      a: ["To preserve core user productivity and business operations even when external third-party dependencies experience catastrophic outages","To make software look simple","To eliminate the need for databases","To save electricity"],
+      c: 0,
+      why: "Graceful degradation ensures that users can complete basic tasks even during component failures."
+    },
+    {
+      q: "Why is falling back to classic keyword search an effective Level 4 degradation for a documentation bot?",
+      a: ["Keyword search relies on internal databases (Elasticsearch/Postgres) that remain online even if external AI APIs are down","Keyword search uses AI models","Keyword search runs without a computer","Keyword search is written in HTML"],
+      c: 0,
+      why: "Local search infrastructure operates independently of external cloud model availability."
+    },
+    {
+      q: "How does displaying a subtle badge like 'Served from knowledge base' maintain user trust during degraded operation?",
+      a: ["It sets honest expectations that the response is a pre-verified static answer rather than a live personalized generation","It warns users of a virus","It tells users to refresh the page","It changes the font color"],
+      c: 0,
+      why: "Transparent communication builds trust and explains slight differences in responsiveness or phrasing."
+    },
+    {
+      q: "What component monitors provider health and triggers graceful degradation automatically?",
+      a: ["The API Gateway Circuit Breaker","The user's mouse","The computer keyboard","The Wi-Fi antenna"],
+      c: 0,
+      why: "Circuit breakers monitor failure thresholds and divert traffic to degradation paths automatically."
+    }
+  ]);
+</script>
+</body>
+</html>

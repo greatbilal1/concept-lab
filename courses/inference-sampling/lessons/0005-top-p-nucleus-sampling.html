@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 05 — Top-P (Nucleus) Sampling: Dynamic Cumulative Probability</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="inference-sampling" data-lesson="5" data-lesson-id="top-p-nucleus-sampling">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 05</span> · Top-P Nucleus</span>
+
+  <h1 class="lesson-title">Top-P (Nucleus) Sampling: Dynamic Cumulative Probability</h1>
+  <p class="lesson-lede">
+    Dynamic sampling: Top-P (Nucleus) sampling, cumulative probability mass thresholds, and adaptive candidate pools.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You understand the dynamic probability mechanics of Top-P Nucleus sampling.</span>
+    <span><b>Mission link</b> Mastering top-p (nucleus) sampling: dynamic cumulative probability across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Top-P (Nucleus) Sampling: Dynamic Cumulative Probability</h2>
+  <p>In 2019, Ari Holtzman and researchers at the University of Washington published <strong>'The Curious Case of Neural Text Degeneration'</strong>, introducing <strong>Top-P (Nucleus) Sampling</strong>. It quickly became the universal standard for sampling from language models.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Dynamic sampling: Top-P (Nucleus) sampling, cumulative probability mass thresholds, and adaptive candidate pools.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Dynamic Nucleus Pool</h2>
+  <p>Instead of keeping a fixed <em>number</em> of tokens (Top-K), Nucleus sampling keeps a dynamic pool based on <strong>Cumulative Probability Mass ($P$)</strong>:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Top-K vs Top-P Philosophy</h2>
+  <ul><li><strong>1. Sort Vocabulary:</strong> Rank tokens from highest to lowest probability.</li><li><strong>2. Accumulate Mass:</strong> Sum probabilities from the top until the cumulative total reaches threshold $P$ (typically $P = 0.90$ or $0.95$).</li><li><strong>3. Dynamic Truncation:</strong> Keep only this 'nucleus' of tokens! Discard the rest, re-normalize, and sample.</li></ul><pre><code># The Beauty of Top-P Dynamic Sizing (P = 0.90):
+# Case 1: High Confidence ("The capital of France is...")
+# - "Paris": 92.4% -> Cumulative = 92.4% >= 90% -> Pool size: EXACTLY 1 TOKEN!
+#
+# Case 2: Ambiguous Context ("She looked into the room and saw a...")
+# - "person": 15%, "desk": 12%, "cat": 10%, "chair": 8% ...
+# -> Pool dynamically expands to 45 tokens to cover 90% mass!</code></pre><p>Top-P automatically adapts to the model's confidence: when certain, it acts like greedy decoding; when open-ended, it provides creative variety without ever dipping into the bizarre tail!</p><div class="callout"><p><strong>The Universal Setting:</strong> Most frontier APIs (OpenAI, Anthropic) configure `temperature=0.7` and `top_p=0.9` as their standard default pairing for balanced natural text.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the Top-P sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You understand the dynamic probability mechanics of Top-P Nucleus sampling.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where top-p (nucleus) sampling: dynamic cumulative probability applies.</li>
+    <li>Author a unit test or verification script exercising top-p (nucleus) sampling: dynamic cumulative probability.</li>
+    <li>Document team architectural conventions regarding top-p (nucleus) sampling: dynamic cumulative probability.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Top-P (Nucleus) Sampling: Dynamic Cumulative Probability.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "How does Top-P (Nucleus) sampling solve the rigid fixed-count flaw of Top-K sampling?",
+    a: ["It dynamically expands or shrinks the candidate pool based on cumulative probability mass (e.g. top 90%), adapting to model confidence","It uses the letter P instead of K","It runs on the nuclear power grid","It limits output to P paragraphs"],
+    c: 0,
+    why: "Top-P adapts dynamically: when confident, the pool shrinks to 1-2 tokens; when uncertain, it expands to 100."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "High Confidence Context",
+            "lines": [
+                  "Top token has 94% probability",
+                  "Threshold P=0.90 reached in 1 token",
+                  "Pool size = 1 (Deterministic precision)"
+            ]
+      },
+      {
+            "title": "Open-Ended Context",
+            "lines": [
+                  "Probabilities spread broadly (15%, 12%, 10%...)",
+                  "Threshold P=0.90 requires 45 tokens",
+                  "Pool size = 45 (Rich creative variety)"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Top-P (Nucleus) Sampling: Dynamic Cumulative Probability",
+      "def execute_flow():",
+      "    # Dynamic sampling: Top-P (Nucleus) sampling, cumula...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Top-P (Nucleus) Sampling: Dynamic Cumulative Probability"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Top-K (Fixed Count)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Top-P (Dynamic Mass)"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Top-P sampling dynamically adjusts candidate pool size by accumulating probability mass until reaching threshold {1}, isolating the {2} of plausible tokens."
+],
+    blanks: [
+      {
+            "a": [
+                  "P"
+            ],
+            "why": "Cumulative probability cutoff (e.g. 0.90)"
+      },
+      {
+            "a": [
+                  "nucleus"
+            ],
+            "why": "Core group of plausible candidates"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What happens in Top-P sampling (P = 0.90) when the top-ranked token has a 95% probability?",
+      a: ["The candidate pool consists of only that single top token, because 95% already exceeds the 90% threshold","The model crashes","The pool expands to 50 tokens","The token is deleted"],
+      c: 0,
+      why: "When a single token exceeds P, the nucleus pool collapses to size 1, acting deterministically."
+    },
+    {
+      q: "What is the typical recommended value for Top-P in natural text generation?",
+      a: ["0.90 to 0.95","0.01","100.0","Exactly zero"],
+      c: 0,
+      why: "0.90-0.95 retains 90-95% of plausible mass while lopping off the unpredictable 5-10% tail."
+    },
+    {
+      q: "Can you use Temperature and Top-P together in the same API call?",
+      a: ["Yes; Temperature scales the sharpness of logits first, and Top-P truncates the resulting cumulative probability distribution","No; using both causes an API error","Only in Python 2","Only on local models"],
+      c: 0,
+      why: "Temperature reshapes the distribution; Top-P truncates the tail of that reshaped distribution."
+    },
+    {
+      q: "If you want to maximize creativity while strictly preventing bizarre nonsense words, how should you configure parameters?",
+      a: ["Set a higher temperature (e.g. 0.9 - 1.0) paired with a tight Top-P (e.g. 0.85 - 0.90)","Set temperature to 5.0 and Top-P to 1.0","Set temperature to 0.0","Set Top-P to 0.0"],
+      c: 0,
+      why: "Higher temperature encourages diversity, while tight Top-P guarantees bad tail tokens are eliminated."
+    }
+  ]);
+</script>
+</body>
+</html>

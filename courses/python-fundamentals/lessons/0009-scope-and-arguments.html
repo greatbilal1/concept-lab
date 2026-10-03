@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 09 — Scope and arguments</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="python-fundamentals" data-lesson="9" data-lesson-id="scope-and-arguments">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 09</span> · Functions</span>
+
+  <h1 class="lesson-title">Scope and arguments</h1>
+  <p class="lesson-lede">
+    Functions have their own little world of names. Understanding that world —
+    scope — explains why some variables vanish and others leak. This lesson also
+    covers the argument features that make functions pleasant to call: defaults
+    and keyword arguments.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~14 min</span>
+    <span><b>Win</b> Predict which names a function can see</span>
+    <span><b>Mission link</b> Scope is why functions stay independent</span>
+  </div>
+
+  <h2><span class="n">1</span>Local names live inside the function</h2>
+
+  <p>
+    A name assigned inside a function is <b>local</b> to that function. It is
+    created when the function is called and disappears when the call ends.
+  </p>
+
+  <pre><code>def double(n):
+    result = n * 2
+    return result
+
+double(5)          # 10
+print(result)      # NameError: result is not defined</code></pre>
+
+  <p>
+    <code>result</code> existed only during the call. Outside, the name was never
+    bound, so reading it raises <code>NameError</code>.
+  </p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Each call gets a fresh set of local names. Two calls to the same function do
+    not share their locals.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>LEGB: the lookup order</h2>
+
+  <p>
+    When Python sees a name, it searches four scopes in order: <b>L</b>ocal,
+    <b>E</b>nclosing, <b>G</b>lobal, <b>B</b>uilt-in. It stops at the first match.
+  </p>
+
+  <div id="diagram1"></div>
+
+  <pre><code>message = "global"
+
+def show():
+    print(message)     # finds the global
+
+show()                 # global</code></pre>
+
+  <p>
+    A function can <i>read</i> a global name without any special syntax. To
+    <i>rebind</i> one, you must declare <code>global</code> — and you usually
+    should not, because it makes code harder to follow.
+  </p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">3</span>Default and keyword arguments</h2>
+
+  <p>
+    A parameter can have a <b>default</b>, used when the caller omits it. And any
+    argument can be passed by <b>keyword</b>, which makes calls readable.
+  </p>
+
+  <pre><code>def greet(name, greeting="Hello"):
+    return f"{greeting}, {name}!"
+
+greet("Ada")                       # Hello, Ada!
+greet("Ada", "Hi")                 # Hi, Ada!
+greet("Ada", greeting="Hey")       # Hey, Ada!</code></pre>
+
+  <p>
+    Parameters with defaults must come after parameters without them. Keyword
+    arguments let you skip the ones you do not care about.
+  </p>
+
+  <div id="intro1"></div>
+
+  <h2><span class="n">4</span>The mutable default trap</h2>
+
+  <p>
+    A default value is evaluated <b>once</b>, when the function is defined — not
+    on each call. That is harmless for numbers and strings, but dangerous for
+    lists.
+  </p>
+
+  <pre><code>def add_item(item, items=[]):     # BAD
+    items.append(item)
+    return items
+
+add_item("a")     # ["a"]
+add_item("b")     # ["a", "b"]  — the same list again!</code></pre>
+
+  <p>
+    The fix is to use <code>None</code> as the default and create a fresh list
+    inside the function.
+  </p>
+
+  <pre><code>def add_item(item, items=None):   # GOOD
+    if items is None:
+        items = []
+    items.append(item)
+    return items</code></pre>
+
+  <div class="note warn">
+    <span class="note-label">Common trap</span>
+    Never use a mutable value — list, dict, set — as a default argument. Use
+    <code>None</code> and build the value inside the function.
+  </div>
+
+  <div id="fill1"></div>
+
+  <h2><span class="n">5</span>Check yourself</h2>
+
+  <p>
+    Answer from memory. Every option has the same number of words, so the length
+    of an answer never gives it away.
+  </p>
+
+  <div id="quiz"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>
+      You can predict which names a function can see, use default and keyword
+      arguments, and avoid the mutable default trap.
+    </p>
+  </div>
+
+  <h2><span class="n">6</span>Do this next</h2>
+
+  <ol>
+    <li>
+      Write a function that assigns a local name and then try to print that name
+      outside. Read the <code>NameError</code>.
+    </li>
+    <li>
+      Write a function with a default argument and call it both with and without
+      that argument.
+    </li>
+    <li>
+      Reproduce the mutable default bug with a list, then fix it using
+      <code>None</code>.
+    </li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Read the official
+    <a href="https://docs.python.org/3/tutorial/controlflow.html#more-on-defining-functions">Python Tutorial §4.9 "More on Defining Functions"</a>
+    and the
+    <a href="https://docs.python.org/3/tutorial/controlflow.html#default-argument-values">default argument values</a> note.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher (me) anything — "what is an
+    enclosing scope?", "when should I use global?", "why is the default shared
+    between calls?". There are no bad questions here.
+  </div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  /* predict-then-reveal: locals vanish */
+  TeachWidgets.predict("#predict1", {
+    q: "A name assigned inside a function is visible where?",
+    a: ["Only inside that function", "Everywhere in the whole file", "Only in the main block", "Only inside other functions"],
+    c: 0,
+    why: "Names assigned inside a function are local. They exist only during the call."
+  });
+
+  /* LEGB lookup order */
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      { title: "Local", lines: ["inside function", "checked first"] },
+      { title: "Enclosing", lines: ["outer function", "checked second"] },
+      { title: "Global", lines: ["module level", "checked third"] },
+      { title: "Built-in", lines: ["print, len", "checked last"] }
+    ]
+  });
+
+  /* step through a global read */
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "message = \"global\"",
+      "def show():",
+      "    print(message)",
+      "show()"
+    ],
+    steps: [
+      { line: 0, vars: { message: "global" } },
+      { line: 1, vars: { note: "function defined" } },
+      { line: 3, vars: { note: "call show()" } },
+      { line: 2, vars: { lookup: "local? no -> global? yes", output: "global" } }
+    ]
+  });
+
+  /* three scope facts */
+  TeachWidgets.introCards("#intro1", {
+    cards: [
+      { ico: "🏠", title: "Local", body: "Names assigned in a function live only during the call." },
+      { ico: "🔍", title: "LEGB", body: "Lookup order: Local, Enclosing, Global, Built-in." },
+      { ico: "⚠️", title: "Defaults", body: "Defaults are evaluated once. Never default to a list." }
+    ]
+  });
+
+  /* recall from memory */
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the blanks",
+    lines: [
+      "The four-scope lookup order is abbreviated <0>.",
+      "A parameter value used when the caller omits it is a <1>.",
+      "A safe default for a list parameter is <2>."
+    ],
+    blanks: [
+      { a: ["legb"], why: "Local, Enclosing, Global, Built-in." },
+      { a: ["default", "default argument"], why: "Defaults fill in omitted arguments." },
+      { a: ["none"], why: "Use None and build the list inside the function." }
+    ]
+  });
+
+  /* the quiz — every option is exactly five words */
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Where do local names live?",
+      a: ["Only during the function call", "For the whole program run", "Inside every other function too", "Only inside the main block"],
+      c: 0,
+      why: "Locals are created when the function is called and discarded when it returns."
+    },
+    {
+      q: "What is the lookup order?",
+      a: ["Local enclosing global builtin", "Global local enclosing builtin", "Builtin global local enclosing", "Enclosing builtin local global"],
+      c: 0,
+      why: "Python searches Local, then Enclosing, then Global, then Built-in."
+    },
+    {
+      q: "When is a default evaluated?",
+      a: ["Once when the function defined", "Every time it is called", "Only when it is used", "Never during the whole program"],
+      c: 0,
+      why: "Defaults are evaluated once at definition time, which is why mutable defaults are dangerous."
+    },
+    {
+      q: "Why avoid list defaults?",
+      a: ["The same list is shared", "Lists cannot be safely defaulted", "Lists are never truly immutable", "Lists make the calls slower"],
+      c: 0,
+      why: "The default list is created once and shared across calls, so items accumulate."
+    }
+  ]);
+</script>
+</body>
+</html>

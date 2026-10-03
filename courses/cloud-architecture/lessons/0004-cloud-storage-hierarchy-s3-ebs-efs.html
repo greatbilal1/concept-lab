@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 04 — Cloud Storage Hierarchy: Object, Block, and File Storage</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="cloud-architecture" data-lesson="4" data-lesson-id="cloud-storage-hierarchy-s3-ebs-efs">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 04</span> · Storage Hierarchy</span>
+
+  <h1 class="lesson-title">Cloud Storage Hierarchy: Object, Block, and File Storage</h1>
+  <p class="lesson-lede">
+    Data persistence in the cloud: Object Storage (S3), Block Storage (EBS), Shared File Systems (EFS), and lifecycle tiering.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to architect cloud storage across Block (EBS), Object (S3), and File (EFS) tiers.</span>
+    <span><b>Mission link</b> Mastering cloud storage hierarchy: object, block, and file storage across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Cloud Storage Hierarchy: Object, Block, and File Storage</h2>
+  <p>Storing data in the cloud is not one-size-fits-all. Storing video uploads on a virtual machine's block disk will rapidly run out of space and cost 10x more than necessary. Conversely, trying to run a high-performance transactional database on S3 will fail due to lack of random write support.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Data persistence in the cloud: Object Storage (S3), Block Storage (EBS), Shared File Systems (EFS), and lifecycle tiering.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Three Storage Paradigms</h2>
+  <p>The Three Cloud Storage Tiers:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>S3 Automated Lifecycle Tiering</h2>
+  <ul><li><strong>1. Block Storage (Amazon EBS):</strong> Acts as a raw physical SSD/HDD attached directly to a single EC2 instance over high-speed PCI/network bus. Formatted with filesystems (`ext4`, `xfs`). Low latency (sub-millisecond), high IOPS. <em>Limitation:</em> Tied to a single Availability Zone; cannot be shared across multiple instances simultaneously. Ideal for <strong>database data files</strong>.</li><li><strong>2. Object Storage (Amazon S3):</strong> Unstructured key-value store accessed via HTTP REST APIs (`GET /bucket/key`). Infinitely scalable, 99.999999999% (11 nines) durability, replicated across multiple AZs automatically. Extremely cheap ($0.023/GB). <em>Limitation:</em> You cannot modify part of an object (must overwrite entire object). Ideal for <strong>media assets, backups, datasets, and static files</strong>.</li><li><strong>3. Shared File Storage (Amazon EFS / NFS):</strong> A POSIX-compliant shared network filesystem that can be mounted simultaneously by hundreds of EC2 instances and Kubernetes pods!</li></ul><pre><code># The Storage Selection Matrix:
+# Workload                               | Optimal Storage Tier | Why?
+# ------------------------------------------------------------------------------------
+# PostgreSQL Database Engine files       | EBS (gp3 / io2)      | Low latency, sub-ms random reads/writes, high IOPS
+# User Profile Pictures & PDF uploads    | S3 Standard          | Infinitely scalable, HTTP accessible, cheap, durable
+# Shared ML training dataset on 10 pods  | EFS / FSx for Lustre | Mounted across multiple concurrent instances
+# Old compliance audit logs (7-year keep)| S3 Glacier           | Deep archival tier, 90% cheaper ($0.004/GB)</code></pre><div class="callout"><p><strong>The Lifecycle Optimization Rule:</strong> Configure S3 Lifecycle Rules to transition files automatically: S3 Standard $\rightarrow$ Infrequent Access (after 30 days) $\rightarrow$ Glacier Deep Archive (after 90 days). Slashes storage bills by 80%.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the storage hierarchy sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to architect cloud storage across Block (EBS), Object (S3), and File (EFS) tiers.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where cloud storage hierarchy: object, block, and file storage applies.</li>
+    <li>Author a unit test or verification script exercising cloud storage hierarchy: object, block, and file storage.</li>
+    <li>Document team architectural conventions regarding cloud storage hierarchy: object, block, and file storage.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Cloud Storage Hierarchy: Object, Block, and File Storage.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is the fundamental architectural difference between Object Storage (Amazon S3) and Block Storage (Amazon EBS)?",
+    a: ["Object storage is accessed via HTTP APIs and is infinitely scalable for static files; Block storage acts as a raw physical hard drive attached directly to a single compute instance","Object storage is for text; block storage is for numbers","They are identical storage services","Block storage is free of charge"],
+    c: 0,
+    why: "S3 is an HTTP-accessed, infinitely scalable key-value object store; EBS is a high-speed raw block device attached to a VM."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Block Storage (EBS)",
+            "lines": [
+                  "Direct-attached virtual hard drive",
+                  "Sub-millisecond latency, high IOPS",
+                  "Mounted to single EC2 instance (Databases)"
+            ]
+      },
+      {
+            "title": "Object Storage (S3)",
+            "lines": [
+                  "HTTP REST API accessible key-value store",
+                  "Infinite scale, 11 nines durability, ultra-cheap",
+                  "Best for: Images, backups, documents, datasets"
+            ]
+      },
+      {
+            "title": "Shared File Storage (EFS)",
+            "lines": [
+                  "POSIX network file system (NFS)",
+                  "Mounted concurrently by 100+ servers",
+                  "Best for: Shared content directories & CMS"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Cloud Storage Hierarchy: Object, Block, and File Storage",
+      "def execute_flow():",
+      "    # Data persistence in the cloud: Object Storage (S3)...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Cloud Storage Hierarchy: Object, Block, and File Storage"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Day 1-30: S3 Standard"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Day 31-90: S3 Infrequent Access"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "step": "Day 90+: Glacier Deep Archive"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "High-performance databases require low-latency {1} storage like EBS, while infinitely scalable static media and backups belong in {2} storage like Amazon S3."
+],
+    blanks: [
+      {
+            "a": [
+                  "block"
+            ],
+            "why": "Direct-attached virtual disk storage"
+      },
+      {
+            "a": [
+                  "object"
+            ],
+            "why": "HTTP-accessible key-value storage"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What durability guarantee does Amazon S3 offer for stored objects across multiple Availability Zones?",
+      a: ["99.999999999% (11 nines) durability","50% durability","90% durability","Durability is not guaranteed"],
+      c: 0,
+      why: "S3 redundantly stores objects across multiple geographically separated AZs to achieve 11 nines durability."
+    },
+    {
+      q: "Can multiple EC2 virtual machines in different Availability Zones mount the same standard Amazon EBS volume simultaneously?",
+      a: ["No; standard EBS volumes are bound to a single Availability Zone and can only be attached to one EC2 instance at a time","Yes; EBS can be mounted by 1,000 instances","Only on Windows","Only on weekends"],
+      c: 0,
+      why: "Standard EBS block devices operate as local drives attached to a single virtual instance in one AZ."
+    },
+    {
+      q: "What is the primary operational trade-off of storing files in Amazon S3 Glacier Deep Archive?",
+      a: ["It is 95% cheaper than S3 Standard, but retrieving an object takes 3 to 12 hours rather than milliseconds","It deletes files after 1 week","Files cannot be downloaded","It requires sending physical tapes"],
+      c: 0,
+      why: "Glacier Deep Archive offers rock-bottom storage pricing in exchange for asynchronous multi-hour retrieval times."
+    },
+    {
+      q: "How does an S3 Pre-Signed URL allow a browser client to upload a video directly to S3 without passing through your application server?",
+      a: ["The application server generates a cryptographically signed temporary URL granting direct upload permissions, freeing server bandwidth","It makes the video public","It converts the video to MP3","It bypasses S3 security"],
+      c: 0,
+      why: "Pre-signed URLs delegate secure direct uploads to S3, bypassing application server memory and network bottlenecks."
+    }
+  ]);
+</script>
+</body>
+</html>

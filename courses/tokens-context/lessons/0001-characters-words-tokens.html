@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 01 — Characters vs Words vs Tokens: How BPE Slices Text</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="tokens-context" data-lesson="1" data-lesson-id="characters-words-tokens">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 01</span> · Token Mechanics</span>
+
+  <h1 class="lesson-title">Characters vs Words vs Tokens: How BPE Slices Text</h1>
+  <p class="lesson-lede">
+    How text is broken into tokens: character counts vs word counts vs token ratios across languages and code.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You understand the relationship between characters, words, and tokens across domains.</span>
+    <span><b>Mission link</b> Mastering characters vs words vs tokens: how bpe slices text across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Characters vs Words vs Tokens: How BPE Slices Text</h2>
+  <p>When designing software with language models, engineers frequently make the mistake of measuring text in <strong>words or characters</strong>. However, LLMs only read and bill in <strong>Tokens</strong>.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    How text is broken into tokens: character counts vs word counts vs token ratios across languages and code.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Text to Token Conversion Ratios</h2>
+  <p>A token is a statistical chunk of text. In English prose, the standard rule of thumb is:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Token Splitting Examples</h2>
+  <ul><li><strong>1 Token $\approx$ 4 characters</strong> (including spaces).</li><li><strong>1 Token $\approx$ 0.75 words</strong> (so 100 tokens $\approx$ 75 words).</li><li><strong>1,000 Tokens $\approx$ 750 words</strong> (roughly 3 double-spaced pages of text).</li></ul><p>However, this ratio changes dramatically across data types:</p><ul><li><strong>Source Code (Python/JS):</strong> Because of indentation, brackets, and camelCase symbols, code has a higher token density: 1 token $\approx$ 2-3 characters!</li><li><strong>Non-Latin Scripts (Arabic, Hindi, Japanese):</strong> Characters often decompose into 2 to 4 byte tokens, resulting in a 2x-4x 'multilingual token tax'.</li><li><strong>Numbers and Math:</strong> Large numbers are often split into arbitrary 2-digit or 3-digit chunks (e.g. <code>123456</code> becomes <code>[123, 456]</code>).</li></ul><pre><code># Measuring Tokenization in Python:
+import tiktoken
+enc = tiktoken.get_encoding("cl100k_base")
+
+def analyze_tokens(text):
+    tokens = enc.encode(text)
+    chars = len(text)
+    words = len(text.split())
+    print(f"Words: {words} | Chars: {chars} | Tokens: {len(tokens)}")
+    print(f"Chars/Token: {chars/len(tokens):.2f}")</code></pre><div class="callout"><p><strong>Cost & Budgeting Rule:</strong> Always calculate rate limits, storage buffers, and API budgets in Tokens, never in words or characters.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the token conversion sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You understand the relationship between characters, words, and tokens across domains.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where characters vs words vs tokens: how bpe slices text applies.</li>
+    <li>Author a unit test or verification script exercising characters vs words vs tokens: how bpe slices text.</li>
+    <li>Document team architectural conventions regarding characters vs words vs tokens: how bpe slices text.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Characters vs Words vs Tokens: How BPE Slices Text.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "On average, approximately how many English words does 1,000 tokens represent?",
+    a: ["Approximately 750 words (an average ratio of roughly 0.75 words per token in English)","Exactly 1,000 words","Only 10 words","Over 10,000 words"],
+    c: 0,
+    why: "In English text, 1,000 tokens represents roughly 750 words (approximately 4 characters per token)."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Standard English Prose",
+            "lines": [
+                  "1,000 Tokens ≈ 750 Words",
+                  "4 characters per token average"
+            ]
+      },
+      {
+            "title": "Source Code (Indentation)",
+            "lines": [
+                  "1,000 Tokens ≈ 400 Words",
+                  "2-3 characters per token (Higher density!)"
+            ]
+      },
+      {
+            "title": "Non-Latin Scripts",
+            "lines": [
+                  "Multilingual token fragmentation",
+                  "2x-4x more tokens per sentence"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Characters vs Words vs Tokens: How BPE Slices Text",
+      "def execute_flow():",
+      "    # How text is broken into tokens: character counts v...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Characters vs Words vs Tokens: How BPE Slices Text"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Common Word"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Compound / Technical"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "In standard English, 1,000 tokens corresponds to roughly {1} words, while source code has higher density at roughly 2-3 {2} per token."
+],
+    blanks: [
+      {
+            "a": [
+                  "750"
+            ],
+            "why": "Approximately 0.75 words per token"
+      },
+      {
+            "a": [
+                  "characters"
+            ],
+            "why": "Letters and spaces"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why does source code consume more tokens per character than English prose?",
+      a: ["Code contains frequent whitespace indentation, punctuation symbols, and camelCase names that split into multiple tokens","Code has more letters","Python is an uncompressed language","Code is encrypted"],
+      c: 0,
+      why: "Punctuation, variable casing, and indentation create frequent subword boundaries in code."
+    },
+    {
+      q: "How does token fragmentation affect numerical calculations in LLMs?",
+      a: ["Numbers like 849204 are split into arbitrary token chunks (e.g. 849 and 204), making alignment for arithmetic difficult","Numbers are converted to letters","Numbers are deleted","Numbers use zero tokens"],
+      c: 0,
+      why: "Arbitrary numerical token chunking obscures positional base-10 column alignment for math."
+    },
+    {
+      q: "What tool in the OpenAI ecosystem calculates exact token counts for GPT-4 models?",
+      a: ["tiktoken","numpy","pandas","pytest"],
+      c: 0,
+      why: "tiktoken is the official, high-speed BPE tokenizer library for OpenAI models."
+    },
+    {
+      q: "Why is budgeting context in words rather than tokens an engineering risk?",
+      a: ["A 1,000-word code snippet or foreign text passage can easily exceed 2,500 tokens, causing unexpected prompt truncation","Words cannot be counted by computers","Tokens are free","Words take too much RAM"],
+      c: 0,
+      why: "Token ratios fluctuate wildly across code and languages, making word counts an unreliable proxy for budget."
+    }
+  ]);
+</script>
+</body>
+</html>

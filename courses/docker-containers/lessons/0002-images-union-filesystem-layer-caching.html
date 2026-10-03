@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 02 — Images and the Union File System: Layer Caching</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="docker-containers" data-lesson="2" data-lesson-id="images-union-filesystem-layer-caching">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 02</span> · Layer Caching</span>
+
+  <h1 class="lesson-title">Images and the Union File System: Layer Caching</h1>
+  <p class="lesson-lede">
+    Inside Docker images: Union File Systems (OverlayFS), immutable image layers, Docker build cache mechanics, and cache busting.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how the Union File System works and how to design Dockerfiles for lightning-fast layer caching.</span>
+    <span><b>Mission link</b> Mastering images and the union file system: layer caching across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Images and the Union File System: Layer Caching</h2>
+  <p>A Docker image is not a single giant zip file. It is a stack of <strong>read-only immutable layers</strong> merged together using a <strong>Union File System (OverlayFS)</strong>. When you launch a container, Docker simply adds a thin, writable layer on top!</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Inside Docker images: Union File Systems (OverlayFS), immutable image layers, Docker build cache mechanics, and cache busting.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Docker Layer Invalidation Cascade</h2>
+  <p>How Docker Layer Caching Works:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>OverlayFS Layer Stacking</h2>
+  <ul><li><strong>1. Instruction = Layer:</strong> Each command in your Dockerfile (`FROM`, `RUN`, `COPY`) creates a cached filesystem diff layer.</li><li><strong>2. Downward Cache Invalidation:</strong> When Docker builds an image, it checks if the instruction and its input files have changed. If a layer changes, <strong>that layer and ALL subsequent layers are invalidated and must be rebuilt!</strong></li><li><strong>3. The Anti-Pattern:</strong> Copying your entire source code directory before running `pip install`! Every time you edit 1 line of Python, Docker is forced to re-download all 50 dependencies for 3 minutes!</li><li><strong>4. The Cache-Optimized Pattern:</strong> Copy only `requirements.txt` first, run `pip install`, and <em>only then</em> copy your application source code! Dependency installation is cached in <strong>0.1 seconds</strong>!</li></ul><pre><code># CACHE-OPTIMIZED DOCKERFILE:
+FROM python:3.12-slim
+WORKDIR /app
+
+# 1. Copy dependencies FIRST (rarely changes -> 100% CACHE HIT!):
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# 2. Copy source code LAST (frequently changes -> Fast layer rebuild!):
+COPY . .
+
+CMD ["python", "main.py"]</code></pre><div class="callout"><p><strong>The Build Optimization Rule:</strong> Order Dockerfile instructions from least-frequently changing (base OS, system tools, dependencies) to most-frequently changing (app code). Builds drop from 4 minutes to 3 seconds.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the layer caching sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how the Union File System works and how to design Dockerfiles for lightning-fast layer caching.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where images and the union file system: layer caching applies.</li>
+    <li>Author a unit test or verification script exercising images and the union file system: layer caching.</li>
+    <li>Document team architectural conventions regarding images and the union file system: layer caching.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Images and the Union File System: Layer Caching.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Why is ordering instructions properly in a Dockerfile critical for build performance?",
+    a: ["Docker caches each build instruction as an image layer; ordering frequently changing files (like source code) after stable files (like dependencies) enables fast cache hits","Wrong order causes the hard drive to crash","Docker requires alphabetical order","Order changes the color of the image"],
+    c: 0,
+    why: "Docker invalidates cache layers from the point of change downward; putting dependencies before code preserves cache hits."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Unoptimized (Slow: 3 mins)",
+            "lines": [
+                  "COPY . . (Code changes every commit)",
+                  "RUN pip install (Cache broken! Re-downloads all 50 packages every time)"
+            ]
+      },
+      {
+            "title": "Optimized (Fast: 2 secs)",
+            "lines": [
+                  "COPY requirements.txt .",
+                  "RUN pip install (Cached in 0.1s!)",
+                  "COPY . . (Only fast app code layer rebuilt!)"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Images and the Union File System: Layer Caching",
+      "def execute_flow():",
+      "    # Inside Docker images: Union File Systems (OverlayF...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Images and the Union File System: Layer Caching"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Top: Writable Container Layer"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Layer 3: Application Code"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "step": "Layer 2: Python Dependencies"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "step": "Layer 1: Base Linux OS"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Docker images use Union File Systems where each instruction creates a cached layer, requiring developers to place stable {1} before frequently edited {2} to maximize cache hits."
+],
+    blanks: [
+      {
+            "a": [
+                  "dependencies"
+            ],
+            "why": "External packages and libraries"
+      },
+      {
+            "a": [
+                  "code"
+            ],
+            "why": "Application source files"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What happens to Docker's build cache if an instruction on Line 4 of a Dockerfile changes?",
+      a: ["Line 4 and every subsequent instruction below it are invalidated and must be completely re-executed from scratch","Only Line 4 is rebuilt; lines below remain cached","The build fails with a syntax error","Docker restarts the computer"],
+      c: 0,
+      why: "Docker layer caching is sequential; any change invalidates all downstream dependent layers."
+    },
+    {
+      q: "Why is adding '--no-cache-dir' recommended when running 'pip install' inside a Dockerfile?",
+      a: ["It prevents pip from caching wheel files inside the image layer, shrinking final Docker image size significantly","It makes pip install run 10x faster","Pip cannot cache files on Linux","It is required by Python syntax"],
+      c: 0,
+      why: "Disabling pip's local wheel cache avoids baking redundant installer tarballs into the image layer."
+    },
+    {
+      q: "What is 'OverlayFS' in Linux container runtimes?",
+      a: ["A Union File System that stacks multiple read-only directory trees into a single merged unified filesystem view","A network file transfer protocol","A hard drive formatting utility","A video overlay software"],
+      c: 0,
+      why: "OverlayFS merges underlying read-only image layers with an active writable container layer."
+    },
+    {
+      q: "How does using a '.dockerignore' file accelerate Docker build times?",
+      a: ["It prevents large, unnecessary local files (.git, node_modules, __pycache__, temp files) from being transferred into the Docker build context","It ignores all syntax errors","It deletes unnecessary code","It speeds up internet Wi-Fi"],
+      c: 0,
+      why: "Excluding local caches and .git repositories minimizes the build context sent to the Docker daemon."
+    }
+  ]);
+</script>
+</body>
+</html>

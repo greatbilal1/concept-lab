@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 05 — Keeping Domain Models Pure</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="ai-generated-architecture" data-lesson="5" data-lesson-id="keeping-domain-models-pure">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 05</span> · Domain Purity</span>
+
+  <h1 class="lesson-title">Keeping Domain Models Pure</h1>
+  <p class="lesson-lede">
+    Isolating pure business domain models from database ORMs, web frameworks, and external dependencies.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to keep domain models pure and decoupled from infrastructure.</span>
+    <span><b>Mission link</b> Mastering keeping domain models pure across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Keeping Domain Models Pure</h2>
+  <p>One of the most insidious architectural traps in software engineering—especially when accelerated by AI coding agents—is coupling your business logic directly to your database ORM (e.g. SQLAlchemy, Django ORM, Prisma).</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Isolating pure business domain models from database ORMs, web frameworks, and external dependencies.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Impure vs Pure Domain Models</h2>
+  <p>When an agent mixes domain rules with ORM models, problems compound:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>The Repository Bridge</h2>
+  <ul><li><strong>Tests Become Slow:</strong> You cannot test a simple discount rule without spinning up a database connection.</li><li><strong>Framework Lock-In:</strong> Upgrading your ORM or switching databases requires rewriting your core business rules.</li><li><strong>Unintended Side Effects:</strong> Accessing a property triggers unexpected lazy-loading network queries.</li></ul><pre><code># IMPURE: Coupled directly to SQLAlchemy ORM and database sessions
+class Order(Base):
+    __tablename__ = "orders"
+    id = Column(Integer, primary_key=True)
+    # Business logic mixed with persistence!
+    def apply_discount(self, db_session):
+        # Queries database directly inside domain method!
+        ...
+
+# PURE DOMAIN ENTITY (Framework-free dataclass):
+@dataclass
+class Order:
+    id: OrderId
+    items: list[OrderItem]
+    # Pure business calculation: in-memory, instant, zero database dependencies!
+    def apply_discount(self, discount: Discount) -> Money:
+        return discount.calculate(self.subtotal)</code></pre><p>Keep your domain models pure: represent entities as standard dataclasses or pure classes, and let repository adapters handle mapping between domain entities and database tables.</p><div class="callout"><p><strong>The Purity Test:</strong> Can you test your core domain logic in pure RAM in under 1 millisecond without importing SQLAlchemy, FastAPI, or Django? If yes, your domain is pure!</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the domain purity sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to keep domain models pure and decoupled from infrastructure.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where keeping domain models pure applies.</li>
+    <li>Author a unit test or verification script exercising keeping domain models pure.</li>
+    <li>Document team architectural conventions regarding keeping domain models pure.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Keeping Domain Models Pure.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is a 'Pure Domain Model' in software architecture?",
+    a: ["A domain entity written in vanilla language constructs that encapsulates business logic with zero framework or database dependencies","A database table with zero columns","A function with no arguments","A model that runs on pure electricity"],
+    c: 0,
+    why: "Pure domain models contain business logic and state, isolated completely from infrastructure and storage."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Impure ORM Entity",
+            "lines": [
+                  "Inherits from ORM Base",
+                  "Tightly bound to SQL schema",
+                  "Requires DB session to test"
+            ]
+      },
+      {
+            "title": "Pure Domain Entity",
+            "lines": [
+                  "Vanilla dataclass / class",
+                  "Pure business calculations",
+                  "Runs in RAM in < 1ms"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Keeping Domain Models Pure",
+      "def execute_flow():",
+      "    # Isolating pure business domain models from databas...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Keeping Domain Models Pure"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Domain Entity (Pure)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Repository Adapter"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "step": "Result"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "A pure domain model encapsulates business rules using vanilla language constructs with zero dependencies on {1} or {2} frameworks."
+],
+    blanks: [
+      {
+            "a": [
+                  "database"
+            ],
+            "why": "Storage engines and ORMs"
+      },
+      {
+            "a": [
+                  "web"
+            ],
+            "why": "HTTP routing frameworks like FastAPI or Express"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why does keeping domain models pure make unit testing vastly easier?",
+      a: ["Pure entities run entirely in memory without requiring database connections, migrations, or mocks","It eliminates the need for test assertions","Pure models test themselves automatically","It makes tests compile to WebAssembly"],
+      c: 0,
+      why: "In-memory domain entities execute in microseconds with zero environmental setup."
+    },
+    {
+      q: "What component is responsible for translating between pure domain entities and database tables?",
+      a: ["A Repository or Data Mapper adapter","The web browser","The git commit driver","The operating system kernel"],
+      c: 0,
+      why: "Repositories map domain entities to persistence schemas, isolating the domain from SQL details."
+    },
+    {
+      q: "What code smell indicates that an agent has contaminated a domain model?",
+      a: ["Importing SQLAlchemy Column types, database Sessions, or HTTP request objects inside domain entities","Using dataclasses","Adding type hints to parameters","Writing unit tests"],
+      c: 0,
+      why: "Importing persistence or delivery libraries inside domain entities violates domain purity."
+    },
+    {
+      q: "How does domain purity protect an application against technology churn?",
+      a: ["You can replace your database or web framework completely without rewriting a single business rule","It prevents computers from aging","It guarantees 100% test coverage","It reduces cloud server bills to zero"],
+      c: 0,
+      why: "Decoupling business rules ensures that technology upgrades do not affect domain behavior."
+    }
+  ]);
+</script>
+</body>
+</html>

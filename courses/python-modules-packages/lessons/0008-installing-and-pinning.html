@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 08 — Installing and pinning dependencies</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="python-modules-packages" data-lesson="8" data-lesson-id="installing-and-pinning">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 08</span> · Environments</span>
+
+  <h1 class="lesson-title">Installing and pinning dependencies</h1>
+  <p class="lesson-lede">
+    An environment you cannot rebuild is a one-off, not a project. This lesson is
+    about the file that turns "it works on my machine" into "it works on every
+    machine, identically".
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Reproduce an environment exactly</span>
+    <span><b>Mission link</b> Reproducibility is a feature</span>
+  </div>
+
+  <h2><span class="n">1</span>pip installs, but does not remember</h2>
+
+  <p>
+    <code>pip install requests</code> fetches the newest compatible version and
+    drops it into the active environment. It does not write anything down. Close
+    the terminal, hand the project to a colleague, and they have no idea what to
+    install.
+  </p>
+
+  <p>
+    The fix is a <b>requirements file</b>: a plain text list of what the project
+    needs. It is not a Python file, not a config format — just names and versions,
+    one per line.
+  </p>
+
+  <pre><code># requirements.txt
+requests==2.32.3
+pandas>=2.0,<3.0
+pytest</code></pre>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Reading a version specifier</h2>
+
+  <p>
+    The characters after a package name are a small language, and each one makes a
+    different promise about what is acceptable:
+  </p>
+
+  <div id="intro1"></div>
+
+  <p>
+    The <code>==</code> form is called a <b>pin</b>. It is the only one that
+    guarantees the same bytes on every machine, which is why applications pin and
+    libraries usually do not.
+  </p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    A pin trades flexibility for <b>reproducibility</b>. For an app you want the
+    same version everywhere; for a library you want to accept compatible upgrades.
+  </div>
+
+  <h2><span class="n">3</span>Freezing what you actually have</h2>
+
+  <p>
+    You rarely write a full requirements file by hand. You install what you need,
+    then ask pip to report the exact set it resolved — including the transitive
+    dependencies you never named:
+  </p>
+
+  <pre><code>pip install requests pandas pytest
+pip freeze > requirements.txt
+
+# later, on a fresh machine:
+python -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt</code></pre>
+
+  <p>
+    <code>pip freeze</code> prints every installed package with an exact
+    <code>==</code> version. That output is a complete, replayable recipe.
+  </p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Why transitive dependencies matter</h2>
+
+  <p>
+    You asked for <code>requests</code>. You got <code>requests</code>,
+    <code>urllib3</code>, <code>certifi</code>, <code>charset-normalizer</code> and
+    <code>idna</code>. Those are <b>transitive</b> dependencies — packages your
+    package needs.
+  </p>
+
+  <div id="diagram1"></div>
+
+  <p>
+    If you only list <code>requests</code>, a future install may resolve a different
+    <code>urllib3</code> and break you. Freezing captures the whole tree, which is
+    why the generated file is longer than the list you typed.
+  </p>
+
+  <div class="note good">
+    <span class="note-label">Why this matters later</span>
+    Every CI job, every Docker build, every deployment starts with
+    <code>pip install -r requirements.txt</code>. When a build fails six months
+    from now, the pinned file is the only thing that tells you what changed. Treat
+    it as part of the source, because it is.
+  </div>
+
+  <h2><span class="n">5</span>Check yourself</h2>
+
+  <p>
+    Answer from memory — do not scroll back up. Each option has the same number of
+    words, so nothing gives the answer away.
+  </p>
+
+  <div id="fill1"></div>
+  <div id="quiz"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>
+      You can now capture an environment as a file and rebuild it byte-for-byte on
+      another machine, and you can read any version specifier and say what it
+      permits. That is the reproducibility half of this course done.
+    </p>
+  </div>
+
+  <h2><span class="n">6</span>Do this next</h2>
+
+  <ol>
+    <li>
+      In a scratch environment, install two packages, run
+      <code>pip freeze</code>, and count how many lines appear versus how many you
+      asked for.
+    </li>
+    <li>
+      Delete the environment, recreate it, and install from the frozen file.
+      Confirm <code>pip freeze</code> now matches exactly.
+    </li>
+    <li>
+      Change one <code>==</code> to <code>&gt;=</code> and reinstall. Notice that
+      pip is now free to pick a newer version.
+    </li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Read the pip documentation on
+    <a href="https://pip.pypa.io/en/stable/reference/requirements-file-format/">requirements file format</a>,
+    which lists every specifier operator and the exact syntax.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher (me) anything — "what is a lock
+    file?", "why does pip freeze include things I never installed?", "what is
+    pyproject.toml for?". There are no bad questions here.
+  </div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  /* version specifiers */
+  TeachWidgets.introCards("#intro1", {
+    cards: [
+      { ico: "📌", title: "== exact", body: "requests==2.32.3 — this version and no other." },
+      { ico: "⬆️", title: ">= minimum", body: "requests>=2.28 — this or anything newer." },
+      { ico: "🔒", title: ">=,< range", body: "pandas>=2.0,<3.0 — newer, but not the next major." }
+    ]
+  });
+
+  /* predict-then-reveal */
+  TeachWidgets.predict("#predict1", {
+    q: "You write `requests` with no version. What does pip install?",
+    a: ["The oldest supported version", "The newest compatible version", "Every version available"],
+    c: 1,
+    why: "An unpinned requirement lets pip choose the newest version compatible with everything else in the environment."
+  });
+
+  /* step-through trace of freeze and rebuild */
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "pip install requests",
+      "  -> requests + urllib3 + certifi + idna",
+      "pip freeze > requirements.txt",
+      "  -> 5 pinned lines written",
+      "pip install -r requirements.txt",
+      "  -> same 5 versions restored"
+    ],
+    steps: [
+      { line: 0, vars: { asked: "requests" } },
+      { line: 1, vars: { resolved: "5 packages" } },
+      { line: 2, vars: { command: "pip freeze" } },
+      { line: 3, vars: { file: "requirements.txt" } },
+      { line: 4, vars: { command: "pip install -r" } },
+      { line: 5, vars: { result: "identical set" } }
+    ]
+  });
+
+  /* transitive dependencies */
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      { title: "requests", lines: ["what you asked", "direct dependency"] },
+      { title: "urllib3", lines: ["needed by requests", "transitive"] },
+      { title: "certifi", lines: ["needed by requests", "transitive"] }
+    ]
+  });
+
+  /* recall from memory */
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — the commands",
+    lines: [
+      "Write the current environment to a file: <code>pip <0> &gt; requirements.txt</code>",
+      "Install from that file: <code>pip install <1> requirements.txt</code>",
+      "The operator that pins an exact version is <2>"
+    ],
+    blanks: [
+      { a: ["freeze"], why: "pip freeze prints every installed package with an exact version." },
+      { a: ["-r"], why: "The -r flag tells pip to read requirements from the given file." },
+      { a: ["=="], why: "The double equals pins to one exact version." }
+    ]
+  });
+
+  /* the quiz — every option is exactly three words */
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is requirements.txt?",
+      a: ["A Python source file", "A list of dependencies", "A virtual environment folder", "A pip configuration file"],
+      c: 1,
+      why: "It is a plain text list of the packages a project needs, one per line."
+    },
+    {
+      q: "What does == mean?",
+      a: ["Any newer version works", "Exactly this one version", "Any version at all", "The oldest version available"],
+      c: 1,
+      why: "The == operator pins to one exact version, which is what makes installs reproducible."
+    },
+    {
+      q: "What does pip freeze do?",
+      a: ["Deletes installed packages", "Lists exact installed versions", "Upgrades every package", "Creates a new environment"],
+      c: 1,
+      why: "pip freeze prints every installed package with its exact version, including transitive ones."
+    },
+    {
+      q: "Why pin an application?",
+      a: ["To make installs faster", "To get identical rebuilds", "To reduce the file size", "To avoid using pip"],
+      c: 1,
+      why: "Pinning guarantees the same versions on every machine, which is what reproducibility means."
+    }
+  ]);
+</script>
+</body>
+</html>

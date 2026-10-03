@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 05 — Verifying Cryptography, Security, and Edge Cases</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="trusting-ai-generated-code" data-lesson="5" data-lesson-id="verifying-crypto-security">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 05</span> · Security Verification</span>
+
+  <h1 class="lesson-title">Verifying Cryptography, Security, and Edge Cases</h1>
+  <p class="lesson-lede">
+    Specialized verification for security code: avoiding custom crypto, timing attacks, and insecure random generation.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to verify security and cryptographic code with specialized rigor.</span>
+    <span><b>Mission link</b> Mastering verifying cryptography, security, and edge cases across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Verifying Cryptography, Security, and Edge Cases</h2>
+  <p>The first rule of cryptography in software engineering is: <strong>Never roll your own crypto</strong>. The second rule is: <strong>Never let an AI agent roll its own crypto</strong>.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Specialized verification for security code: avoiding custom crypto, timing attacks, and insecure random generation.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Timing Attack Vulnerability</h2>
+  <p>AI models have read thousands of textbooks and may attempt to implement RSA, AES, or custom hashing algorithms by hand using bitwise XOR and modular arithmetic. These homegrown implementations are virtually guaranteed to suffer from fatal vulnerabilities:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Cryptographic Randomness</h2>
+  <ul><li><strong>Timing Attacks:</strong> Comparing secret keys with standard `==` allows attackers to deduce secrets by measuring microsecond execution time differences. Secure code requires constant-time comparisons (`hmac.compare_digest`).</li><li><strong>Insecure Randomness:</strong> Using `random.randint()` instead of cryptographically secure random generators (`secrets.token_bytes()`). Standard PRNGs are predictable!</li><li><strong>Weak Hashes:</strong> Falling back on MD5 or SHA-1 instead of modern Argon2id, bcrypt, or SHA-256.</li></ul><pre><code># INSECURE (AI Hallucinated Custom Crypto):
+# Vulnerable to timing attack: returns False earlier on first mismatch!
+def verify_api_token(user_token, secret_token):
+    return user_token == secret_token # DANGEROUS!
+
+# SECURE (Constant-Time Verification):
+import hmac
+def verify_api_token(user_token: str, secret_token: str) -> bool:
+    # Executes in constant time regardless of where mismatches occur!
+    return hmac.compare_digest(user_token, secret_token)</code></pre><div class="callout"><p><strong>The Crypto Law:</strong> Require agents to use established, audited high-level libraries (`cryptography`, `nacl`, `argon2-cffi`). Never accept hand-rolled cryptographic routines.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the cryptography verification sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to verify security and cryptographic code with specialized rigor.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where verifying cryptography, security, and edge cases applies.</li>
+    <li>Author a unit test or verification script exercising verifying cryptography, security, and edge cases.</li>
+    <li>Document team architectural conventions regarding verifying cryptography, security, and edge cases.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Verifying Cryptography, Security, and Edge Cases.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Why must software engineers never allow an AI agent to 'invent' a custom cryptographic algorithm?",
+    a: ["Custom cryptography is almost always fatally flawed; secure systems must strictly use battle-tested, peer-reviewed standard libraries","Custom cryptography is too fast for computers","Python forbids custom math","Crypto algorithms take too much disk space"],
+    c: 0,
+    why: "Rolling your own crypto is a notorious anti-pattern. Proven, audited primitives (like libsodium, Argon2) must be used."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Standard '==' (Variable Time)",
+            "lines": [
+                  "Fails on char 1: 0.1ms",
+                  "Fails on char 5: 0.5ms",
+                  "Attacker deduces secret char by char!"
+            ]
+      },
+      {
+            "title": "hmac.compare_digest (Constant Time)",
+            "lines": [
+                  "Always takes exact same time",
+                  "Zero timing leakage, immune to attacks"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Verifying Cryptography, Security, and Edge Cases",
+      "def execute_flow():",
+      "    # Specialized verification for security code: avoidi...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Verifying Cryptography, Security, and Edge Cases"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "random.random() (Dangerous)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "secrets.token_hex() (Secure)"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "In security code, secret comparisons must use {1} comparisons to prevent timing attacks, and tokens must use the {2} module for entropy."
+],
+    blanks: [
+      {
+            "a": [
+                  "constant-time"
+            ],
+            "why": "Execution time independent of mismatch location"
+      },
+      {
+            "a": [
+                  "secrets"
+            ],
+            "why": "Python cryptographic random module"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why is 'hmac.compare_digest' preferred over '==' when comparing password hashes or API tokens?",
+      a: ["It takes constant time to execute regardless of matching characters, preventing timing side-channel attacks","It runs 10x faster","It converts strings to integers","It encrypts the terminal"],
+      c: 0,
+      why: "Constant-time comparison eliminates timing side-channel leaks."
+    },
+    {
+      q: "Why is Python's standard 'random' module unsafe for generating security tokens or session IDs?",
+      a: ["It uses the Mersenne Twister algorithm, which is completely deterministic and predictable once internal state is observed","It only generates numbers between 0 and 10","It is deprecated in Python 3","It uses too much memory"],
+      c: 0,
+      why: "Standard PRNGs are designed for statistical modeling, not cryptographic unpredictability."
+    },
+    {
+      q: "What should an engineer do if an agent implements a custom AES cipher by hand?",
+      a: ["Reject the code and require the agent to use an audited, established library like 'cryptography.hazmat'","Accept it if tests pass","Rename the variables","Speed up the CPU clock"],
+      c: 0,
+      why: "Hand-rolled cryptography inevitably contains subtle timing and memory vulnerabilities."
+    },
+    {
+      q: "Which password hashing algorithm is recommended by modern NIST cybersecurity standards?",
+      a: ["Argon2id","MD5","Plain SHA-256 without salt","ROT13"],
+      c: 0,
+      why: "Argon2id provides state-of-the-art memory-hard resistance against GPU and ASIC cracking attacks."
+    }
+  ]);
+</script>
+</body>
+</html>

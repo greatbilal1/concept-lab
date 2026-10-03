@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 06 — Defensive Prompt Design for Truthfulness</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="hallucination-reliability" data-lesson="6" data-lesson-id="defensive-prompt-design-truthfulness">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 06</span> · Defensive Prompting</span>
+
+  <h1 class="lesson-title">Defensive Prompt Design for Truthfulness</h1>
+  <p class="lesson-lede">
+    Prompt engineering for truthfulness: uncertainty permission, chain-of-thought grounding, and quotes-only extraction.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to design defensive prompts that enforce truthfulness and eliminate speculation.</span>
+    <span><b>Mission link</b> Mastering defensive prompt design for truthfulness across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Defensive Prompt Design for Truthfulness</h2>
+  <p>Language models are trained on internet forums and human dialogue where saying <em>'I don't know'</em> is rare. Left unprompted, an LLM will treat every question as a command to generate an answer. To engineer reliability, your prompt templates must actively <strong>incentivize honesty and penalize speculation</strong>.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Prompt engineering for truthfulness: uncertainty permission, chain-of-thought grounding, and quotes-only extraction.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Defensive Prompt Patterns</h2>
+  <p>Three battle-tested Defensive Prompt Patterns for Truthfulness:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Quotes-First Verification Seam</h2>
+  <ul><li><strong>1. Explicit Permission to be Uncertain:</strong> <em>'It is completely acceptable to state that you do not know. If the provided documents do not contain the answer, reply: "Information not found." Never guess.'</em></li><li><strong>2. Quotes-First Extraction:</strong> Before answering, require the model to extract verbatim quotes from the source document: <em>'Step 1: Extract verbatim quotes that answer the question. Step 2: Formulate your answer based ONLY on those exact quotes.'</em></li><li><strong>3. Challenge-Resistant System Prompts:</strong> Explicitly instruct the model to resist user presuppositions: <em>'If the user prompt contains a false premise (e.g. "Why is the moon made of green cheese?"), politely correct the premise.'</em></li></ul><pre><code># The Quotes-First Defensive Prompt Pattern:
+"You are a compliance auditing assistant.
+Task: Answer the user's question about the contract.
+
+Instructions:
+1. First, search the <contract> and output: <quotes> exact verbatim text spans </quotes>.
+2. If no matching quotes exist, output: <result> Not addressed in contract </result>.
+3. Only if quotes exist, synthesize your answer: <result> ... </result> based strictly on those quotes."</code></pre><div class="callout"><p><strong>The Verbatim Shield:</strong> Requiring the model to output exact quotes first grounds its attention in source tokens, eliminating 90% of extractive hallucinations.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the defensive prompt sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to design defensive prompts that enforce truthfulness and eliminate speculation.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where defensive prompt design for truthfulness applies.</li>
+    <li>Author a unit test or verification script exercising defensive prompt design for truthfulness.</li>
+    <li>Document team architectural conventions regarding defensive prompt design for truthfulness.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Defensive Prompt Design for Truthfulness.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What simple prompt instruction dramatically reduces hallucinations when a model is asked about unfamiliar topics?",
+    a: ["'If you are uncertain or the information is not provided in context, reply: I do not know. Do NOT speculate.'","'Always guess if you are unsure'","'Be as creative as possible'","'Answer in all capital letters'"],
+    c: 0,
+    why: "Giving models explicit permission to say 'I don't know' overrides their training bias toward forced completion."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Uncertainty Authorization",
+            "lines": [
+                  "Explicit permission to say 'I don't know'",
+                  "Overrides completion pressure"
+            ]
+      },
+      {
+            "title": "Quotes-First Extraction",
+            "lines": [
+                  "Step 1: Extract verbatim quotes from source",
+                  "Step 2: Synthesize answer based ONLY on quotes"
+            ]
+      },
+      {
+            "title": "Premise Challenge",
+            "lines": [
+                  "Checks user prompt for false assumptions",
+                  "Corrects false premises before answering"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Defensive Prompt Design for Truthfulness",
+      "def execute_flow():",
+      "    # Prompt engineering for truthfulness: uncertainty p...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Defensive Prompt Design for Truthfulness"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "<quotes> Exact Text </quotes>"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "<result> Grounded Answer </result>"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Defensive prompt engineering enforces truthfulness by granting explicit permission to express {1} and requiring verbatim {2} extraction."
+],
+    blanks: [
+      {
+            "a": [
+                  "uncertainty"
+            ],
+            "why": "Admitting lack of knowledge"
+      },
+      {
+            "a": [
+                  "quote"
+            ],
+            "why": "Exact text span from source documents"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why does requiring a model to extract verbatim quotes before answering reduce hallucinations?",
+      a: ["It forces the model's self-attention to align with actual text tokens in the context, conditioning the subsequent answer on real evidence","It makes the prompt shorter","Quotes are encrypted","Quotes run on faster GPUs"],
+      c: 0,
+      why: "Emitting verbatim quotes first anchors the attention state directly to factual source tokens."
+    },
+    {
+      q: "What happens if a prompt contains the instruction 'Never say I don't know'?",
+      a: ["The model is forced to hallucinate plausible-sounding answers whenever information is missing","The model becomes 100% accurate","The model shuts down","The server runs faster"],
+      c: 0,
+      why: "Forbidding admissions of uncertainty guarantees that missing knowledge will be filled with hallucinations."
+    },
+    {
+      q: "How should a prompt instruct a model to handle conflicting facts between two provided source documents?",
+      a: ["Explicitly state that Document A and Document B contradict each other, cite both perspectives, and decline to declare one as truth","Pick the longer document","Pick Document A always","Delete both documents"],
+      c: 0,
+      why: "Transparently noting source contradictions provides accurate, auditable guidance without bias."
+    },
+    {
+      q: "Why is 'Answer in 2 sentences' a helpful defensive constraint for factual retrieval?",
+      a: ["It prevents the model from generating long rambling paragraphs where hallucinations and ungrounded claims typically hide","It reduces GPU temperature","It is required by Python syntax","It saves internet bandwidth"],
+      c: 0,
+      why: "Concise answers limit surface area, eliminating verbose filler where hallucinations thrive."
+    }
+  ]);
+</script>
+</body>
+</html>

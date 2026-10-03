@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 08 — Fixing the cause, not the symptom</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="debugging-code" data-lesson="8" data-lesson-id="fixing-the-cause-not-the-symptom">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 08</span> · Root Cause & Prevention</span>
+
+  <h1 class="lesson-title">Fixing the cause, not the symptom</h1>
+  <p class="lesson-lede">
+    A good fix solves the defect at its origin, adds a regression test to keep it solved forever, and asks what architectural flaw allowed it to exist.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Implement durable root-cause fixes accompanied by automated regression tests</span>
+    <span><b>Mission link</b> Completes the debugging lifecycle with permanent prevention</span>
+  </div>
+
+  <h2><span class="n">1</span>The difference between masking and fixing</h2>
+  <p>When an index is out of bounds, wrapping the line in a <code>try...except IndexError: pass</code> block is not a fix — it is a mask. The program continues running, but in an invalid, infected state that will corrupt data downstream.</p><p>A genuine fix addresses the original calculation that generated the invalid index, and ensures that invalid inputs are rejected or handled cleanly at the system boundary.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Never catch an exception merely to silence it; cure the condition that originated the error.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The prevention workflow</h2>
+  <p>A complete bug fix follows four mandatory steps: write a failing regression test, apply the minimal root-cause fix, verify the test passes, and assess the codebase for identical patterns.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>A verified regression test</h2>
+  <p>Observe how encoding the bug reproduction into an automated test ensures the bug can never return unnoticed.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Confirm the steps of permanent defect remediation.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can resolve defects at their root cause and lock in the fix with permanent automated regression tests.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Convert an old bug fix into a permanent automated regression test in your test suite.</li>
+    <li>Search your codebase for catch blocks that silently swallow exceptions.</li>
+    <li>Conduct a mini post-mortem on your most recent production issue.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Martin Fowler, *Refactoring: Improving the Design of Existing Code* (Chapter on Technical Debt and Root Cause Fixes).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "A function receives None and crashes. Is adding 'if val is None: return' always a complete fix?",
+    a: ["Yes, it completely prevents the crash from ever happening","No, it may mask why an invalid None was passed in the first place","Yes, because returning None is standard practice everywhere","No, because Python does not support the None keyword"],
+    c: 1,
+    why: "Early returns often silence errors while passing unexpected None values to other callers."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Regression Test",
+            "lines": [
+                  "encode minimal repro",
+                  "test fails on current code"
+            ]
+      },
+      {
+            "title": "Root Fix",
+            "lines": [
+                  "fix defect at origin",
+                  "verify test now passes"
+            ]
+      },
+      {
+            "title": "Auditing",
+            "lines": [
+                  "check for twin bugs",
+                  "improve boundary types"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "def divide(a, b):",
+      "    if b == 0: raise ValueError('divisor cannot be zero')",
+      "    return a / b",
+      "assert divide(10, 2) == 5"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "divide": "function"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "check": "active"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "logic": "safe"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "result": "5.0 (verified)"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the missing terms",
+    lines: [
+      "Hiding an error without fixing the underlying flaw is <0> the symptom.",
+      "An automated test created to prevent a bug from recurring is a <1> test.",
+      "Investigating how a defect was introduced to improve engineering processes is a <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "masking"
+            ],
+            "why": "Masking hides symptoms while leaving underlying defects intact."
+      },
+      {
+            "a": [
+                  "regression"
+            ],
+            "why": "A regression test guards against the recurrence of known defects."
+      },
+      {
+            "a": [
+                  "post-mortem",
+                  "retrospective"
+            ],
+            "why": "A post-mortem analyzes systemic causes to prevent future occurrences."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the primary role of a regression test?",
+      a: ["To prove that a previously fixed defect never silently returns","To test whether code can compile on older operating systems","To benchmark the CPU performance of database queries","To verify user interface color contrast accessibility"],
+      c: 0,
+      why: "Regression tests run in CI to alert the team if a known defect is accidentally reintroduced."
+    },
+    {
+      q: "Why is swallowing exceptions with empty except blocks dangerous?",
+      a: ["It turns observable failures into silent, hidden state infections","It automatically increases memory allocation on the heap","It causes Python scripts to switch into JavaScript mode","It corrupts git commit author email information"],
+      c: 0,
+      why: "Silencing exceptions hides corrupt state and makes downstream failures much harder to debug."
+    },
+    {
+      q: "What should you do after successfully fixing a critical bug?",
+      a: ["Search the rest of the codebase for similar vulnerable patterns","Immediately delete the reproduction test to save disk space","Disable continuous integration testing to speed up deploys","Never discuss the defect with other engineers on the team"],
+      c: 0,
+      why: "Defects often appear in clusters where similar assumptions or patterns were copy-pasted."
+    },
+    {
+      q: "What is the correct order of operations when fixing a bug?",
+      a: ["Deploy to production, write unit tests, inspect git history","Write failing regression test, fix root cause, verify test passes","Apply speculative fix, delete failing tests, reboot servers","Rewrite module from scratch, commit changes, wait for user reports"],
+      c: 1,
+      why: "Writing a failing test first ensures your fix actually resolves the proven problem."
+    }
+  ]);
+</script>
+</body>
+</html>

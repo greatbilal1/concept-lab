@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 08 — Systematic Prompt Evaluation and Versioning</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="prompt-engineering" data-lesson="8" data-lesson-id="systematic-prompt-eval-versioning">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 08</span> · Prompt Evals</span>
+
+  <h1 class="lesson-title">Systematic Prompt Evaluation and Versioning</h1>
+  <p class="lesson-lede">
+    Engineering prompts systematically: tracking prompt versions in git, regression testing with evals, and LLM-as-a-judge scoring.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You have completed the Prompt Engineering course.</span>
+    <span><b>Mission link</b> Mastering systematic prompt evaluation and versioning across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Systematic Prompt Evaluation and Versioning</h2>
+  <p>In amateur development, prompt engineering is tweaking a sentence in a web playground, seeing that it works on one example, and declaring victory. In professional software engineering, <strong>prompts are source code</strong>: they must be version-controlled, tested, and evaluated against golden benchmark datasets.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Engineering prompts systematically: tracking prompt versions in git, regression testing with evals, and LLM-as-a-judge scoring.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Prompt CI/CD Pipeline</h2>
+  <p>A systematic <strong>Prompt Evaluation Pipeline</strong> consists of:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>LLM-as-a-Judge Rubric</h2>
+  <ul><li><strong>1. Versioning in Git:</strong> Prompts are stored in versioned repository files (e.g. `prompts/extract_invoice_v2.txt` or `.jinja` templates), tracked in pull requests alongside application code.</li><li><strong>2. Golden Eval Datasets:</strong> A dataset of 50 to 100 diverse, representative test inputs paired with expected ground-truth answers or validation assertions.</li><li><strong>3. Automated Regression Benchmarking:</strong> When someone modifies a prompt, a test script runs the new prompt across all 50 examples, measuring accuracy, schema compliance, latency, and cost.</li><li><strong>4. LLM-as-a-Judge Evaluation:</strong> For qualitative text, a frontier judge model (e.g. GPT-4o) scores candidate outputs against a strict grading rubric (1 to 5 scale with justification).</li></ul><pre><code># Automated Prompt Eval Script (eval_prompts.py):
+# Compare prompt_v1 vs prompt_v2 across 50 golden test cases:
+# ---------------------------------------------------------
+# Metric                | Prompt v1 | Prompt v2 (Candidate)
+# Schema Pass Rate      | 96.0%     | 100.0% (Improved!)
+# Factual Accuracy      | 88.0%     | 94.0%  (Improved!)
+# Average Output Tokens | 420 toks  | 210 toks (50% cheaper!)
+# Verdict: APPROVED! Merge prompt_v2 to main branch!</code></pre><div class="callout"><p><strong>The Final Engineering Truth:</strong> You cannot improve what you do not measure. Stop guessing whether a prompt edit is better; run the eval and let the data prove it.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the prompt eval sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You have completed the Prompt Engineering course.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where systematic prompt evaluation and versioning applies.</li>
+    <li>Author a unit test or verification script exercising systematic prompt evaluation and versioning.</li>
+    <li>Document team architectural conventions regarding systematic prompt evaluation and versioning.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Systematic Prompt Evaluation and Versioning.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Why must prompt changes be treated with the same engineering rigor as production code changes?",
+    a: ["A minor edit to a prompt can inadvertently degrade accuracy, break JSON schemas, or introduce regressions on other tasks","Prompts can short-circuit computer power supplies","Prompts cannot be tracked in git","Prompt engineering is a legal requirement"],
+    c: 0,
+    why: "Prompts are functional code; modifying prompt text can cause unexpected behavioral regressions across use cases."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1. Prompt Edit in Git",
+            "lines": [
+                  "Developer updates system prompt",
+                  "Creates feature branch PR"
+            ]
+      },
+      {
+            "title": "2. Run Golden Eval Suite",
+            "lines": [
+                  "Executes prompt on 100 test cases",
+                  "Evaluates schema pass rate & accuracy"
+            ]
+      },
+      {
+            "title": "3. Compare Metrics",
+            "lines": [
+                  "Compare v1 vs v2 regression delta",
+                  "Pass CI only if accuracy is preserved"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Systematic Prompt Evaluation and Versioning",
+      "def execute_flow():",
+      "    # Engineering prompts systematically: tracking promp...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Systematic Prompt Evaluation and Versioning"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Input & Output"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Judge Prompt (Frontier LLM)"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Systematic prompt engineering stores prompts in version control and evaluates prompt changes against golden {1} suites to prevent behavioral {2}."
+],
+    blanks: [
+      {
+            "a": [
+                  "eval"
+            ],
+            "why": "Evaluation benchmark datasets"
+      },
+      {
+            "a": [
+                  "regressions"
+            ],
+            "why": "Accidental degradation of accuracy"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is 'LLM-as-a-Judge' evaluation?",
+      a: ["Using a powerful frontier model to evaluate and score the quality of outputs generated by other models based on a strict rubric","A robot judge in a court of law","A model that sentences criminals","A tool for paying legal fines"],
+      c: 0,
+      why: "Frontier models can reliably score qualitative text outputs against detailed rubrics."
+    },
+    {
+      q: "Why is testing a prompt change on only 1 or 2 manual examples dangerous?",
+      a: ["An edit that fixes one specific example can silently break formatting or accuracy on dozens of other edge cases","It uses too many tokens","It violates git commit rules","The API will ban the user"],
+      c: 0,
+      why: "Prompts have complex non-linear effects; changes must be tested across diverse benchmark sets."
+    },
+    {
+      q: "Where should production prompt templates be stored in a software project?",
+      a: ["In version-controlled repository files (like markdown, text, or template files) alongside code","In the user's browser history","On a physical notepad","In temporary operating system caches"],
+      c: 0,
+      why: "Version control ensures prompts evolve atomically with application code in pull requests."
+    },
+    {
+      q: "What is an assertion-based eval check for structured outputs?",
+      a: ["Verifying that the output parses cleanly with json.loads() and validates against a Pydantic schema with zero errors","Checking if the text has vowels","Counting the number of exclamation points","Testing internet download speed"],
+      c: 0,
+      why: "Deterministic assertion checks provide unambiguous Pass/Fail metrics in automated eval pipelines."
+    }
+  ]);
+</script>
+</body>
+</html>

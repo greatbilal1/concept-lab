@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 08 — Backups, disaster recovery, and vacuum</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="postgresql" data-lesson="8" data-lesson-id="backups-disaster-recovery-and-vacuum">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 08</span> · Operations & Backups</span>
+
+  <h1 class="lesson-title">Backups, disaster recovery, and vacuum</h1>
+  <p class="lesson-lede">
+    There are two kinds of engineers: those who have lost data, and those who will. Master logical backups with pg_dump, physical Point-In-Time Recovery (PITR), and VACUUM maintenance.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Execute database backups, perform Point-In-Time Recovery, and manage vacuum maintenance</span>
+    <span><b>Mission link</b> The ultimate operational safeguard protecting enterprise data from permanent loss</span>
+  </div>
+
+  <h2><span class="n">1</span>Logical dumps versus Physical backups</h2>
+  <p>A database backup is only as good as your ability to restore it. PostgreSQL provides two backup mechanisms: <b>Logical Backups (pg_dump)</b> and <b>Physical Backups with WAL Archiving (Point-In-Time Recovery / PITR)</b>.</p><p><code>pg_dump</code> exports the database as SQL scripts or a compressed custom archive. It is perfect for small-to-medium databases. For large terabyte databases, continuous WAL archiving allows <b>Point-in-Time Recovery</b>: you can roll back the database to <i>any exact historical second</i> (e.g. 1 minute before a junior developer accidentally ran DROP TABLE)!</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Use pg_dump for logical backups; use WAL archiving for continuous Point-in-Time Recovery (PITR).
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The backup strategy comparison</h2>
+  <p>Evaluate logical dumps versus physical continuous archiving.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing a Point-in-Time Recovery (PITR)</h2>
+  <p>Trace how a company recovers from an accidental table drop at 14:05:00 using PITR.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of backup and maintenance commands.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can design and execute robust disaster recovery plans using pg_dump and Point-in-Time Recovery.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Create a compressed custom backup using pg_dump -Fc mydb > mydb.dump.</li>
+    <li>Restore the backup into a new test database using pg_restore.</li>
+    <li>Run VACUUM (VERBOSE, ANALYZE) on a table and inspect dead tuple cleanup in output.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    PostgreSQL Documentation: *Backup and Restore* (postgresql.org/docs/current/backup.html).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Does running 'pg_dump' lock the database and block other users from reading or writing data?",
+    a: ["No, pg_dump uses an MVCC snapshot to export a consistent point-in-time backup without blocking writes","Yes, it locks the entire database exclusively for the entire duration of the dump","It blocks reads, but allows writes","It forces the database to restart"],
+    c: 0,
+    why: "Thanks to MVCC, pg_dump reads a consistent snapshot while normal write traffic continues undisturbed."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "pg_dump (Logical)",
+            "lines": [
+                  "exports SQL / custom archive (-Fc)",
+                  "portable across Postgres versions",
+                  "slower on large terabyte tables"
+            ]
+      },
+      {
+            "title": "WAL Archiving + Basebackup (PITR)",
+            "lines": [
+                  "continuous physical backup",
+                  "restore to any exact historical second!",
+                  "essential for mission-critical enterprise data"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Disaster: Malicious script dropped 'orders' table at 2026-10-03 14:05:22",
+      "# Recovery Step 1: Restore midnight base backup",
+      "# Recovery Step 2: Configure recovery_target_time = '2026-10-03 14:05:00' (22 seconds before drop!)",
+      "# Recovery Step 3: Engine replays WAL logs and halts right before the DROP TABLE statement!",
+      "# Result: Database restored to perfection with zero lost data!"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "incident": "accidental drop at 14:05:22"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "restore_base": "unpacks physical basebackup"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "target_time": "target set to 14:05:00"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "replay": "replays WAL sequentially, stopping 22 seconds before disaster"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The CLI utility to create a logical database backup is pg_<0>.",
+      "Restoring a database to a specific historical second is Point-In-Time <1>.",
+      "The maintenance command that reclaims dead tuple storage is <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "dump"
+            ],
+            "why": "pg_dump creates logical database backups."
+      },
+      {
+            "a": [
+                  "Recovery",
+                  "PITR"
+            ],
+            "why": "PITR enables second-by-second rollbacks."
+      },
+      {
+            "a": [
+                  "VACUUM"
+            ],
+            "why": "VACUUM frees dead row versions."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What does Point-in-Time Recovery (PITR) allow you to do after an operational disaster?",
+      a: ["Replay WAL logs on top of a base backup to restore the database to the exact second right before the disaster occurred","Undo the physical passage of time on the server clock","Restore deleted files from the user web browser cache","Convert PostgreSQL into an Oracle database"],
+      c: 0,
+      why: "PITR replays WAL transactions forward to an exact specified timestamp, avoiding data loss."
+    },
+    {
+      q: "Why is the custom format (-Fc) preferred when running pg_dump?",
+      a: ["It is compressed, supports parallel multi-threaded restore with pg_restore, and allows selective table restoration","It converts all tables into PDF documents","It is the only format supported on Apple Mac computers","It deletes old backups automatically"],
+      c: 0,
+      why: "The custom format (-Fc) is compact and enables fast parallel restores via pg_restore -j."
+    },
+    {
+      q: "What is the difference between standard VACUUM and VACUUM FULL in PostgreSQL?",
+      a: ["VACUUM reclaims dead space for future table inserts without locking; VACUUM FULL rewrites the table to disk and requires an exclusive lock","VACUUM only works on numbers; VACUUM FULL works on text","VACUUM FULL is automatic; VACUUM must be run manually","There is no difference between them"],
+      c: 0,
+      why: "VACUUM FULL rewrites the entire table file to reclaim OS disk space, but locks out all reads and writes."
+    },
+    {
+      q: "What is the golden rule of database disaster recovery?",
+      a: ["An untested backup is not a backup: you must routinely practice restoring backups into test environments to prove they work","Backups should only be created on December 31st","Never store backups on external hard drives","Always store database passwords inside the backup filename"],
+      c: 0,
+      why: "Backups often fail during restore if unverified; regular restore drills are mandatory for reliability."
+    }
+  ]);
+</script>
+</body>
+</html>

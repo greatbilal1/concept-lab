@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 09 — Where procedural breaks down</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="procedural-programming" data-lesson="9" data-lesson-id="where-procedural-breaks-down">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 09</span> · Putting it together</span>
+
+  <h1 class="lesson-title">Where procedural breaks down</h1>
+  <p class="lesson-lede">
+    Procedural programming is not wrong — it is limited. This lesson is about the
+    exact point where the style starts to strain, so you can recognise it in your own
+    code instead of discovering it the hard way.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Recognise the procedural limit in real code</span>
+    <span><b>Mission link</b> Know when to reach for something else</span>
+  </div>
+
+  <h2><span class="n">1</span>The same data, passed everywhere</h2>
+
+  <p>
+    The first sign of strain is a group of values that always travel together. Here
+    <code>name</code>, <code>email</code>, and <code>plan</code> are passed to every
+    procedure as three separate parameters.
+  </p>
+
+  <pre><code>def send_welcome(name, email, plan):
+    ...
+
+def send_invoice(name, email, plan):
+    ...
+
+def upgrade(name, email, plan):
+    ...</code></pre>
+
+  <p>
+    This is a <b>data clump</b>: a set of values that belong together but have no
+    name. Every procedure repeats the same three parameters, and adding a fourth
+    means editing every one of them.
+  </p>
+
+  <div id="diagram1"></div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Coupling between steps</h2>
+
+  <p>
+    The second sign is <b>coupling</b>: procedures that know too much about each
+    other. When one procedure must be called before another, or must be passed the
+    exact shape the other expects, the steps are no longer independent.
+  </p>
+
+  <pre><code>def load_user():
+    return {"name": "Ada", "email": "a@x.com", "plan": "pro"}
+
+def send_invoice(user):
+    # must know the exact keys load_user produces
+    print(user["name"], user["email"], user["plan"])</code></pre>
+
+  <p>
+    The dictionary helps — the clump now has one name, <code>user</code> — but the
+    two procedures are still coupled through its exact shape. Change a key in one and
+    the other breaks silently.
+  </p>
+
+  <div class="note warn">
+    <span class="note-label">Watch out</span>
+    A dictionary is a step towards a fix, not the fix itself. It groups the data, but
+    nothing stops a procedure from using the wrong key or leaving one out.
+  </div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">3</span>The procedural limit</h2>
+
+  <p>
+    The <b>procedural limit</b> is this: procedures operate on data, but the data has
+    no procedures of its own. The behaviour that belongs to a user — sending them a
+    welcome, invoicing them, upgrading them — lives far away from the user data, in
+    free-floating procedures.
+  </p>
+
+  <pre><code># the data
+user = {"name": "Ada", "email": "a@x.com", "plan": "pro"}
+
+# the behaviour, somewhere else entirely
+send_welcome(user)
+send_invoice(user)
+upgrade(user)</code></pre>
+
+  <p>
+    Nothing ties the two together. A new reader has to search the whole file to find
+    every procedure that touches a user. That is the strain — and it is exactly what
+    the next course, Object-Oriented Programming, is built to relieve.
+  </p>
+
+  <div id="intro1"></div>
+
+  <h2><span class="n">4</span>Spot the limit</h2>
+
+  <p>
+    Here is the win for today. The lab below has a data clump and a coupled pair of
+    procedures. Group the clump into one value, then note which procedures still
+    depend on its exact shape.
+  </p>
+
+  <div id="lab1"></div>
+
+  <div id="fill1"></div>
+
+  <h2><span class="n">5</span>Check yourself</h2>
+
+  <p>
+    Answer from memory — do not scroll back up. Each option has the same number of
+    words, so nothing gives the answer away.
+  </p>
+
+  <div id="quiz"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>
+      You can name the procedural limit: data and the behaviour that belongs to it
+      live in different places. That is not a bug in your code — it is the edge of
+      the style. The next lesson puts the whole course together, and points at what
+      comes after.
+    </p>
+  </div>
+
+  <h2><span class="n">6</span>Do this next</h2>
+
+  <ol>
+    <li>
+      Find a data clump in your own code — three or more parameters that always
+      travel together — and group them into one value.
+    </li>
+    <li>
+      List every procedure that touches that value, and note which ones depend on its
+      exact shape.
+    </li>
+    <li>
+      Write one sentence describing what behaviour belongs to that data, and where it
+      currently lives.
+    </li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Read <a href="https://docs.python.org/3/tutorial/classes.html">Python — Classes</a>.
+    Read only the opening section: it states the problem this lesson describes, in
+    Python's own words.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher (me) anything — "is procedural ever
+    the right choice?", "what is a dataclass?", "what does OOP actually fix?". There
+    are no bad questions here.
+  </div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  /* the strain */
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      { title: "data", lines: ["name, email, plan"] },
+      { title: "clump", lines: ["always together"] },
+      { title: "passed", lines: ["to every procedure"] },
+      { title: "no name", lines: ["nothing ties them"] }
+    ]
+  });
+
+  /* predict-then-reveal */
+  TeachWidgets.predict("#predict1", {
+    q: "What is a set of values always passed together?",
+    a: ["A data clump", "A hidden dependency", "A circular import", "A main guard"],
+    c: 0,
+    why: "A data clump is a group of values that belong together but have no name."
+  });
+
+  /* step through the coupled pair */
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "def load_user():",
+      "    return {\"name\": \"Ada\", \"plan\": \"pro\"}",
+      "def send_invoice(user):",
+      "    print(user[\"name\"], user[\"plan\"])",
+      "send_invoice(load_user())"
+    ],
+    steps: [
+      { line: 0, vars: { action: "define load_user" } },
+      { line: 2, vars: { action: "define send_invoice" } },
+      { line: 4, vars: { action: "call load_user" } },
+      { line: 1, vars: { returned: "{'name': 'Ada', 'plan': 'pro'}" } },
+      { line: 4, vars: { action: "call send_invoice", user: "the dict" } },
+      { line: 3, vars: { printed: "Ada pro" } }
+    ]
+  });
+
+  /* three signs of the limit */
+  TeachWidgets.introCards("#intro1", {
+    cards: [
+      { ico: "🧳", title: "Data clump", body: "The same group of values is passed to every procedure, unnamed." },
+      { ico: "🔗", title: "Coupling", body: "Procedures depend on each other's exact data shape to work." },
+      { ico: "🧭", title: "Scattered behaviour", body: "The behaviour that belongs to the data lives somewhere else." }
+    ]
+  });
+
+  /* the tiny interpreter */
+  TeachWidgets.lab("#lab1", {
+    label: "Run it — group the clump into one value",
+    starter: "def send_welcome(name, email, plan):\n    print(\"Welcome\", name)\n\ndef send_invoice(name, email, plan):\n    print(\"Invoice\", name, plan)\n\nsend_welcome(\"Ada\", \"a@x.com\", \"pro\")\nsend_invoice(\"Ada\", \"a@x.com\", \"pro\")"
+  });
+
+  /* recall from memory */
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the blanks",
+    lines: [
+      "Values always passed together are a <0>",
+      "Procedures knowing too much about each other is <1>",
+      "Data and its behaviour living apart is the <2> limit"
+    ],
+    blanks: [
+      { a: ["clump", "data clump"], why: "A data clump is a group of values that belong together but have no name." },
+      { a: ["coupling"], why: "Coupling is when procedures depend on each other's exact data shape." },
+      { a: ["procedural"], why: "The procedural limit is that data and the behaviour belonging to it live apart." }
+    ]
+  });
+
+  /* the quiz — every option is exactly three words */
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is a data clump?",
+      a: ["Values always passed together here", "A procedure with no name", "A module with no guard", "A loop with no exit"],
+      c: 0,
+      why: "A data clump is a group of values that belong together but have no name."
+    },
+    {
+      q: "What is coupling?",
+      a: ["Steps knowing too much", "Steps running too slowly", "Steps with long names", "Steps with no parameters"],
+      c: 0,
+      why: "Coupling is when procedures depend on each other's exact data shape to work."
+    },
+    {
+      q: "What is the procedural limit?",
+      a: ["Data and behaviour live apart", "Procedures cannot return values here", "Modules cannot be imported here", "Loops cannot be nested here"],
+      c: 0,
+      why: "The procedural limit is that data and the behaviour belonging to it live in different places."
+    },
+    {
+      q: "What does a dictionary fix?",
+      a: ["It names the clump", "It removes all coupling", "It speeds up code", "It hides the parameters"],
+      c: 0,
+      why: "A dictionary gives the clump one name, but the procedures are still coupled through its shape."
+    }
+  ]);
+</script>
+</body>
+</html>

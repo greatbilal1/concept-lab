@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 03 — Functional Requirements vs Implementation Constraints</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="prompting-vs-specification" data-lesson="3" data-lesson-id="functional-reqs-vs-constraints">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 03</span> · Requirements</span>
+
+  <h1 class="lesson-title">Functional Requirements vs Implementation Constraints</h1>
+  <p class="lesson-lede">
+    Distinguishing what the system must achieve (functional requirements) from how it must achieve it (constraints).
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to decouple functional requirements from technical constraints.</span>
+    <span><b>Mission link</b> Mastering functional requirements vs implementation constraints across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Functional Requirements vs Implementation Constraints</h2>
+  <p>When authoring specifications, junior engineers often conflate <strong>functional requirements</strong> (what the software does for the user) with <strong>implementation constraints</strong> (the technical and architectural rules governing how it is built).</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Distinguishing what the system must achieve (functional requirements) from how it must achieve it (constraints).
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Requirements vs Constraints</h2>
+  <p>Separating these two dimensions gives the agent appropriate freedom to implement while keeping it strictly bounded by your architecture:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Freedom Within Guardrails</h2>
+  <ul><li><strong>Functional Requirement:</strong> <em>'When an invoice is paid, generate a PDF receipt and email it to the customer.'</em></li><li><strong>Implementation Constraint:</strong> <em>'Use ReportLab for PDF generation. Send emails asynchronously via Celery worker task. Do not block the HTTP request thread.'</em></li></ul><pre><code># Mixing Requirements and Constraints (Bad):
+"Make PDF receipts fast using celery and send them with sendgrid without blocking."
+
+# Clean Separation (Good):
+### Functional Requirements
+- Generate invoice PDF with line items, tax, and company header.
+- Dispatch receipt email to user's registered email address.
+
+### Implementation Constraints
+- Asynchronous execution: PDF generation must run in a Celery background task.
+- Library constraint: Use 'weasyprint' (already installed in pyproject.toml).
+- Storage: Store generated PDFs in /var/data/receipts/ using uuid4 filenames.</code></pre><div class="callout"><p><strong>Rule of Thumb:</strong> Let functional requirements express business outcomes; use implementation constraints to preserve architectural consistency.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the requirements distinction sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to decouple functional requirements from technical constraints.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where functional requirements vs implementation constraints applies.</li>
+    <li>Author a unit test or verification script exercising functional requirements vs implementation constraints.</li>
+    <li>Document team architectural conventions regarding functional requirements vs implementation constraints.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Functional Requirements vs Implementation Constraints.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Which of the following is an implementation constraint rather than a functional requirement?",
+    a: ["'Must use PostgreSQL 16 and avoid adding third-party ORM packages'","'Must allow users to reset their password via email'","'Must calculate sales tax based on zip code'","'Must export transaction history to CSV'"],
+    c: 0,
+    why: "Technology choices, performance limits, and library restrictions are constraints; business capabilities are requirements."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Functional Requirements (What)",
+            "lines": [
+                  "User can reset password",
+                  "Validate reset token within 15 min",
+                  "Emit audit event"
+            ]
+      },
+      {
+            "title": "Implementation Constraints (How)",
+            "lines": [
+                  "Use argon2id for token hashing",
+                  "Store tokens in Redis with TTL",
+                  "No new npm/pip packages"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Functional Requirements vs Implementation Constraints",
+      "def execute_flow():",
+      "    # Distinguishing what the system must achieve (funct...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Functional Requirements vs Implementation Constraints"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Too Rigid"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Too Vague"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "step": "Clean Spec"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Functional requirements specify the business {1} of the software, while constraints define the technical {2} within which it must be built."
+],
+    blanks: [
+      {
+            "a": [
+                  "capabilities"
+            ],
+            "why": "What the user or system can do"
+      },
+      {
+            "a": [
+                  "guardrails"
+            ],
+            "why": "Technical boundaries and limitations"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why is it important to explicitly state library constraints in an agent spec?",
+      a: ["To prevent the agent from installing redundant or unapproved third-party dependencies","Because Python can only import one library at a time","To make package installations faster","Because third-party packages are illegal in commercial software"],
+      c: 0,
+      why: "Without library constraints, agents will install whatever package they were pretrained on, bloating dependencies."
+    },
+    {
+      q: "Which of the following is a functional requirement?",
+      a: ["A user who enters an incorrect password three times must be temporarily locked out for 15 minutes","All code must be formatted with Black","Database queries must complete in under 5ms","Use Python 3.12 syntax"],
+      c: 0,
+      why: "Account lockout logic is a direct user-facing business behavior."
+    },
+    {
+      q: "What happens if you over-specify implementation down to every variable name?",
+      a: ["You waste engineering time doing the agent's job and make the specification brittle to minor structural variations","The agent generates faster code","The model context window shrinks","The code compiles to C"],
+      c: 0,
+      why: "Over-constraining low-level trivia wastes time; focus constraints on architecture, security, and contracts."
+    },
+    {
+      q: "How do performance constraints (e.g. latency budgets) guide agent choices?",
+      a: ["They force the agent to choose efficient data structures, indexing, and algorithms rather than naive nested loops","They make the CPU run at higher clock speeds","They reduce internet bills","They turn on compiler optimizations automatically"],
+      c: 0,
+      why: "Latency and resource constraints guide the agent away from naive O(N^2) implementations."
+    }
+  ]);
+</script>
+</body>
+</html>

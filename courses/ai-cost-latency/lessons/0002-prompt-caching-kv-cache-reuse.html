@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 02 — Prompt Caching Architecture: KV-Cache Reuse</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="ai-cost-latency" data-lesson="2" data-lesson-id="prompt-caching-kv-cache-reuse">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 02</span> · Prompt Caching</span>
+
+  <h1 class="lesson-title">Prompt Caching Architecture: KV-Cache Reuse</h1>
+  <p class="lesson-lede">
+    Harnessing Key-Value (KV) cache reuse: Anthropic and OpenAI prompt caching, static prefix optimization, and 90% cost discounts.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to design prompts that maximize KV-cache reuse and slash token bills.</span>
+    <span><b>Mission link</b> Mastering prompt caching architecture: kv-cache reuse across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Prompt Caching Architecture: KV-Cache Reuse</h2>
+  <p>In many enterprise AI applications, 90% of the prompt is identical across every query: a 5,000-token system prompt containing instructions, few-shot examples, tools, and company documentation. Re-computing attention over that static text on every single user request is pure computational waste.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Harnessing Key-Value (KV) cache reuse: Anthropic and OpenAI prompt caching, static prefix optimization, and 90% cost discounts.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Prompt Caching Architecture</h2>
+  <p><strong>Prompt Caching (KV-Cache Reuse)</strong> revolutionizes inference economics:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Cache Invalidation Pitfall</h2>
+  <ul><li><strong>1. The KV-Cache Principle:</strong> During pre-fill, the model calculates Key ($K$) and Value ($V$) attention matrices for every token. Instead of throwing them away, the serving engine stores the KV-cache in GPU VRAM.</li><li><strong>2. 80-90% Price Discount:</strong> Providers (OpenAI, Anthropic) pass the savings to developers: cached input tokens receive an automatic <strong>50% to 90% cost discount</strong>!</li><li><strong>3. Slashing Time-to-First-Token (TTFT):</strong> Ingesting a 50,000-token document normally takes 2.5 seconds. With prompt caching, the pre-fill finishes in <strong>under 100 milliseconds</strong>!</li></ul><pre><code># The Prompt Caching Architecture Rule:
+# ALWAYS place static, unchanging content at the BEGINNING of your prompt,
+# and place dynamic user content at the VERY END!
+#
+# [STATIC CACHEABLE PREFIX (5,000 tokens - 90% DISCOUNT & 100ms TTFT)]
+# ├── System Persona & Operating Rules
+# ├── Tool Definitions & JSON Schemas
+# └── Fixed Few-Shot Golden Examples
+#
+# [DYNAMIC TAIL (100 tokens - Billed at standard rate)]
+# └── Current User Question: "How do I reset my password?"</code></pre><div class="callout"><p><strong>The Golden Prefix Rule:</strong> Caching requires an exact 100% prefix match. If you inject a dynamic timestamp into line 1 of your system prompt, you invalidate the cache for the entire document!</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the prompt caching sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to design prompts that maximize KV-cache reuse and slash token bills.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where prompt caching architecture: kv-cache reuse applies.</li>
+    <li>Author a unit test or verification script exercising prompt caching architecture: kv-cache reuse.</li>
+    <li>Document team architectural conventions regarding prompt caching architecture: kv-cache reuse.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Prompt Caching Architecture: KV-Cache Reuse.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "How does Prompt Caching achieve massive latency reductions and up to 90% cost discounts?",
+    a: ["By reusing pre-computed Key-Value (KV) attention states for static prompt prefixes across requests, bypassing redundant pre-fill compute","By storing answers in a browser cookie","By deleting prompt tokens","By running on quantum computers"],
+    c: 0,
+    why: "Reusing pre-computed KV-cache states bypasses the expensive matrix pre-fill computation phase on static prefixes."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Static Prefix (Cached)",
+            "lines": [
+                  "System prompt, schemas, docs",
+                  "Pre-computed KV-cache stored in VRAM",
+                  "Cost: 90% discount! TTFT: < 100ms"
+            ]
+      },
+      {
+            "title": "Dynamic Tail (Uncached)",
+            "lines": [
+                  "User's current query",
+                  "Processed on top of cached state",
+                  "Minimal compute required"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Prompt Caching Architecture: KV-Cache Reuse",
+      "def execute_flow():",
+      "    # Harnessing Key-Value (KV) cache reuse: Anthropic a...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Prompt Caching Architecture: KV-Cache Reuse"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Dynamic Timestamp at Top (BAD)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Clean Static Prefix (OPTIMAL)"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Prompt caching achieves dramatic cost and latency reductions by storing pre-computed {1} cache states for static prompt {2} in GPU memory."
+],
+    blanks: [
+      {
+            "a": [
+                  "KV"
+            ],
+            "why": "Key-Value attention state cache"
+      },
+      {
+            "a": [
+                  "prefixes"
+            ],
+            "why": "Beginning unchanging portions of the prompt"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What happens if a developer places a dynamic date-time string at the very beginning of the system prompt?",
+      a: ["It invalidates the prompt cache on every request, completely destroying prompt caching benefits for the entire prompt","It makes the model run faster","It updates the computer clock","It formats the text in bold"],
+      c: 0,
+      why: "Prompt caching requires exact byte-for-byte prefix matches; early dynamic text breaks cache reuse."
+    },
+    {
+      q: "What discount do providers like Anthropic and OpenAI typically offer for cached input tokens?",
+      a: ["Between 50% and 90% discount compared to uncached input token prices","Tokens are free forever","Tokens cost 10x more","Zero discount"],
+      c: 0,
+      why: "Providers offer massive discounts because cached tokens require almost zero GPU compute to process."
+    },
+    {
+      q: "How does prompt caching affect Time-to-First-Token (TTFT) on large documents?",
+      a: ["It reduces TTFT from several seconds down to tens of milliseconds by bypassing pre-fill matrix multiplications","It increases TTFT by 10x","It turns off the screen","It deletes the document"],
+      c: 0,
+      why: "Loading pre-computed KV states from memory bypasses heavy attention pre-fill calculation."
+    },
+    {
+      q: "Where in the prompt structure should the dynamic user query be placed to maximize cache efficiency?",
+      a: ["At the very end of the prompt, following all static system instructions, schemas, and reference documents","At the very beginning","In the middle of the system prompt","In a separate email"],
+      c: 0,
+      why: "Placing dynamic elements at the tail preserves the static prefix for cache reuse across queries."
+    }
+  ]);
+</script>
+</body>
+</html>

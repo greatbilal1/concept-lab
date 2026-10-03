@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 01 — The Challenge of Evaluating Multi-Step Agency</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="agent-evaluation" data-lesson="1" data-lesson-id="evaluating-multi-step-agency">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 01</span> · Agency Evaluation</span>
+
+  <h1 class="lesson-title">The Challenge of Evaluating Multi-Step Agency</h1>
+  <p class="lesson-lede">
+    Why evaluating autonomous agents is fundamentally harder than evaluating single-turn chatbots: state, non-determinism, and multi-turn trajectories.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You understand the challenges of evaluating multi-step agency and the end-state principle.</span>
+    <span><b>Mission link</b> Mastering the challenge of evaluating multi-step agency across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of The Challenge of Evaluating Multi-Step Agency</h2>
+  <p>Evaluating a chatbot is relatively simple: you feed an input, get an output, and compare it to a reference string. But an autonomous agent is not a chatbot; it is a <strong>stateful, multi-step problem solver</strong>.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Why evaluating autonomous agents is fundamentally harder than evaluating single-turn chatbots: state, non-determinism, and multi-turn trajectories.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Single-Turn vs Multi-Step Evaluation</h2>
+  <p>Why evaluating autonomous agents is an advanced engineering challenge:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Multiple Valid Trajectories</h2>
+  <ul><li><strong>1. Divergent Valid Trajectories:</strong> To fix a bug, Agent A might run `grep`, read line 40, and edit the file. Agent B might run `pytest` first, inspect the stack trace, and edit the file. Both paths are completely valid! You cannot evaluate an agent by grading its intermediate thoughts.</li><li><strong>2. Environmental State Mutation:</strong> Agents change the world: they edit files, create branches, and write database rows. Evaluation requires inspecting the <strong>final environment state</strong>.</li><li><strong>3. Compounding Failure Probability:</strong> A 10-step agent that makes a small mistake at step 4 can derail its entire trajectory.</li><li><strong>4. Non-Deterministic Loops:</strong> An agent might take 4 turns today and 7 turns tomorrow to solve the identical issue.</li></ul><pre><code># The Autonomous Agent Evaluation Paradigm:
+# Do NOT evaluate: "Did the agent's chat explanation match my reference?"
+# DO evaluate: "Did the agent's code edits cause `pytest` to pass with exit code 0
+#               without introducing new regressions or breaking linters?"</code></pre><div class="callout"><p><strong>The End-State Principle:</strong> Evaluate agents based on the final physical and digital state of the environment, not on the intermediate words they uttered.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the agent evaluation sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You understand the challenges of evaluating multi-step agency and the end-state principle.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where the challenge of evaluating multi-step agency applies.</li>
+    <li>Author a unit test or verification script exercising the challenge of evaluating multi-step agency.</li>
+    <li>Document team architectural conventions regarding the challenge of evaluating multi-step agency.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for The Challenge of Evaluating Multi-Step Agency.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What makes evaluating an autonomous coding agent fundamentally harder than evaluating a simple question-answering model?",
+    a: ["Agents execute multi-step trajectories across files and tools where intermediate paths vary wildly, requiring evaluation of real-world end-state correctness","Agents refuse to be evaluated","Agents run on paper","Evaluation of code is illegal"],
+    c: 0,
+    why: "Agents explore diverse multi-turn tool trajectories; evaluation must assess end-state environment correctness rather than text matching."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Single-Turn Chatbot Eval",
+            "lines": [
+                  "Input -> Output text",
+                  "Compared against reference string",
+                  "Static, predictable, zero environment"
+            ]
+      },
+      {
+            "title": "Multi-Step Agent Eval",
+            "lines": [
+                  "Input goal -> Multi-tool trajectory",
+                  "Mutates files, branches, & databases",
+                  "Evaluated via final test suite pass/fail"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing The Challenge of Evaluating Multi-Step Agency",
+      "def execute_flow():",
+      "    # Why evaluating autonomous agents is fundamentally ...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "The Challenge of Evaluating Multi-Step Agency"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Agent Path A (Grep-First)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Agent Path B (Test-First)"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Evaluating autonomous agents requires assessing final environment {1} correctness and test pass rates rather than grading intermediate text {2}."
+],
+    blanks: [
+      {
+            "a": [
+                  "state"
+            ],
+            "why": "Condition of files, databases, and code"
+      },
+      {
+            "a": [
+                  "trajectories"
+            ],
+            "why": "The sequence of thoughts and tool calls"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the primary indicator of success when evaluating an autonomous software engineering agent?",
+      a: ["The automated test suite passes with exit code 0 on the modified repository without regressing existing tests","The agent outputs a friendly apology","The agent finishes in 1 second","The agent uses 100 tools"],
+      c: 0,
+      why: "Passing the repository's test suite provides objective proof of task resolution."
+    },
+    {
+      q: "Why is grading an agent's intermediate tool calls against a strict golden sequence usually an anti-pattern?",
+      a: ["Different valid exploration strategies (e.g. grep-first vs test-first) arrive at correct solutions through different tool sequences","Tool calls are encrypted","Computers cannot compare tools","It is illegal in Python"],
+      c: 0,
+      why: "Over-constraining intermediate paths penalizes creative and equally valid problem-solving strategies."
+    },
+    {
+      q: "What is 'Environment Teardown' in agent evaluation harnesses?",
+      a: ["Resetting the sandbox repository, files, and database back to a pristine baseline after each agent test run","Breaking physical computer monitors","Formatting the hard drive","Deleting the user account"],
+      c: 0,
+      why: "Teardown ensures each test case executes in an isolated, reproducible environment without state pollution."
+    },
+    {
+      q: "How does multi-step execution compound failure rates in autonomous agents?",
+      a: ["A minor error or false assumption in early turns compounds across subsequent tool calls, derailing the entire task","It doubles the speed of the CPU","It deletes the model weights","It converts code to HTML"],
+      c: 0,
+      why: "Early errors mislead subsequent planning, causing compounding failure cascades."
+    }
+  ]);
+</script>
+</body>
+</html>

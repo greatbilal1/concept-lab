@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 06 — Multiple Tool Calls in a Single Turn (Parallel Calling)</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="function-calling" data-lesson="6" data-lesson-id="parallel-tool-calling">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 06</span> · Parallel Tools</span>
+
+  <h1 class="lesson-title">Multiple Tool Calls in a Single Turn (Parallel Calling)</h1>
+  <p class="lesson-lede">
+    Parallel tool execution: how models emit multiple tool calls in a single turn, and executing them concurrently with asyncio.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to execute multiple tool calls concurrently using asynchronous pipelines.</span>
+    <span><b>Mission link</b> Mastering multiple tool calls in a single turn (parallel calling) across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Multiple Tool Calls in a Single Turn (Parallel Calling)</h2>
+  <p>If a user asks: <em>'Compare the stock price of Apple, Microsoft, and Google'</em>, an old sequential agent would require three full round trips: Call Apple $\rightarrow$ Wait $\rightarrow$ Call Microsoft $\rightarrow$ Wait $\rightarrow$ Call Google $\rightarrow$ Wait. Total latency: 9 seconds.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Parallel tool execution: how models emit multiple tool calls in a single turn, and executing them concurrently with asyncio.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Sequential vs Parallel Tool Execution</h2>
+  <p>Modern models support <strong>Parallel Tool Calling</strong>: the model analyzes the prompt and emits <strong>all three tool calls in a single response turn</strong>!</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Parallel Result Resolution Flow</h2>
+  <pre><code># The Parallel Tool Call Response:
+# message.tool_calls contains THREE items simultaneously:
+# - call_1: get_stock(ticker="AAPL")
+# - call_2: get_stock(ticker="MSFT")
+# - call_3: get_stock(ticker="GOOGL")
+
+# Your backend executes all three CONCURRENTLY using asyncio:
+results = await asyncio.gather(
+    fetch_stock("AAPL"),
+    fetch_stock("MSFT"),
+    fetch_stock("GOOGL")
+)
+# Total execution time drops from 9 seconds to 1 second!</code></pre><p>To return results, you append a <code>role: "tool"</code> message for <strong>every individual tool_call_id</strong> before calling the model again. The model then synthesizes all three results together!</p><div class="callout"><p><strong>The Async Rule:</strong> Always execute multiple tool calls concurrently using `asyncio.gather()` or thread pools. Never run independent tool calls serially in a for-loop.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the parallel tool sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to execute multiple tool calls concurrently using asynchronous pipelines.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where multiple tool calls in a single turn (parallel calling) applies.</li>
+    <li>Author a unit test or verification script exercising multiple tool calls in a single turn (parallel calling).</li>
+    <li>Document team architectural conventions regarding multiple tool calls in a single turn (parallel calling).</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Multiple Tool Calls in a Single Turn (Parallel Calling).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Why is Parallel Tool Calling significantly faster than sequential tool execution?",
+    a: ["The model requests multiple independent tools in one turn, allowing the backend to execute them concurrently with asyncio.gather()","Parallel calling runs on quantum computers","Parallel calling deletes the database","Parallel tools are free"],
+    c: 0,
+    why: "Concurrent execution slashes latency by executing multiple independent queries or API calls simultaneously."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Sequential Execution (Slow)",
+            "lines": [
+                  "Turn 1: Call AAPL -> Wait 1s",
+                  "Turn 2: Call MSFT -> Wait 1s",
+                  "Turn 3: Call GOOGL -> Wait 1s (Total: 6s)"
+            ]
+      },
+      {
+            "title": "Parallel Execution (Fast)",
+            "lines": [
+                  "Model emits all 3 calls in Turn 1",
+                  "Backend runs all 3 in parallel via asyncio",
+                  "Finished in 1s (3x speedup!)"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Multiple Tool Calls in a Single Turn (Parallel Calling)",
+      "def execute_flow():",
+      "    # Parallel tool execution: how models emit multiple ...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Multiple Tool Calls in a Single Turn (Parallel Calling)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Model Requests"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Parallel Execution"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "step": "Tool Messages Appended"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Parallel tool calling emits multiple tool requests in one turn, allowing backends to execute them concurrently with {1} to slash {2}."
+],
+    blanks: [
+      {
+            "a": [
+                  "asyncio"
+            ],
+            "why": "Python asynchronous concurrency library"
+      },
+      {
+            "a": [
+                  "latency"
+            ],
+            "why": "Total wait time for execution"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "How does an application know if the model emitted multiple tool calls in a single turn?",
+      a: ["By checking len(message.tool_calls): if greater than 1, multiple tool calls were requested","By checking if the text has commas","By waiting 5 seconds","By counting words"],
+      c: 0,
+      why: "The message.tool_calls list contains all individual tool call objects emitted in that turn."
+    },
+    {
+      q: "What happens if a backend only returns results for 2 out of 3 requested parallel tool calls?",
+      a: ["The API will return an error because every tool_call_id emitted by the assistant must have a matching tool response message","The model ignores the missing tool","The computer restarts","The third tool runs automatically"],
+      c: 0,
+      why: "API contracts require that all tool_call_ids in a turn must be resolved before proceeding."
+    },
+    {
+      q: "What Python function runs multiple asynchronous coroutines concurrently?",
+      a: ["asyncio.gather(*tasks)","time.sleep()","os.fork()","thread.stop()"],
+      c: 0,
+      why: "asyncio.gather fires all coroutines concurrently, awaiting until all have finished."
+    },
+    {
+      q: "Can a model call two different tools in parallel (e.g. check_weather and check_traffic simultaneously)?",
+      a: ["Yes; parallel tool calling supports calling different functions with different schemas in the same turn","No; parallel calls must be the same function","Only in JavaScript","Only on Sundays"],
+      c: 0,
+      why: "Models can interleave completely different tool definitions in a single parallel turn."
+    }
+  ]);
+</script>
+</body>
+</html>

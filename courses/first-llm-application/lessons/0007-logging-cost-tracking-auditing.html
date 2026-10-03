@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 07 — Logging, Cost Tracking, and Usage Auditing</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="first-llm-application" data-lesson="7" data-lesson-id="logging-cost-tracking-auditing">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 07</span> · Observability</span>
+
+  <h1 class="lesson-title">Logging, Cost Tracking, and Usage Auditing</h1>
+  <p class="lesson-lede">
+    Production LLM observability: tracking prompt/completion tokens, calculating dollar costs, and tracing requests with OpenTelemetry.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to track token spend, calculate costs, and monitor LLM application telemetry.</span>
+    <span><b>Mission link</b> Mastering logging, cost tracking, and usage auditing across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Logging, Cost Tracking, and Usage Auditing</h2>
+  <p>If you don't measure it, you cannot manage it. When you deploy an AI feature to thousands of users, some users will make 3 requests a day, while others will write automated bots that fire 5,000 requests an hour. Without <strong>Usage Auditing and Observability</strong>, you will receive an unexpected $15,000 invoice at the end of the month.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Production LLM observability: tracking prompt/completion tokens, calculating dollar costs, and tracing requests with OpenTelemetry.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Observability Dashboard</h2>
+  <p>Every production LLM call returns a <code>usage</code> object in its response metadata:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Per-Tenant Quota Enforcement</h2>
+  <pre><code># Inspecting the Usage Object:
+response = client.chat.completions.create(...)
+usage = response.usage
+print(usage.prompt_tokens)      # e.g. 1,420 input tokens
+print(usage.completion_tokens)  # e.g. 280 output tokens
+print(usage.total_tokens)       # e.g. 1,700 total tokens</code></pre><p>The three pillars of production LLM observability:</p><ul><li><strong>1. Cost Accounting:</strong> Multiply `prompt_tokens` and `completion_tokens` by model pricing rates and record the dollar cost directly to the user's account database row.</li><li><strong>2. Latency Tracing:</strong> Record Time-to-First-Token and total generation duration using OpenTelemetry (e.g. Langfuse, Arize Phoenix, OpenInference).</li><li><strong>3. Rate Limiting by Token Quota:</strong> Enforce monthly token budgets per subscription tier (e.g. Free Tier = 100k tokens/month).</li></ul><div class="callout"><p><strong>Observability Rule:</strong> Never log sensitive customer Personally Identifiable Information (PII) in plaintext in your tracing databases! Anonymize or redact prompts before shipping them to third-party dashboards.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the observability sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to track token spend, calculate costs, and monitor LLM application telemetry.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where logging, cost tracking, and usage auditing applies.</li>
+    <li>Author a unit test or verification script exercising logging, cost tracking, and usage auditing.</li>
+    <li>Document team architectural conventions regarding logging, cost tracking, and usage auditing.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Logging, Cost Tracking, and Usage Auditing.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Why is tracking token usage per user or per tenant essential in multi-tenant SaaS applications?",
+    a: ["To prevent abusive heavy users from consuming company profits, enforce billing quotas, and monitor feature costs","To see what users are typing in private","To sell user data to advertising companies","It is required by the operating system"],
+    c: 0,
+    why: "Tracking per-tenant token usage protects gross margins and enforces subscription tier quotas."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Token Usage Tracking",
+            "lines": [
+                  "Record prompt & completion tokens",
+                  "Aggregate by user_id and tenant_id"
+            ]
+      },
+      {
+            "title": "Real-Time Cost Audit",
+            "lines": [
+                  "Calculate exact dollar spend",
+                  "Enforce monthly subscription quotas"
+            ]
+      },
+      {
+            "title": "Latency Tracing",
+            "lines": [
+                  "Track TTFT and total duration",
+                  "Alert on API slowdowns or outages"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Logging, Cost Tracking, and Usage Auditing",
+      "def execute_flow():",
+      "    # Production LLM observability: tracking prompt/comp...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Logging, Cost Tracking, and Usage Auditing"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Free Tier User"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Enterprise Tier User"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Production applications track token usage from the API {1} object to calculate dollar costs and enforce per-user subscription {2}."
+],
+    blanks: [
+      {
+            "a": [
+                  "usage"
+            ],
+            "why": "Response metadata containing token counts"
+      },
+      {
+            "a": [
+                  "quotas"
+            ],
+            "why": "Usage caps and monthly budgets"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Where in the API response does OpenAI provide the exact count of tokens consumed by a request?",
+      a: ["In the response.usage object (prompt_tokens, completion_tokens, total_tokens)","In the HTTP cookies","In the user's email","In the URL query string"],
+      c: 0,
+      why: "The response.usage dictionary provides exact token metrics billed by the provider."
+    },
+    {
+      q: "What is an LLM tracing platform like Langfuse or Arize Phoenix used for?",
+      a: ["Tracing multi-step agent execution, logging prompts and responses, monitoring latency, and auditing evaluation metrics","Editing photos","Mining cryptocurrency","Translating website HTML"],
+      c: 0,
+      why: "LLM observability platforms provide distributed tracing, evaluation, and cost analytics."
+    },
+    {
+      q: "Why is rate limiting by Tokens-Per-Minute (TPM) more effective than Requests-Per-Minute (RPM) for AI APIs?",
+      a: ["A single request with a 100k-token document consumes 1,000x more compute than a 100-token request","TPM is easier to spell","RPM is only used for cars","Tokens are cheaper than requests"],
+      c: 0,
+      why: "Compute and cost scale with token volume, not raw HTTP request counts."
+    },
+    {
+      q: "How does tracking cost per transaction protect a software startup?",
+      a: ["It ensures that the cost of serving each customer action remains safely below the revenue earned from that action","It eliminates the need for taxes","It speeds up the database","It turns off the cloud servers"],
+      c: 0,
+      why: "Positive unit economics are essential for sustainable, profitable business operations."
+    }
+  ]);
+</script>
+</body>
+</html>

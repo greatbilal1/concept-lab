@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 02 — Injection Attacks: SQLi, Command Injection, and Parameterized Queries</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="web-security" data-lesson="2" data-lesson-id="injection-attacks-sqli-parameterized-queries">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 02</span> · Injection Attacks</span>
+
+  <h1 class="lesson-title">Injection Attacks: SQLi, Command Injection, and Parameterized Queries</h1>
+  <p class="lesson-lede">
+    The classic fatal vulnerability: SQL Injection (SQLi), OS command injection, why string concatenation fails, and parameterized queries.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to prevent SQL and command injection attacks using parameterized queries and array execution.</span>
+    <span><b>Mission link</b> Mastering injection attacks: sqli, command injection, and parameterized queries across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Injection Attacks: SQLi, Command Injection, and Parameterized Queries</h2>
+  <p>SQL Injection (SQLi) has caused some of the largest data breaches in human history. It stems from a single fundamental mistake: <strong>confusing data with code</strong>. When you concatenate user input into an SQL query string, the database interpreter cannot tell where your query ends and the attacker's commands begin.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    The classic fatal vulnerability: SQL Injection (SQLi), OS command injection, why string concatenation fails, and parameterized queries.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>String Concatenation vs Parameterized Queries</h2>
+  <p>The Classic SQL Injection Vulnerability:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>OS Command Injection Danger</h2>
+  <pre><code># VULNERABLE CODE (String Concatenation): 
+user_input = "admin' OR '1'='1"
+query = "SELECT * FROM users WHERE email = '" + user_input + "' AND password = 'secret'"
+# Resulting Executed SQL:
+# SELECT * FROM users WHERE email = 'admin' OR '1'='1' AND password = 'secret'
+# Because '1'='1' is always TRUE, the attacker logs in as ADMIN without a password!</code></pre><p>The Absolute Defense: <strong>Parameterized Queries (Prepared Statements)</strong>:</p><ul><li><strong>Separation of Code and Data:</strong> The SQL query structure is sent to the database engine first: <code>SELECT * FROM users WHERE email = $1</code>. The database compiles the execution plan.</li><li><strong>Data Passed as Bound Values:</strong> The user input is transmitted separately across the wire as a literal value parameter. Even if the user types <code>' OR 1=1; DROP TABLE users;--</code>, the database treats it strictly as a harmless, literal string!</li></ul><pre><code># SECURE CODE (Parameterized Query in Python/asyncpg):
+# The database driver handles parameter binding safely:
+user_input = "admin' OR '1'='1"
+row = await db.fetchrow(
+    "SELECT * FROM users WHERE email = $1 AND password_hash = $2",
+    user_input, hashed_pw # Passed as separate parameters! 100% IMMUNE TO SQLi!
+)</code></pre><div class="callout"><p><strong>The Zero-Tolerance Law:</strong> Never, under any circumstances, use f-strings, format(), or + string concatenation to build SQL or shell commands. Always use parameterized queries.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the injection sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to prevent SQL and command injection attacks using parameterized queries and array execution.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where injection attacks: sqli, command injection, and parameterized queries applies.</li>
+    <li>Author a unit test or verification script exercising injection attacks: sqli, command injection, and parameterized queries.</li>
+    <li>Document team architectural conventions regarding injection attacks: sqli, command injection, and parameterized queries.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Injection Attacks: SQLi, Command Injection, and Parameterized Queries.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What causes an SQL Injection (SQLi) vulnerability in a web application?",
+    a: ["Directly interpolating untrusted user strings into an SQL command string, allowing user input to be parsed and executed as database code","Using an SQL database instead of NoSQL","Having too many rows in a table","Running queries on Linux"],
+    c: 0,
+    why: "SQL injection occurs when untrusted user input alters the grammatical structure of the SQL query syntax."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "String Concatenation (Vulnerable)",
+            "lines": [
+                  "query = 'SELECT * WHERE user = ' + input",
+                  "Attacker input alters SQL syntax logic",
+                  "Allows authentication bypass & data theft"
+            ]
+      },
+      {
+            "title": "Parameterized Query (Immune)",
+            "lines": [
+                  "query = 'SELECT * WHERE user = $1', [input]",
+                  "Input is bound strictly as literal data",
+                  "100% immune to SQL injection!"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Injection Attacks: SQLi, Command Injection, and Parameterized Queries",
+      "def execute_flow():",
+      "    # The classic fatal vulnerability: SQL Injection (SQ...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Injection Attacks: SQLi, Command Injection, and Parameterized Queries"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Vulnerable Shell Execution"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Secure Array Execution"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "SQL injection occurs when untrusted input is concatenated into queries, and is completely neutralized by using {1} queries to separate code from {2}."
+],
+    blanks: [
+      {
+            "a": [
+                  "parameterized"
+            ],
+            "why": "Prepared statements with bound variables"
+      },
+      {
+            "a": [
+                  "data"
+            ],
+            "why": "Literal values passed to database"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why does a parameterized query completely prevent SQL injection attacks?",
+      a: ["The database compiles the query syntax before binding user values, ensuring input can only ever be treated as literal data, never executable syntax","It encrypts the database","It deletes quotation marks","It runs queries in C"],
+      c: 0,
+      why: "Parameterized queries separate the query structure from data values at the database protocol level."
+    },
+    {
+      q: "What is 'OS Command Injection'?",
+      a: ["When untrusted user input is passed to a shell execution function (like os.system), allowing attackers to execute arbitrary operating system commands","A computer virus on Windows","A broken motherboard","A database query syntax error"],
+      c: 0,
+      why: "Command injection occurs when unvalidated input reaches a system shell interpreter."
+    },
+    {
+      q: "How can an engineer prevent OS command injection when executing external CLI utilities in Python?",
+      a: ["Use subprocess.run(('cmd', arg1, arg2), shell=False) passing arguments as a discrete list without invoking a shell","Use os.system with quotation marks","Ask the user not to use semicolons","Use eval()"],
+      c: 0,
+      why: "Passing command arguments as an array to subprocess without shell=True bypasses shell interpreters."
+    },
+    {
+      q: "Do modern Object-Relational Mappers (ORMs like SQLAlchemy or Prisma) protect against SQL injection by default?",
+      a: ["Yes; standard ORM query builders use parameterized queries under the hood, unless developers explicitly execute raw concatenated SQL strings","No; ORMs increase SQL injection","ORMs only work on SQLite","ORMs disable databases"],
+      c: 0,
+      why: "Standard ORM query methods parameterize inputs automatically, preventing injection unless raw SQL strings are forced."
+    }
+  ]);
+</script>
+</body>
+</html>

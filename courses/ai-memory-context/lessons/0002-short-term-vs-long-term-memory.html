@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 02 — Short-Term vs Long-Term Memory Architecture</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="ai-memory-context" data-lesson="2" data-lesson-id="short-term-vs-long-term-memory">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 02</span> · Memory Types</span>
+
+  <h1 class="lesson-title">Short-Term vs Long-Term Memory Architecture</h1>
+  <p class="lesson-lede">
+    Architectural memory tiers: Short-Term Working Memory (in-context buffer) vs Long-Term Persistent Memory (databases).
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to architect dual short-term and long-term memory systems.</span>
+    <span><b>Mission link</b> Mastering short-term vs long-term memory architecture across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Short-Term vs Long-Term Memory Architecture</h2>
+  <p>Human cognition operates with distinct memory systems: <strong>Working Memory</strong> (holding 5-7 items in mind right now) and <strong>Long-Term Memory</strong> (recalling events from last year). AI systems mirror this exact bifurcation:</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Architectural memory tiers: Short-Term Working Memory (in-context buffer) vs Long-Term Persistent Memory (databases).
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Short-Term vs Long-Term Memory</h2>
+  <ul><li><strong>1. Short-Term Memory (In-Context Working Memory):</strong> The active prompt window. Fast, immediate, and fully accessible to transformer attention. Contains the current task, recent dialogue turns, and active tool results. <em>Limitation:</em> Ephemeral, expensive, and bounded by context token limits.</li><li><strong>2. Long-Term Memory (External Persistent Store):</strong> Relational databases (PostgreSQL), Key-Value caches (Redis), and Vector Stores (pgvector). Stores user preferences, project facts, and past conversation summaries across months. <em>Limitation:</em> Must be explicitly retrieved and injected into short-term memory before the model can see it.</li></ul>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Memory Lifecycle Flow</h2>
+  <pre><code># The Dual-Memory Architecture:
+# LONG-TERM MEMORY (Database):
+user_profile = db.get_user_memory(user_id=42) # "Prefers TypeScript, hates ORMs"
+
+# SHORT-TERM WORKING MEMORY (Prompt Assembly):
+messages = [
+    {"role": "system", "content": f"User Preferences: {user_profile}"},
+    *recent_conversation_window, # Last 6 turns
+    {"role": "user", "content": current_prompt}
+]</code></pre><div class="callout"><p><strong>The Retrieval Rule:</strong> Long-term memory is useless until retrieved. The intelligence of your system depends on how accurately it fetches relevant long-term memories into active short-term context.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the memory types sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to architect dual short-term and long-term memory systems.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where short-term vs long-term memory architecture applies.</li>
+    <li>Author a unit test or verification script exercising short-term vs long-term memory architecture.</li>
+    <li>Document team architectural conventions regarding short-term vs long-term memory architecture.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Short-Term vs Long-Term Memory Architecture.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What distinguishes Short-Term Memory from Long-Term Memory in an AI agent architecture?",
+    a: ["Short-term memory lives directly in the active prompt context window; long-term memory is persisted in databases and retrieved selectively","Short-term memory is for numbers; long-term memory is for words","Long-term memory is stored in the GPU","There is no difference"],
+    c: 0,
+    why: "Short-term memory is immediate in-context working state; long-term memory is external persistent storage."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Short-Term (In-Context)",
+            "lines": [
+                  "Immediate prompt window",
+                  "Full transformer attention access",
+                  "Ephemeral, strictly bounded by token limits"
+            ]
+      },
+      {
+            "title": "Long-Term (External DB)",
+            "lines": [
+                  "PostgreSQL, Redis, Vector Stores",
+                  "Unlimited capacity across years",
+                  "Requires search and retrieval to access"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Short-Term vs Long-Term Memory Architecture",
+      "def execute_flow():",
+      "    # Architectural memory tiers: Short-Term Working Mem...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Short-Term vs Long-Term Memory Architecture"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "1. Active Dialog"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "2. Extraction Worker"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "step": "3. Future Session"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Short-term memory lives directly in the active prompt {1}, while long-term memory resides in external {2} and must be retrieved."
+],
+    blanks: [
+      {
+            "a": [
+                  "context"
+            ],
+            "why": "Active token window"
+      },
+      {
+            "a": [
+                  "databases"
+            ],
+            "why": "Persistent storage engines"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the primary constraint of short-term in-context memory?",
+      a: ["It is bounded by token limits and increases API cost and latency as it grows","It cannot store English text","It is illegal under copyright law","It only runs on Linux"],
+      c: 0,
+      why: "In-context tokens incur direct costs, increase latency, and eventually hit maximum context limits."
+    },
+    {
+      q: "How does an agent retrieve a fact stored in long-term memory?",
+      a: ["By querying an external database or vector store and injecting the retrieved snippet into the short-term prompt","By thinking hard","By rebooting the server","The model remembers automatically"],
+      c: 0,
+      why: "Stateless models require external facts to be fetched and injected into the prompt payload."
+    },
+    {
+      q: "What type of information belongs in long-term user memory?",
+      a: ["Persistent user preferences, recurring domain facts, account settings, and historical milestones","Temporary syntax error messages from 1 minute ago","Intermediate shell tool outputs","A raw 50MB log dump"],
+      c: 0,
+      why: "Long-term memory should store durable facts, not transient execution noise."
+    },
+    {
+      q: "What happens to short-term working memory when an API call finishes?",
+      a: ["It vanishes from the model's perspective unless the host application saves it in a database","It is saved to the model weights","It is printed to paper","It is sent to Google"],
+      c: 0,
+      why: "GPU inference memory is wiped upon process completion; persistence requires explicit database saves."
+    }
+  ]);
+</script>
+</body>
+</html>

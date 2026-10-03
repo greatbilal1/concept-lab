@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 03 — Structural patterns: Adapter and Facade</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="design-patterns" data-lesson="3" data-lesson-id="structural-patterns-adapter-and-facade">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 03</span> · Structural Patterns</span>
+
+  <h1 class="lesson-title">Structural patterns: Adapter and Facade</h1>
+  <p class="lesson-lede">
+    How do you plug an incompatible third-party library into your clean architecture? Master the Adapter pattern to bridge interfaces, and the Facade pattern to simplify complex subsystems.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Implement Adapter and Facade patterns to bridge interfaces and tame complex subsystems</span>
+    <span><b>Mission link</b> The primary structural patterns for integrating third-party SDKs and legacy code</span>
+  </div>
+
+  <h2><span class="n">1</span>Adapting interfaces and simplifying systems</h2>
+  <p>Two classic structural patterns solve interface incompatibility: <b>Adapter</b> and <b>Facade</b>.</p><p>An <b>Adapter</b> acts like a physical travel plug adapter: it converts an existing incompatible interface (like a third-party Stripe SDK) into an interface your application expects (<code>PaymentGateway</code>). A <b>Facade</b> provides a simple, unified front door to a complex subsystem (like wrapping 5 video codecs, audio decoders, and file parsers behind a single <code>VideoConverter.convert(file)</code> method).</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Adapter makes an incompatible interface work; Facade simplifies a complex subsystem.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Adapter versus Facade comparison</h2>
+  <p>Understand the intent difference: interface translation versus subsystem simplification.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing the Adapter translation execution</h2>
+  <p>Trace how an adapter translates domain calls into vendor-specific API formats.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of structural patterns.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can bridge third-party vendor libraries cleanly using Adapters and provide intuitive interfaces to complex subsystems using Facades.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Wrap a third-party SMS or payment SDK in a clean Adapter class.</li>
+    <li>Create a Facade that simplifies a multi-step image uploading and resizing workflow.</li>
+    <li>Explain the difference between Adapter and Facade to a peer.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Erich Gamma et al., *Design Patterns: Elements of Reusable Object-Oriented Software*, 'Adapter' & 'Facade'.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "You have an existing application expecting 'send_email(to, body)'. A new third-party vendor SDK uses 'deliver_message(recipient_email, message_payload)'. Which pattern bridges them?",
+    a: ["The Adapter pattern (wraps the third-party SDK and translates send_email to deliver_message)","The Singleton pattern","The Observer pattern","The Builder pattern"],
+    c: 0,
+    why: "Adapters translate calls between incompatible interfaces without modifying either original class."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Adapter Pattern",
+            "lines": [
+                  "Intent: convert interface",
+                  "makes incompatible class B conform to interface A",
+                  "1-to-1 interface translation!"
+            ]
+      },
+      {
+            "title": "Facade Pattern",
+            "lines": [
+                  "Intent: simplify complexity",
+                  "wraps 10 complex subsystem classes behind 1 simple method",
+                  "simple high-level front door!"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "class StripeAdapter(PaymentGateway):",
+      "    def __init__(self, stripe_sdk): self.sdk = stripe_sdk",
+      "    def charge(self, amount, user): # Domain interface",
+      "        # Translates domain parameters to vendor SDK format:",
+      "        return self.sdk.create_charge(amount_cents=int(amount*100), customer_id=user.stripe_id)"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "adapter": "StripeAdapter implements domain PaymentGateway interface"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "incoming": "charge(amount=50.0, user=Ada)"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "translation": "converts dollars to cents and extracts customer_id for vendor SDK"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The pattern converting an incompatible interface into another is the <0> pattern.",
+      "The pattern providing a simplified front door to a complex subsystem is the <1> pattern.",
+      "Adapters enable third-party libraries to satisfy internal domain <2>s."
+],
+    blanks: [
+      {
+            "a": [
+                  "Adapter"
+            ],
+            "why": "Adapter bridges incompatible interfaces."
+      },
+      {
+            "a": [
+                  "Facade"
+            ],
+            "why": "Facade simplifies complex subsystems."
+      },
+      {
+            "a": [
+                  "interfaces",
+                  "contracts"
+            ],
+            "why": "Adapters adapt external classes to domain contracts."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the primary difference in intent between the Adapter and Facade patterns?",
+      a: ["An Adapter makes an existing interface match an expected interface; a Facade provides a simplified high-level interface to an entire complex subsystem","Adapter is for Python; Facade is for JavaScript","Adapter runs on servers; Facade runs in web browsers","There is no difference between them"],
+      c: 0,
+      why: "Adapter matches an interface (1:1 translation); Facade simplifies complexity (1:many front door)."
+    },
+    {
+      q: "Why does using the Adapter pattern protect your codebase from third-party vendor lock-in?",
+      a: ["Your application code depends on your own domain interface; if you switch vendors, you only rewrite the single Adapter class","Vendors cannot charge fees when adapters are used","Adapters encrypt the vendor code","It turns off vendor tracking"],
+      c: 0,
+      why: "Adapters localize third-party dependencies to a single boundary class, shielding the application."
+    },
+    {
+      q: "Can a Facade be bypassed if a client genuinely needs low-level access to the subsystem?",
+      a: ["Yes, a Facade provides a convenient shortcut for common tasks, but does not block direct access to subsystem classes when advanced features are needed","No, Facades permanently lock access to subsystem classes","Only on Linux computers","Only with administrator permissions"],
+      c: 0,
+      why: "Facades offer convenience, not strict encapsulation; direct access remains available if required."
+    },
+    {
+      q: "What real-world hardware item is the classic physical analogy for the Adapter pattern?",
+      a: ["An international electrical plug adapter allowing an American laptop to plug into a European wall socket","A computer monitor screen","A keyboard keycap","A mouse pad"],
+      c: 0,
+      why: "The travel adapter converts one physical prong interface to another without modifying the laptop."
+    }
+  ]);
+</script>
+</body>
+</html>

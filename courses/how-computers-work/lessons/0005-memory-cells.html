@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 05 — Memory cells</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="how-computers-work" data-lesson="5" data-lesson-id="memory-cells">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 05</span> · Logic</span>
+
+  <h1 class="lesson-title">Memory cells</h1>
+  <p class="lesson-lede">
+    Every circuit so far has been forgetful. Feed it inputs, get an output, and the
+    moment the inputs change the past is gone. To compute anything interesting, the
+    machine needs to <b>remember</b>. This lesson builds memory out of gates.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Trace a bit being stored</span>
+    <span><b>Mission link</b> How state exists at all</span>
+  </div>
+
+  <h2><span class="n">1</span>The problem with pure logic</h2>
+
+  <p>
+    An AND gate has no memory. Give it <code>1, 1</code> and it says <code>1</code>.
+    Change the inputs and the output changes instantly. There is no "before".
+  </p>
+
+  <p>
+    But a program needs a before. A counter needs to know what it counted to. A
+    running loop needs to know where it is. So we need a circuit whose output depends
+    on its own past — a circuit with <b>feedback</b>.
+  </p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Memory is not a new component. Memory is a gate whose output is wired back into
+    its own input. The circuit holds itself in place.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The flip-flop</h2>
+
+  <p>
+    Cross-couple two NAND gates — each one's output feeds the other's input — and you
+    get a <b>flip-flop</b>. It has two stable states, and it will sit in whichever one
+    you put it in, indefinitely, as long as power is on.
+  </p>
+
+  <div id="diagram1"></div>
+
+  <p>
+    The two outputs are always opposites. Call them <code>Q</code> and
+    <code>Q̄</code>. If <code>Q</code> is 1, the cell stores a 1. If <code>Q</code>
+    is 0, it stores a 0. That is one bit of memory, made of two gates.
+  </p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">3</span>Writing and holding</h2>
+
+  <p>
+    A flip-flop has two jobs: <b>write</b> a value, and <b>hold</b> it. The write
+    happens by briefly pulling one input low; the hold happens by doing nothing at
+    all, letting the feedback loop keep the value alive.
+  </p>
+
+  <pre><code>set   →  Q becomes 1, and stays 1
+reset →  Q becomes 0, and stays 0
+hold  →  Q keeps whatever it had</code></pre>
+
+  <p>
+    Notice that "hold" is the default. The circuit is stable; you only disturb it
+    when you want to change the bit. This is why memory is cheap in energy terms —
+    holding a value costs almost nothing.
+  </p>
+
+  <div id="intro1"></div>
+
+  <div class="note good">
+    <span class="note-label">The clock</span>
+    If a circuit changes state whenever it likes, coordinating thousands of them is
+    chaos. So we add a <b>clock</b>: a signal that ticks, and gates only update on
+    the tick. The clock is the heartbeat that makes the whole machine synchronous.
+  </div>
+
+  <h2><span class="n">4</span>From one bit to a register</h2>
+
+  <p>
+    One flip-flop stores one bit. Put eight side by side, sharing a clock, and you
+    have a <b>register</b> — a place to hold a byte. Put billions together with
+    addressing logic and you have RAM.
+  </p>
+
+  <p>
+    Here is the win. Trace a single bit through a write and a read:
+  </p>
+
+  <pre><code>1. clock low,  data = 1   →  cell still holds old value
+2. clock ticks            →  cell latches the 1
+3. clock low,  data = 0   →  cell still holds 1  (input ignored)
+4. read                   →  Q outputs 1</code></pre>
+
+  <p>
+    Step 3 is the whole point. The input changed, and the stored value did not. That
+    is memory.
+  </p>
+
+  <div id="fill1"></div>
+
+  <h2><span class="n">5</span>Check yourself</h2>
+
+  <p>
+    Answer from memory — do not scroll back up. Each option has the same number of
+    words, so nothing gives the answer away.
+  </p>
+
+  <div id="quiz"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>
+      You can now explain how a circuit remembers something, and you have traced a
+      bit through a write and a read. You have built state out of pure logic — which
+      means the machine can now hold a value between clock ticks, and that is the
+      difference between a calculator and a computer.
+    </p>
+  </div>
+
+  <h2><span class="n">6</span>Do this next</h2>
+
+  <ol>
+    <li>
+      Draw two NAND gates with each output feeding the other's input. Label the
+      outputs <code>Q</code> and <code>Q̄</code> and convince yourself they must
+      always be opposites.
+    </li>
+    <li>
+      Explain in one sentence why a plain AND gate cannot store a bit. The answer is
+      about feedback, not about gates.
+    </li>
+    <li>
+      Work out how many flip-flops you need to store the word "cat" in ASCII. Each
+      character is one byte, so count the bits.
+    </li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Read <a href="https://www.charlespetzold.com/code/">_Code_ by Charles Petzold</a>,
+    Chapter 14 ("Feedback and Flip-Flops") — the clearest explanation of this idea
+    anywhere. Then watch <a href="https://eater.net/8bit">Ben Eater's SR latch and
+    clock videos</a> to see the feedback loop on real chips.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher (me) anything — "why does a flip-flop
+    not oscillate?", "what is a latch versus a flip-flop?", "how does RAM get
+    addressed?". There are no bad questions here.
+  </div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  /* the flip-flop */
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      { title: "NAND A", lines: ["output feeds B", "input from B"] },
+      { title: "NAND B", lines: ["output feeds A", "input from A"] },
+      { title: "Q and Q̄", lines: ["always opposite", "one bit stored"] }
+    ]
+  });
+
+  /* what memory is made of */
+  TeachWidgets.introCards("#intro1", {
+    cards: [
+      { ico: "🔁", title: "Feedback", body: "The output loops back in, so the value persists." },
+      { ico: "⏱️", title: "Clock", body: "A tick decides when cells are allowed to change." },
+      { ico: "🗄️", title: "Register", body: "Eight flip-flops sharing a clock hold one byte." }
+    ]
+  });
+
+  /* predict-then-reveal */
+  TeachWidgets.predict("#predict1", {
+    q: "What makes a circuit able to remember a value?",
+    a: ["Extra voltage", "A feedback loop", "A bigger gate"],
+    c: 1,
+    why: "Wiring the output back into the input lets the circuit hold its own state. Without feedback there is no memory."
+  });
+
+  /* step-through trace of a write and read */
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "clock = 0, data = 1",
+      "clock = 1  (tick)",
+      "clock = 0, data = 0",
+      "read Q"
+    ],
+    steps: [
+      { line: 0, vars: { clock: "0", data: "1", Q: "0 (old)" } },
+      { line: 1, vars: { clock: "1", data: "1", Q: "1 (latched)" } },
+      { line: 2, vars: { clock: "0", data: "0", Q: "1 (held)" } },
+      { line: 3, vars: { Q: "1", stored: "1" } }
+    ]
+  });
+
+  /* recall from memory: memory basics */
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the blanks",
+    lines: [
+      "A flip-flop is built from two <0> gates.",
+      "Its two outputs are always <1>.",
+      "Eight flip-flops sharing a clock form a <2>."
+    ],
+    blanks: [
+      { a: ["nand"], why: "Two cross-coupled NAND gates make the classic SR flip-flop." },
+      { a: ["opposite", "opposites"], why: "Q and Q̄ are complements by construction." },
+      { a: ["register"], why: "A register is a bank of flip-flops holding one word of data." }
+    ]
+  });
+
+  /* the quiz — every option is exactly three words */
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is a flip-flop?",
+      a: ["A circuit storing one bit", "A gate with two inputs", "A type of arithmetic unit", "A fast kind of memory"],
+      c: 0,
+      why: "A flip-flop is a feedback circuit that holds a single bit until changed."
+    },
+    {
+      q: "Why can a gate remember?",
+      a: ["It uses more power", "Its output feeds back", "It has extra inputs", "It runs much faster"],
+      c: 1,
+      why: "Feedback is what creates state. Without it, output always follows input."
+    },
+    {
+      q: "What does the clock do?",
+      a: ["It supplies the power", "It decides the update", "It stores the data", "It counts the cycles"],
+      c: 1,
+      why: "The clock synchronises updates so thousands of cells change in step."
+    },
+    {
+      q: "What is a register?",
+      a: ["A bank of flip-flops", "A single memory cell", "A logic gate type", "A clock signal type"],
+      c: 0,
+      why: "A register is several flip-flops sharing a clock, holding one word."
+    }
+  ]);
+</script>
+</body>
+</html>

@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 01 — What Is Function Calling? The Model as a Dispatcher</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="function-calling" data-lesson="1" data-lesson-id="what-is-function-calling-dispatcher">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 01</span> · Function Calling</span>
+
+  <h1 class="lesson-title">What Is Function Calling? The Model as a Dispatcher</h1>
+  <p class="lesson-lede">
+    The foundational concept: language models do not execute code; they act as intelligent dispatchers emitting tool arguments.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You understand the dispatcher architecture behind LLM function calling.</span>
+    <span><b>Mission link</b> Mastering what is function calling? the model as a dispatcher across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of What Is Function Calling? The Model as a Dispatcher</h2>
+  <p>A common misconception about AI agents is that the model itself connects to databases, runs SQL queries, or makes Stripe charges. In reality, a language model is an isolated matrix multiplication engine with zero network sockets or disk permissions.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    The foundational concept: language models do not execute code; they act as intelligent dispatchers emitting tool arguments.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Dispatcher Architecture</h2>
+  <p><strong>Function Calling (Tool Use)</strong> transforms the model into an <strong>Intelligent Dispatcher</strong>:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Security Boundary Isolation</h2>
+  <ul><li><strong>1. Provide Tool Definitions:</strong> You pass a list of available tools (names, descriptions, and JSON Schemas) to the model API.</li><li><strong>2. The Model Decides:</strong> Based on the user's prompt, the model decides whether to answer in natural language or request a tool call.</li><li><strong>3. Emitting Arguments:</strong> If a tool is needed, the model emits a structured tool call object specifying the function name and arguments (e.g. <code>get_weather(city="Paris")</code>).</li><li><strong>4. Application Execution:</strong> Your backend application reads the request, executes the real function in the real world, and feeds the result back to the model!</li></ul><pre><code># The Function Calling Dispatch Loop:
+# 1. User: "What is the stock price of Apple?"
+# 2. Model emits tool call:
+{
+  "name": "get_stock_quote",
+  "arguments": "{\"ticker\": \"AAPL\"}"
+}
+# 3. Your Backend executes real API: quote = stock_api.fetch("AAPL") -> 220.50
+# 4. Feed result back to model -> Model answers: "Apple (AAPL) is currently $220.50."</code></pre><div class="callout"><p><strong>The Security Shield:</strong> Because your backend executes the tool, you retain absolute authority to enforce authentication, validate parameters, and block unauthorized operations before anything runs.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the function calling sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You understand the dispatcher architecture behind LLM function calling.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where what is function calling? the model as a dispatcher applies.</li>
+    <li>Author a unit test or verification script exercising what is function calling? the model as a dispatcher.</li>
+    <li>Document team architectural conventions regarding what is function calling? the model as a dispatcher.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for What Is Function Calling? The Model as a Dispatcher.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Does a language model directly execute database queries or API requests when performing function calling?",
+    a: ["No; the model emits structured JSON arguments specifying which function to call, leaving execution strictly to your application code","Yes; the model runs the code inside its neural network","Yes; the model connects directly to the database socket","No; models can only call Python scripts"],
+    c: 0,
+    why: "The model acts as an intelligent reasoning dispatcher: it decides to call a tool and formats arguments, but the host application executes it."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1. User Prompt",
+            "lines": [
+                  "'Check order ORD-412'",
+                  "User submits query to app"
+            ]
+      },
+      {
+            "title": "2. Model (Dispatcher)",
+            "lines": [
+                  "Selects tool: get_order",
+                  "Emits arguments: {id: 'ORD-412'}"
+            ]
+      },
+      {
+            "title": "3. Backend (Executor)",
+            "lines": [
+                  "Executes SQL query in DB",
+                  "Captures JSON result"
+            ]
+      },
+      {
+            "title": "4. Model (Synthesizer)",
+            "lines": [
+                  "Receives result in context",
+                  "Synthesizes friendly answer"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing What Is Function Calling? The Model as a Dispatcher",
+      "def execute_flow():",
+      "    # The foundational concept: language models do not e...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "What Is Function Calling? The Model as a Dispatcher"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Neural Network Core"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Host Application Gate"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "In function calling, the model acts as an intelligent {1} that emits structured arguments, while the host application acts as the {2}."
+],
+    blanks: [
+      {
+            "a": [
+                  "dispatcher"
+            ],
+            "why": "Decides which tool to invoke and formats args"
+      },
+      {
+            "a": [
+                  "executor"
+            ],
+            "why": "Physically runs the function and captures output"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What component of an AI application is responsible for physically executing a tool call?",
+      a: ["The developer's host backend application code","The OpenAI cloud neural network","The user's web browser","The internet service provider"],
+      c: 0,
+      why: "The model only formats the function call request; execution happens strictly in the host environment."
+    },
+    {
+      q: "Can a model choose to answer a question directly without calling any tools?",
+      a: ["Yes; if the user query does not require external data or actions, the model responds with standard natural language","No; once tools are provided, the model must always call one","Only if temperature is 0","Only in Python"],
+      c: 0,
+      why: "Models evaluate whether the prompt requires tools, responding directly if tools are unnecessary."
+    },
+    {
+      q: "What setting in the OpenAI API forces the model to call a specific tool unconditionally?",
+      a: ["tool_choice={\"type\": \"function\", \"function\": {\"name\": \"my_tool\"}}","force_tool=True","must_call=1","tools=all"],
+      c: 0,
+      why: "The tool_choice parameter allows forcing the model to invoke a designated function."
+    },
+    {
+      q: "Why is function calling vastly superior to asking a model to 'write Python code that I will eval()'?",
+      a: ["Executing arbitrary model-generated Python code with eval() is an extreme remote code execution (RCE) security vulnerability","eval() is slow","Python does not have eval","Function calling only works on Tuesdays"],
+      c: 0,
+      why: "Predefined tool schemas restrict the model to safe, auditable function signatures, preventing arbitrary RCE."
+    }
+  ]);
+</script>
+</body>
+</html>

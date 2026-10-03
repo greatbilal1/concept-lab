@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 05 — Artifacts, Dependency Caching, and Pipeline Acceleration</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="ci-cd" data-lesson="5" data-lesson-id="artifacts-dependency-caching-acceleration">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 05</span> · Pipeline Acceleration</span>
+
+  <h1 class="lesson-title">Artifacts, Dependency Caching, and Pipeline Acceleration</h1>
+  <p class="lesson-lede">
+    Optimizing CI performance: caching package dependencies (`actions/cache`), sharing build artifacts (`actions/upload-artifact`), and sub-minute builds.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to accelerate CI/CD pipelines using dependency caching, artifacts, and concurrency cancellation.</span>
+    <span><b>Mission link</b> Mastering artifacts, dependency caching, and pipeline acceleration across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Artifacts, Dependency Caching, and Pipeline Acceleration</h2>
+  <p>A pipeline that takes 12 minutes to run destroys developer velocity: engineers get distracted, open Twitter, and lose their train of thought. A world-class CI pipeline should finish in <strong>under 60 seconds</strong>. The secret to sub-minute pipelines is <strong>Aggressive Caching and Artifact Sharing</strong>.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Optimizing CI performance: caching package dependencies (`actions/cache`), sharing build artifacts (`actions/upload-artifact`), and sub-minute builds.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Uncached vs Cached CI Execution</h2>
+  <p>Two Acceleration Techniques in GitHub Actions:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Sharing Build Artifacts Across Jobs</h2>
+  <ul><li><strong>1. Dependency Caching (`actions/setup-python` / `actions/cache`):</strong> Hash your lockfile (`hashFiles('**/requirements.txt')` or `poetry.lock`). If the lockfile has not changed, GitHub Actions restores the cached `~/.cache/pip` directory in <strong>2 seconds</strong> instead of downloading packages from the internet!</li><li><strong>2. Passing Build Artifacts (`actions/upload-artifact`):</strong> A workflow might have two jobs: Job A (Build frontend bundle `dist/`) and Job B (Deploy to CDN). Instead of re-building the frontend in Job B, Job A uploads the `dist/` folder as an artifact, and Job B downloads it in 1 second!</li><li><strong>3. Concurrency Cancellation:</strong> If an engineer pushes 3 rapid commits to the same PR, cancel older running builds automatically: <code>concurrency: { group: pr-${{ github.ref }}, cancel-in-progress: true }</code>!</li></ul><pre><code># Fast Dependency Caching & Concurrency Cancellation:
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true # Cancels redundant outdated builds!
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Python with Built-In Pip Cache
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip" # Automatically caches ~/.cache/pip based on requirements.txt!
+      - run: pip install -r requirements.txt # Restored from cache in 1.8 seconds!</code></pre><div class="callout"><p><strong>The Cancel-In-Progress Rule:</strong> Always enable <code>cancel-in-progress: true</code> on pull request workflows. It saves 40% of your company's monthly CI compute bill by terminating obsolete runs.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the pipeline acceleration sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to accelerate CI/CD pipelines using dependency caching, artifacts, and concurrency cancellation.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where artifacts, dependency caching, and pipeline acceleration applies.</li>
+    <li>Author a unit test or verification script exercising artifacts, dependency caching, and pipeline acceleration.</li>
+    <li>Document team architectural conventions regarding artifacts, dependency caching, and pipeline acceleration.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Artifacts, Dependency Caching, and Pipeline Acceleration.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Why is dependency caching (`actions/cache`) essential for fast CI/CD pipelines?",
+    a: ["It avoids re-downloading and recompiling hundreds of megabytes of third-party packages on every commit, shrinking CI runtime from minutes to seconds","It makes code run without electricity","It deletes old test files","It is required by git"],
+    c: 0,
+    why: "Dependency caching reuses previously downloaded packages based on lockfile checksums, bypassing network downloads."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Uncached Pipeline (Slow: 8m 30s)",
+            "lines": [
+                  "Clones repo -> Downloads 200MB wheels over internet",
+                  "Compiles C-extensions -> Wastes 7 minutes every commit"
+            ]
+      },
+      {
+            "title": "Cached Pipeline (Blazing: 48s)",
+            "lines": [
+                  "Restores cached wheels from GitHub storage (2s)",
+                  "Executes tests immediately -> Instant feedback!"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Artifacts, Dependency Caching, and Pipeline Acceleration",
+      "def execute_flow():",
+      "    # Optimizing CI performance: caching package depende...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Artifacts, Dependency Caching, and Pipeline Acceleration"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Job 1: Build Application"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Job 2: Deploy to Cloud"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Pipeline acceleration restores third-party packages from cache based on {1} hashes and uses cancel-in-progress to terminate {2} builds."
+],
+    blanks: [
+      {
+            "a": [
+                  "lockfile"
+            ],
+            "why": "File containing exact pinned dependency checksums"
+      },
+      {
+            "a": [
+                  "redundant"
+            ],
+            "why": "Obsolete out-of-date runs"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "How does 'cache-key: ${{ hashFiles('requirements.txt') }}' determine when to invalidate a dependency cache?",
+      a: ["If requirements.txt changes, its SHA-256 hash changes, resulting in a cache miss that triggers a clean re-download of dependencies","It checks the date on the file","It asks the developer","It deletes the repository"],
+      c: 0,
+      why: "HashFiles computes a cryptographic digest of the file; any edit produces a new cache key."
+    },
+    {
+      q: "What is the purpose of 'cancel-in-progress: true' in workflow concurrency settings?",
+      a: ["It automatically cancels older, in-flight runs of the same workflow branch when a newer commit is pushed, saving compute minutes","It cancels the entire git repository","It deletes the pull request","It turns off the developer's laptop"],
+      c: 0,
+      why: "Cancel-in-progress aborts obsolete intermediate builds, freeing runners for the latest commit."
+    },
+    {
+      q: "What action is used to pass compiled binary or web bundles between separate jobs in GitHub Actions?",
+      a: ["actions/upload-artifact and actions/download-artifact","actions/send-email","actions/save-cookie","actions/print"],
+      c: 0,
+      why: "The upload/download artifact actions persist and retrieve files across independent job environments."
+    },
+    {
+      q: "Where does GitHub Actions store cached dependencies?",
+      a: ["In GitHub-managed cloud cache storage, retained for up to 7 days per repository branch","On the developer's desktop","In the user's browser cache","On a floppy disk"],
+      c: 0,
+      why: "GitHub maintains a cloud cache storage tier scoped to repository branches with a 7-day retention window."
+    }
+  ]);
+</script>
+</body>
+</html>

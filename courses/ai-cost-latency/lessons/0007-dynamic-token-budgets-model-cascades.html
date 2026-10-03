@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 07 — Dynamic Token Budgets and Model Cascades</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="ai-cost-latency" data-lesson="7" data-lesson-id="dynamic-token-budgets-model-cascades">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 07</span> · Token Cascades</span>
+
+  <h1 class="lesson-title">Dynamic Token Budgets and Model Cascades</h1>
+  <p class="lesson-lede">
+    Intelligent compute allocation: dynamic max_tokens caps, model cascades (routing simple to cheap, hard to frontier), and cost optimization.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to design dynamic token budgets and two-tier model cascades.</span>
+    <span><b>Mission link</b> Mastering dynamic token budgets and model cascades across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Dynamic Token Budgets and Model Cascades</h2>
+  <p>Treating every incoming query identically is the fastest way to waste money. Answering <em>'What time does the store close?'</em> does not require an expensive $15/1M frontier reasoning model; a $0.15/1M mini model answers it in 150ms with 100% accuracy.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Intelligent compute allocation: dynamic max_tokens caps, model cascades (routing simple to cheap, hard to frontier), and cost optimization.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Model Cascade Workflow</h2>
+  <p>The <strong>Model Cascade Architecture</strong> optimizes compute dynamically:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Dynamic Token Budgets</h2>
+  <ul><li><strong>1. The Fast-Tier First Attempt:</strong> Route the query to a fast, cheap model (GPT-4o-mini, Claude 3.5 Haiku, Llama-3-8B).</li><li><strong>2. Fast Confidence & Schema Verification:</strong> Inspect the fast model's output: Did it satisfy Pydantic schema validation? Is the confidence score high?</li><li><strong>3. Escalation to Frontier Tier:</strong> If and only if the fast model fails verification (invalid schema, low confidence, expressed uncertainty), escalate the query to the frontier model (GPT-4o, Claude 3.5 Sonnet)!</li><li><strong>4. Dynamic Output Budgeting:</strong> Adjust `max_tokens` based on task intent: classification queries get `max_tokens=20`, while code synthesis queries get `max_tokens=1000`.</li></ul><pre><code># The Model Cascade Pattern in Python:
+async def cascade_query_resolver(query: str, context: str) -> str:
+    # Step 1: Try Fast Tier Model ($0.15 / 1M tokens)
+    fast_response = await call_fast_model(query, context, max_tokens=150)
+    
+    # Step 2: Verification Check
+    if is_high_confidence(fast_response) and not fast_response.expressed_doubt:
+        return fast_response.text # 80% of queries succeed here! (Massive savings!)
+        
+    # Step 3: Escalate remaining 20% to Frontier Model ($5.00 / 1M tokens)
+    logger.info("Fast tier uncertain. Escalating to Frontier Tier.")
+    return await call_frontier_model(query, context, max_tokens=500)</code></pre><div class="callout"><p><strong>The 80/20 Cascade Dividend:</strong> A model cascade delivers frontier-level overall accuracy while cutting your aggregate API invoice by <strong>70% or more</strong>.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the token cascade sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to design dynamic token budgets and two-tier model cascades.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where dynamic token budgets and model cascades applies.</li>
+    <li>Author a unit test or verification script exercising dynamic token budgets and model cascades.</li>
+    <li>Document team architectural conventions regarding dynamic token budgets and model cascades.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Dynamic Token Budgets and Model Cascades.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is a 'Model Cascade' in production AI architecture?",
+    a: ["A routing pattern that sends queries to a fast, cheap model first; only escalating to an expensive frontier model if the first model fails confidence checks","A waterfall in a data center","A computer virus","A cascade of style sheets (CSS)"],
+    c: 0,
+    why: "Model cascades resolve 80% of queries on fast, inexpensive models, reserving frontier models strictly for tough edge cases."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1. Incoming Request",
+            "lines": [
+                  "User query arrives at gateway",
+                  "Sent to Fast Tier first"
+            ]
+      },
+      {
+            "title": "2. Fast Tier ($0.15/1M)",
+            "lines": [
+                  "Processes query in 200ms",
+                  "Checks confidence & schema"
+            ]
+      },
+      {
+            "title": "3. The Branching Seam",
+            "lines": [
+                  "80% PASS -> Returned to user (90% savings!)",
+                  "20% FAIL -> Escalated to Frontier Model"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Dynamic Token Budgets and Model Cascades",
+      "def execute_flow():",
+      "    # Intelligent compute allocation: dynamic max_tokens...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Dynamic Token Budgets and Model Cascades"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Intent: Classification"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Intent: Code Synthesis"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Model cascades send queries to fast, inexpensive models first, escalating to {1} models only when verification checks detect uncertainty or {2} failures."
+],
+    blanks: [
+      {
+            "a": [
+                  "frontier"
+            ],
+            "why": "Top-tier high-intelligence models"
+      },
+      {
+            "a": [
+                  "schema"
+            ],
+            "why": "Data contract or syntax errors"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What proportion of real-world user queries can typically be resolved successfully by the fast tier in a model cascade?",
+      a: ["Approximately 75% to 85% of standard user queries","Exactly 0%","Only 1%","100% of all queries"],
+      c: 0,
+      why: "The majority of real customer queries involve straightforward lookups or classifications that smaller models excel at."
+    },
+    {
+      q: "How does setting dynamic 'max_tokens' prevent accidental financial waste?",
+      a: ["It prevents models from entering runaway verbose loops on simple tasks like binary classification or entity extraction","It speeds up network cables","It deletes prompt history","It makes models open source"],
+      c: 0,
+      why: "Capping max_tokens according to task requirements eliminates wasteful, verbose token generation."
+    },
+    {
+      q: "What signal indicates that a query should be escalated from the fast model to the frontier model in a cascade?",
+      a: ["Schema validation failure, low token logprob confidence, or the model expressing uncertainty ('I am not certain')","The user's username starts with A","The time of day is afternoon","The computer monitor is large"],
+      c: 0,
+      why: "Verification failures and expressed doubt trigger escalation to higher intelligence tiers."
+    },
+    {
+      q: "What is the net economic effect of implementing a two-tier model cascade across a high-volume application?",
+      a: ["Total API costs decrease by 60% to 80% while overall response accuracy matches the frontier tier","Costs increase by 500%","Latency increases for all users","The company must buy servers"],
+      c: 0,
+      why: "Resolving most queries on cheap tiers slashes aggregate spend while preserving frontier quality on hard cases."
+    }
+  ]);
+</script>
+</body>
+</html>

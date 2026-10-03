@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 03 — Mocking External I/O and Network Boundaries</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="unit-integration-testing" data-lesson="3" data-lesson-id="mocking-external-boundaries">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 03</span> · Mocking Boundaries</span>
+
+  <h1 class="lesson-title">Mocking External I/O and Network Boundaries</h1>
+  <p class="lesson-lede">
+    Isolating code from third-party APIs and network latency using responses and unittest.mock.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You can isolate network seams and test HTTP integrations reliably.</span>
+    <span><b>Mission link</b> Mastering mocking external i/o and network boundaries across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Mocking External I/O and Network Boundaries</h2>
+  <p>When your code talks to Stripe, GitHub, or an SMS gateway, you cannot execute real HTTP requests in unit tests. Real requests introduce latency, require secret production API keys, and fail whenever the external server experiences downtime.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Isolating code from third-party APIs and network latency using responses and unittest.mock.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>HTTP Transport Interception</h2>
+  <p>Libraries like `responses` (for `requests`) or `httpx_mock` (for `httpx`) intercept HTTP calls at the transport adapter level, returning predefined status codes and JSON payloads without opening network sockets.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Testing Error Paths</h2>
+  <pre><code># Mocking HTTP requests with responses
+import responses
+import requests
+
+@responses.activate
+def test_fetch_user_profile_success():
+    # Register mocked endpoint
+    responses.add(
+        responses.GET,
+        "https://api.example.com/users/42",
+        json={"id": 42, "name": "Alice", "role": "admin"},
+        status=200
+    )
+
+    client = APIClient(base_url="https://api.example.com")
+    profile = client.get_user(42)
+
+    assert profile.name == "Alice"
+    assert profile.role == "admin"</code></pre><p>Notice that the code under test uses the genuine `requests` library. We did not monkey-patch internal client functions; we intercepted the network layer itself. This ensures our serialization, header parsing, and error-handling code runs exactly as it would in production.</p><div class="callout"><p><strong>Best Practice:</strong> Always test how your code handles network errors! Test what happens when the API returns 401 Unauthorized, 429 Rate Limited, or 500 Server Error.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the sentence on HTTP mocking</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can isolate network seams and test HTTP integrations reliably.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where mocking external i/o and network boundaries applies.</li>
+    <li>Author a unit test or verification script exercising mocking external i/o and network boundaries.</li>
+    <li>Document team architectural conventions regarding mocking external i/o and network boundaries.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Mocking External I/O and Network Boundaries.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What happens if an automated test suite calls real external third-party APIs during CI runs?",
+    a: ["Tests fail intermittently due to rate limits, network outages, and credential issues","The third-party API provides free enterprise accounts","Tests execute faster because cloud servers are used","The test runner automatically caches API tokens"],
+    c: 0,
+    why: "Real network calls cause rate-limiting, flakiness, credential leaks, and severe CI delays."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Application Code",
+            "lines": [
+                  "requests.get('/users/42')",
+                  "Constructs real HTTP call"
+            ]
+      },
+      {
+            "title": "Adapter Interceptor",
+            "lines": [
+                  "Match URL & Method",
+                  "Short-circuit before socket"
+            ]
+      },
+      {
+            "title": "Mocked Response",
+            "lines": [
+                  "Return JSON & status 200",
+                  "Zero network traffic"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Mocking External I/O and Network Boundaries",
+      "def execute_flow():",
+      "    # Isolating code from third-party APIs and network l...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Mocking External I/O and Network Boundaries"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Simulate 429"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Client Logic"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "step": "Assertion"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Intercepting HTTP traffic with tools like responses allows testing serialization and error handling without {1} calls or {2} leaks."
+],
+    blanks: [
+      {
+            "a": [
+                  "network"
+            ],
+            "why": "External internet transmission"
+      },
+      {
+            "a": [
+                  "credential"
+            ],
+            "why": "Secret API tokens and passwords"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the advantage of intercepting HTTP at the adapter level over mocking your own client function?",
+      a: ["It exercises the real HTTP client serialization, headers, and error parsing logic","It makes the network run faster","It requires no Python libraries","It works without writing test code"],
+      c: 0,
+      why: "Adapter interception exercises the real serialization and deserialization code."
+    },
+    {
+      q: "Why is testing HTTP error codes (like 500 and 429) just as important as testing 200 OK?",
+      a: ["To ensure client software handles failures, retries, and errors gracefully without crashing","To verify that cloud servers never fail","Because HTTP 500 is the most common status code","To increase test execution time"],
+      c: 0,
+      why: "Production systems inevitably experience upstream errors; client resilience must be tested."
+    },
+    {
+      q: "What library is commonly used in Python to mock HTTP calls made with the requests library?",
+      a: ["responses","pytest-html","unittest.dom","virtualenv"],
+      c: 0,
+      why: "The `responses` library intercepts requests HTTP transport adapters."
+    },
+    {
+      q: "What security risk occurs when tests connect to real third-party services in CI?",
+      a: ["API secrets and authentication credentials must be exposed in CI environment variables","Python files become unencrypted","Tests delete local SSH keys","Browsers block git commits"],
+      c: 0,
+      why: "Calling real APIs requires storing sensitive secrets in CI runner environments."
+    }
+  ]);
+</script>
+</body>
+</html>

@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 04 — Extracting Structured Data from Unstructured Text</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="structured-outputs" data-lesson="4" data-lesson-id="extracting-data-unstructured-text">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 04</span> · Information Extraction</span>
+
+  <h1 class="lesson-title">Extracting Structured Data from Unstructured Text</h1>
+  <p class="lesson-lede">
+    Transforming messy unstructured human text (resumes, emails, medical reports) into typed schemas.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to extract structured, normalized data from messy human documents.</span>
+    <span><b>Mission link</b> Mastering extracting structured data from unstructured text across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Extracting Structured Data from Unstructured Text</h2>
+  <p>Before generative AI, extracting information from messy PDFs, emails, invoices, or medical records required brittle custom pipelines: regular expressions, template coordinates, and specialized OCR models. If an invoice swapped the placement of the date and total, the entire script failed.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Transforming messy unstructured human text (resumes, emails, medical reports) into typed schemas.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Traditional Regex vs LLM Extraction</h2>
+  <p>Combining <strong>Large Language Models with Structured Outputs</strong> creates the ultimate <strong>Information Extraction Engine</strong>:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Normalization in Extraction</h2>
+  <ul><li><strong>Semantic Disambiguation:</strong> The model understands that 'Bill To:', 'Purchaser:', 'Client:', and 'Invoiced To:' all map to the schema attribute `customer_name`.</li><li><strong>Date Normalization:</strong> Translates diverse formats ('March 4th 2026', '04/03/26', 'yesterday') into standardized ISO-8601 strings (`2026-03-04`).</li><li><strong>Currency Normalization:</strong> Parses '$1,450.50', '1450.5 USD', and 'one thousand four hundred dollars' into an exact integer `145050` (cents).</li></ul><pre><code># Semantic Extraction Pipeline:
+raw_email = """Hi team, our client Acme Corp (tax ID US-84920) purchased
+15 Pro Licenses at $40 each on March 15th. Total is $600."""
+
+# Model extracts directly into InvoiceSchema:
+# {
+#   "company": "Acme Corp",
+#   "tax_id": "US-84920",
+#   "items": [{"name": "Pro License", "quantity": 15, "unit_price_cents": 4000}],
+#   "total_cents": 60000,
+#   "invoice_date": "2026-03-15"
+# }</code></pre><div class="callout"><p><strong>The Pipeline Shift:</strong> What once took three months of handcrafted NLP rule engineering now takes a single Pydantic schema and one model API call.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the extraction sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to extract structured, normalized data from messy human documents.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where extracting structured data from unstructured text applies.</li>
+    <li>Author a unit test or verification script exercising extracting structured data from unstructured text.</li>
+    <li>Document team architectural conventions regarding extracting structured data from unstructured text.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Extracting Structured Data from Unstructured Text.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Why is an LLM with structured outputs superior to traditional regex for extracting data from unstructured documents?",
+    a: ["LLMs understand context, synonyms, formatting variations, and implied semantics that break rigid regex patterns","LLMs run without CPU power","Regex is forbidden by modern operating systems","LLMs only extract numbers"],
+    c: 0,
+    why: "LLMs perform semantic extraction, identifying entities despite typos, missing labels, and layout variations."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Brittle Regex",
+            "lines": [
+                  "Breaks on layout changes",
+                  "Fails on synonyms ('Buyer' vs 'Client')",
+                  "High ongoing maintenance cost"
+            ]
+      },
+      {
+            "title": "LLM Semantic Extraction",
+            "lines": [
+                  "Understands context & meaning",
+                  "Normalizes dates, currencies, & units",
+                  "Resilient to typos and formatting shifts"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Extracting Structured Data from Unstructured Text",
+      "def execute_flow():",
+      "    # Transforming messy unstructured human text (resume...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Extracting Structured Data from Unstructured Text"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Raw Input Text"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Schema Output"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "LLM structured extraction parses messy human documents into clean schemas, automatically normalizing dates and currencies into standardized {1} and {2}."
+],
+    blanks: [
+      {
+            "a": [
+                  "types"
+            ],
+            "why": "Formal data types like integers and strings"
+      },
+      {
+            "a": [
+                  "formats"
+            ],
+            "why": "Standardized representations like ISO-8601"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "How does an LLM handle OCR typos (e.g. '0rder' with a zero instead of an O) during structured extraction?",
+      a: ["It uses contextual language modeling to recognize the intended word and extracts the correct data despite surface typos","It crashes with an exception","It deletes the OCR file","It ignores the line"],
+      c: 0,
+      why: "Contextual representations allow models to resolve obvious character-level optical errors seamlessly."
+    },
+    {
+      q: "Why is normalizing currencies into integer cents (e.g. 1500 instead of 15.0) recommended in extracted schemas?",
+      a: ["Integer cents eliminate binary floating-point rounding inaccuracies in financial databases","Integers use fewer bytes on disk","Floats are illegal in banking","JSON cannot store decimals"],
+      c: 0,
+      why: "Integer cents avoid floating-point math inaccuracies in downstream accounting systems."
+    },
+    {
+      q: "What should an extraction schema do if a field is frequently absent in real-world documents?",
+      a: ["Declare the field as Optional with a default of None, rather than making it a mandatory required field","Make the field a random number","Delete the schema","Ask the user to type it in"],
+      c: 0,
+      why: "Optional fields allow extraction to proceed smoothly when documents have missing sections."
+    },
+    {
+      q: "How can you evaluate the accuracy of a structured extraction pipeline?",
+      a: ["Compare extracted JSON objects against human-labeled ground truth using exact field-by-field matching metrics","Ask the model if it made any errors","Count the number of tokens","Check the server uptime"],
+      c: 0,
+      why: "Field-by-field assertion against ground-truth datasets provides quantitative extraction accuracy metrics."
+    }
+  ]);
+</script>
+</body>
+</html>

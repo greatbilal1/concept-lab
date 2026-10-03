@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 06 — Debugging Logic Errors vs Syntax Errors</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="ai-assisted-debugging" data-lesson="6" data-lesson-id="logic-errors-vs-syntax-errors">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 06</span> · Error Types</span>
+
+  <h1 class="lesson-title">Debugging Logic Errors vs Syntax Errors</h1>
+  <p class="lesson-lede">
+    Contrasting syntax/type errors (easy for compilers) with subtle logic/state errors (requiring deep tracing).
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to diagnose subtle logic and state errors with AI agents.</span>
+    <span><b>Mission link</b> Mastering debugging logic errors vs syntax errors across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Debugging Logic Errors vs Syntax Errors</h2>
+  <p>Debugging falls into two completely different categories, each demanding a different engineering strategy:</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Contrasting syntax/type errors (easy for compilers) with subtle logic/state errors (requiring deep tracing).
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Loud Syntax vs Silent Logic</h2>
+  <ul><li><strong>1. Syntax & Type Errors (Loud Failures):</strong> The compiler or runtime halts immediately with a clear error: `SyntaxError: invalid syntax` or `TypeError: unsupported operand type`. Agents resolve these trivially in seconds because the error message and line number provide exact coordinates.</li><li><strong>2. Logic & State Errors (Silent Failures):</strong> The code compiles cleanly, runs without throwing exceptions, and exits with code 0—but produces the wrong business result (e.g. charging $80 instead of $100).</li></ul>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Exposing Logic Errors</h2>
+  <pre><code># Silent Logic Error (Off-by-One in Pagination):
+def get_paginated_items(items, page, page_size):
+    # Bug: page 1 skips the first item!
+    start = page * page_size # If page=1, page_size=10, start=10 (skips 0-9!)
+    return items[start:start + page_size]</code></pre><p>To help an agent solve logic errors, you cannot just say 'it failed'. You must provide the <strong>trace of state transformations</strong>: <em>'Given page=1 and page_size=10, expected items 0-9, but received items 10-19. Inspect the index calculation.'</em></p><div class="callout"><p><strong>Tracing Logic:</strong> Use state inspection traces: show variable values before and after each transformation to expose where reality diverged from intent.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the error type sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to diagnose subtle logic and state errors with AI agents.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where debugging logic errors vs syntax errors applies.</li>
+    <li>Author a unit test or verification script exercising debugging logic errors vs syntax errors.</li>
+    <li>Document team architectural conventions regarding debugging logic errors vs syntax errors.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Debugging Logic Errors vs Syntax Errors.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Why are silent logic errors vastly harder for AI agents to diagnose than syntax errors?",
+    a: ["Syntax errors produce explicit line numbers and compiler traces; logic errors run without errors but produce wrong results","Logic errors are prohibited by Python","Agents cannot read if-statements","Syntax errors only occur in C++"],
+    c: 0,
+    why: "Syntax errors have explicit tracebacks, whereas logic errors require reasoning over state transformations."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Syntax / Type Error",
+            "lines": [
+                  "Loud crash with line number",
+                  "Agent fixes in 1 turn (Trivial)"
+            ]
+      },
+      {
+            "title": "Logic / State Error",
+            "lines": [
+                  "Silent wrong output, exit code 0",
+                  "Requires state trace & math verification"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Debugging Logic Errors vs Syntax Errors",
+      "def execute_flow():",
+      "    # Contrasting syntax/type errors (easy for compilers...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Debugging Logic Errors vs Syntax Errors"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Actual State"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Expected State"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "step": "Discrepancy Revealed"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "While syntax errors provide explicit crash tracebacks, silent logic errors require developers to supply {1} inputs and {2} states."
+],
+    blanks: [
+      {
+            "a": [
+                  "actual"
+            ],
+            "why": "What the program produced"
+      },
+      {
+            "a": [
+                  "expected"
+            ],
+            "why": "What the program should produce"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why do language models struggle with off-by-one and boundary logic errors without clear examples?",
+      a: ["The code looks syntactically valid and plausible; models require input/output discrepancies to spot algorithmic flaws","Models cannot perform addition","Python hides math errors","Linters delete logic errors"],
+      c: 0,
+      why: "Plausible-looking logic passes statistical surface checks; concrete values expose math errors."
+    },
+    {
+      q: "What is the most effective prompt strategy for diagnosing a silent logic error?",
+      a: ["Provide the concrete input, the actual wrong output received, and the exact expected output","Paste the entire codebase into the chat","Tell the agent the code is bad","Ask the agent if it knows math"],
+      c: 0,
+      why: "Highlighting the exact delta between actual and expected outputs exposes the logical flaw."
+    },
+    {
+      q: "What is an invariant check that catches logic errors early?",
+      a: ["Assert statements that verify pre-conditions and post-conditions during execution","Comments explaining variable names","Using camelCase variables","Running git status"],
+      c: 0,
+      why: "In-code assertions catch state divergence immediately before corruption spreads."
+    },
+    {
+      q: "What tool helps visualize logic execution step-by-step for an agent?",
+      a: ["A debugger trace or print logs showing intermediate variable values at each step of the loop","A CSS stylesheet","A terminal screen recorder","A database backup"],
+      c: 0,
+      why: "Intermediate trace logs reveal the exact step where variables deviated from expected values."
+    }
+  ]);
+</script>
+</body>
+</html>

@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 03 — Inspecting the Tool Call Response from the Model</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="function-calling" data-lesson="3" data-lesson-id="inspecting-tool-call-response">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 03</span> · Tool Response</span>
+
+  <h1 class="lesson-title">Inspecting the Tool Call Response from the Model</h1>
+  <p class="lesson-lede">
+    Parsing tool call responses: finish_reason='tool_calls', extracting tool_call_id, and parsing JSON arguments.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to inspect and parse tool call responses from language models.</span>
+    <span><b>Mission link</b> Mastering inspecting the tool call response from the model across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Inspecting the Tool Call Response from the Model</h2>
+  <p>When you pass tools to an API call, you must inspect the response object to determine what the model decided to do. Did it finish talking, or is it asking you to execute a tool?</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Parsing tool call responses: finish_reason='tool_calls', extracting tool_call_id, and parsing JSON arguments.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Tool Call Response Anatomy</h2>
+  <p>When a model requests a tool, two things happen:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Branching Execution Flow</h2>
+  <ul><li><strong>1. `finish_reason == 'tool_calls'`:</strong> This status indicates that generation paused because a tool call was requested.</li><li><strong>2. `message.tool_calls`:</strong> A list of tool call objects containing the unique <code>id</code>, function <code>name</code>, and serialized JSON <code>arguments</code>.</li></ul><pre><code># Inspecting a Tool Call Response in Python:
+response = client.chat.completions.create(
+    model="gpt-4o",
+    messages=messages,
+    tools=tools
+)
+message = response.choices[0].message
+
+if response.choices[0].finish_reason == "tool_calls":
+    for tool_call in message.tool_calls:
+        print(f"Tool ID:   {tool_call.id}")           # e.g. 'call_91823ab'
+        print(f"Function:  {tool_call.function.name}") # e.g. 'get_product_inventory'
+        # Parse the JSON arguments string:
+        args = json.loads(tool_call.function.arguments)
+        print(f"Arguments: {args}")                   # e.g. {'sku': 'PROD-8492'}</code></pre><div class="callout"><p><strong>The Tool Call ID:</strong> Note the unique `tool_call_id`! You must save this ID because you will need to attach it to the tool execution result when sending it back to the model.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the tool response sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to inspect and parse tool call responses from language models.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where inspecting the tool call response from the model applies.</li>
+    <li>Author a unit test or verification script exercising inspecting the tool call response from the model.</li>
+    <li>Document team architectural conventions regarding inspecting the tool call response from the model.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Inspecting the Tool Call Response from the Model.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What finish_reason value does the model return when it decides to invoke a tool rather than emitting normal text?",
+    a: ["finish_reason='tool_calls'","finish_reason='stop'","finish_reason='length'","finish_reason='error'"],
+    c: 0,
+    why: "When requesting a tool, the model returns finish_reason='tool_calls' and populates the tool_calls array."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "finish_reason: 'tool_calls'",
+            "lines": [
+                  "Indicates model paused for tool execution",
+                  "Not a standard text response"
+            ]
+      },
+      {
+            "title": "tool_call.id",
+            "lines": [
+                  "Unique string identifier (e.g. call_8492)",
+                  "Must be paired with result"
+            ]
+      },
+      {
+            "title": "tool_call.function.name",
+            "lines": [
+                  "Exact function to dispatch",
+                  "Matches your schema definition"
+            ]
+      },
+      {
+            "title": "tool_call.function.arguments",
+            "lines": [
+                  "Serialized JSON string",
+                  "Parsed via json.loads()"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Inspecting the Tool Call Response from the Model",
+      "def execute_flow():",
+      "    # Parsing tool call responses: finish_reason='tool_c...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Inspecting the Tool Call Response from the Model"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "If finish_reason == 'tool_calls'"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "If finish_reason == 'stop'"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "When requesting a tool, the model sets finish_reason to {1} and emits a unique tool {2} that must be paired with the result."
+],
+    blanks: [
+      {
+            "a": [
+                  "tool_calls"
+            ],
+            "why": "The tool call finish reason string"
+      },
+      {
+            "a": [
+                  "id"
+            ],
+            "why": "Unique call identifier"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What datatype is message.tool_calls[0].function.arguments in the OpenAI API response?",
+      a: ["A serialized JSON string that must be parsed using json.loads() in Python","A Python dictionary","An integer","A binary byte stream"],
+      c: 0,
+      why: "Arguments are returned as a JSON string and must be parsed into an object."
+    },
+    {
+      q: "Why is the unique 'tool_call_id' required when sending results back to the model?",
+      a: ["It allows the model to match which result corresponds to which specific tool request, especially during parallel calls","It is used for billing","It encrypts the response","It resets the session"],
+      c: 0,
+      why: "IDs bind tool results to their original requests, essential for multi-tool parallel calls."
+    },
+    {
+      q: "What should your code do if json.loads(tool_call.function.arguments) raises a JSONDecodeError?",
+      a: ["Catch the error and return an error message to the model in the tool response so the model can correct its arguments","Crash the server","Delete the database","Ignore the error"],
+      c: 0,
+      why: "Passing parsing errors back to the model allows it to self-correct its arguments."
+    },
+    {
+      q: "Can a model emit both text content and a tool call in the same response?",
+      a: ["Yes; modern models can emit an optional text thought or explanation alongside the tool call","No; it is strictly one or the other","Only in C++","Only on Mondays"],
+      c: 0,
+      why: "Models often include conversational context or thinking text alongside tool requests."
+    }
+  ]);
+</script>
+</body>
+</html>

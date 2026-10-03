@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 07 — The TLS handshake step-by-step</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="dns-domains-tls" data-lesson="7" data-lesson-id="the-tls-handshake-step-by-step">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 07</span> · TLS Handshake & HTTPS</span>
+
+  <h1 class="lesson-title">The TLS handshake step-by-step</h1>
+  <p class="lesson-lede">
+    What happens in the first 50 milliseconds of an HTTPS connection? Follow the ClientHello, certificate verification, and key derivation of TLS 1.3.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Trace the TLS 1.3 handshake sequence and inspect live connections with openssl s_client</span>
+    <span><b>Mission link</b> Demystifies the handshake mechanics behind modern encrypted connections</span>
+  </div>
+
+  <h2><span class="n">1</span>The 1-RTT handshake</h2>
+  <p>In older TLS 1.2, establishing an encrypted connection required two full round-trips (2-RTT) of back-and-forth negotiation before any application data could travel. Modern <b>TLS 1.3</b> streamlined this into a blazing fast <b>1-RTT handshake</b>.</p><p>In the very first message (<code>ClientHello</code>), the client sends its supported cipher suites and guesses the key exchange algorithm by sending its public key share immediately.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    TLS 1.3 establishes an authenticated, encrypted channel in a single round-trip.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The TLS 1.3 handshake exchange</h2>
+  <p>Follow the streamlined two-flight message exchange of TLS 1.3.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing a handshake with openssl s_client</h2>
+  <p>Trace the terminal output of openssl establishing a live TLS 1.3 session.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your recall of handshake phases.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can explain and debug every message of the TLS handshake and test live server certificates using openssl.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Connect to a secure website using openssl s_client -connect example.com:443.</li>
+    <li>Inspect the negotiated TLS version and cipher suite in the output.</li>
+    <li>Verify why SNI is required when multiple domains share an IP address.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    IETF RFC 8446: *The Transport Layer Security (TLS) Protocol Version 1.3*.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "How many round trips are required to complete a full TLS 1.3 handshake before sending HTTP data?",
+    a: ["1 Round Trip (1-RTT)","5 Round Trips","0 Round Trips","10 Round Trips"],
+    c: 0,
+    why: "TLS 1.3 combines key exchange with the initial greeting, finishing the handshake in 1-RTT."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "ClientHello (->)",
+            "lines": [
+                  "supported ciphers, SNI (domain)",
+                  "client Diffie-Hellman public key share"
+            ]
+      },
+      {
+            "title": "ServerHello & Cert (<-)",
+            "lines": [
+                  "chosen cipher, server key share",
+                  "X.509 cert chain + digital signature"
+            ]
+      },
+      {
+            "title": "Encrypted Traffic",
+            "lines": [
+                  "both compute symmetric session key",
+                  "HTTP GET / sent under AES-GCM encryption"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# openssl s_client -connect example.com:443 -tls1_3",
+      "CONNECTED(00000003)",
+      "depth=2 C = US, O = Internet Security Research Group, CN = ISRG Root X1",
+      "Certificate chain verified: OK",
+      "New, TLSv1.3, Cipher is TLS_AES_256_GCM_SHA384"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "command": "initiating TLS 1.3 connection"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "trust_root": "ISRG Root X1 verified from local OS store"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "validity": "certificate signatures valid"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "cipher": "symmetric encryption active via AES-256-GCM"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The first message sent by the client is the Client<0>.",
+      "The extension specifying the target domain name is <1>.",
+      "The number of round trips required by TLS 1.3 is <2>-RTT."
+],
+    blanks: [
+      {
+            "a": [
+                  "Hello"
+            ],
+            "why": "ClientHello initiates the TLS negotiation."
+      },
+      {
+            "a": [
+                  "SNI",
+                  "Server Name Indication"
+            ],
+            "why": "SNI tells the server which certificate to present."
+      },
+      {
+            "a": [
+                  "1",
+                  "one"
+            ],
+            "why": "TLS 1.3 completes in one round-trip."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is Server Name Indication (SNI) in the TLS ClientHello?",
+      a: ["An extension telling the server which specific hostname the client wishes to connect to, before encryption begins","A header that lists the user real personal name","A setting that turns off password authentication","A tool that measures internet download speeds"],
+      c: 0,
+      why: "SNI allows servers hosting multiple HTTPS sites on one IP to present the correct certificate."
+    },
+    {
+      q: "What major legacy ciphers did TLS 1.3 completely remove to improve security?",
+      a: ["Weak RSA static key exchange, RC4, MD5, and SHA-1","AES-GCM and ChaCha20","Elliptic Curve Diffie-Hellman","TCP and UDP protocol headers"],
+      c: 0,
+      why: "TLS 1.3 removed legacy broken ciphers, mandating Forward Secrecy and authenticated encryption."
+    },
+    {
+      q: "What verifies that the server holds the private key matching its certificate?",
+      a: ["The server signs the handshake transcript using its private key, verified by the client with the public key","The server emails a confirmation link to the client","The user types an administrator password into the terminal","The operating system checks the computer serial number"],
+      c: 0,
+      why: "Digital signatures mathematically prove possession of the private key corresponding to the certificate."
+    },
+    {
+      q: "What is 0-RTT Early Data in TLS 1.3?",
+      a: ["A feature allowing clients reconnecting to a known server to send encrypted HTTP data in the very first packet","A method to browse the web without an internet connection","A protocol that eliminates physical fiber optic cables","An operating system setting that disables firewalls"],
+      c: 0,
+      why: "0-RTT allows resuming previous sessions instantly, though with replay attack trade-offs."
+    }
+  ]);
+</script>
+</body>
+</html>

@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 04 — Routing and modular APIRouter</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="fastapi" data-lesson="4" data-lesson-id="routing-and-modular-apirouter">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 04</span> · Dependency Injection & Structure</span>
+
+  <h1 class="lesson-title">Routing and modular APIRouter</h1>
+  <p class="lesson-lede">
+    Stop putting 50 endpoints in a single main.py file. Master FastAPI's APIRouter: decomposing routes into feature modules with custom prefixes, tags, and dependencies.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Structure multi-route applications modularly using APIRouter and path prefixes</span>
+    <span><b>Mission link</b> Enables scalable code organization across large backend projects</span>
+  </div>
+
+  <h2><span class="n">1</span>Modular route decomposition</h2>
+  <p>A production API can have hundreds of endpoints. Putting them all in <code>main.py</code> creates an unmaintainable monolithic script. FastAPI solves this with <b>APIRouter</b>.</p><p>An <code>APIRouter</code> behaves just like an <code>app</code> instance: you declare routes on it, and then include the router into your main app: <code>app.include_router(users_router, prefix="/users", tags=["Users"])</code>. This automatically groups your endpoints cleanly in the interactive Swagger documentation.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Use APIRouter to decompose routes into feature modules with shared prefixes and tags.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The modular project structure</h2>
+  <p>Observe how modular routers roll up into the main FastAPI application instance.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing router-level dependencies</h2>
+  <p>Trace how applying a dependency to an APIRouter protects all routes inside that module automatically.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of APIRouter conventions.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can organize multi-file FastAPI codebases cleanly using modular APIRouter feature packages.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Create a routers/ package and extract endpoints into separate users.py and items.py files.</li>
+    <li>Mount the routers in main.py using app.include_router().</li>
+    <li>Add a router-level dependency to protect all routes in an administrative router.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Sebastián Ramírez, *FastAPI Documentation: Bigger Applications — Multiple Files* (fastapi.tiangolo.com/tutorial/bigger-applications/).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "If an APIRouter has prefix='/items', and a route inside defines '@router.get('/{id}')', what is the full path?",
+    a: ["/items/{id}","/{id}","/items/items/{id}","/api/{id}"],
+    c: 0,
+    why: "FastAPI concatenates router prefixes with route paths: /items + /{id} = /items/{id}."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "routers/users.py",
+            "lines": [
+                  "router = APIRouter(prefix='/users')",
+                  "GET /, POST /, GET /{id}"
+            ]
+      },
+      {
+            "title": "routers/orders.py",
+            "lines": [
+                  "router = APIRouter(prefix='/orders')",
+                  "GET /, POST /, DELETE /{id}"
+            ]
+      },
+      {
+            "title": "main.py",
+            "lines": [
+                  "app.include_router(users.router)",
+                  "app.include_router(orders.router)"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Protect all admin routes with a single declaration:",
+      "admin_router = APIRouter(",
+      "    prefix='/admin',",
+      "    tags=['Admin'],",
+      "    dependencies=[Depends(verify_admin_token)] # applies to ALL routes inside!",
+      ")",
+      "@admin_router.get('/metrics') # automatically protected by verify_admin_token!"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "prefix": "mounted at /admin"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "security": "verify_admin_token enforced across every route in router"
+            }
+      },
+      {
+            "line": 6,
+            "vars": {
+                  "protected": "/admin/metrics inherits router dependency automatically"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The modular routing class in FastAPI is API<0>.",
+      "The method to mount a router into the main app is app.include_<1>().",
+      "The property grouping routes in Swagger documentation is <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "Router"
+            ],
+            "why": "APIRouter groups modular route handlers."
+      },
+      {
+            "a": [
+                  "router"
+            ],
+            "why": "include_router mounts routers."
+      },
+      {
+            "a": [
+                  "tags"
+            ],
+            "why": "tags=['Users'] organizes endpoints in Swagger UI."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the primary benefit of using APIRouter in FastAPI?",
+      a: ["It allows decomposing a large application into modular, independent route files with shared prefixes, tags, and dependencies","It makes Python execute in parallel across multiple machines","It encrypts all network packets with TLS","It eliminates the need for Pydantic models"],
+      c: 0,
+      why: "APIRouter enables clean, modular code organization across large multi-developer codebases."
+    },
+    {
+      q: "How can you apply an authentication dependency to every route in an APIRouter at once?",
+      a: ["Pass a list of dependencies to the APIRouter constructor via the dependencies parameter","Add the @auth decorator above every single function","Name the router 'secure_router'","It is impossible; dependencies must be declared on each route individually"],
+      c: 0,
+      why: "Router-level dependencies apply automatically to every endpoint declared on that router."
+    },
+    {
+      q: "What do 'tags' do on an APIRouter (e.g. tags=['Billing'])?",
+      a: ["They group related endpoints together under named accordion sections in the interactive Swagger UI at /docs","They set the billing price for API calls","They track user browsing history","They tag database records with metadata"],
+      c: 0,
+      why: "Tags organize and categorize endpoints in OpenAPI documentation."
+    },
+    {
+      q: "Can an APIRouter include another sub-APIRouter?",
+      a: ["Yes, APIRouters can be nested hierarchically using router.include_router()","No, routers can only be mounted directly on the top-level FastAPI app","Only on mobile devices","Only if both routers have identical prefixes"],
+      c: 0,
+      why: "Hierarchical nesting allows building complex sub-module routing trees."
+    }
+  ]);
+</script>
+</body>
+</html>

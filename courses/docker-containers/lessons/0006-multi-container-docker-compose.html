@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 06 — Multi-Container Orchestration with Docker Compose</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="docker-containers" data-lesson="6" data-lesson-id="multi-container-docker-compose">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 06</span> · Docker Compose</span>
+
+  <h1 class="lesson-title">Multi-Container Orchestration with Docker Compose</h1>
+  <p class="lesson-lede">
+    Orchestrating microservices: compose.yaml specifications, service dependencies (`depends_on`), environment interpolation, and network topologies.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to define, orchestrate, and manage multi-service application stacks with Docker Compose.</span>
+    <span><b>Mission link</b> Mastering multi-container orchestration with docker compose across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Multi-Container Orchestration with Docker Compose</h2>
+  <p>Typing four separate `docker run` commands with 15 flags every morning to start your web app, PostgreSQL, Redis, and Celery worker is tedious and error-prone. <strong>Docker Compose</strong> provides declarative, version-controlled multi-container orchestration.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Orchestrating microservices: compose.yaml specifications, service dependencies (`depends_on`), environment interpolation, and network topologies.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Docker Compose Architecture</h2>
+  <p>Key Features of Docker Compose (`compose.yaml`):</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Single Command Lifecycle</h2>
+  <ul><li><strong>1. Declarative Stack Definition:</strong> Define all services, build targets, environment variables, ports, and volumes in a single `compose.yaml` file checked into git.</li><li><strong>2. Automatic Bridge Network:</strong> Compose automatically creates a shared private bridge network for the stack. Services communicate using their service names as DNS hostnames (`http://api:8000`, `postgres:5432`)!</li><li><strong>3. Startup Order & Healthchecks (`depends_on`):</strong> Ensure your API doesn't start until PostgreSQL is not just running, but <strong>healthy and ready to accept connections</strong>!</li><li><strong>4. One-Command Lifecycle:</strong> `docker compose up -d` launches the entire stack in the background; `docker compose down` stops and cleans up everything cleanly.</li></ul><pre><code># Production-Ready compose.yaml Example:
+services:
+  web:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgres://app:secret@db:5432/app_db
+      - REDIS_URL=redis://cache:6379/0
+    depends_on:
+      db:
+        condition: service_healthy # Waits for healthcheck to PASS!
+      cache:
+        condition: service_started
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      - POSTGRES_USER=app
+      - POSTGRES_PASSWORD=secret
+      - POSTGRES_DB=app_db
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  cache:
+    image: redis:7-alpine
+
+volumes:
+  pgdata: # Named volume for persistent database storage!</code></pre><div class="callout"><p><strong>The Healthcheck Condition:</strong> Never use a bare <code>depends_on: [db]</code>. A database container reports 'started' in 50ms, but takes 3 seconds to initialize. Always use <code>condition: service_healthy</code>.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the Docker Compose sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to define, orchestrate, and manage multi-service application stacks with Docker Compose.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where multi-container orchestration with docker compose applies.</li>
+    <li>Author a unit test or verification script exercising multi-container orchestration with docker compose.</li>
+    <li>Document team architectural conventions regarding multi-container orchestration with docker compose.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Multi-Container Orchestration with Docker Compose.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is 'Docker Compose' and why is it standard for local multi-service development?",
+    a: ["A tool for defining and running multi-container Docker applications using a declarative YAML file with a single command (`docker compose up`)","A tool for making music with computers","A compiler for Dockerfiles","A cloud hosting provider"],
+    c: 0,
+    why: "Docker Compose orchestrates multi-container applications (backend, frontend, database, Redis) using a single declarative YAML file."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Service: web",
+            "lines": [
+                  "Builds local Dockerfile",
+                  "Maps port 8000:8000",
+                  "Depends on healthy database"
+            ]
+      },
+      {
+            "title": "Service: db (Postgres)",
+            "lines": [
+                  "Uses postgres:16-alpine",
+                  "Persistent named volume (pgdata)",
+                  "Healthcheck: pg_isready"
+            ]
+      },
+      {
+            "title": "Service: cache (Redis)",
+            "lines": [
+                  "In-memory cache for sessions & rate limits"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Multi-Container Orchestration with Docker Compose",
+      "def execute_flow():",
+      "    # Orchestrating microservices: compose.yaml specific...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Multi-Container Orchestration with Docker Compose"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "docker compose up -d"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "docker compose down"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Docker Compose orchestrates multi-container applications declaratively, using {1} conditions to ensure applications wait for databases to become {2}."
+],
+    blanks: [
+      {
+            "a": [
+                  "healthcheck"
+            ],
+            "why": "Status probe verifying readiness"
+      },
+      {
+            "a": [
+                  "healthy"
+            ],
+            "why": "Ready to accept incoming connections"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What happens if a backend service uses 'depends_on: [db]' without a healthcheck condition?",
+      a: ["The backend starts as soon as the database process launches, often crashing because the database is still initializing and not yet ready to accept connections","The database is deleted","The build hangs forever","Docker crashes"],
+      c: 0,
+      why: "Containers report started before internal daemons are ready; healthcheck conditions ensure readiness."
+    },
+    {
+      q: "What command stops all containers defined in a Compose file and removes the internal network?",
+      a: ["docker compose down","docker stop all","docker kill","docker purge"],
+      c: 0,
+      why: "docker compose down gracefully terminates containers, removes networks, and cleans up the stack."
+    },
+    {
+      q: "How do environment variables in a local '.env' file interact with Docker Compose by default?",
+      a: ["Compose automatically reads the .env file in the project root and interpolates variable values (${DATABASE_URL}) into compose.yaml","Compose deletes the .env file","Compose ignores .env files","Compose converts .env to JSON"],
+      c: 0,
+      why: "Docker Compose automatically parses .env files for variable substitution in compose.yaml."
+    },
+    {
+      q: "What flag is passed to 'docker compose up' to run all containers in the background as detached daemons?",
+      a: ["-d (or --detach)","-b","-bg","--daemon"],
+      c: 0,
+      why: "The -d flag runs containers in the background, freeing the terminal prompt."
+    }
+  ]);
+</script>
+</body>
+</html>

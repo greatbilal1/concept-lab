@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 05 — Persistent Storage: Bind Mounts vs Named Volumes</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="docker-containers" data-lesson="5" data-lesson-id="persistent-storage-bind-mounts-named-volumes">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 05</span> · Storage & Volumes</span>
+
+  <h1 class="lesson-title">Persistent Storage: Bind Mounts vs Named Volumes</h1>
+  <p class="lesson-lede">
+    Data persistence: why containers are ephemeral by default, Named Volumes (managed by Docker), and Bind Mounts (local directories).
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to manage persistent data using Bind Mounts, Named Volumes, and tmpfs.</span>
+    <span><b>Mission link</b> Mastering persistent storage: bind mounts vs named volumes across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Persistent Storage: Bind Mounts vs Named Volumes</h2>
+  <p>By default, containers are <strong>ephemeral and stateless</strong>. If you run a PostgreSQL container, insert 10,000 customers, and run `docker rm -f pg_container`, <strong>all your data is gone forever</strong>. The container's writable layer is destroyed along with the container.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Data persistence: why containers are ephemeral by default, Named Volumes (managed by Docker), and Bind Mounts (local directories).
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Bind Mounts vs Named Volumes</h2>
+  <p>The Two Storage Paradigms in Docker:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Data Persistence Guarantee</h2>
+  <ul><li><strong>1. Named Volumes (Production Standard — Managed by Docker):</strong> Docker manages a dedicated storage area on the host filesystem (`/var/lib/docker/volumes/`). Volumes are independent of container lifecycles: you can delete, upgrade, or replace the container, and mount the volume to a new container with <strong>zero data loss</strong>! High performance on all OSs.</li><li><strong>2. Bind Mounts (Local Development Standard):</strong> Mounts an exact directory on your host laptop directly into the container: `-v $(pwd):/app`. When you edit code in VS Code, the container sees the changes instantly (live reload!). Slower on macOS/Windows due to filesystem translation.</li><li><strong>3. In-Memory tmpfs Mounts:</strong> Mounts temporary storage in host RAM (`--tmpfs /tmp`). Never written to disk; wiped on stop. Ideal for sensitive secrets or fast temp caches!</li></ul><pre><code># Persistent Database using Named Volumes (CLI):
+# 1. Create a persistent named volume:
+docker volume create pg_data
+
+# 2. Mount named volume to PostgreSQL data directory:
+docker run -d \
+    --name prod_db \
+    -v pg_data:/var/lib/postgresql/data \
+    postgres:16-alpine
+# Even if prod_db is deleted and upgraded to postgres:17, pg_data remains 100% intact!</code></pre><div class="callout"><p><strong>The Golden Storage Rule:</strong> Use <strong>Bind Mounts</strong> for active local code editing during development; use <strong>Named Volumes</strong> for persistent databases and state in production.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the persistent storage sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to manage persistent data using Bind Mounts, Named Volumes, and tmpfs.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where persistent storage: bind mounts vs named volumes applies.</li>
+    <li>Author a unit test or verification script exercising persistent storage: bind mounts vs named volumes.</li>
+    <li>Document team architectural conventions regarding persistent storage: bind mounts vs named volumes.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Persistent Storage: Bind Mounts vs Named Volumes.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What happens to data written inside a container's writable filesystem layer when the container is removed (`docker rm`)?",
+    a: ["All data written inside the container layer is permanently deleted and lost, unless persistent volumes or bind mounts were attached","The data is saved to the desktop","The data is automatically uploaded to AWS","The container cannot be deleted if it has data"],
+    c: 0,
+    why: "Container filesystems are ephemeral by default; persistent data must be stored in Docker volumes or bind mounts."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Bind Mounts (-v /host/path:/container/path)",
+            "lines": [
+                  "Mounts exact host folder into container",
+                  "Perfect for local dev & live reloading (hot-reload)",
+                  "Tied to specific host directory structure"
+            ]
+      },
+      {
+            "title": "Named Volumes (-v my_data:/var/lib/data)",
+            "lines": [
+                  "Managed by Docker in /var/lib/docker/volumes",
+                  "Completely decoupled from container lifecycle",
+                  "Gold standard for production databases & state"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Persistent Storage: Bind Mounts vs Named Volumes",
+      "def execute_flow():",
+      "    # Data persistence: why containers are ephemeral by ...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Persistent Storage: Bind Mounts vs Named Volumes"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Container Lifecycle"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Volume Lifecycle"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Containers are ephemeral by default, requiring {1} mounts for local code live-reloading and Docker-managed named {2} for production database persistence."
+],
+    blanks: [
+      {
+            "a": [
+                  "bind"
+            ],
+            "why": "Host-relative directory mount"
+      },
+      {
+            "a": [
+                  "volumes"
+            ],
+            "why": "Docker-managed storage pools"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why are Named Volumes preferred over Bind Mounts for production database deployments?",
+      a: ["Volumes are managed entirely by Docker, isolated from host OS directory structure differences, and offer optimized I/O performance","Named volumes are encrypted by default","Bind mounts cannot store databases","Named volumes run in memory only"],
+      c: 0,
+      why: "Named volumes are platform-agnostic, decoupled from host filesystem layouts, and fully managed by Docker."
+    },
+    {
+      q: "What is the primary benefit of using a Bind Mount during local web development?",
+      a: ["Changes made to source code files on the host computer are reflected inside the container instantly without rebuilding the image","It speeds up Python execution by 10x","It makes Docker images smaller","It compiles code to C"],
+      c: 0,
+      why: "Bind mounts mirror host files into the container, enabling instant hot-reloading during development."
+    },
+    {
+      q: "Where does Docker store Named Volumes on a Linux host by default?",
+      a: ["Under /var/lib/docker/volumes/","Inside the user's home Documents folder","On the desktop","In /tmp"],
+      c: 0,
+      why: "Docker maintains its managed volumes in the /var/lib/docker/volumes directory on Linux hosts."
+    },
+    {
+      q: "What does a 'tmpfs' mount do in Docker?",
+      a: ["Mounts an ephemeral storage volume directly in host RAM that is never written to physical disk and is cleared when the container stops","Formats the hard drive","Stores files in the cloud","Compresses image layers"],
+      c: 0,
+      why: "tmpfs mounts store data in host memory only, ensuring high-speed access and zero disk persistence."
+    }
+  ]);
+</script>
+</body>
+</html>

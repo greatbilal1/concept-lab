@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 05 — Token Economics: Signal-to-Noise Ratio</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="context-engineering" data-lesson="5" data-lesson-id="token-economics-signal-noise">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 05</span> · Token Economics</span>
+
+  <h1 class="lesson-title">Token Economics: Signal-to-Noise Ratio</h1>
+  <p class="lesson-lede">
+    Analyzing the economics of tokens: pricing tiers, caching discounts, and maximizing the signal-to-noise ratio.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You understand the mathematics and economics of token budgeting.</span>
+    <span><b>Mission link</b> Mastering token economics: signal-to-noise ratio across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Token Economics: Signal-to-Noise Ratio</h2>
+  <p>Every token in an LLM prompt costs money, time, and attention. In production engineering, optimizing <strong>Token Economics</strong> is not about penny-pinching; it is about engineering reliability.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Analyzing the economics of tokens: pricing tiers, caching discounts, and maximizing the signal-to-noise ratio.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Quadratic Cost Escalation</h2>
+  <p>Language model APIs bill using an asymmetric pricing model: <strong>input tokens</strong> are cheaper than <strong>output tokens</strong> (typically 1:3 to 1:5 ratio). However, because multi-turn agent sessions resend the entire conversation history on every single turn, input token volume grows <em>quadratically</em> with turn count!</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Signal-to-Noise Optimization</h2>
+  <pre><code># The Quadratic Input Token Escalation:
+# Turn 1: 5k context   -> Model runs 5k input tokens
+# Turn 2: 12k context  -> Model runs 12k input tokens
+# Turn 3: 20k context  -> Model runs 20k input tokens
+# ...
+# Turn 15: 85k context -> Model runs 85k input tokens
+# Total input tokens billed: over 600,000 tokens for one 15-turn task!</code></pre><p>To maximize your Signal-to-Noise Ratio (SNR):</p><ul><li><strong>Strip Markdown Flavor Padding:</strong> Remove chatty fluff ('Please be so kind as to...'). State constraints directly.</li><li><strong>Strip Comments in Ingested Code:</strong> Remove license headers, auto-generated banners, and verbose multi-line docstrings from injected context files.</li><li><strong>Filter Whitespace:</strong> Avoid sending thousands of empty blank lines or massive indented ASCII tables.</li></ul><div class="callout"><p><strong>The Math:</strong> Doubling your prompt SNR cuts token bills in half, slashes latency by 40%, and directly reduces hallucination rates.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the token economics sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You understand the mathematics and economics of token budgeting.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where token economics: signal-to-noise ratio applies.</li>
+    <li>Author a unit test or verification script exercising token economics: signal-to-noise ratio.</li>
+    <li>Document team architectural conventions regarding token economics: signal-to-noise ratio.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Token Economics: Signal-to-Noise Ratio.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is 'Signal-to-Noise Ratio' (SNR) in the context of LLM prompts?",
+    a: ["The proportion of tokens that directly inform the task vs tokens that are irrelevant, redundant, or boilerplate","The volume of audio notifications from the IDE","The speed of the network cable in megahertz","The ratio of uppercase to lowercase letters"],
+    c: 0,
+    why: "High SNR ensures the model's attention is focused exclusively on critical task requirements."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Single Turn",
+            "lines": [
+                  "5,000 tokens",
+                  "Cost: $0.015"
+            ]
+      },
+      {
+            "title": "Turn 10 (Compounded)",
+            "lines": [
+                  "50,000 tokens per turn",
+                  "Total billed: 275k tokens"
+            ]
+      },
+      {
+            "title": "Turn 20 (Unpruned)",
+            "lines": [
+                  "100k tokens per turn",
+                  "Total billed: 1.2M tokens"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Token Economics: Signal-to-Noise Ratio",
+      "def execute_flow():",
+      "    # Analyzing the economics of tokens: pricing tiers, ...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Token Economics: Signal-to-Noise Ratio"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Noise Removed"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Pure Signal Retained"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "In multi-turn agent sessions, input tokens scale {1} because conversation history is resent on every turn, making high {2} critical."
+],
+    blanks: [
+      {
+            "a": [
+                  "quadratically"
+            ],
+            "why": "Compounding growth curve"
+      },
+      {
+            "a": [
+                  "signal-to-noise"
+            ],
+            "why": "Proportion of useful information"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why does multi-turn agent chat consume vastly more input tokens than a single prompt?",
+      a: ["Every turn re-sends the entire preceding conversation history and tool outputs to the model API","Language models charge penalty fees for long conversations","Output tokens are converted to input tokens","The IDE re-reads the entire hard drive on each turn"],
+      c: 0,
+      why: "APIs are stateless; full conversation history must be transmitted on every subsequent request."
+    },
+    {
+      q: "How does removing boilerplate license headers from injected context improve agent performance?",
+      a: ["It prevents wasting hundreds of tokens on legal disclaimers that provide zero architectural value","It violates international copyright law","It speeds up Python compilation","It turns off the linter"],
+      c: 0,
+      why: "Legal banners consume context budget without contributing any technical signal."
+    },
+    {
+      q: "What is the economic consequence of high-noise prompts in CI pipelines?",
+      a: ["Massive cloud API bills and slow CI build times that compound across hundreds of PR runs","GitHub blocks the repository","Developers lose commit access","Servers automatically shut down"],
+      c: 0,
+      why: "Automated agent runs in CI scale token costs with every PR commit."
+    },
+    {
+      q: "Which technique directly combats quadratic token escalation during long agent sessions?",
+      a: ["Milestone compaction: replacing verbose turn history with a concise state summary checkpoint","Using a faster internet connection","Writing prompts in all caps","Running tests with -v flag"],
+      c: 0,
+      why: "Compaction resets the history volume, flattening the quadratic token escalation curve."
+    }
+  ]);
+</script>
+</body>
+</html>

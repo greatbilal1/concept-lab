@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 07 — Caching and conditional requests</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="http" data-lesson="7" data-lesson-id="caching-and-conditional-requests">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 07</span> · State, Cookies & Caching</span>
+
+  <h1 class="lesson-title">Caching and conditional requests</h1>
+  <p class="lesson-lede">
+    The fastest request is the one you never make. Master Cache-Control, max-age, ETags, and 304 Not Modified conditional requests.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Implement efficient HTTP caching strategies using Cache-Control and ETag validation</span>
+    <span><b>Mission link</b> Dramatically reduces server load and optimizes client performance</span>
+  </div>
+
+  <h2><span class="n">1</span>The hierarchy of web caching</h2>
+  <p>Every network request consumes bandwidth and introduces latency. HTTP provides built-in caching primitives that allow browsers and CDNs to serve copies of resources without contacting the origin server.</p><p>Caching is controlled by <code>Cache-Control</code>. Directives like <code>max-age=3600</code> declare how long a resource is fresh. When fresh, the browser serves it directly from local memory or disk without sending any network packets.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Cache-Control directs browsers and CDNs whether, where, and how long to store copies of responses.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Conditional validation with ETags</h2>
+  <p>When a cached item expires, the browser doesn't need to download it again if it hasn't changed. It sends a conditional check.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing ETag revalidation</h2>
+  <p>Trace how a conditional request saves 2 megabytes of download bandwidth using 304 Not Modified.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of HTTP caching headers.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can design caching headers that eliminate redundant data transfers and keep web applications fast and responsive.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Inspect Cache-Control headers on images and scripts in your browser DevTools.</li>
+    <li>Observe 304 Not Modified responses on page reloads.</li>
+    <li>Configure immutable asset caching for fingerprinted asset bundles.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    IETF RFC 9111: *HTTP Caching* (2022).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "If a response has 'Cache-Control: max-age=600', what happens when the user visits the page 2 minutes later?",
+    a: ["The browser loads the resource instantly from local cache without making a network request","The browser downloads the entire resource from the server again","The server returns status 500 Internal Server Error","The browser prompts the user to clear their browsing history"],
+    c: 0,
+    why: "At 2 minutes (120s), the 600s cache window is fresh; the browser fulfills it locally."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "First Request",
+            "lines": [
+                  "Server returns: 200 OK",
+                  "ETag: 'v1.4-hash'",
+                  "Cache-Control: no-cache"
+            ]
+      },
+      {
+            "title": "Next Request (Expired)",
+            "lines": [
+                  "Browser sends: If-None-Match: 'v1.4-hash'",
+                  "'Has this changed?'"
+            ]
+      },
+      {
+            "title": "Server Validation",
+            "lines": [
+                  "Hash matches! Resource identical.",
+                  "Server replies: 304 Not Modified (0 bytes body)"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "Browser: GET /bundle.js (cached hash: 'a1b2c3')",
+      "Browser sends header: If-None-Match: \"a1b2c3\"",
+      "Server checks bundle.js on disk -> hash is still 'a1b2c3'",
+      "Server returns: HTTP/1.1 304 Not Modified (empty body)",
+      "Browser reuses existing cached copy immediately"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "cache_status": "stale cache entry present"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "conditional_header": "If-None-Match: \"a1b2c3\""
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "server_check": "bundle content hash unchanged"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "bandwidth": "0 bytes payload transferred; 304 response"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The primary header setting cache lifetime is <0>-Control.",
+      "The cryptographic content hash header used for validation is <1>.",
+      "The conditional request header matching an ETag is If-None-<2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "Cache"
+            ],
+            "why": "Cache-Control governs caching behavior."
+      },
+      {
+            "a": [
+                  "ETag"
+            ],
+            "why": "ETag provides a content-based fingerprint."
+      },
+      {
+            "a": [
+                  "Match"
+            ],
+            "why": "If-None-Match verifies if the client ETag is still current."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What does 'Cache-Control: no-cache' mean?",
+      a: ["The browser may cache the response, but must validate it with the origin server before each use","The browser is completely forbidden from storing the response anywhere on disk","The server will delete its database cache after sending the response","The user must manually clear their browser cache to view the page"],
+      c: 0,
+      why: "no-cache permits caching, but mandates server revalidation (e.g. via ETag) prior to use."
+    },
+    {
+      q: "Which directive strictly forbids any cache (browser or intermediate CDN) from storing a response?",
+      a: ["Cache-Control: no-store","Cache-Control: no-cache","Cache-Control: max-age=0","Cache-Control: public"],
+      c: 0,
+      why: "no-store prohibits storing sensitive data to disk or memory caches entirely."
+    },
+    {
+      q: "What is the purpose of the ETag response header?",
+      a: ["To provide a unique version fingerprint for a resource so changes can be detected conditionally","To encrypt the response body with public key cryptography","To track user browsing habits across different websites","To display the author name in the browser status bar"],
+      c: 0,
+      why: "ETags act as content checksums that enable 304 Not Modified revalidation."
+    },
+    {
+      q: "Why is 'Cache-Control: max-age=31536000, immutable' recommended for hashed assets (e.g. app.a8f9.js)?",
+      a: ["Because the content hash in the filename guarantees the URL content will never change, allowing 1-year caching","Because browsers delete files after 31 million milliseconds","Because the operating system requires 1-year expiration for JavaScript files","To comply with European Union privacy regulations"],
+      c: 0,
+      why: "Fingerprinted filenames mean updates get new URLs, making cached copies safe to keep forever."
+    }
+  ]);
+</script>
+</body>
+</html>

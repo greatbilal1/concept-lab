@@ -1,0 +1,3 @@
+# Mission — Tokens, Context Windows & Context Limits
+
+Master the economics, physical constraints, and architecture of context windows. Understand subword BPE tokenization ratios, analyze asymmetric input/output pricing and TTFT latency, explore context window evolution from 2k to 1M+, unravel the O(N^2) quadratic attention bottleneck and FlashAttention, audit long-context retrieval with Needle-in-a-Haystack tests, implement rolling summarization buffers, execute defensive client-side truncation, and design scalable Map-Reduce architectures.

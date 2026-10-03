@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 03 — The three trees</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="git-version-control" data-lesson="3" data-lesson-id="the-three-trees">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 03</span> · History & commits</span>
+
+  <h1 class="lesson-title">The three trees</h1>
+  <p class="lesson-lede">
+    Git keeps three copies of your project at once. Once you can name them, every
+    confusing Git command suddenly makes sense.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~12 min</span>
+    <span><b>Win</b> Say which of the three trees any change lives in</span>
+    <span><b>Mission link</b> This model explains add, commit, diff, and restore</span>
+  </div>
+
+  <h2><span class="n">1</span>Three places, one project</h2>
+
+  <p>
+    In the last lesson you met the staging area. It is one of <b>three</b> places
+    your project exists inside a repository:
+  </p>
+
+  <ul>
+    <li><b>Working tree</b> — the actual files you edit in your editor.</li>
+    <li><b>Staging area</b> (also called the <i>index</i>) — the changes you have chosen for the next commit.</li>
+    <li><b>Repository</b> — the committed history, stored inside <code>.git</code>.</li>
+  </ul>
+
+  <p>
+    People call these "the three trees". A change moves through them in one
+    direction: you edit the working tree, you stage into the index, you commit
+    into the repository.
+  </p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Almost every Git command is really a question about <i>which tree</i> you are
+    moving data between.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Reading the three trees</h2>
+
+  <p>
+    The command <code>git status</code> is your map. It tells you which files
+    differ between the working tree and the index, and which staged changes are
+    waiting to be committed. Run it constantly; it is cheap and it always tells
+    you where you are.
+  </p>
+
+  <p>
+    <code>git diff</code> compares the working tree against the index — what you
+    have changed but not yet staged. <code>git diff --staged</code> compares the
+    index against the last commit — what you are about to record. Two different
+    questions, two different answers.
+  </p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Following one change</h2>
+
+  <p>
+    Watch a single edit travel through all three trees. This is the mental model
+    to hold onto: at each step, the change exists in a different tree, and a
+    different command moves it forward.
+  </p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+
+  <p>Recall the key facts from memory before the quiz.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <b>✓ Your win for today</b>
+    You can name the three trees and say which one any change currently lives in.
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Edit a file and run <code>git status</code>. Note which tree the change is in.</li>
+    <li>Run <code>git add</code> on it, then <code>git status</code> again. What moved?</li>
+    <li>Run <code>git diff</code> and <code>git diff --staged</code> and compare the two outputs.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Pro Git, Chapter 2 — "Recording Changes to the Repository", especially the
+    "Staging Modified Files" section (git-scm.com/book).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "You edit a file but run no Git command. Which tree holds the change?",
+    a: [
+      "The working tree only",
+      "The staging area only",
+      "The repository history",
+      "All three trees at once"
+    ],
+    c: 0,
+    why: "Editing changes only the working tree. The change reaches the index only when you run git add, and the repository only when you commit."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      { title: "Working tree", lines: ["files you edit", "git diff shows this"] },
+      { title: "Staging area", lines: ["chosen changes", "git diff --staged"] },
+      { title: "Repository", lines: ["committed history", "git log shows this"] }
+    ]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    label: "One edit through three trees",
+    code: [
+      "edit essay.txt",
+      "git add essay.txt",
+      "git commit -m \"rewrite intro\""
+    ],
+    steps: [
+      { line: 0, vars: { working: "changed", index: "old", repo: "old" } },
+      { line: 1, vars: { working: "changed", index: "changed", repo: "old" } },
+      { line: 2, vars: { working: "changed", index: "changed", repo: "changed" } }
+    ]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the blanks",
+    lines: [
+      "The files you edit live in the <0> tree.",
+      "The index is another name for the <1> area.",
+      "Committed history lives in the <2>.",
+      "The command that shows your position is <3>."
+    ],
+    blanks: [
+      { a: ["working", "working tree"], why: "The working tree is the set of files on disk that you edit." },
+      { a: ["staging"], why: "The index and the staging area are the same thing." },
+      { a: ["repository", "repo"], why: "The repository holds the committed snapshots inside .git." },
+      { a: ["git status"], why: "git status reports which tree each change is in." }
+    ]
+  });
+
+  /* the quiz — every option must have the SAME number of words */
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Which tree holds your edited files?",
+      a: ["The working directory", "The staging area", "The commit history", "The remote server"],
+      c: 0,
+      why: "The working directory (working tree) is where your edits land. Staging and history are separate trees."
+    },
+    {
+      q: "What does git add do?",
+      a: ["It records the change", "It saves the file", "It uploads the file", "It deletes the file"],
+      c: 0,
+      why: "git add moves a change into the staging area. It does not save to disk, upload, or delete anything."
+    },
+    {
+      q: "What is a commit, in tree terms?",
+      a: ["A snapshot of the whole project", "A copy of the working tree", "A list of the changed files", "A pointer to a remote here"],
+      c: 0,
+      why: "A commit is a full snapshot stored in the repository. It is not a copy of the working tree or merely a change list."
+    },
+    {
+      q: "What does git diff --staged show?",
+      a: ["It shows what will commit", "It saves the file now", "It uploads to the server", "It creates a new branch"],
+      c: 0,
+      why: "git diff --staged compares the index against the last commit — exactly what the next commit will contain."
+    }
+  ]);
+</script>
+</body>
+</html>

@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 05 — Supervised Fine-Tuning (SFT): From Completion to Assistant</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="llms" data-lesson="5" data-lesson-id="supervised-fine-tuning-sft">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 05</span> · Instruction Tuning</span>
+
+  <h1 class="lesson-title">Supervised Fine-Tuning (SFT): From Completion to Assistant</h1>
+  <p class="lesson-lede">
+    Transforming base models into conversational assistants: prompt-response dataset curation and instruction tuning.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You understand how Supervised Fine-Tuning transforms base models into conversational assistants.</span>
+    <span><b>Mission link</b> Mastering supervised fine-tuning (sft): from completion to assistant across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Supervised Fine-Tuning (SFT): From Completion to Assistant</h2>
+  <p>When an LLM finishes pre-training on 15 trillion tokens, it is called a <strong>Base Model</strong>. It possesses immense knowledge of the world, but it is <em>not an assistant</em>. It is an unguided autocomplete engine. If you prompt it with: <em>'Write a poem about the sea'</em>, it might complete the text with: <em>'Write a poem about the mountains. Due Friday by 5pm.'</em> (treating your prompt as a homework assignment!).</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Transforming base models into conversational assistants: prompt-response dataset curation and instruction tuning.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Base Model vs Instruct Model</h2>
+  <p>To turn a wild base model into a helpful, obedient assistant, engineers perform <strong>Supervised Fine-Tuning (SFT)</strong> (also called <em>Instruction Tuning</em>):</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Special Token Chat Delimiters</h2>
+  <ul><li><strong>Curated Instruction Datasets:</strong> Tens of thousands of high-quality (Prompt, Ideal Response) pairs written by human experts or teacher models.</li><li><strong>Chat Formats & Special Tokens:</strong> Structuring dialog with special delimiters (e.g. <code>&lt;|im_start|&gt;user ... &lt;|im_end|&gt;</code>).</li><li><strong>Continued Autoregressive Training:</strong> The model is trained on these pairs, but loss is computed <strong>only on the assistant's response tokens</strong>, teaching it to answer directly.</li></ul><pre><code># The SFT ChatML Format:
+<|im_start|>system
+You are a helpful, concise programming assistant.<|im_end|>
+<|im_start|>user
+How do I reverse a list in Python?<|im_end|>
+<|im_start|>assistant
+Use `my_list.reverse()` for in-place reversal, or `my_list[::-1]` for a new list.<|im_end|></code></pre><p>SFT acts as a <strong>thin behavioral mask</strong> over the vast reservoir of base model knowledge, aligning the model's outputs with human conversational expectations.</p><div class="callout"><p><strong>The Superficial Alignment Hypothesis:</strong> Pre-training teaches the model all its knowledge and reasoning; fine-tuning merely teaches it the format and style of how to interact with humans.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the SFT sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You understand how Supervised Fine-Tuning transforms base models into conversational assistants.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where supervised fine-tuning (sft): from completion to assistant applies.</li>
+    <li>Author a unit test or verification script exercising supervised fine-tuning (sft): from completion to assistant.</li>
+    <li>Document team architectural conventions regarding supervised fine-tuning (sft): from completion to assistant.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Supervised Fine-Tuning (SFT): From Completion to Assistant.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Why is a raw pre-trained 'Base Model' difficult for ordinary humans to chat with?",
+    a: ["A base model is an unconstrained document completer: if you ask a question, it might generate more questions rather than answering","A base model cannot generate text","A base model only understands French","Base models require physical keys to unlock"],
+    c: 0,
+    why: "Base models complete text statistically; if you type 'What is Python?', it might generate 'What is Java?' as a test questionnaire."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Base Model (Unconstrained)",
+            "lines": [
+                  "Prompt: 'Explain quantum physics'",
+                  "Completion: 'Chapter 2: Thermodynamics'",
+                  "Treats prompt as document excerpt"
+            ]
+      },
+      {
+            "title": "Instruct Model (SFT Aligned)",
+            "lines": [
+                  "Prompt: 'Explain quantum physics'",
+                  "Response: 'Quantum physics is the study of...'",
+                  "Behaves as obedient assistant"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Supervised Fine-Tuning (SFT): From Completion to Assistant",
+      "def execute_flow():",
+      "    # Transforming base models into conversational assis...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Supervised Fine-Tuning (SFT): From Completion to Assistant"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "System Turn"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "User Turn"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "step": "Assistant Turn"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Supervised Fine-Tuning transforms unconstrained base models into helpful assistants by training on curated {1} and {2} pairs."
+],
+    blanks: [
+      {
+            "a": [
+                  "prompt"
+            ],
+            "why": "User instruction or query"
+      },
+      {
+            "a": [
+                  "response"
+            ],
+            "why": "Ideal assistant answer"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the 'Superficial Alignment Hypothesis' (Zhou et al., LIMA paper)?",
+      a: ["A model learns almost all its knowledge and capabilities during pre-training; fine-tuning simply teaches it which sub-distribution of style to use","Alignment is superficial and useless","Models only learn on the surface of hard drives","Fine-tuning takes 10 years"],
+      c: 0,
+      why: "Research shows a small set of 1,000 curated examples can align a strong base model effectively."
+    },
+    {
+      q: "Why is training loss masked out on user prompt tokens during SFT training?",
+      a: ["We only want the model to learn how to generate the assistant's response, not learn to predict user prompts","User tokens are encrypted","To save hard drive space","User prompts have zero tokens"],
+      c: 0,
+      why: "Masking input tokens focuses gradient updates strictly on generating high-quality assistant answers."
+    },
+    {
+      q: "What are 'Special Tokens' (like <|im_start|> or [INST]) used for in chat models?",
+      a: ["They provide unambiguous boundary markers that tell the model who is speaking (system, user, or assistant)","They are secret cheat codes for developers","They turn on GPU fans","They encrypt chat history"],
+      c: 0,
+      why: "Special tokens prevent prompt confusion by cleanly separating conversational roles."
+    },
+    {
+      q: "What happens if you try to use a Base Model for zero-shot JSON tool calling?",
+      a: ["It frequently fails or produces rambling text continuations because it lacks instruction tuning on structured formats","It works perfectly","It runs 100x faster","It deletes the database"],
+      c: 0,
+      why: "Base models require fine-tuning to reliably adhere to rigid output formats like JSON schemas."
+    }
+  ]);
+</script>
+</body>
+</html>

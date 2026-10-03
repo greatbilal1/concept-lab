@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 07 — Architectural Fitness Functions and Linting</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="ai-generated-architecture" data-lesson="7" data-lesson-id="architectural-fitness-functions">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 07</span> · Fitness Functions</span>
+
+  <h1 class="lesson-title">Architectural Fitness Functions and Linting</h1>
+  <p class="lesson-lede">
+    Writing automated architectural fitness functions that fail CI when agents violate design rules.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to implement automated architectural fitness functions.</span>
+    <span><b>Mission link</b> Mastering architectural fitness functions and linting across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Architectural Fitness Functions and Linting</h2>
+  <p>In <em>Building Evolutionary Architectures</em>, Neal Ford and Rebecca Parsons introduced <strong>Architectural Fitness Functions</strong>: automated tests that evaluate architectural characteristics (layer boundaries, circular dependencies, cyclomatic complexity) just like unit tests evaluate business logic.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Writing automated architectural fitness functions that fail CI when agents violate design rules.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Architectural Fitness Gate</h2>
+  <p>When working with AI coding agents, architectural fitness functions are your ultimate guardrail. You don't have to hope the agent remembers your boundary rules; CI will mathematically enforce them:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Types of Architectural Tests</h2>
+  <ul><li><strong>Import Direction Checks:</strong> Asserting that `domain` never imports `infrastructure`.</li><li><strong>Circular Dependency Checks:</strong> Guaranteeing no cyclical import loops between modules.</li><li><strong>Dependency Fan-Out Bounds:</strong> Flagging classes that depend on more than 7 other services.</li></ul><pre><code># Architectural Fitness Function with import-linter (.importlinter)
+[importlinter]
+root_package = src
+
+[importlinter:contract:1]
+name = Domain Layer Purity
+type = forbidden
+source_modules =
+    src.domain
+forbidden_modules =
+    src.infrastructure
+    src.api
+    sqlalchemy
+    fastapi</code></pre><p>If an agent accidentally imports `sqlalchemy` inside `src/domain/entities.py`, the linter fails in 150ms: <em>'CONTRACT VIOLATION: src.domain cannot import sqlalchemy.'</em> The agent observes the error and fixes its own boundary violation!</p><div class="callout"><p><strong>Automated Enforcement:</strong> Never rely on human memory for things a 100ms AST check can enforce deterministically in CI.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the fitness function sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to implement automated architectural fitness functions.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where architectural fitness functions and linting applies.</li>
+    <li>Author a unit test or verification script exercising architectural fitness functions and linting.</li>
+    <li>Document team architectural conventions regarding architectural fitness functions and linting.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Architectural Fitness Functions and Linting.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is an 'Architectural Fitness Function'?",
+    a: ["An automated test or check that programmatically validates that code adheres to defined architectural invariants","A health app for software developers","A benchmark test measuring typing speed","A metric that counts lines of code"],
+    c: 0,
+    why: "Fitness functions provide automated, objective verification of architectural integrity in CI."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Agent Violates Boundary",
+            "lines": [
+                  "Imports ORM into Domain",
+                  "Saves 10 seconds locally"
+            ]
+      },
+      {
+            "title": "Fitness Function Runs",
+            "lines": [
+                  "import-linter executes in 150ms",
+                  "Detects forbidden import path"
+            ]
+      },
+      {
+            "title": "Automated Rejection",
+            "lines": [
+                  "CI fails with exact violation line",
+                  "Agent forced to refactor to pure port"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Architectural Fitness Functions and Linting",
+      "def execute_flow():",
+      "    # Writing automated architectural fitness functions ...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Architectural Fitness Functions and Linting"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Layer Isolation"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Cycle Prevention"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "step": "Coupling Limits"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Architectural fitness functions provide automated {1} in CI that fail builds whenever code violates defined architectural {2}."
+],
+    blanks: [
+      {
+            "a": [
+                  "tests"
+            ],
+            "why": "Automated verification checks"
+      },
+      {
+            "a": [
+                  "invariants"
+            ],
+            "why": "Structural rules and boundaries"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What tool in the Python ecosystem enables writing architectural fitness tests for import directions?",
+      a: ["import-linter or pytest-archon","requests","pip","virtualenv"],
+      c: 0,
+      why: "import-linter and pytest-archon analyze module imports to enforce architectural boundary contracts."
+    },
+    {
+      q: "What happens when an agent breaks an architectural fitness rule during a CI run?",
+      a: ["The fitness test fails with an explicit error identifying the forbidden import, prompting the agent to correct it","The computer restarts","The git repository is deleted","The developer is notified by phone"],
+      c: 0,
+      why: "The automated failure provides exact feedback, guiding the agent to remove the forbidden dependency."
+    },
+    {
+      q: "Why are automated fitness functions superior to manual code review for enforcing boundaries?",
+      a: ["Automated tests never get tired, execute in milliseconds, and catch 100% of illegal imports objectively","Fitness functions write code automatically","Manual code review is illegal","Fitness functions eliminate the need for QA"],
+      c: 0,
+      why: "Automated AST checks provide tireless, mathematical verification that never misses a violation."
+    },
+    {
+      q: "What is a 'Circular Dependency' and why should fitness functions prohibit it?",
+      a: ["Module A imports Module B, and Module B imports Module A, creating tightly coupled, fragile code that is hard to test and maintain","A loop in a Python for-statement","A database query that returns all rows","A git branch that never merges"],
+      c: 0,
+      why: "Circular dependencies tangle modules together, making independent testing and refactoring impossible."
+    }
+  ]);
+</script>
+</body>
+</html>

@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 06 — Skimming versus deep reading</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="reading-code" data-lesson="6" data-lesson-id="skimming-versus-deep-reading">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 06</span> · Mental Models & Tests</span>
+
+  <h1 class="lesson-title">Skimming versus deep reading</h1>
+  <p class="lesson-lede">
+    Knowing what to ignore is the superpower of fast comprehension. Learn how to skim for structure and only deep-read when you hit the critical seam.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Categorize code into skimmable plumbing and critical business logic</span>
+    <span><b>Mission link</b> Dramatically increases comprehension speed by filtering noise</span>
+  </div>
+
+  <h2><span class="n">1</span>Selective attention</h2>
+  <p>A typical 500-line file contains about 50 lines of core business logic. The remaining 450 lines are boilerplate: error checking, logging, parameter serialization, imports, and plumbing.</p><p>If you read at full attention the entire time, mental fatigue sets in within thirty minutes. You must learn to <b>skim</b> the plumbing with low attention, slowing down to <b>deep read</b> only when you reach the core decision point.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Skim the plumbing quickly; invest your deep attention only in the core decision logic.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The two gear speeds</h2>
+  <p>Operate in two distinct reading speeds: Gear 1 (Skimming for shape and landmarks) and Gear 2 (Deep reading for correctness and state mutation).</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Filtering boilerplate</h2>
+  <p>Observe how scanning past defensive checks isolates the single line where the key calculation occurs.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your skill at distinguishing plumbing from core logic.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can survey large files in seconds and zero in on the small percentage of code that actually matters.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Open a large file in your repo and highlight the boilerplate versus domain logic.</li>
+    <li>Practice skimming a 300-line module in under two minutes to describe its purpose.</li>
+    <li>Locate the single line where an essential decision is made.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Hermans, *The Programmer's Brain*, Chapter 3: 'How to Read Code Efficiently'.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Which section of a file can usually be skimmed with minimal cognitive effort?",
+    a: ["The core mathematical pricing algorithm","Standard import statements and logging boilerplate","Security authentication verification logic","Database transaction rollback mechanisms"],
+    c: 1,
+    why: "Imports and standard logging statements rarely contain unique domain logic."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Gear 1: Skim",
+            "lines": [
+                  "class names, imports",
+                  "function signatures, layout"
+            ]
+      },
+      {
+            "title": "Locate Seam",
+            "lines": [
+                  "identify the critical logic",
+                  "switch gears"
+            ]
+      },
+      {
+            "title": "Gear 2: Deep",
+            "lines": [
+                  "variable mutations",
+                  "branching conditions, edge cases"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "if not user: raise ValueError('no user') # skim: defensive check",
+      "logger.info('processing order for %s', user.id) # skim: logging",
+      "tier_discount = 0.15 if user.is_vip else 0.0 # DEEP: key logic",
+      "total = order.subtotal * (1 - tier_discount) # DEEP: calculation"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "type": "boilerplate guard"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "type": "boilerplate logging"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "type": "BUSINESS RULE: VIP discount is 15%"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "type": "BUSINESS RULE: apply discount formula"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Rapidly scanning for file shape and headers is <0>.",
+      "Meticulously analyzing state mutation line by line is <1> reading.",
+      "Code dedicated to logging, guarding, and plumbing is <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "skimming"
+            ],
+            "why": "Skimming navigates quickly across non-essential structure."
+      },
+      {
+            "a": [
+                  "deep"
+            ],
+            "why": "Deep reading focuses intense working memory on core logic."
+      },
+      {
+            "a": [
+                  "boilerplate",
+                  "plumbing"
+            ],
+            "why": "Boilerplate supports the runtime without defining business rules."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the primary danger of reading all code at maximum deep attention?",
+      a: ["Mental exhaustion and cognitive overload on non-essential boilerplate","Causing code syntax to corrupt on the local file system","Triggering automated security alerts in CI systems","Slow internet download speeds during git fetches"],
+      c: 0,
+      why: "Treating every line with equal focus burns mental energy on logging and guards."
+    },
+    {
+      q: "What constitutes 'boilerplate' in typical backend files?",
+      a: ["Imports, logging statements, standard parameter null-checks, and serialization","The intellectual property and trade secret calculations","The specific pricing formulas unique to the business","The customer database schema migrations"],
+      c: 0,
+      why: "Boilerplate handles routine system hygiene rather than specific business logic."
+    },
+    {
+      q: "When should you switch from skimming to deep reading?",
+      a: ["When you identify the function or conditional statement responsible for the target behavior","As soon as you open the very first file in the repository","Only after you have memorised all project variable names","When the compiler issues a deprecation warning notice"],
+      c: 0,
+      why: "Switch to deep reading once you have located the specific decision seam."
+    },
+    {
+      q: "How does skimming aid code orientation?",
+      a: ["It gives you a mental map of available symbols and structural layout","It automatically refactors code to follow clean code standards","It eliminates the need for automated test suites","It generates documentation web pages without human intervention"],
+      c: 0,
+      why: "Skimming builds high-level mental scaffolds without getting bogged down in mechanics."
+    }
+  ]);
+</script>
+</body>
+</html>

@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 08 — Bounded contexts and vertical slice architecture</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="separation-of-concerns" data-lesson="8" data-lesson-id="bounded-contexts-and-vertical-slice-architecture">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 08</span> · Boundaries & Abstractions</span>
+
+  <h1 class="lesson-title">Bounded contexts and vertical slice architecture</h1>
+  <p class="lesson-lede">
+    Moving beyond technical layers: explore Domain-Driven Design's Bounded Contexts and Vertical Slice Architecture to organize software by business capabilities.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Design vertical slice architectures and define domain Bounded Context boundaries</span>
+    <span><b>Mission link</b> The modern architectural paradigm organizing large software teams around business capabilities</span>
+  </div>
+
+  <h2><span class="n">1</span>From horizontal layers to vertical slices</h2>
+  <p>In traditional horizontal architectures, adding a new feature requires editing five folders: <code>controllers/</code>, <code>services/</code>, <code>repositories/</code>, <code>models/</code>, and <code>dtos/</code>. Code that changes together is scattered far apart.</p><p><b>Vertical Slice Architecture</b> groups code by <b>Business Capability</b>: everything needed to execute 'PlaceOrder' (the endpoint, command handler, validator, and query) lives inside a single cohesive folder: <code>features/place_order/</code>. Paired with Domain-Driven Design's <b>Bounded Contexts</b>, systems evolve rapidly with zero cross-feature contamination.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Vertical slices group code by business capability, keeping everything that changes together in one place.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Horizontal Layers versus Vertical Slices</h2>
+  <p>Contrast technical horizontal separation with business-aligned vertical feature slices.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing Bounded Context boundaries</h2>
+  <p>Trace how the concept of 'User' changes meaning across different Bounded Contexts in an e-commerce platform.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of vertical slices and bounded contexts.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can architect systems around cohesive vertical slices and bounded contexts, maximizing developer velocity and team autonomy.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Organize a new feature into a vertical slice folder containing route, handler, and query.</li>
+    <li>Define the boundary between two Bounded Contexts (e.g. Billing vs Catalog) in your domain.</li>
+    <li>Read Jimmy Bogard's foundational essay *Vertical Slice Architecture*.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Eric Evans, *Domain-Driven Design*, Chapter 14: 'Maintaining Model Integrity — Bounded Context'.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is the primary benefit of Vertical Slice Architecture over horizontal layering?",
+    a: ["Features are self-contained: modifying 'PlaceOrder' touches only files in features/place_order without rippling across horizontal layers","It eliminates the need for software testing","It converts Python into machine binary","It makes the computer screen wider"],
+    c: 0,
+    why: "High cohesion around business capabilities: everything related to a feature lives in one cohesive slice."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Horizontal (Separated by Tech)",
+            "lines": [
+                  "controllers/ (all endpoints)",
+                  "services/ (all services)",
+                  "repositories/ (all SQL queries)",
+                  "changing 1 feature touches all folders!"
+            ]
+      },
+      {
+            "title": "Vertical Slice (By Feature)",
+            "lines": [
+                  "features/create_order/ (endpoint, logic, query)",
+                  "features/cancel_order/ (endpoint, logic, query)",
+                  "features/refund_order/ (isolated slices!)"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Context 1 (Authentication): User = { id, email, password_hash, mfa_secret }",
+      "# Context 2 (Shipping): Customer = { id, delivery_address, gate_code }",
+      "# Context 3 (Support): Client = { id, ticket_history, satisfaction_score }",
+      "# Result: Zero bloated god-models! Each context models exactly what it needs!"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "auth_context": "identity models credentials and login security"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "shipping_context": "shipping models physical address and delivery logistics"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "support_context": "support models customer satisfaction and ticket history"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "ddd_clarity": "bounded contexts eliminate bloated monolithic User models"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Organizing code by business feature rather than technical layer is <0> slice architecture.",
+      "A linguistic and model boundary in Domain-Driven Design is a <1> context.",
+      "The creator of Vertical Slice Architecture is Jimmy <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "vertical"
+            ],
+            "why": "Vertical slices group code by feature."
+      },
+      {
+            "a": [
+                  "bounded"
+            ],
+            "why": "Bounded contexts isolate domain models."
+      },
+      {
+            "a": [
+                  "Bogard"
+            ],
+            "why": "Jimmy Bogard popularized Vertical Slice Architecture."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is a 'Bounded Context' in Domain-Driven Design (DDD)?",
+      a: ["A defined boundary within which a specific domain model applies consistently and words have exact, unambiguous meanings","A database transaction timeout","A firewall that blocks internet connections","A memory limit on Docker containers"],
+      c: 0,
+      why: "A bounded context provides a linguistic boundary where domain models remain pure and focused."
+    },
+    {
+      q: "Why does Vertical Slice Architecture improve developer velocity on large teams?",
+      a: ["Developers working on Feature A rarely touch files in Feature B, minimizing git merge conflicts and enabling independent deployment","It turns off compiler syntax errors","It speeds up CPU clock frequencies","It eliminates the need for database migrations"],
+      c: 0,
+      why: "Self-contained feature folders minimize file contention and blast radius across teams."
+    },
+    {
+      q: "How does the concept of a 'Product' differ between a Sales Bounded Context and an Inventory Bounded Context?",
+      a: ["Sales cares about price, marketing copy, and photos; Inventory cares about dimensions, weight, and warehouse shelf coordinates","Sales uses numbers; Inventory uses text","They are identical in all contexts","Products are illegal in Sales contexts"],
+      c: 0,
+      why: "Different contexts model different attributes of the same real-world entity, avoiding bloated monolithic models."
+    },
+    {
+      q: "When is Vertical Slice Architecture preferred over traditional N-Tier Layered Architecture?",
+      a: ["In complex, rapidly evolving business domains where feature teams need autonomy to modify features without navigating 10 layer folders","Only on mobile devices","Only when building static HTML websites","Never; layered architecture is legally mandatory"],
+      c: 0,
+      why: "Vertical slices optimize for change velocity around business capabilities rather than technical tiers."
+    }
+  ]);
+</script>
+</body>
+</html>

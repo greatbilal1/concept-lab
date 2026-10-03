@@ -1,0 +1,3 @@
+# Mission — Function Calling & Tool Use
+
+Transform passive language models into active computational agents with tools. Master the dispatcher architecture separating reasoning from execution, author robust tool schemas with parameter constraints, inspect tool call responses and extract arguments, format tool result messages with matching call IDs, build multi-turn execution loops with circuit breakers, execute parallel tool calls with asyncio, return self-correcting error feedback, and enforce strict human confirmation gates.

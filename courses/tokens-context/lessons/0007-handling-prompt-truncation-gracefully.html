@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 07 — Handling Prompt Truncation Gracefully</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="tokens-context" data-lesson="7" data-lesson-id="handling-prompt-truncation-gracefully">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 07</span> · Truncation Hygiene</span>
+
+  <h1 class="lesson-title">Handling Prompt Truncation Gracefully</h1>
+  <p class="lesson-lede">
+    Defensive token management: counting tokens before sending, safe truncation heuristics, and avoiding mid-token cutoffs.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to implement defensive client-side token counting and graceful truncation.</span>
+    <span><b>Mission link</b> Mastering handling prompt truncation gracefully across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Handling Prompt Truncation Gracefully</h2>
+  <p>A mature application never sends a request to an LLM API and 'hopes' it fits within the context window. If the user attaches an unexpected 5MB log file, a naive API call will fail with a hard 400 error, breaking the user experience.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Defensive token management: counting tokens before sending, safe truncation heuristics, and avoiding mid-token cutoffs.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Context Budget Allocation</h2>
+  <p><strong>Graceful Prompt Truncation</strong> requires defensive client-side engineering:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Mid-Token Truncation Danger</h2>
+  <ul><li><strong>1. Count Tokens Before Sending:</strong> Use local tokenizer libraries (e.g. `tiktoken` in Python, `@dqbd/tiktoken` in JS) to calculate exact token counts locally.</li><li><strong>2. Safe Truncation Order:</strong> If total tokens exceed your safety limit (e.g. 90% of model window), truncate in a predictable order: <em>never truncate system prompts; truncate intermediate history or retrieved document chunks first.</em></li><li><strong>3. Truncate at Line or Sentence Boundaries:</strong> Never chop text at an arbitrary character or token index, which can create malformed Unicode or cut code in the middle of a variable name.</li></ul><pre><code># Defensive Token Truncation in Python:
+import tiktoken
+
+def fit_context_budget(system_prompt, user_query, retrieved_chunks, max_tokens=8000):
+    enc = tiktoken.get_encoding("cl100k_base")
+    # Always allocate budget for system and query first!
+    base_tokens = len(enc.encode(system_prompt)) + len(enc.encode(user_query))
+    available_for_chunks = max_tokens - base_tokens - 1000 # 1000 token output reserve!
+
+    selected_chunks = []
+    current_tokens = 0
+    for chunk in retrieved_chunks:
+        chunk_tokens = len(enc.encode(chunk))
+        if current_tokens + chunk_tokens <= available_for_chunks:
+            selected_chunks.append(chunk)
+            current_tokens += chunk_tokens
+        else:
+            break # Gracefully stop adding chunks before exceeding budget!
+    return selected_chunks</code></pre><div class="callout"><p><strong>The Output Reserve:</strong> Always reserve token capacity for the model's response! If a context window is 128k and your prompt is 127,900 tokens, the model can only generate 100 tokens before crashing.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the truncation hygiene sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to implement defensive client-side token counting and graceful truncation.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where handling prompt truncation gracefully applies.</li>
+    <li>Author a unit test or verification script exercising handling prompt truncation gracefully.</li>
+    <li>Document team architectural conventions regarding handling prompt truncation gracefully.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Handling Prompt Truncation Gracefully.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Why must token counting and truncation be performed client-side before calling an LLM API?",
+    a: ["To prevent unexpected HTTP 400 context limit crashes, budget overruns, and corrupted mid-sentence prompts","Because APIs cannot count tokens","To make Python compile faster","Because client-side tokens are free"],
+    c: 0,
+    why: "Client-side token counting guarantees that prompts fit within limits before incurring network round-trips."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "System Prompt (Pinned)",
+            "lines": [
+                  "Core identity & constraints",
+                  "Guaranteed 100% budget"
+            ]
+      },
+      {
+            "title": "User Query (Pinned)",
+            "lines": [
+                  "Immediate active instruction",
+                  "Guaranteed 100% budget"
+            ]
+      },
+      {
+            "title": "Retrieved Chunks (Flexible)",
+            "lines": [
+                  "Filled up to budget ceiling",
+                  "Gracefully truncated if too large"
+            ]
+      },
+      {
+            "title": "Output Reserve (Protected)",
+            "lines": [
+                  "Reserved for model answer",
+                  "Prevents mid-sentence cutoff"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Handling Prompt Truncation Gracefully",
+      "def execute_flow():",
+      "    # Defensive token management: counting tokens before...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Handling Prompt Truncation Gracefully"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Arbitrary Token Cut"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Clean Boundary Cut"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Defensive prompt management counts tokens client-side, truncates flexible retrieved chunks first, and reserves capacity for the model's {1} {2}."
+],
+    blanks: [
+      {
+            "a": [
+                  "output"
+            ],
+            "why": "Generated answer tokens"
+      },
+      {
+            "a": [
+                  "response"
+            ],
+            "why": "Assistant completion tokens"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What happens if a prompt fills 100% of the model's maximum context window leaving zero tokens for the output reserve?",
+      a: ["The model terminates immediately with a 'length' finish reason after emitting zero or one truncated token","The model compresses its output","The model runs in reverse","The computer restarts"],
+      c: 0,
+      why: "Output generation shares the total context window; with zero reserve, the model cannot generate."
+    },
+    {
+      q: "Why should text truncation be performed at line or paragraph boundaries rather than arbitrary token counts?",
+      a: ["Truncating mid-line can slice variable names, JSON tags, or code statements in half, confusing the model with broken syntax","It speeds up Python","It reduces electric bills","It is required by git"],
+      c: 0,
+      why: "Clean boundary cuts preserve the syntactic validity of the remaining context."
+    },
+    {
+      q: "What library allows instant client-side token counting for OpenAI models without network calls?",
+      a: ["tiktoken","requests","django","pytest"],
+      c: 0,
+      why: "tiktoken runs locally in Python or Rust, calculating exact token counts in microseconds."
+    },
+    {
+      q: "When truncating context to fit a budget, which content should be sacrificed first?",
+      a: ["Older retrieved document chunks or distant middle conversation turns, preserving system instructions and the current query","The system prompt","The current user query","All error handling code"],
+      c: 0,
+      why: "Preserving core instructions and the immediate task while trimming auxiliary context maintains task alignment."
+    }
+  ]);
+</script>
+</body>
+</html>

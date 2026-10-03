@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 08 — HTTPS and browser security indicators</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="dns-domains-tls" data-lesson="8" data-lesson-id="https-and-browser-security-indicators">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 08</span> · TLS Handshake & HTTPS</span>
+
+  <h1 class="lesson-title">HTTPS and browser security indicators</h1>
+  <p class="lesson-lede">
+    What does the browser padlock really mean? Learn how browsers enforce HSTS, diagnose mixed content errors, and understand the limits of HTTPS protection.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Enforce HTTPS using HSTS headers and resolve mixed content security vulnerabilities</span>
+    <span><b>Mission link</b> Secures end-user browser experiences and eliminates security warnings</span>
+  </div>
+
+  <h2><span class="n">1</span>What HTTPS protects and what it does not</h2>
+  <p>HTTPS is HTTP running inside an encrypted TLS channel. It provides three guarantees: <b>Confidentiality</b> (eavesdroppers cannot read traffic), <b>Integrity</b> (traffic cannot be tampered with), and <b>Authentication</b> (you are communicating with the genuine server).</p><p>However, HTTPS does <i>not</i> mean a website is trustworthy or ethical; it only means the connection between you and that server is secure. A malicious phishing site can have a valid HTTPS padlock.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    HTTPS guarantees confidentiality and authenticity with the server, not that the server is trustworthy.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Defensive HTTPS headers</h2>
+  <p>Learn the standard security headers that enforce modern HTTPS policies across browsers.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing HSTS browser enforcement</h2>
+  <p>Trace how a browser with an active HSTS cache automatically redirects HTTP to HTTPS internally.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of browser HTTPS security concepts.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can configure HSTS headers, eliminate mixed content vulnerabilities, and maintain bulletproof HTTPS security.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your website using the free SSL Labs test (ssllabs.com/ssltest).</li>
+    <li>Add the Strict-Transport-Security header to your web server configuration.</li>
+    <li>Check browser DevTools Console for mixed content warnings.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    IETF RFC 6797: *HTTP Strict Transport Security (HSTS)*.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What causes a 'Mixed Content' warning on an HTTPS web page?",
+    a: ["The HTTPS page attempts to load subresources (like an image or script) over insecure HTTP","The website contains both English and Spanish text","The server is running both Python and JavaScript code","The user is using both Wi-Fi and Bluetooth simultaneously"],
+    c: 0,
+    why: "Loading insecure HTTP subresources into an encrypted page destroys integrity and triggers mixed content blocks."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "HSTS Header",
+            "lines": [
+                  "Strict-Transport-Security: max-age=63072000",
+                  "forces browser to use HTTPS always"
+            ]
+      },
+      {
+            "title": "Upgrade Insecure",
+            "lines": [
+                  "Content-Security-Policy: upgrade-insecure-requests",
+                  "rewrites http:// to https:// automatically"
+            ]
+      },
+      {
+            "title": "Mixed Content Block",
+            "lines": [
+                  "active content (scripts) blocked immediately",
+                  "passive content (images) warned"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# User types: http://bank.com in browser address bar",
+      "# Browser checks internal HSTS preload list",
+      "# HSTS Match! Browser transforms URL internally to https://bank.com",
+      "# Insecure plaintext HTTP packet is NEVER sent over the local network"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "user_input": "insecure http:// link clicked"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "hsts_cache": "domain matched max-age policy"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "internal_redirect": "redirect 307 internal synthetic"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "security": "connection launched over port 443 with zero plaintext exposure"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The header that forces browsers to only connect over HTTPS is <0>.",
+      "Loading insecure HTTP resources inside an HTTPS page creates <1> content.",
+      "The browser address bar icon signaling a valid TLS connection is the <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "HSTS",
+                  "Strict-Transport-Security"
+            ],
+            "why": "HSTS prevents SSL-stripping downgrade attacks."
+      },
+      {
+            "a": [
+                  "mixed"
+            ],
+            "why": "Mixed content mixes secure HTTPS with insecure HTTP."
+      },
+      {
+            "a": [
+                  "padlock",
+                  "lock"
+            ],
+            "why": "The padlock icon confirms an authenticated, encrypted TLS session."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What does the Strict-Transport-Security (HSTS) header prevent?",
+      a: ["SSL-stripping downgrade attacks where an attacker forces connections to downgrade to plaintext HTTP","Computers from running out of disk space","Web browsers from displaying advertisements","Server databases from experiencing SQL injection"],
+      c: 0,
+      why: "HSTS instructs the browser to never connect over insecure HTTP, even if the user clicks an http:// link."
+    },
+    {
+      q: "Does seeing a green padlock in the browser mean a website is safe from fraud or scams?",
+      a: ["No, it only means traffic is encrypted with that server; criminals can easily obtain valid certificates","Yes, Certificate Authorities verify that website owners are honest and ethical","Yes, the padlock proves the company has government clearance","Yes, fraudulent websites cannot obtain HTTPS certificates"],
+      c: 0,
+      why: "Certificates verify domain control, not intent or business integrity; phishing sites use HTTPS too."
+    },
+    {
+      q: "Why do modern web browsers completely block active mixed content (like scripts)?",
+      a: ["An attacker on the network could tamper with the insecure script and hijack the entire encrypted page","Insecure scripts use too much battery electricity","Browsers charge a fee to execute insecure scripts","Active mixed content breaks user keyboard shortcuts"],
+      c: 0,
+      why: "Insecure JavaScript running in a secure DOM completely destroys all confidentiality and integrity guarantees."
+    },
+    {
+      q: "What is HSTS Preloading?",
+      a: ["Hardcoding a domain directly into browser source code so it is NEVER requested over HTTP from the very first visit","Downloading all website images before the user opens the browser","Pre-compiling JavaScript before running the browser","Pre-registering domain names with ICANN for free"],
+      c: 0,
+      why: "HSTS preloading protects even the very first connection attempt from being intercepted."
+    }
+  ]);
+</script>
+</body>
+</html>

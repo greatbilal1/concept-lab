@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 04 — Routing and hops across the globe</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="how-the-internet-works" data-lesson="4" data-lesson-id="routing-and-hops-across-the-globe">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 04</span> · Packets & Routing</span>
+
+  <h1 class="lesson-title">Routing and hops across the globe</h1>
+  <p class="lesson-lede">
+    How does a packet find its way from London to Tokyo in 150 milliseconds? Master router hops, the BGP routing protocol, and the diagnostic power of traceroute.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Diagnose network latency bottlenecks and packet loss using traceroute and ping</span>
+    <span><b>Mission link</b> Provides concrete diagnostic capability during network outages</span>
+  </div>
+
+  <h2><span class="n">1</span>Hop-by-hop forwarding</h2>
+  <p>No single router knows the entire global path between you and a distant server. Instead, routing is <b>hop-by-hop</b>: each router inspects a packet's destination IP, consults its internal <b>routing table</b>, and forwards the packet to the next closest neighbor router.</p><p>The global coordination protocol binding the internet together is <b>BGP (Border Gateway Protocol)</b>. Autonomous Systems (ISPs, universities, cloud providers) use BGP to announce which IP ranges they can reach.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Routers forward packets hop-by-hop using routing tables populated by BGP announcements.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>How traceroute works with TTL</h2>
+  <p>Traceroute is a stroke of engineering genius. It intentionally sends packets with TTL=1 to discover the first router, TTL=2 to discover the second, and so on.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing traceroute terminal output</h2>
+  <p>Trace how traceroute measures latency across home, ISP, backbone, and destination hops.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of network diagnostic tools.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can read and interpret traceroute output to isolate whether network lag is in your Wi-Fi, your ISP, or a cloud provider.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Run traceroute google.com in your terminal and count how many hops are traversed.</li>
+    <li>Observe the latency jump when tracing a server on another continent.</li>
+    <li>Use ping to test packet loss to your local router gateway.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Van Jacobson, *Traceroute Design Document* (Lawrence Berkeley National Laboratory, 1988).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What tool maps every intermediate router between your machine and a remote host?",
+    a: ["traceroute","grep","git status","curl -I"],
+    c: 0,
+    why: "traceroute sends incrementing TTL probes to elicit ICMP responses from each router hop."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Probe 1 (TTL=1)",
+            "lines": [
+                  "drops at router 1",
+                  "Router 1 replies: ICMP Time Exceeded (2ms)"
+            ]
+      },
+      {
+            "title": "Probe 2 (TTL=2)",
+            "lines": [
+                  "passes router 1, drops at router 2",
+                  "Router 2 replies: ICMP Time Exceeded (14ms)"
+            ]
+      },
+      {
+            "title": "Probe N (TTL=N)",
+            "lines": [
+                  "reaches destination server",
+                  "Destination replies: Port Unreachable or Pong"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "1  192.168.1.1 (home gateway)       1.2 ms",
+      "2  10.240.0.1  (ISP optical node)    8.4 ms",
+      "3  203.0.113.5 (transatlantic trunk) 72.1 ms  # ocean crossing latency jump",
+      "4  142.250.190.46 (target server)    74.2 ms"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "hop_1": "local Wi-Fi latency: ~1ms"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "hop_2": "telecom regional fiber: ~8ms"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "hop_3": "speed of light across Atlantic Ocean: +64ms"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "hop_4": "destination reached in 74ms"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The tool to measure round-trip ping time using ICMP packets is <0>.",
+      "The diagnostic command showing every router hop is <1>.",
+      "The global protocol used by ISPs to exchange IP routes is <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "ping"
+            ],
+            "why": "ping sends ICMP Echo Request packets to check reachability and latency."
+      },
+      {
+            "a": [
+                  "traceroute",
+                  "tracert"
+            ],
+            "why": "traceroute maps intermediate router hops using TTL tricks."
+      },
+      {
+            "a": [
+                  "BGP"
+            ],
+            "why": "BGP (Border Gateway Protocol) routes traffic between autonomous networks."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "How does traceroute discover the IP addresses of intermediate routers?",
+      a: ["It sends packets with incrementing TTL values, causing each router in turn to return an ICMP Time Exceeded message","It queries a central global database containing all router locations","It asks the destination server to provide a list of all routers visited","It scans the local Wi-Fi router configuration logs"],
+      c: 0,
+      why: "Each router drops the expired packet and sends an ICMP error packet identifying itself."
+    },
+    {
+      q: "What causes a sudden 60-80 millisecond latency jump between two traceroute hops?",
+      a: ["The physical speed of light traveling across an undersea transoceanic fiber cable","A software bug inside the operating system terminal emulator","The local computer running low on available RAM memory","The web browser installing an automatic software update"],
+      c: 0,
+      why: "Light in fiber optic glass travels at ~200,000 km/s; crossing 6,000 km of ocean takes ~60 ms minimum."
+    },
+    {
+      q: "What is Border Gateway Protocol (BGP)?",
+      a: ["The routing protocol that allows autonomous ISP systems to advertise IP reachable routes to each other","A web browser extension that blocks malicious advertisements","A database indexing algorithm for relational SQL tables","A physical copper cable standard for local area networks"],
+      c: 0,
+      why: "BGP is the routing glue of the internet, directing traffic between autonomous networks."
+    },
+    {
+      q: "What do asterisks (* * *) indicate on a line in traceroute output?",
+      a: ["The router did not reply with an ICMP response within the timeout window (often firewall filtered)","The destination computer has been hacked or compromised","The network connection has infinite bandwidth","The packet was encrypted with quantum cryptography"],
+      c: 0,
+      why: "Many production backbone routers drop or rate-limit ICMP diagnostic probes for security."
+    }
+  ]);
+</script>
+</body>
+</html>

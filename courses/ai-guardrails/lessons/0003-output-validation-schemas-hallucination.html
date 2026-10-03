@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 03 — Output Validation: JSON Schemas, Hallucination Checks, and Toxic Language</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="ai-guardrails" data-lesson="3" data-lesson-id="output-validation-schemas-hallucination">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 03</span> · Output Validation</span>
+
+  <h1 class="lesson-title">Output Validation: JSON Schemas, Hallucination Checks, and Toxic Language</h1>
+  <p class="lesson-lede">
+    Egress verification: strict JSON schema parsing, regex secret masking, NLI hallucination blocking, and toxic language screening.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to enforce output schemas, detect credential leaks, and block ungrounded responses.</span>
+    <span><b>Mission link</b> Mastering output validation: json schemas, hallucination checks, and toxic language across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Output Validation: JSON Schemas, Hallucination Checks, and Toxic Language</h2>
+  <p>Even with clean input prompts, models occasionally drift: they emit invalid JSON, hallucinate untrue claims, or accidentally parrot internal API tokens. <strong>Output Validation</strong> acts as the final inspection checkpoint before text reaches the user or database.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Egress verification: strict JSON schema parsing, regex secret masking, NLI hallucination blocking, and toxic language screening.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Output Validation Pipeline</h2>
+  <p>Four critical Output Validation checks:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Automated Schema Repair</h2>
+  <ul><li><strong>1. Strict Schema Validation (Pydantic / Zod):</strong> Ensures every key, type, and enum constraint is satisfied. With Pydantic v2, parsing takes under 1ms.</li><li><strong>2. Secret & Token Leak Scanners:</strong> High-speed regex checks to verify the model didn't leak environment variables, OpenAI API keys (<code>sk-...</code>), or database passwords in its response.</li><li><strong>3. Factual Grounding (NLI Entailment):</strong> Checks whether the claims in the response logically follow from the retrieved RAG context. If a contradiction is detected, block the output!</li><li><strong>4. Output Toxicity & Tone Screening:</strong> Verifies the response maintains a respectful, brand-safe tone free from offensive language.</li></ul><pre><code># Output Validation Guardrail in Python:
+def validate_model_output(raw_response_text: str, source_context: str) -> dict:
+    # 1. Secret leakage check
+    if re.search(r"(sk-[a-zA-Z0-9]{32,}|AKIA[0-9A-Z]{16})", raw_response_text):
+        raise GuardrailViolation("SECURITY ALERT: Model attempted to leak credentials!")
+        
+    # 2. Structural Schema Validation
+    try:
+        validated = TicketResponse.model_validate_json(raw_response_text)
+    except ValidationError as e:
+        return repair_json_with_fast_model(raw_response_text, e)
+        
+    # 3. Grounding Verification
+    if not is_entailed_by_context(validated.answer, source_context):
+        raise GuardrailViolation("Output failed factual grounding verification.")
+        
+    return validated.model_dump()</code></pre><div class="callout"><p><strong>The Self-Healing Loop:</strong> When a schema validation error occurs, pass the invalid JSON and the Pydantic error message to a fast mini model to repair the syntax in 200ms!</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the output validation sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to enforce output schemas, detect credential leaks, and block ungrounded responses.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where output validation: json schemas, hallucination checks, and toxic language applies.</li>
+    <li>Author a unit test or verification script exercising output validation: json schemas, hallucination checks, and toxic language.</li>
+    <li>Document team architectural conventions regarding output validation: json schemas, hallucination checks, and toxic language.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Output Validation: JSON Schemas, Hallucination Checks, and Toxic Language.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What should happen if an LLM generates a response that fails output JSON schema validation in production?",
+    a: ["The output guardrail catches the validation error, preventing corrupt data from crashing downstream services, and triggers an automated repair loop","The database is deleted","The server shuts down","The corrupt data is delivered anyway"],
+    c: 0,
+    why: "Output guardrails catch formatting defects and trigger programmatic repair loops to protect downstream consumers."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1. Secret Leak Scanner",
+            "lines": [
+                  "Regex scans for API keys & tokens",
+                  "Zero plain-text credential leaks"
+            ]
+      },
+      {
+            "title": "2. Pydantic Schema Check",
+            "lines": [
+                  "Validates types, enums, & required fields",
+                  "Failsafe against corrupt payloads"
+            ]
+      },
+      {
+            "title": "3. Grounding Entailment",
+            "lines": [
+                  "Verifies claims against source context",
+                  "Blocks hallucinated statements"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Output Validation: JSON Schemas, Hallucination Checks, and Toxic Language",
+      "def execute_flow():",
+      "    # Egress verification: strict JSON schema parsing, r...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Output Validation: JSON Schemas, Hallucination Checks, and Toxic Language"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Broken Model Output"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Fast Mini-Model Repair"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Output guardrails protect downstream services by parsing responses against strict {1} schemas and scanning for accidental {2} leaks."
+],
+    blanks: [
+      {
+            "a": [
+                  "Pydantic"
+            ],
+            "why": "Python data validation library"
+      },
+      {
+            "a": [
+                  "credential"
+            ],
+            "why": "API keys and secret passwords"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the primary danger of delivering unvalidated model output directly into an automated database insert?",
+      a: ["Malformed JSON, missing fields, or SQL characters can crash downstream backend services or corrupt persistent records","It makes the database free","It turns off the server lights","It converts Python to HTML"],
+      c: 0,
+      why: "Downstream software requires strict data contracts; unvalidated text causes pipeline crashes."
+    },
+    {
+      q: "How does an automated repair loop fix malformed JSON emitted by an LLM?",
+      a: ["It feeds the broken JSON and the exact parser error message to a fast, cheap model with instructions to output only valid syntax","It deletes the entire program","It restarts the computer","It writes code by hand"],
+      c: 0,
+      why: "Targeted repair prompts fix minor syntax slips (missing commas, quotes) in milliseconds."
+    },
+    {
+      q: "Why must secret scanners inspect generated text before delivering it to chat users?",
+      a: ["Models can accidentally recite internal API keys or database passwords if they were present in system prompts or retrieved context","To see if users have credit cards","To calculate taxes","It is required by git"],
+      c: 0,
+      why: "Secret leakage in model outputs compromises backend infrastructure."
+    },
+    {
+      q: "What metric does an output guardrail optimize when blocking ungrounded claims?",
+      a: ["Faithfulness and factual reliability: ensuring no fabricated statements reach users","The number of words generated","The typing speed of the user","The screen brightness"],
+      c: 0,
+      why: "Grounding verification guarantees that generated assertions are substantiated by evidence."
+    }
+  ]);
+</script>
+</body>
+</html>

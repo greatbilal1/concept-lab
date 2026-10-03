@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 12 — Instance, class, static</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="oop" data-lesson="12" data-lesson-id="method-kinds">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 12</span> · Python power tools</span>
+
+  <h1 class="lesson-title">Instance, class, static</h1>
+  <p class="lesson-lede">
+    Not every method needs an object. Python gives you three kinds, and picking the
+    right one tells the reader exactly what the method depends on — the object, the
+    class, or nothing at all.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Choose the right method kind every time</span>
+    <span><b>Mission link</b> Methods that say what they need</span>
+  </div>
+
+  <h2><span class="n">1</span>Three kinds, three meanings</h2>
+
+  <p>
+    The first parameter tells you what the method depends on.
+  </p>
+
+  <table>
+    <tr><th>Kind</th><th>First parameter</th><th>Depends on</th></tr>
+    <tr><td>Instance</td><td><code>self</code></td><td>One specific object</td></tr>
+    <tr><td>Class</td><td><code>cls</code></td><td>The class itself</td></tr>
+    <tr><td>Static</td><td>none</td><td>Nothing — just a helper</td></tr>
+  </table>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    The first parameter is a <b>signal</b>. <code>self</code> means "I need an
+    object". <code>cls</code> means "I need the class". Nothing means "I need
+    neither".
+  </div>
+
+  <div id="cards1"></div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>All three in one class</h2>
+
+  <pre><code>class Book:
+    library_name = "City Library"          # class attribute
+
+    def __init__(self, title):
+        self.title = title
+
+    def describe(self):                    # instance method
+        return f"{self.title} at {self.library_name}"
+
+    @classmethod
+    def from_string(cls, text):            # class method
+        title, copies = text.split("|")
+        return cls(title, int(copies))
+
+    @staticmethod
+    def is_valid_title(title):             # static method
+        return bool(title and title.strip())</code></pre>
+
+  <div class="note good">
+    <span class="note-label">Why this matters</span>
+    <code>from_string</code> is a common pattern: an alternative constructor. It uses
+    <code>cls</code> so subclasses get the right type back automatically.
+  </div>
+
+  <h2><span class="n">3</span>Choosing between them</h2>
+
+  <p>
+    Ask one question: does this method need the object's data?
+  </p>
+
+  <table>
+    <tr><th>Question</th><th>Answer</th></tr>
+    <tr><td>Does it use <code>self</code>?</td><td>Instance method</td></tr>
+    <tr><td>Does it use the class, not an object?</td><td>Class method</td></tr>
+    <tr><td>Does it use neither?</td><td>Static method</td></tr>
+  </table>
+
+  <div class="note warn">
+    <span class="note-label">Do not overuse static</span>
+    A static method that never touches the class is really just a function. If it
+    does not belong to the class conceptually, move it out to module level.
+  </div>
+
+  <div id="fill1"></div>
+
+  <h2><span class="n">4</span>Check yourself</h2>
+
+  <p>
+    Answer from memory. Every option has the same number of words.
+  </p>
+
+  <div id="quiz"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>
+      You can now read a method's first parameter and know what it depends on, write
+      an alternative constructor with <code>@classmethod</code>, and use
+      <code>@staticmethod</code> for genuine helpers. Your method signatures now
+      document themselves.
+    </p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+
+  <ol>
+    <li>
+      Add a <code>@classmethod from_string(cls, text)</code> to <code>Book</code>
+      that parses <code>"Dune|3"</code>.
+    </li>
+    <li>
+      Add a <code>@staticmethod is_valid_title(title)</code> helper.
+    </li>
+    <li>
+      Call all three kinds and print what each returns. Note which ones you call on
+      the class and which on an object.
+    </li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Read <a href="https://docs.python.org/3/library/functions.html#classmethod">The
+    Python Standard Library → classmethod</a> and the neighbouring
+    <code>staticmethod</code> entry.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask me anything — "when is a classmethod better?",
+    "why does cls matter for subclasses?", "should helpers be static?". I will tailor
+    the next lesson to you.
+  </div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  /* the three method kinds side by side */
+  TeachWidgets.cards("#cards1", {
+    cards: [
+      { title: "Instance method", body: "Takes self. Reads and changes one object's own state." },
+      { title: "Class method", body: "Takes cls. Works with the class — often an alternative constructor." },
+      { title: "Static method", body: "Takes neither. A plain helper that belongs with the class." },
+      { title: "How to choose", body: "Ask what the method needs: the object, the class, or nothing." }
+    ]
+  });
+
+  TeachWidgets.predict("#predict1", {
+    q: "Which method needs no object at all?",
+    a: ["An instance method", "A class method", "A static method"],
+    c: 2,
+    why: "A static method receives neither self nor cls — it is a plain helper that happens to live in the class."
+  });
+
+  TeachWidgets.fill("#fill1", {
+    lines: [
+      "class Book:",
+      "    @<0>",
+      "    def from_string(cls, text):",
+      "        title, copies = text.split(\"|\")",
+      "        return cls(title, int(copies))",
+      "",
+      "    @<1>",
+      "    def is_valid_title(title):",
+      "        return bool(title and title.strip())"
+    ],
+    blanks: [
+      { a: ["classmethod"], why: "@classmethod passes the class as cls, which is what makes an alternative constructor work for subclasses." },
+      { a: ["staticmethod"], why: "@staticmethod passes nothing automatically — the method is a plain helper." }
+    ]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What does an instance method get?",
+      a: ["The class as cls", "The object as self", "Nothing at all here", "The module name here"],
+      c: 1,
+      why: "An instance method receives the specific object as its first parameter, self."
+    },
+    {
+      q: "What does a class method get?",
+      a: ["The object as self", "The class as cls", "Nothing at all here", "The parent class here"],
+      c: 1,
+      why: "A class method receives the class itself as cls, which is why it works for subclasses."
+    },
+    {
+      q: "When use a class method?",
+      a: ["For alternative constructors here", "For changing object state", "For printing debug output", "For private helpers here"],
+      c: 0,
+      why: "Class methods are ideal for alternative constructors like from_string, because cls gives the right type."
+    },
+    {
+      q: "When is static overkill?",
+      a: ["When it uses cls here", "When it uses nothing here", "When it uses self here", "When it returns a value"],
+      c: 1,
+      why: "If a static method touches neither the class nor an object, it is really just a module-level function."
+    }
+  ]);
+</script>
+</body>
+</html>

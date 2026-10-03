@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 04 — Provider Fallbacks and Circuit Breakers</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="ai-model-routing" data-lesson="4" data-lesson-id="provider-fallbacks-circuit-breakers">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 04</span> · Circuit Breakers</span>
+
+  <h1 class="lesson-title">Provider Fallbacks and Circuit Breakers</h1>
+  <p class="lesson-lede">
+    Engineering resilience: handling HTTP 429 rate limits, 500 server errors, automated provider failovers, and the Circuit Breaker pattern.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to engineer fault-tolerant fallback chains and circuit breakers across model providers.</span>
+    <span><b>Mission link</b> Mastering provider fallbacks and circuit breakers across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Provider Fallbacks and Circuit Breakers</h2>
+  <p>Every cloud LLM provider suffers outages. OpenAI has rate-limit surges, Anthropic experiences API connection drops, and local servers crash. If your application depends on a single model provider without automated failover, <strong>their outage is your outage</strong>.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Engineering resilience: handling HTTP 429 rate limits, 500 server errors, automated provider failovers, and the Circuit Breaker pattern.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Circuit Breaker State Machine</h2>
+  <p>The <strong>Circuit Breaker & Fallback Pattern</strong> guarantees five-nines uptime:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Multi-Provider Failover Chain</h2>
+  <ul><li><strong>1. The Circuit Breaker States:</strong><ul><li><em>CLOSED (Normal):</em> Requests flow normally to Primary Provider (e.g. OpenAI).</li><li><em>OPEN (Tripped):</em> If error rate exceeds 10% over 30 seconds, the breaker trips to OPEN. All requests bypass Primary and route immediately to Secondary (e.g. Anthropic) with <strong>zero timeout delay</strong>!</li><li><em>HALF-OPEN (Probing):</em> After 60 seconds, send 5% test traffic to Primary to check if it recovered. If healthy, reset to CLOSED!</li></ul></li><li><strong>2. Multi-Provider Fallback Chain:</strong> Primary: OpenAI GPT-4o $\rightarrow$ Fallback 1: Anthropic Claude 3.5 Sonnet $\rightarrow$ Fallback 2: Google Gemini 1.5 Pro $\rightarrow$ Fallback 3: Local vLLM Llama-3!</li></ul><pre><code># The Circuit Breaker & Fallback Chain in Python:
+async def resilient_ai_call(prompt: str) -> str:
+    providers = [openai_provider, anthropic_provider, gemini_provider]
+    
+    for provider in providers:
+        if provider.circuit_breaker.is_open():
+            continue # Skip unhealthy provider immediately!
+            
+        try:
+            return await provider.generate(prompt)
+        except (RateLimitError, APIConnectionError, TimeoutError) as e:
+            provider.circuit_breaker.record_failure()
+            logger.warning(f"{provider.name} failed. Falling back to next provider.")
+            
+    raise SystemDownException("All AI providers are currently degraded!")</code></pre><div class="callout"><p><strong>The High Availability Standard:</strong> Never deploy to production with only one provider. A multi-provider circuit breaker transforms fragile scripts into enterprise infrastructure.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the circuit breaker sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to engineer fault-tolerant fallback chains and circuit breakers across model providers.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where provider fallbacks and circuit breakers applies.</li>
+    <li>Author a unit test or verification script exercising provider fallbacks and circuit breakers.</li>
+    <li>Document team architectural conventions regarding provider fallbacks and circuit breakers.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Provider Fallbacks and Circuit Breakers.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is the purpose of the 'Circuit Breaker' pattern when integrating third-party AI APIs?",
+    a: ["To detect when a provider is down and temporarily stop sending requests to it, failing over immediately to a healthy provider without waiting for timeouts","To cut electrical power to the office","To turn off computer monitors","To format the hard drive"],
+    c: 0,
+    why: "Circuit breakers prevent cascading timeouts by cutting traffic to unhealthy providers and routing to healthy backups."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "CLOSED (Normal Operation)",
+            "lines": [
+                  "Traffic flows to Primary Provider",
+                  "Monitors error rate & latency"
+            ]
+      },
+      {
+            "title": "OPEN (Tripped on Outage)",
+            "lines": [
+                  "Error rate > 10% -> Breaker trips!",
+                  "Traffic immediately routed to Secondary",
+                  "Zero timeout waiting for users"
+            ]
+      },
+      {
+            "title": "HALF-OPEN (Recovery Probe)",
+            "lines": [
+                  "Sends 5% canary traffic to Primary",
+                  "Recovers? Reset to CLOSED!"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Provider Fallbacks and Circuit Breakers",
+      "def execute_flow():",
+      "    # Engineering resilience: handling HTTP 429 rate lim...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Provider Fallbacks and Circuit Breakers"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Primary: OpenAI (Active)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Fallback 1: Anthropic (Warm Standby)"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "step": "Fallback 2: Self-Hosted vLLM"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Circuit breakers prevent timeout cascades by tripping to {1} during provider outages, instantly rerouting traffic to secondary {2} providers."
+],
+    blanks: [
+      {
+            "a": [
+                  "OPEN"
+            ],
+            "why": "State where traffic is redirected away"
+      },
+      {
+            "a": [
+                  "fallback"
+            ],
+            "why": "Backup alternative providers"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What happens when a client makes a request to a provider whose circuit breaker state is 'OPEN'?",
+      a: ["The request bypasses the unhealthy provider instantly without waiting for network timeouts, routing directly to the backup provider","The computer crashes","The request waits for 60 seconds","The database deletes the query"],
+      c: 0,
+      why: "An open circuit breaker short-circuits immediately, avoiding wasted timeout latency on known-down services."
+    },
+    {
+      q: "What does the 'HALF-OPEN' state test in a circuit breaker?",
+      a: ["It sends a small sample of probe traffic to the primary provider to check if service health has been restored before fully resetting","It tests the computer monitor","It tests half of the prompt text","It shuts down the backup"],
+      c: 0,
+      why: "Half-open states safely probe recovering services without overwhelming them with full production volume."
+    },
+    {
+      q: "Why must an application handle HTTP 429 (Too Many Requests) with fallback routing rather than just naive sleep retries?",
+      a: ["In high-throughput apps, naive sleep retries cause thread pileups and user timeouts, whereas falling back to another provider succeeds in milliseconds","HTTP 429 is a syntax error","Sleep is illegal in Python","429 errors delete user accounts"],
+      c: 0,
+      why: "Immediate failover to an alternative provider avoids blocking user threads during rate-limit spikes."
+    },
+    {
+      q: "What is a major requirement when building a multi-provider fallback between OpenAI and Anthropic?",
+      a: ["Using an abstraction layer that normalizes prompt formatting, system messages, and tool definitions across both SDK interfaces","Translating code into French","Buying two separate computers","Using two different internet cables"],
+      c: 0,
+      why: "An abstraction layer normalizes parameter schemas and message formats across differing provider APIs."
+    }
+  ]);
+</script>
+</body>
+</html>

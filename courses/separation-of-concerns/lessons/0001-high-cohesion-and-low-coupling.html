@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 01 — High cohesion and low coupling</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="separation-of-concerns" data-lesson="1" data-lesson-id="high-cohesion-and-low-coupling">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 01</span> · Cohesion & Coupling Foundations</span>
+
+  <h1 class="lesson-title">High cohesion and low coupling</h1>
+  <p class="lesson-lede">
+    The two eternal metrics of software quality. Discover why highly cohesive modules that are loosely coupled form the backbone of maintainable software.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Evaluate software modules against cohesion and coupling metrics</span>
+    <span><b>Mission link</b> The fundamental compass guiding all architectural design decisions</span>
+  </div>
+
+  <h2><span class="n">1</span>The eternal twin metrics</h2>
+  <p>Every software architecture book talks about two fundamental metrics: <b>Cohesion</b> and <b>Coupling</b>.</p><p><b>Cohesion</b> is internal: <i>Do the functions and variables inside this module belong together?</i> A highly cohesive module does one thing and does it completely. <b>Coupling</b> is external: <i>How dependent is this module on other modules?</i> Tightly coupled code is like tangled Christmas lights: pull on one string and the whole tree shakes. The goal of architecture is <b>High Cohesion and Low Coupling</b>.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    High Cohesion means elements inside a module belong together; Low Coupling means modules are independent.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Cohesion-Coupling matrix</h2>
+  <p>Understand the ideal architectural target: High Cohesion paired with Low Coupling.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing decoupled module interaction</h2>
+  <p>Trace how decoupling billing calculations from email notifications enables independent testing.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of cohesion and coupling.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can evaluate codebases using cohesion and coupling metrics and separate tangled responsibilities into independent modules.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit a class that imports 20 different modules and evaluate its coupling.</li>
+    <li>Refactor an entangled class by grouping related functions into a cohesive helper.</li>
+    <li>Draw a module dependency graph showing coupling between your application packages.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Edsger W. Dijkstra: *On the role of scientific thought* (EWD 447, 1974) & David Parnas (CACM, 1972).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is the consequence of high coupling between modules in a large application?",
+    a: ["A change made to one module accidentally breaks unrelated features in distant modules (spooky action at a distance)","The computer compiler runs twice as fast","The database requires fifty percent less memory","There are no negative consequences"],
+    c: 0,
+    why: "Tight coupling creates fragile dependency chains where changes ripple uncontrollably."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Worst (Low Cohesion, High Coupling)",
+            "lines": [
+                  "God classes, tangled spaghetti code",
+                  "every change causes five regressions"
+            ]
+      },
+      {
+            "title": "Ideal (High Cohesion, Low Coupling)",
+            "lines": [
+                  "focused, single-responsibility modules",
+                  "interact through minimal, stable interfaces",
+                  "isolated, testable, and swappable!"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tightly coupled: InvoiceCalculator imports SmtpEmailClient directly",
+      "# Loosely coupled: InvoiceCalculator emits InvoiceCalculated event or returns DTO",
+      "invoice = calculator.compute(order) # pure calculation, zero email coupling!",
+      "notifier.send_receipt(invoice)       # notification service handles delivery independently"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "coupled_anti_pattern": "calculator cannot run in unit tests without SMTP server"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "high_cohesion": "calculator does only math"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "low_coupling": "notifier consumes pure invoice DTO"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The internal focus and relatedness of elements in a module is <0>.",
+      "The degree of external interdependence between modules is <1>.",
+      "Software architecture aims for high cohesion and <2> coupling."
+],
+    blanks: [
+      {
+            "a": [
+                  "cohesion"
+            ],
+            "why": "Cohesion measures internal relatedness."
+      },
+      {
+            "a": [
+                  "coupling"
+            ],
+            "why": "Coupling measures external interdependence."
+      },
+      {
+            "a": [
+                  "low",
+                  "loose"
+            ],
+            "why": "Low coupling minimizes ripple effects."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What does 'High Cohesion' mean in software design?",
+      a: ["All the methods and data fields inside a class are closely related and work together to fulfill a single, well-defined purpose","The code has zero comments","The class has at least 1,000 lines of code","The software runs on multiple cloud servers"],
+      c: 0,
+      why: "High cohesion means a module has a clear, singular identity and internal unity."
+    },
+    {
+      q: "Why is 'Low Coupling' desirable between software packages?",
+      a: ["Modules can be modified, refactored, or replaced without causing unintended breaking changes in other modules","It turns off the need for software licenses","It reduces the size of the computer screen","It forces all functions to be written in assembly"],
+      c: 0,
+      why: "Loose coupling isolates changes, making software resilient to evolution."
+    },
+    {
+      q: "What did David Parnas famously conclude about decomposing systems into modules in 1972?",
+      a: ["Modules should be designed around information hiding: each module hides a difficult design decision or likely change from the rest of the system","Every function must have five parameters","All software should be written in a single file","Databases should be abolished"],
+      c: 0,
+      why: "Parnas introduced information hiding as the primary criterion for modular decomposition."
+    },
+    {
+      q: "What is an indicator of 'Low Cohesion' in a class?",
+      a: ["The class contains methods that operate on completely different sets of fields and serve unrelated business domains (e.g. UserBillingAndImageResizer)","The class is smaller than 20 lines of code","The class has unit tests","The class uses type annotations"],
+      c: 0,
+      why: "Disjoint methods operating on unrelated fields indicate multiple fragmented concerns mashed into one class."
+    }
+  ]);
+</script>
+</body>
+</html>

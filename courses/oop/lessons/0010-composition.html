@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 10 — Composition (has-a)</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="oop" data-lesson="10" data-lesson-id="composition">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 10</span> · Relationships</span>
+
+  <h1 class="lesson-title">Composition (has-a)</h1>
+  <p class="lesson-lede">
+    Composition means building objects out of other objects. A Library <b>has</b>
+    books. It is usually the better choice than inheritance — more flexible, easier
+    to change, and it matches how the real world is actually structured.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Build complex objects from simple ones</span>
+    <span><b>Mission link</b> Systems assembled from parts</span>
+  </div>
+
+  <h2><span class="n">1</span>Inheritance is not always the answer</h2>
+
+  <p>
+    You need a <code>Library</code> that holds books. The tempting move is to inherit
+    from <code>Book</code> — but a library is not a book.
+  </p>
+
+  <pre><code>class Library(Book):        # Library IS-A Book? No.
+    ...</code></pre>
+
+  <p>
+    This gives <code>Library</code> a <code>title</code> and <code>copies</code> it
+    has no business having. The is-a test fails, so inheritance is wrong here.
+  </p>
+
+  <div class="note bad">
+    <span class="note-label">The failure</span>
+    Inheriting for the wrong reason drags in attributes and methods that do not
+    belong. The class becomes confusing and hard to change.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Hold the parts instead</h2>
+
+  <p>
+    A library <b>has</b> a list of books. Store them as an attribute and delegate the
+    work.
+  </p>
+
+  <div id="diagram1"></div>
+
+  <pre><code>class Library:
+    def __init__(self, name):
+        self.name = name
+        self.books = []            # HAS-A list of books
+
+    def add(self, book):
+        self.books.append(book)
+
+    def available(self):
+        return [b for b in self.books if b.copies &gt; 0]</code></pre>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Composition says "has-a". The library owns its books and uses their behaviour —
+    without pretending to be one.
+  </div>
+
+  <h2><span class="n">3</span>Delegation</h2>
+
+  <p>
+    The outer object does not reimplement the inner object's behaviour. It
+    <b>delegates</b> — passes the call through.
+  </p>
+
+  <pre><code>class Library:
+    def borrow(self, title):
+        for book in self.books:
+            if book.title == title:
+                return book.borrow()      # delegate to the book
+        return False</code></pre>
+
+  <div class="note good">
+    <span class="note-label">Why this is better</span>
+    The rule about borrowing lives in <code>Book</code>, in one place. The library
+    just routes the request. Change the rule once and every library obeys.
+  </div>
+
+  <div id="fill1"></div>
+
+  <h2><span class="n">4</span>Check yourself</h2>
+
+  <p>
+    Answer from memory. Every option has the same number of words.
+  </p>
+
+  <div id="quiz"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>
+      You can now tell has-a from is-a, build objects out of other objects, and
+      delegate behaviour instead of duplicating it. Composition is the tool you will
+      reach for most often in real designs.
+    </p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+
+  <ol>
+    <li>
+      Write a <code>Library</code> class that holds a list of <code>Book</code>
+      objects.
+    </li>
+    <li>
+      Add a <code>borrow(title)</code> method that delegates to the matching book.
+    </li>
+    <li>
+      Add a <code>total_copies</code> property that sums across all books. Notice how
+      it uses each book's own state.
+    </li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Read <a href="https://docs.python.org/3/tutorial/classes.html#inheritance">The
+    Python Tutorial → Inheritance</a>, then re-read it asking "could this be
+    composition instead?". The contrast is the lesson.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask me anything — "composition vs inheritance, when?",
+    "what is a mixin?", "how deep should nesting go?". I will adapt the next lesson
+    to your questions.
+  </div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  /* has-a: the library owns books, it is not a book */
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      { title: "Library", lines: ["name", "books = []"] },
+      { title: "Book", lines: ["title", "copies", "borrow()"] },
+      { title: "Book", lines: ["title", "copies", "borrow()"] }
+    ]
+  });
+
+  TeachWidgets.predict("#predict1", {
+    q: "Why is Library(Book) a bad idea?",
+    a: ["It runs much slower", "A library is not a book", "It uses more memory"],
+    c: 1,
+    why: "The is-a test fails. Inheriting gives Library a title and copies it should not have — composition is the right tool."
+  });
+
+  TeachWidgets.fill("#fill1", {
+    lines: [
+      "class Library:",
+      "    def __init__(self, name):",
+      "        self.name = name",
+      "        self.<0> = []",
+      "",
+      "    def add(self, book):",
+      "        self.books.<1>(book)"
+    ],
+    blanks: [
+      { a: ["books"], why: "The library holds its books in an attribute — that is the has-a relationship." },
+      { a: ["append"], why: "append adds the book to the list the library owns." }
+    ]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What does composition mean?",
+      a: ["Inheriting from a parent", "Building objects from objects", "Hiding all the attributes", "Copying a class definition"],
+      c: 1,
+      why: "Composition means an object holds other objects as parts — a has-a relationship."
+    },
+    {
+      q: "When should you compose?",
+      a: ["When the is-a test fails", "When code is duplicated here", "When classes look similar here", "When you need more methods"],
+      c: 0,
+      why: "If the relationship is has-a rather than is-a, composition is the right choice."
+    },
+    {
+      q: "What is delegation?",
+      a: ["Copying the inner method", "Passing the call through", "Deleting the inner object", "Inheriting the inner class"],
+      c: 1,
+      why: "Delegation means the outer object routes the call to the inner object instead of reimplementing it."
+    },
+    {
+      q: "Why is composition flexible?",
+      a: ["It runs much faster", "Parts can be swapped", "It uses less memory", "It avoids all errors"],
+      c: 1,
+      why: "Because parts are separate objects, you can replace or change them without touching the outer class."
+    }
+  ]);
+</script>
+</body>
+</html>

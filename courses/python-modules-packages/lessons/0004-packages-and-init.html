@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 04 — Packages and __init__.py</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="python-modules-packages" data-lesson="4" data-lesson-id="packages-and-init">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 04</span> · Packages</span>
+
+  <h1 class="lesson-title">Packages and __init__.py</h1>
+  <p class="lesson-lede">
+    One module is a file. A hundred modules need a shape. A package is how Python
+    gives a folder of files a single importable name — and the dotted path is how
+    you address anything inside it.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Turn a folder into a package</span>
+    <span><b>Mission link</b> Structure is what makes scale possible</span>
+  </div>
+
+  <h2><span class="n">1</span>A folder becomes a name</h2>
+
+  <p>
+    You already know that a file can be imported. A <b>package</b> extends that idea
+    one level up: a <b>directory</b> of modules that Python treats as a single
+    importable unit. The directory's name becomes the first part of a dotted path.
+  </p>
+
+  <pre><code>myapp/
+  __init__.py
+  helpers.py
+  report.py
+
+# from anywhere on the path:
+import myapp.helpers
+from myapp.report import build</code></pre>
+
+  <p>
+    <code>myapp</code> is the package. <code>myapp.helpers</code> is a module
+    <i>inside</i> the package. The dot is the same attribute access you learned in
+    lesson 1 — it just walks through a directory now.
+  </p>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>What __init__.py is for</h2>
+
+  <p>
+    The file <code>__init__.py</code> is what marks a directory as a <b>regular
+    package</b>. It runs the first time the package is imported — exactly like a
+    module's top-level code, because that is what it is.
+  </p>
+
+  <div id="intro1"></div>
+
+  <p>
+    It is allowed to be empty, and for a long time "empty <code>__init__.py</code>"
+    was the standard advice. Modern practice is to use it deliberately: re-export
+    the names you want callers to use, so the package presents a clean front door.
+  </p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    <code>__init__.py</code> is the package's <b>public face</b>. What you import
+    there is what callers can reach without knowing your internal file layout.
+  </div>
+
+  <h2><span class="n">3</span>Re-exporting: the front door</h2>
+
+  <p>
+    Suppose <code>myapp/helpers.py</code> defines <code>clean</code>. Without any
+    <code>__init__.py</code> content, callers must write
+    <code>from myapp.helpers import clean</code> — they have to know your file
+    layout. Add one line to <code>__init__.py</code> and that changes:
+  </p>
+
+  <pre><code># myapp/__init__.py
+from .helpers import clean
+
+# callers can now write:
+from myapp import clean</code></pre>
+
+  <p>
+    You have just made <code>helpers.py</code> an implementation detail. You can
+    rename it, split it, or move it, and callers never notice. That is the whole
+    value of a package boundary.
+  </p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Subpackages: nesting all the way down</h2>
+
+  <p>
+    Packages can contain packages. A directory inside a package with its own
+    <code>__init__.py</code> is a <b>subpackage</b>, and the dotted path simply
+    grows:
+  </p>
+
+  <div id="diagram1"></div>
+
+  <p>
+    <code>myapp.data.loaders</code> is a module, three levels deep. Nothing new is
+    happening — it is the same rule applied recursively. This is how libraries like
+    <code>django.contrib.auth</code> are built.
+  </p>
+
+  <div class="note good">
+    <span class="note-label">Why this matters later</span>
+    Every library you install is a package tree. When you read
+    <code>from sklearn.linear_model import LogisticRegression</code>, you are
+    reading a dotted path through a package, a subpackage, and a module. You now
+    know exactly what each dot means.
+  </div>
+
+  <h2><span class="n">5</span>Check yourself</h2>
+
+  <p>
+    Answer from memory — do not scroll back up. Each option has the same number of
+    words, so nothing gives the answer away.
+  </p>
+
+  <div id="fill1"></div>
+  <div id="quiz"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>
+      You can now turn a flat folder of scripts into a package with a deliberate
+      public interface, and you can read any dotted import path in the wild and
+      say what each segment is. That is the structure half of this course done.
+    </p>
+  </div>
+
+  <h2><span class="n">6</span>Do this next</h2>
+
+  <ol>
+    <li>
+      Take three related modules and put them in a folder with an
+      <code>__init__.py</code>. Import them by dotted path.
+    </li>
+    <li>
+      Add a re-export to <code>__init__.py</code> and change your call sites to use
+      the short form. Notice how the file layout disappears from the caller.
+    </li>
+    <li>
+      Add a <code>print()</code> to <code>__init__.py</code> and import two
+      different submodules. Confirm it prints exactly once.
+    </li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Read the Python tutorial's
+    <a href="https://docs.python.org/3/tutorial/modules.html">Modules chapter</a>,
+    section 6.4 ("Packages"), which builds this exact example step by step.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher (me) anything — "do I still need
+    __init__.py in Python 3?", "what is a namespace package?", "should __init__.py
+    ever contain logic?". There are no bad questions here.
+  </div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  /* what __init__.py does */
+  TeachWidgets.introCards("#intro1", {
+    cards: [
+      { ico: "🏷️", title: "Marks the package", body: "Its presence tells Python this directory is importable." },
+      { ico: "▶️", title: "Runs on first import", body: "Its top-level code executes once, like any module." },
+      { ico: "🚪", title: "Defines the front door", body: "Re-exports decide what callers can reach directly." }
+    ]
+  });
+
+  /* predict-then-reveal */
+  TeachWidgets.predict("#predict1", {
+    q: "You import `myapp.helpers` and `myapp.report` in the same program. How many times does `myapp/__init__.py` run?",
+    a: ["Once for each module", "Once in total, ever", "Never, it is empty"],
+    c: 1,
+    why: "The package is a module too, and it is cached in sys.modules. Its __init__.py runs once, on the first import of anything inside the package."
+  });
+
+  /* step-through trace of a package import */
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "from myapp import clean",
+      "  -> load package myapp",
+      "  -> run myapp/__init__.py",
+      "  -> __init__ does: from .helpers import clean",
+      "  -> bind clean here"
+    ],
+    steps: [
+      { line: 0, vars: { statement: "from myapp import clean" } },
+      { line: 1, vars: { package: "myapp" } },
+      { line: 2, vars: { ran: "__init__.py" } },
+      { line: 3, vars: { reexport: "clean <- helpers.clean" } },
+      { line: 4, vars: { bound: "clean -> function" } }
+    ]
+  });
+
+  /* nested package tree */
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      { title: "myapp", lines: ["package", "__init__.py"] },
+      { title: "myapp.data", lines: ["subpackage", "__init__.py"] },
+      { title: "myapp.data.loaders", lines: ["module", "loaders.py"] }
+    ]
+  });
+
+  /* recall from memory */
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — the package rules",
+    lines: [
+      "The file that marks a directory as a package is <0>",
+      "A package inside a package is called a <1>",
+      "To expose <code>clean</code> from <code>helpers.py</code> at the package root, write <code>from .helpers import <2></code> in __init__.py."
+    ],
+    blanks: [
+      { a: ["__init__.py"], why: "Its presence is what makes the directory a regular package." },
+      { a: ["subpackage"], why: "A nested directory with its own __init__.py is a subpackage." },
+      { a: ["clean"], why: "Re-exporting the name in __init__.py makes it reachable as myapp.clean." }
+    ]
+  });
+
+  /* the quiz — every option is exactly three words */
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is a package?",
+      a: ["A single Python file", "A directory of modules", "A list of imports", "A compiled binary file"],
+      c: 1,
+      why: "A package is a directory of modules that Python treats as one importable unit."
+    },
+    {
+      q: "What does __init__.py do?",
+      a: ["Compiles the whole package", "Marks and initialises it", "Lists the public functions", "Caches the submodules"],
+      c: 1,
+      why: "It marks the directory as a package and runs once when the package is first imported."
+    },
+    {
+      q: "Why re-export in __init__?",
+      a: ["To make imports faster", "To hide the file layout", "To avoid running modules", "To reduce the file count"],
+      c: 1,
+      why: "Re-exporting gives callers a stable front door, so internal file names can change freely."
+    },
+    {
+      q: "What is myapp.data.loaders?",
+      a: ["A single flat module", "A module in a subpackage", "A package with no modules", "A function inside a class"],
+      c: 1,
+      why: "The dotted path walks package, then subpackage, then module — three levels deep."
+    }
+  ]);
+</script>
+</body>
+</html>

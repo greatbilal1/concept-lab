@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Design Patterns — Cheat Sheet</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+<style>
+  .ref-toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0 8px; }
+  .ref-toc a { font-size: .8rem; border: 1px solid var(--border); background: #111a30; padding: 5px 11px; border-radius: 999px; color: var(--muted); text-decoration: none; border-bottom: 1px solid var(--border); }
+  .ref-toc a:hover { color: #fff; border-color: #3d5488; }
+  .lesson-wrap h2 { scroll-margin-top: 20px; }
+  .snippet { margin: 14px 0 22px; }
+  .snippet .lbl { font-size: .72rem; font-weight: 800; letter-spacing: .7px; text-transform: uppercase; color: var(--accent2); margin-bottom: 6px; }
+  .see { font-size: .82rem; color: var(--muted); margin: -6px 0 12px; }
+  .see a { color: var(--accent2); border-bottom: 0; }
+  .see a:hover { color: #fff; }
+  .snippet pre { padding-top: 34px; }
+  @media print { .snippet pre { padding-top: 18px; } }
+</style>
+</head>
+<body class="lesson-body" data-course="design-patterns">
+
+<div class="lesson-wrap">
+
+  <span class="lesson-kicker">Reference · Cheat sheet</span>
+  <h1 class="lesson-title">Design Patterns — Cheat Sheet</h1>
+  <p class="lesson-lede">
+    The whole course on one page. Every snippet links back to the lesson that
+    teaches it.
+  </p>
+
+  <div class="ref-toc">
+    <a href="#sec-1">Factory Pattern</a>
+    <a href="#sec-2">Adapter & Facade</a>
+    <a href="#sec-3">Observer Pattern (Pub/Sub)</a>
+    <a href="#sec-4">When NOT to Use Patterns</a>
+  </div>
+
+  <h2 id="sec-1"><span class="n">1</span>Factory Pattern</h2>
+  <div class="snippet">
+    <div class="lbl">Decoupling creation from execution</div>
+    <pre><code>class PaymentFactory:
+    @staticmethod
+    def create(method: str) -&gt; PaymentGateway:
+        if method == "stripe": return StripeGateway()
+        if method == "paypal": return PayPalGateway()
+        raise ValueError(f"Unknown payment method: {method}")
+
+gateway = PaymentFactory.create("stripe")
+gateway.charge(amount)</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0002-creational-patterns-factory-and-builder.html">Lesson 02 — Creational patterns: Factory and Builder</a>.</p>
+
+  <h2 id="sec-2"><span class="n">2</span>Adapter & Facade</h2>
+  <div class="snippet">
+    <div class="lbl">Structural interface bridges</div>
+    <pre><code>// Adapter: Makes an incompatible interface compatible
+class StripeAdapter implements PaymentProcessor {
+  constructor(private stripe: ThirdPartyStripeSDK) {}
+  pay(amountCents: number) {
+    return this.stripe.makeCharge({ cents: amountCents });
+  }
+}
+
+// Facade: Provides a simple front door to a complex subsystem
+class VideoConverterFacade {
+  convert(file: string, format: string) { ... }
+}</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0003-structural-patterns-adapter-and-facade.html">Lesson 03 — Structural patterns: Adapter and Facade</a>.</p>
+
+  <h2 id="sec-3"><span class="n">3</span>Observer Pattern (Pub/Sub)</h2>
+  <div class="snippet">
+    <div class="lbl">Event notification decouple</div>
+    <pre><code>class EventEmitter {
+    constructor() { this.events = {}; }
+    on(event, listener) {
+        (this.events[event] = this.events[event] || []).push(listener);
+    }
+    emit(event, data) {
+        (this.events[event] || []).forEach(fn =&gt; fn(data));
+    }
+}</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0005-behavioral-patterns-observer-and-pub-sub.html">Lesson 05 — Behavioral patterns: Observer and Pub/Sub</a>.</p>
+
+  <h2 id="sec-4"><span class="n">4</span>When NOT to Use Patterns</h2>
+  <div class="snippet">
+    <div class="lbl">Preventing Patternitis</div>
+    <pre><code>// Don't create an AbstractFactoryProviderStrategyManager
+// for a single if/else statement!
+// Rule: Simple procedural code beats a design pattern
+// until variability or complexity genuinely demands it.</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0008-patternitis-and-knowing-when-not-to-use-patterns.html">Lesson 08 — Patternitis and knowing when not to use patterns</a>.</p>
+
+  <div class="lesson-foot">
+    <div class="links">
+      <a href="design-patterns-glossary.html">📖 Glossary</a>
+      <a href="../course.html">← Course map</a>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

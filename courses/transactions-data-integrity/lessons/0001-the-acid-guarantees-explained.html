@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 01 — The ACID guarantees explained</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="transactions-data-integrity" data-lesson="1" data-lesson-id="the-acid-guarantees-explained">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 01</span> · The ACID Properties</span>
+
+  <h1 class="lesson-title">The ACID guarantees explained</h1>
+  <p class="lesson-lede">
+    What happens when the server loses power midway through a balance transfer? Discover the four ACID guarantees that keep enterprise data correct.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Explain the four ACID database guarantees and group operations into atomic transactions</span>
+    <span><b>Mission link</b> The fundamental trust contract between application developers and database storage</span>
+  </div>
+
+  <h2><span class="n">1</span>All or nothing: The bank transfer</h2>
+  <p>Consider transferring $100 from Account 1 to Account 2. This requires two operations: <b>1.</b> Deduct $100 from Account 1, and <b>2.</b> Add $100 to Account 2. What happens if the server loses power or crashes between step 1 and step 2?</p><p>Without transactions, $100 vanishes into thin air! A <b>Transaction</b> wraps both statements into an atomic unit: <code>BEGIN; ... COMMIT;</code>. If an error or crash occurs anywhere before COMMIT, the database automatically rolls back step 1, leaving the database completely uncorrupted.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    A transaction guarantees atomicity: all operations succeed together, or all fail together.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The four ACID pillars</h2>
+  <p>Understand the exact definition of each pillar in the ACID guarantee.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing an atomic rollback</h2>
+  <p>Trace how an error during step 2 triggers an automatic rollback of step 1.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of the ACID acronym.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can explain the four ACID guarantees and wrap dependent multi-statement operations into atomic transaction blocks.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Wrap a multi-step financial transfer inside BEGIN ... COMMIT in your database.</li>
+    <li>Trigger an intentional error after step 1 and execute ROLLBACK.</li>
+    <li>Verify that the database state remains completely untouched after a rollback.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Jim Gray, *The Transaction Concept: Virtues and Limitations* (IEEE, 1981).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What does the 'A' in ACID stand for?",
+    a: ["Atomicity (the transaction executes as an indivisible unit: all-or-nothing)","Authentication (verifying user passwords)","Asynchronous (executing in the background)","Algorithms (using mathematical formulas)"],
+    c: 0,
+    why: "Atomicity ensures operations are indivisible; partial execution is impossible."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Atomicity (A)",
+            "lines": [
+                  "All or nothing",
+                  "failure rolls back everything"
+            ]
+      },
+      {
+            "title": "Consistency (C)",
+            "lines": [
+                  "enforces constraints (NOT NULL, CHECK)",
+                  "never leaves database in invalid state"
+            ]
+      },
+      {
+            "title": "Isolation (I)",
+            "lines": [
+                  "concurrent transactions cannot see",
+                  "each other's uncommitted intermediate state"
+            ]
+      },
+      {
+            "title": "Durability (D)",
+            "lines": [
+                  "committed data survives power loss",
+                  "written to Write-Ahead Log (WAL) on disk"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "BEGIN TRANSACTION;",
+      "UPDATE accounts SET balance = balance - 100 WHERE id = 1;",
+      "UPDATE accounts SET balance = balance + 100 WHERE id = 999; # id 999 not found -> ERROR!",
+      "ROLLBACK; # Database restores Account 1's $100 instantly!"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "transaction": "active block started"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step_1": "Account 1 decremented in transaction sandbox"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step_2": "Account 999 check fails; error raised"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "rollback": "all changes undone; database state clean"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The guarantee that all operations succeed or all fail is <0>.",
+      "The guarantee that concurrent transactions do not interfere is <1>.",
+      "The guarantee that committed data survives power outages is <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "Atomicity"
+            ],
+            "why": "Atomicity enforces all-or-nothing."
+      },
+      {
+            "a": [
+                  "Isolation"
+            ],
+            "why": "Isolation separates concurrent transactions."
+      },
+      {
+            "a": [
+                  "Durability"
+            ],
+            "why": "Durability guarantees persistence across crashes."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the primary role of 'Atomicity' in database transactions?",
+      a: ["It guarantees that all statements in a transaction complete successfully, or all changes are rolled back completely","It ensures that numbers are stored as atomic subatomic particles","It speeds up queries by fifty percent","It allows multiple users to share a single database password"],
+      c: 0,
+      why: "Atomicity eliminates intermediate half-executed states during software crashes or errors."
+    },
+    {
+      q: "What does 'Durability' guarantee in an ACID-compliant database?",
+      a: ["Once a transaction commits, its changes are written to non-volatile storage and will survive even a sudden power loss","The physical computer hard drive will never break","The database software will never need updates","The database is immune to internet network outages"],
+      c: 0,
+      why: "Durability guarantees that committed data is safely persisted to disk and recoverable after power cuts."
+    },
+    {
+      q: "What happens if a database client loses its network connection in the middle of an uncommitted transaction?",
+      a: ["The database detects the disconnection and automatically executes a ROLLBACK, discarding all uncommitted changes","The database commits the partial changes automatically","The database waits forever and blocks all other users","The computer server crashes"],
+      c: 0,
+      why: "Uncommitted transactions are automatically aborted and rolled back if the client disconnects."
+    },
+    {
+      q: "What command in SQL permanently seals a transaction's changes into the database?",
+      a: ["COMMIT","SAVE","PUSH","CLOSE"],
+      c: 0,
+      why: "COMMIT marks the successful end of a transaction and persists changes to disk."
+    }
+  ]);
+</script>
+</body>
+</html>

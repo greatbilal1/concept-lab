@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 03 — Context Pruning, Summarization, and Compaction</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="context-engineering" data-lesson="3" data-lesson-id="pruning-summarization-compaction">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 03</span> · Context Reduction</span>
+
+  <h1 class="lesson-title">Context Pruning, Summarization, and Compaction</h1>
+  <p class="lesson-lede">
+    Techniques for reducing context volume: AST pruning, log stripping, and milestone summarization.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to use AST pruning and log stripping to drastically reduce context volume.</span>
+    <span><b>Mission link</b> Mastering context pruning, summarization, and compaction across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Context Pruning, Summarization, and Compaction</h2>
+  <p>When an agent needs to know how to interact with another module, it rarely needs to read all 2,000 lines of implementation logic. It only needs the <strong>public surface</strong>: class names, method signatures, parameter types, return types, and docstrings.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Techniques for reducing context volume: AST pruning, log stripping, and milestone summarization.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Context Pruning Strategies</h2>
+  <p>Three powerful techniques allow context engineers to compress context by 80-90%:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Log Stripping Pipeline</h2>
+  <ul><li><strong>1. AST Skeleton Pruning:</strong> Extracting interfaces and type stubs (`.pyi` or TypeScript declarations) while replacing function bodies with `...`. An 800-line service file compresses to 40 lines of pure interface contract.</li><li><strong>2. Terminal Log Truncation:</strong> When a test command outputs 500 lines of passing tests, strip the noise and keep only the failing traceback and summary line.</li><li><strong>3. Milestone Summarization (Compaction):</strong> Replacing 20 turns of trial-and-error debugging with a concise 3-line statement of facts learned.</li></ul><pre><code># Full Implementation (850 tokens):
+class PaymentService:
+    def charge(self, user_id: str, amount_cents: int) -> Transaction:
+        # 40 lines of Stripe SDK calls, retries, webhook dispatch, logging...
+        return txn
+
+# AST Pruned Skeleton (60 tokens):
+class PaymentService:
+    def charge(self, user_id: str, amount_cents: int) -> Transaction:
+        """Charge customer card and return recorded Transaction record."""
+        ...</code></pre><p>The agent gets 100% of the type and contract information it needs to write caller code, consuming 7% of the tokens!</p><div class="callout"><p><strong>Rule:</strong> Never send full implementations of dependency modules into context when a type stub or interface signature provides the exact same information.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Fill in the context reduction sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to use AST pruning and log stripping to drastically reduce context volume.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where context pruning, summarization, and compaction applies.</li>
+    <li>Author a unit test or verification script exercising context pruning, summarization, and compaction.</li>
+    <li>Document team architectural conventions regarding context pruning, summarization, and compaction.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Context Pruning, Summarization, and Compaction.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "How does AST (Abstract Syntax Tree) pruning reduce code size in context?",
+    a: ["It strips function bodies, keeping only class interfaces, method signatures, and docstrings","It deletes all comments and leaves only variable names","It converts Python code into binary machine code","It translates code into compressed ZIP archives"],
+    c: 0,
+    why: "AST pruning provides complete structural interfaces while omitting thousands of lines of internal implementation details."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Raw File (1,200 tokens)",
+            "lines": [
+                  "Full method bodies & loops",
+                  "Internal helper variables",
+                  "Logging & boilerplate"
+            ]
+      },
+      {
+            "title": "AST Skeleton (90 tokens)",
+            "lines": [
+                  "Method signatures & types",
+                  "Docstring contract",
+                  "Body replaced with '...'"
+            ]
+      },
+      {
+            "title": "Token Savings",
+            "lines": [
+                  "92% token reduction",
+                  "Identical interface utility"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Context Pruning, Summarization, and Compaction",
+      "def execute_flow():",
+      "    # Techniques for reducing context volume: AST prunin...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Context Pruning, Summarization, and Compaction"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Raw Test Output"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Stripping Filter"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "step": "Clean Context"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "AST pruning replaces internal function bodies with {1} while preserving class names, method signatures, and {2}."
+],
+    blanks: [
+      {
+            "a": [
+                  "ellipses"
+            ],
+            "why": "The three dots placeholder ..."
+      },
+      {
+            "a": [
+                  "type hints"
+            ],
+            "why": "Parameter and return annotations"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why is an interface skeleton (AST stub) often superior to full source code for an agent?",
+      a: ["It conveys all necessary public methods and parameter types without distracting the model with internal implementation trivia","It allows the agent to run code without Python","It prevents other developers from seeing code","It compiles faster in browsers"],
+      c: 0,
+      why: "Skeletons provide complete contract clarity with minimal token overhead."
+    },
+    {
+      q: "What should a tool runner do when a bash command outputs 50,000 lines of compilation logs?",
+      a: ["Truncate the middle, preserve the final exit code and the last 50 error lines, or save to a file for targeted grep","Send all 50,000 lines into the model prompt","Crash the IDE","Delete the terminal session"],
+      c: 0,
+      why: "Truncating repetitive output saves context budget while preserving the critical error traceback."
+    },
+    {
+      q: "How does milestone summarization prevent infinite context growth during long agent sessions?",
+      a: ["It collapses dozens of exploratory turns into a compact summary of decisions, state, and active blockers","It restarts the computer every 10 turns","It automatically commits code to GitHub","It removes all test assertions"],
+      c: 0,
+      why: "Summarization distills progress into a concise checkpoint, reclaiming token capacity."
+    },
+    {
+      q: "What tool in Python generates type stubs automatically from source files?",
+      a: ["stubgen (part of mypy) or pyright stub generation","pytest","black","pip"],
+      c: 0,
+      why: "stubgen and pyright generate clean `.pyi` interface stubs from existing source code."
+    }
+  ]);
+</script>
+</body>
+</html>

@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 01 — Arrays: the default</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="data-structures" data-lesson="1" data-lesson-id="arrays-the-default">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 01</span> · Contiguous data</span>
+
+  <h1 class="lesson-title">Arrays: the default</h1>
+  <p class="lesson-lede">
+    A Python list is the tool everyone reaches for first. It is also an
+    <b>array</b> — a block of memory laid out end to end. Understanding that
+    layout explains why some list operations are instant and others crawl.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Explain why indexing is instant but inserting is not</span>
+    <span><b>Mission link</b> Choosing a structure starts with knowing the default</span>
+  </div>
+
+  <h2><span class="n">1</span>One block, end to end</h2>
+
+  <p>
+    An array stores its items in <b>contiguous</b> memory — one after another,
+    with no gaps. If each item is the same size, the computer can jump straight
+    to any of them:
+  </p>
+
+  <pre><code>address = start + index * item_size</code></pre>
+
+  <p>
+    That single line is the whole trick. To read <code>items[4]</code>, the
+    computer does one multiplication and one addition. It does not walk the list.
+    This is why indexing is <b>O(1)</b> — constant time, no matter how big the
+    array is.
+  </p>
+
+  <div id="diagram1"></div>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Contiguity is what makes indexing instant. The cost of every other array
+    operation follows from having to <b>preserve</b> that contiguity.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The price of staying contiguous</h2>
+
+  <p>
+    Reading is cheap. Changing the <em>shape</em> is not, because the block must
+    stay unbroken. Insert an item at the front and every later item has to shift
+    one slot to the right:
+  </p>
+
+  <pre><code>items = ["a", "b", "c", "d"]
+items.insert(0, "z")
+# every item moved:  ["z", "a", "b", "c", "d"]</code></pre>
+
+  <p>
+    That shift touches every element, so inserting at the front is <b>O(n)</b>.
+    Appending at the <em>end</em> is different — nothing needs to move, so it is
+    O(1) (amortised, because the block occasionally has to grow).
+  </p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">3</span>What a list is good at</h2>
+
+  <p>
+    A Python list is an array with a few conveniences. Reach for it when you:
+  </p>
+
+  <ul>
+    <li>need fast access <b>by position</b> — <code>items[i]</code>;</li>
+    <li>mostly <b>append</b> and read, rather than insert in the middle;</li>
+    <li>want to iterate in order, front to back.</li>
+  </ul>
+
+  <p>
+    Reach for something else when you insert and delete at the front constantly —
+    that is the linked list, next lesson.
+  </p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <b>✓ Your win for today</b>
+    You can explain why <code>items[1000]</code> is instant but
+    <code>items.insert(0, x)</code> is not — and it is the same reason.
+  </div>
+
+  <h2><span class="n">4</span>Do this next</h2>
+  <ol>
+    <li>Time <code>items.append(x)</code> vs <code>items.insert(0, x)</code> on a list of 100,000 items.</li>
+    <li>Predict which is slower before you run it, then check.</li>
+    <li>Write one sentence: what does an array make cheap, and what does it make expensive?</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    <i>Grokking Algorithms</i> — Aditya Bhargava, chapter 2 (arrays vs linked lists).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Reading items[500] from a list of 1,000,000 items takes…",
+    a: ["About the same time as items[0]", "About 500 times longer", "About 1,000,000 times longer"],
+    c: 0,
+    why: "Indexing is O(1): the address is computed directly, so position does not matter."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      { title: "start", lines: ["address of items[0]"] },
+      { title: "items[0]", lines: ["one slot"] },
+      { title: "items[1]", lines: ["one slot"] },
+      { title: "items[2]", lines: ["one slot"] },
+      { title: "items[3]", lines: ["one slot"] }
+    ]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "items = [\"a\", \"b\", \"c\", \"d\"]",
+      "items.insert(0, \"z\")",
+      "# a, b, c, d each shift right",
+      "items[0]  # \"z\""
+    ],
+    steps: [
+      { line: 0, vars: { items: "a b c d" } },
+      { line: 1, vars: { items: "a b c d", shifting: "yes" } },
+      { line: 2, vars: { items: "z a b c d" } },
+      { line: 3, vars: { items: "z a b c d", result: "z" } }
+    ]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the blanks",
+    lines: [
+      "An array stores items in <0> memory.",
+      "Indexing is O(1) because the address is <1> directly.",
+      "Inserting at the front is O(n) because every later item must <2>."
+    ],
+    blanks: [
+      { a: ["contiguous"], why: "End to end, with no gaps." },
+      { a: ["computed"], why: "start + index * size — no walking." },
+      { a: ["shift"], why: "Contiguity must be preserved." }
+    ]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why is reading items[i] constant time?",
+      a: ["The address is computed directly here", "The list keeps a sorted index", "The computer caches every item first", "It scans from the front quickly"],
+      c: 0,
+      why: "Contiguous memory means the address is start + i * size — one calculation."
+    },
+    {
+      q: "Why is inserting at the front expensive?",
+      a: ["Every later item must shift right", "The list must be re-sorted first", "The hash of each key changes", "The array is copied to disk"],
+      c: 0,
+      why: "Contiguity must be preserved, so all following items move one slot."
+    },
+    {
+      q: "Which operation is cheap on a Python list?",
+      a: ["Appending at the very end", "Inserting at the very front", "Deleting from the very front", "Searching for an unknown value"],
+      c: 0,
+      why: "Appending needs no shifting; the others touch many items or scan."
+    },
+    {
+      q: "What does an array make expensive?",
+      a: ["Changing its shape in the middle", "Reading an item by its index", "Iterating from the front to back", "Knowing its own total length now"],
+      c: 0,
+      why: "Inserting or deleting in the middle forces the block to shift."
+    }
+  ]);
+</script>
+</body>
+</html>

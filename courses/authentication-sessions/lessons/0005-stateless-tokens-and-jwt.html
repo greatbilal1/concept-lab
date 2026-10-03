@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 05 — Stateless tokens and JWT</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="authentication-sessions" data-lesson="5" data-lesson-id="stateless-tokens-and-jwt">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 05</span> · Stateless Tokens & JWT</span>
+
+  <h1 class="lesson-title">Stateless tokens and JWT</h1>
+  <p class="lesson-lede">
+    What if the server never stored sessions at all? Explore JSON Web Tokens (JWT): header, payload, digital signatures, and stateless verification.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Dissect, decode, and cryptographically verify JSON Web Tokens (JWT)</span>
+    <span><b>Mission link</b> The primary token format for microservices, mobile APIs, and single-page apps</span>
+  </div>
+
+  <h2><span class="n">1</span>The stateless token idea</h2>
+  <p>In a microservice architecture with dozens of services, querying a centralized Redis session store for every HTTP call can become a bottleneck. What if the client stored its own session data, but in a way that <b>the client cannot tamper with</b>?</p><p>This is a <b>JSON Web Token (JWT)</b>. A JWT contains user claims (<code>user_id: 42, role: 'admin'</code>) cryptographically signed by the server's secret key. Any server possessing the secret key can verify the signature and trust the claims without querying any database!</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    A JWT encodes claims in a payload protected by a cryptographic signature; verification requires zero database lookups.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The three parts of a JWT</h2>
+  <p>Every JWT is composed of three dot-separated Base64URL-encoded strings.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing signature verification</h2>
+  <p>Trace how a server verifies whether a JWT was tampered with by an attacker.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of JWT anatomy.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can decode, inspect, and cryptographically verify JSON Web Tokens without security misconfigurations.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Paste a JWT into jwt.io and inspect its decoded header, payload, and signature.</li>
+    <li>Sign and verify a JWT using jsonwebtoken or PyJWT libraries.</li>
+    <li>Ensure your verification code explicitly validates the exp expiration timestamp.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    IETF RFC 7519: *JSON Web Token (JWT)*.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Are the contents of a standard JWT token encrypted so third parties cannot read them?",
+    a: ["No, standard JWT payloads are merely Base64URL-encoded plaintext; anyone can read the claims!","Yes, all JWT tokens are encrypted with military-grade AES-256","Only the user ID is readable; other fields are encrypted","JWTs can only be read on Linux operating systems"],
+    c: 0,
+    why: "JWTs are signed for integrity, NOT encrypted for confidentiality; never store passwords inside them."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Header (Base64)",
+            "lines": [
+                  "{\"alg\": \"HS256\", \"typ\": \"JWT\"}",
+                  "declares signing algorithm"
+            ]
+      },
+      {
+            "title": "Payload (Base64)",
+            "lines": [
+                  "{\"sub\": \"42\", \"exp\": 1790000000}",
+                  "user claims & expiration timestamp"
+            ]
+      },
+      {
+            "title": "Signature",
+            "lines": [
+                  "HMACSHA256(header + '.' + payload, secret)",
+                  "guarantees tamper-proof integrity"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Incoming token: header.payload.signature",
+      "# Attacker changed payload role from 'user' to 'admin'",
+      "# Server re-computes: HMACSHA256(header + '.' + payload, SECRET_KEY)",
+      "# Comparison: computed signature does NOT match incoming signature!",
+      "# Result: Server rejects token -> 401 Unauthorized (tampering detected)"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "received_token": "header.payload.signature"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "alteration": "payload claims altered by client"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "recomputation": "server computes expected signature"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "verdict": "signatures do not match; token rejected"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The three parts of a JWT are header, <0>, and signature.",
+      "Standard JWTs are encoded using Base64<1>.",
+      "The claim specifying when a token expires is the <2> claim."
+],
+    blanks: [
+      {
+            "a": [
+                  "payload"
+            ],
+            "why": "The payload holds user claims and metadata."
+      },
+      {
+            "a": [
+                  "URL"
+            ],
+            "why": "Base64URL replaces + and / to be URL-safe."
+      },
+      {
+            "a": [
+                  "exp"
+            ],
+            "why": "exp specifies expiration Unix timestamp."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the critical difference between encoding (Base64) and encryption in JWTs?",
+      a: ["Base64 is simple data representation readable by anyone; encryption makes data unreadable without a decryption key","Base64 uses numbers; encryption uses letters","Base64 is only supported on mobile phones","There is no difference between encoding and encryption"],
+      c: 0,
+      why: "Base64 is reversible by anyone; a JWT signature proves integrity, not confidentiality."
+    },
+    {
+      q: "What vulnerability occurred in older JWT libraries involving 'alg: none'?",
+      a: ["Attackers changed the algorithm header to 'none', tricking servers into skipping signature verification entirely","The token became infinite in size and crashed the server","The database password was printed to the console","The server operating system rebooted"],
+      c: 0,
+      why: "Insecure parsers accepted 'alg: none' and accepted unsigned tokens as valid admin tokens."
+    },
+    {
+      q: "Why shouldn't sensitive secrets (like credit card numbers) be stored in a JWT payload?",
+      a: ["Because standard JWT payloads are unencrypted Base64 text that can be decoded by any client or proxy","Because JWT payloads can only store numbers","Because credit card companies forbid JSON","Because JWT tokens expire after five seconds"],
+      c: 0,
+      why: "Payloads are fully public; only store non-sensitive identifiers and claims."
+    },
+    {
+      q: "What is the main challenge of purely stateless JWT tokens compared to sessions?",
+      a: ["Revocation: you cannot easily invalidate a stolen JWT before its expiration time without storing state","JWT tokens cannot be sent over HTTPS connections","JWT tokens only work on Windows servers","JWT tokens require twice as much RAM as sessions"],
+      c: 0,
+      why: "Statelessness means the server has no record to delete; tokens remain valid until expiration."
+    }
+  ]);
+</script>
+</body>
+</html>

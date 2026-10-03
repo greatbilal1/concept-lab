@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 03 — Deterministic vs Model-Based Graders</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="ai-evaluation" data-lesson="3" data-lesson-id="deterministic-vs-model-graders">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 03</span> · Graders</span>
+
+  <h1 class="lesson-title">Deterministic vs Model-Based Graders</h1>
+  <p class="lesson-lede">
+    Grading methodologies: Deterministic Code Graders (exact match, regex, schemas) vs Model-Based Graders (LLM-as-a-Judge).
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know when and how to deploy deterministic assertions versus model-based judges.</span>
+    <span><b>Mission link</b> Mastering deterministic vs model-based graders across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Deterministic vs Model-Based Graders</h2>
+  <p>Once your model generates a response on an eval dataset, how do you grade it? Evaluation engineering uses two complementary grader families:</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Grading methodologies: Deterministic Code Graders (exact match, regex, schemas) vs Model-Based Graders (LLM-as-a-Judge).
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Deterministic vs Model Graders</h2>
+  <ul><li><strong>1. Deterministic Code Graders (Fast, Free, Objective):</strong> Pure code assertions. Does the output parse as valid JSON? Does `result["status"] == "approved"`? Does the email match regex? Did the tool execution exit with code 0? <em>Advantages:</em> Runs in 1ms, costs $0.00, 100% reproducible. <em>Limitation:</em> Cannot evaluate subjective tone or semantic prose.</li><li><strong>2. Model-Based Graders (LLM-as-a-Judge - Nuanced & Semantic):</strong> A powerful frontier model (GPT-4o, Claude 3.5 Sonnet) grades the response based on a detailed qualitative rubric (e.g. 1-5 scale for helpfulness, tone, safety). <em>Advantages:</em> Evaluates fuzzy natural language, summary quality, and reasoning. <em>Limitation:</em> Slower, costs API tokens, and subject to minor judge variance.</li></ul>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>The Hybrid Grading Pipeline</h2>
+  <pre><code># The Two Grader Types in Code:
+# 1. Deterministic Code Grader (Binary PASS/FAIL):
+def grade_schema_pass(output_text):
+    try:
+        InvoiceSchema.model_validate_json(output_text)
+        return 1.0 # 100% objective PASS!
+    except ValidationError:
+        return 0.0 # FAIL!
+
+# 2. Model-Based Grader (Semantic Score 1-5):
+def grade_helpfulness(user_query, model_response):
+    judge_prompt = f"Score helpfulness from 1 to 5 for:\nQuery: {user_query}\nResponse: {model_response}"
+    return call_judge_llm(judge_prompt) # Evaluates nuance!</code></pre><div class="callout"><p><strong>The Evaluation Hierarchy:</strong> Always use deterministic code graders for everything you can mathematically assert (schemas, status codes, math). Reserve expensive LLM judges strictly for subjective semantic qualities.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the grader sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know when and how to deploy deterministic assertions versus model-based judges.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where deterministic vs model-based graders applies.</li>
+    <li>Author a unit test or verification script exercising deterministic vs model-based graders.</li>
+    <li>Document team architectural conventions regarding deterministic vs model-based graders.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Deterministic vs Model-Based Graders.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "When should an engineer prefer a Deterministic Code Grader over an LLM-as-a-Judge grader?",
+    a: ["When testing tasks with objective, unambiguous criteria like JSON schema validity, exact status codes, or regex patterns","When grading poetry","When evaluating conversational tone","Deterministic graders should never be used"],
+    c: 0,
+    why: "Deterministic code graders are fast, free, and 100% reproducible for objective criteria like schemas and status codes."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Deterministic Grader (Code)",
+            "lines": [
+                  "JSON schema parsing, regex, exit codes",
+                  "Time: 1ms, Cost: $0.00, 100% objective",
+                  "Best for: Formats, numbers, code"
+            ]
+      },
+      {
+            "title": "Model-Based Grader (LLM)",
+            "lines": [
+                  "Evaluates tone, clarity, helpfulness",
+                  "Time: 1s, Cost: Token billed, Nuanced",
+                  "Best for: Summaries, chat, explanations"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Deterministic vs Model-Based Graders",
+      "def execute_flow():",
+      "    # Grading methodologies: Deterministic Code Graders ...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Deterministic vs Model-Based Graders"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Stage 1: Deterministic Filter"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Stage 2: LLM Judge"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Deterministic code graders evaluate objective {1} validity at zero cost, while model-based graders evaluate subjective {2} and tone."
+],
+    blanks: [
+      {
+            "a": [
+                  "schema"
+            ],
+            "why": "Data formatting and structural syntax"
+      },
+      {
+            "a": [
+                  "quality"
+            ],
+            "why": "Semantic nuances and helpfulness"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why is evaluating JSON output with a deterministic code assertion (Pydantic) superior to asking an LLM judge 'Is this JSON valid?'",
+      a: ["Code parsers (like json.loads) are 100% mathematically exact, execute in microseconds, and cost zero API tokens","LLM judges refuse to read JSON","Pydantic is an AI model","Code assertions take too much memory"],
+      c: 0,
+      why: "Deterministic parsers provide immediate, infallible verification of syntax without token costs."
+    },
+    {
+      q: "What is an ideal use case for a model-based LLM judge?",
+      a: ["Evaluating whether an article summary captures the core themes of a 50-page document accurately and concisely","Checking if an integer is even or odd","Verifying if a URL starts with https","Testing database port connectivity"],
+      c: 0,
+      why: "Qualitative synthesis and thematic summary evaluation require linguistic reasoning."
+    },
+    {
+      q: "How can you minimize API costs when using LLM-as-a-Judge in CI pipelines?",
+      a: ["Run deterministic assertions first to filter out obvious format failures, and sample a representative subset of qualitative tests","Use a slower internet connection","Delete test cases","Grade tests manually by eye"],
+      c: 0,
+      why: "Pre-filtering with deterministic assertions saves expensive model judge calls for worthy candidates."
+    },
+    {
+      q: "Can a deterministic grader evaluate semantic similarity without calling an LLM?",
+      a: ["Yes; using embedding cosine similarity or string overlap algorithms (BLEU/ROUGE) computed locally","No; math cannot measure similarity","Only on paper","Only in C++"],
+      c: 0,
+      why: "Local embedding distance and n-gram overlap algorithms evaluate semantic proximity deterministically."
+    }
+  ]);
+</script>
+</body>
+</html>

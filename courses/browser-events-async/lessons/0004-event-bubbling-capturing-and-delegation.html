@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 04 — Event delegation in practice</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="browser-events-async" data-lesson="4" data-lesson-id="event-bubbling-capturing-and-delegation">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 04</span> · DOM Events & Delegation</span>
+
+  <h1 class="lesson-title">Event delegation in practice</h1>
+  <p class="lesson-lede">
+    Do not attach 1,000 event listeners to 1,000 list items. Master event delegation: attaching one smart listener to a parent to manage dynamic children.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Implement event delegation to manage dynamic list items using element.closest()</span>
+    <span><b>Mission link</b> Dramatically reduces memory consumption and handles dynamically added elements</span>
+  </div>
+
+  <h2><span class="n">1</span>The power of event delegation</h2>
+  <p>If you have a list of 500 items, attaching an event listener to every individual <code>&lt;li&gt;</code> consumes memory and breaks when new items are added dynamically via JavaScript.</p><p>Because events bubble upward, you can attach a <b>single event listener to the parent container</b>. When any child is clicked, the event bubbles to the parent. Using <code>event.target.closest('li')</code>, the parent easily identifies which child was clicked.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Event delegation leverages bubbling to handle events for all children with one parent listener.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Event delegation architecture</h2>
+  <p>Observe how one container listener services clicks from existing and future children.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing delegation with closest()</h2>
+  <p>Trace how closest() identifies the button even when an inner SVG icon was clicked.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of event delegation patterns.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can write high-performance UI components that handle dynamic child additions seamlessly using event delegation.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Implement a dynamic todo list where newly created items delete properly via a single parent listener.</li>
+    <li>Use element.closest() to identify an item when clicking an inner icon.</li>
+    <li>Verify in DevTools Elements tab that only one listener exists on the parent.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    David Walsh: *How JavaScript Event Delegation Works* (davidwalsh.name/event-delegate).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What happens to event listeners attached directly to child elements when those child elements are deleted from the DOM?",
+    a: ["If references are kept in variables, memory leaks can occur; event delegation on the parent avoids this entirely","The browser automatically deletes the parent container","The computer hard drive runs low on memory","The operating system reboots"],
+    c: 0,
+    why: "Direct listeners on deleted nodes risk memory leaks if not cleaned up; delegation avoids this."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Parent: <ul id='list'>",
+            "lines": [
+                  "single listener attached here",
+                  "listens for all child clicks"
+            ]
+      },
+      {
+            "title": "Child Click (<button>)",
+            "lines": [
+                  "user clicks button inside li",
+                  "event bubbles up to <ul>"
+            ]
+      },
+      {
+            "title": "Delegation Check",
+            "lines": [
+                  "e.target.closest('button.delete')",
+                  "executes logic for matching child"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "list.addEventListener('click', (e) => {",
+      "    const btn = e.target.closest('button.action');",
+      "    if (!btn || !list.contains(btn)) return; # guard",
+      "    handleAction(btn.dataset.id);",
+      "});"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "click": "user clicks <svg> inside <button class='action' data-id='5'>"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "closest": "ascends from SVG to find button.action"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "check": "passed: button is inside list"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "executed": "handleAction('5') called"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Attaching one listener to a container for all children is event <0>.",
+      "The DOM method to find the nearest matching ancestor element is .<1>().",
+      "Custom data parameters attached to elements are read via element.<2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "delegation"
+            ],
+            "why": "Event delegation exploits bubbling."
+      },
+      {
+            "a": [
+                  "closest"
+            ],
+            "why": "element.closest(selector) matches ancestors."
+      },
+      {
+            "a": [
+                  "dataset"
+            ],
+            "why": "dataset exposes data-* attribute values."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why is 'event.target.closest(selector)' preferred over 'event.target.matches(selector)' in delegation?",
+      a: ["The user might click an inner nested element (like an <i> icon or <span>) inside the target button","closest() executes faster in older browsers","matches() only works on table elements","closest() encrypts the event payload"],
+      c: 0,
+      why: "closest() ascends the tree, finding the target button even if an inner child was clicked."
+    },
+    {
+      q: "What is the primary performance benefit of event delegation?",
+      a: ["It avoids creating hundreds of individual listener function objects in memory","It makes CSS animations run at 120 frames per second","It increases network download bandwidth","It converts synchronous loops into WebAssembly"],
+      c: 0,
+      why: "One listener uses far less memory than hundreds of individual function allocations."
+    },
+    {
+      q: "Does event delegation work for newly created DOM elements added after page load?",
+      a: ["Yes, because the parent listener intercepts bubbling events from any child, present or future","No, you must re-attach the listener every time a new element is added","Only if the elements are created using document.write","Only on Google Chrome browsers"],
+      c: 0,
+      why: "Since the parent listener exists permanently, newly inserted children bubble up to it automatically."
+    },
+    {
+      q: "Which property on the event object reveals the exact element that was clicked?",
+      a: ["event.target","event.currentTarget","event.delegateTarget","event.originNode"],
+      c: 0,
+      why: "event.target references the innermost element that initiated the event."
+    }
+  ]);
+</script>
+</body>
+</html>

@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 06 — Sanitizing and Validating Model Responses</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="first-llm-application" data-lesson="6" data-lesson-id="sanitizing-validating-responses">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 06</span> · Validation</span>
+
+  <h1 class="lesson-title">Sanitizing and Validating Model Responses</h1>
+  <p class="lesson-lede">
+    Defensive output validation: parsing JSON, schema enforcement with Pydantic/Zod, and sanitizing untrusted LLM outputs.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to sanitize and validate LLM outputs defensively.</span>
+    <span><b>Mission link</b> Mastering sanitizing and validating model responses across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Sanitizing and Validating Model Responses</h2>
+  <p>A dangerous assumption in software engineering is: <em>'The model is running on my backend, so its output must be trusted.'</em> In reality, model outputs are the result of probabilistic generation that can be manipulated by malicious user data or prompt injection attacks.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Defensive output validation: parsing JSON, schema enforcement with Pydantic/Zod, and sanitizing untrusted LLM outputs.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Defensive Output Pipeline</h2>
+  <p><strong>Defensive Response Validation</strong> treats every model response with the same skepticism as a raw form submission from an unknown stranger:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Cross-Site Scripting (XSS) Defense</h2>
+  <ul><li><strong>1. Strict Schema Parsing:</strong> Parse JSON responses using Pydantic (Python) or Zod (TypeScript). Verify every field type, enum value, and string length constraint.</li><li><strong>2. Strip Markdown Wrapper Artifacts:</strong> Models frequently wrap JSON in markdown code fences (<code>```json ... ```</code>). Use clean regex strippers before parsing!</li><li><strong>3. HTML / Script Sanitization:</strong> If displaying model outputs in a web frontend, pass text through an HTML sanitizer (like DOMPurify) to prevent Cross-Site Scripting (XSS).</li><li><strong>4. SQL Parameterization:</strong> Never interpolate model-generated text directly into raw SQL strings! Always use parameterized queries.</li></ul><pre><code># Defensive JSON Response Parsing in Python:
+import json, re
+from pydantic import BaseModel, ValidationError
+
+class ExtractedEntity(BaseModel):
+    name: str
+    category: str
+    confidence: float
+
+def parse_llm_json(raw_text: str) -> ExtractedEntity:
+    # Strip markdown ```json code fences if present
+    cleaned = re.sub(r"^```(?:json)?\n?|\n?```$", "", raw_text.strip())
+    # Parse JSON and validate against Pydantic schema
+    data = json.loads(cleaned)
+    return ExtractedEntity.model_validate(data)</code></pre><div class="callout"><p><strong>The Golden Security Rule:</strong> Output from an LLM is untrusted input to the rest of your application. Validate schemas, sanitize HTML, and parameterize queries.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the validation sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to sanitize and validate LLM outputs defensively.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where sanitizing and validating model responses applies.</li>
+    <li>Author a unit test or verification script exercising sanitizing and validating model responses.</li>
+    <li>Document team architectural conventions regarding sanitizing and validating model responses.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Sanitizing and Validating Model Responses.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Why must AI-generated text be treated as 'untrusted user input' by your backend software?",
+    a: ["Models can hallucinate invalid syntax, emit prompt injection payloads, or return malformed data that attacks downstream systems","AI text is copyrighted","AI text cannot be displayed on screens","Models only generate numbers"],
+    c: 0,
+    why: "Model outputs are probabilistic and can be influenced by prompt injections; treat them as untrusted inputs."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1. Raw Model Output",
+            "lines": [
+                  "Contains markdown fences (```json)",
+                  "Probabilistic text payload"
+            ]
+      },
+      {
+            "title": "2. Strip Artifacts",
+            "lines": [
+                  "Regex removes ``` code fences",
+                  "Extracts pure JSON string"
+            ]
+      },
+      {
+            "title": "3. Pydantic / Zod Gate",
+            "lines": [
+                  "Enforces types & field constraints",
+                  "Rejects malformed structures immediately"
+            ]
+      },
+      {
+            "title": "4. Trusted Ingestion",
+            "lines": [
+                  "Clean typed object passed to app",
+                  "Zero risk of corrupting database"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Sanitizing and Validating Model Responses",
+      "def execute_flow():",
+      "    # Defensive output validation: parsing JSON, schema ...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Sanitizing and Validating Model Responses"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Malicious Model Output"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "DOMPurify Sanitization"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Model responses must be treated as untrusted data by stripping markdown code {1} and validating data shapes with {2} schemas."
+],
+    blanks: [
+      {
+            "a": [
+                  "fences"
+            ],
+            "why": "Triple backtick markdown wrappers ```"
+      },
+      {
+            "a": [
+                  "Pydantic"
+            ],
+            "why": "Python data validation library"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why do models frequently wrap JSON responses in '```json ... ```' code fences even when asked for raw JSON?",
+      a: ["Pre-training data heavily reinforced markdown code formatting patterns as the standard way to present code and data","It is required by the JSON specification","To compress the text","Because computers only read markdown"],
+      c: 0,
+      why: "Models associate structured code with markdown fences; defensive sanitization must strip them."
+    },
+    {
+      q: "What happens if an application executes an LLM response directly in an SQL query using f-strings (f'SELECT * WHERE name = {output}')?",
+      a: ["Severe SQL Injection vulnerability: an attacker could manipulate the prompt to inject arbitrary SQL statements and drop tables","The query runs 10x faster","The database automatically encrypts","The computer restarts"],
+      c: 0,
+      why: "Direct string interpolation of untrusted model outputs opens catastrophic SQL injection vulnerabilities."
+    },
+    {
+      q: "What tool should you use to sanitize model text before rendering it as raw HTML in a React frontend?",
+      a: ["DOMPurify","jQuery","npm install","git stash"],
+      c: 0,
+      why: "DOMPurify strips dangerous JavaScript tags (<script>, onload) preventing XSS attacks."
+    },
+    {
+      q: "How does Pydantic model validation protect against unexpected data types returned by an LLM?",
+      a: ["It raises a ValidationError if fields are missing, invalid, or of the wrong type, allowing the app to catch errors or retry","It deletes the database","It converts all text to integers","It reboots the server"],
+      c: 0,
+      why: "Pydantic guarantees runtime type safety by raising validation errors on invalid shapes."
+    }
+  ]);
+</script>
+</body>
+</html>

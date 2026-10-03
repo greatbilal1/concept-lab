@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 05 — Prompt and Response Logging with PII Scrubbing</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="llm-observability" data-lesson="5" data-lesson-id="prompt-logging-and-pii-scrubbing">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 05</span> · Privacy Scrubbing</span>
+
+  <h1 class="lesson-title">Prompt and Response Logging with PII Scrubbing</h1>
+  <p class="lesson-lede">
+    Logging without legal liability: scrubbing Personally Identifiable Information (PII), secrets, and tokens before storage.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to implement robust PII and secret scrubbing for compliant AI observability.</span>
+    <span><b>Mission link</b> Mastering prompt and response logging with pii scrubbing across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Prompt and Response Logging with PII Scrubbing</h2>
+  <p>Observability requires seeing what your system did: inspecting the exact prompt, the retrieved chunks, and the model's response. However, if a user pastes their credit card, password, or medical history into your chat app, logging that raw prompt into a third-party tracing dashboard violates <strong>GDPR, HIPAA, and SOC2</strong>.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Logging without legal liability: scrubbing Personally Identifiable Information (PII), secrets, and tokens before storage.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The PII Scrubbing Pipeline</h2>
+  <p>Production observability pipelines enforce <strong>PII Scrubbing at Ingress</strong>:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Compliance Defense in Depth</h2>
+  <ul><li><strong>1. Regular Expression Scrubbers:</strong> High-speed regex filters that detect and mask credit cards, Social Security numbers, email addresses, and phone numbers.</li><li><strong>2. Dedicated Entity Recognition (Microsoft Presidio):</strong> Open-source NLP models that recognize named entities (patient names, medical conditions, addresses) in real time.</li><li><strong>3. Replacement with Synthetic Pseudonyms:</strong> Replace sensitive entities with clean placeholders: <code>"Call Alice at 555-0199"</code> $\rightarrow$ <code>"Call [PERSON_1] at [PHONE_1]"</code>.</li><li><strong>4. Role-Based Access to Logs:</strong> Encrypt raw traces and ensure only authorized compliance officers can view unmasked logs.</li></ul><pre><code># Automated PII Scrubbing in Python with Presidio:
+from presidio_analyzer import AnalyzerEngine
+from presidio_anonymizer import AnonymizerEngine
+
+analyzer = AnalyzerEngine()
+anonymizer = AnonymizerEngine()
+
+def scrub_pii_before_tracing(raw_text: str) -> str:
+    # Detect PII entities (Names, Emails, Phones, SSNs)
+    results = analyzer.analyze(text=raw_text, language="en")
+    # Anonymize with placeholders
+    anonymized = anonymizer.anonymize(text=raw_text, analyzer_results=results)
+    return anonymized.text
+# Ingest anonymized.text into Langfuse / Phoenix! 100% compliant!</code></pre><div class="callout"><p><strong>The Privacy Law:</strong> Observability must never compromise user trust. Scrub sensitive data at the telemetry exporter before it leaves your application memory.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the PII scrubbing sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to implement robust PII and secret scrubbing for compliant AI observability.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where prompt and response logging with pii scrubbing applies.</li>
+    <li>Author a unit test or verification script exercising prompt and response logging with pii scrubbing.</li>
+    <li>Document team architectural conventions regarding prompt and response logging with pii scrubbing.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Prompt and Response Logging with PII Scrubbing.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What severe compliance risk arises if an enterprise logs raw prompts and model responses directly to cloud tracing databases?",
+    a: ["Raw logs frequently contain customer PII, passwords, credit card numbers, or medical data, violating GDPR, HIPAA, and SOC2","Logs make the database run out of letters","AI providers delete accounts that log text","Logging text is prohibited by Python"],
+    c: 0,
+    why: "Raw prompt logs often contain sensitive personal data that must be scrubbed to prevent compliance violations."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1. User Input (Raw PII)",
+            "lines": [
+                  "'My name is John Doe, SSN 442-11-9821'",
+                  "Contains sensitive personal data"
+            ]
+      },
+      {
+            "title": "2. Presidio Scrubbing Gate",
+            "lines": [
+                  "Detects PERSON and US_SSN entities",
+                  "Replaces with synthetic placeholders"
+            ]
+      },
+      {
+            "title": "3. Clean Telemetry Export",
+            "lines": [
+                  "'My name is [PERSON], SSN [US_SSN]'",
+                  "100% HIPAA and GDPR compliant"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Prompt and Response Logging with PII Scrubbing",
+      "def execute_flow():",
+      "    # Logging without legal liability: scrubbing Persona...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Prompt and Response Logging with PII Scrubbing"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Unscrubbed Traces (High Risk)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Sanitized Traces (Secure)"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "To prevent GDPR and HIPAA violations, observability pipelines use PII scrubbers like Microsoft {1} to replace sensitive entities with synthetic {2}."
+],
+    blanks: [
+      {
+            "a": [
+                  "Presidio"
+            ],
+            "why": "Open-source PII detection library"
+      },
+      {
+            "a": [
+                  "placeholders"
+            ],
+            "why": "Redacted tags like [PERSON]"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What open-source framework from Microsoft is the industry standard for detecting and anonymizing PII?",
+      a: ["Microsoft Presidio","Microsoft Word","DirectX","Windows Media Player"],
+      c: 0,
+      why: "Presidio provides customizable analyzer and anonymizer engines for PII scrubbing."
+    },
+    {
+      q: "Why is regex alone often insufficient for scrubbing names and locations from natural language?",
+      a: ["Names and locations do not follow rigid mathematical patterns like credit cards; they require contextual named entity recognition","Regex cannot read English","Regex is too slow","Regex crashes on names"],
+      c: 0,
+      why: "Contextual NLP models recognize arbitrary person and location names that regex patterns miss."
+    },
+    {
+      q: "Where in the software pipeline should PII scrubbing occur?",
+      a: ["At the application telemetry export boundary before traces leave your private infrastructure","Inside the third-party dashboard","After the data breach occurs","On the user's monitor"],
+      c: 0,
+      why: "Scrubbing at export ensures unmasked sensitive data never leaves your secure perimeter."
+    },
+    {
+      q: "What should happen to API keys or internal database passwords if a user accidentally pastes them into chat?",
+      a: ["Secret detection filters (like Shannon entropy analyzers) should scrub them to (REDACTED_SECRET)","They should be saved to git","They should be printed in logs","They should be emailed to support"],
+      c: 0,
+      why: "Entropy and regex analyzers detect high-entropy keys and redact them from trace logs."
+    }
+  ]);
+</script>
+</body>
+</html>

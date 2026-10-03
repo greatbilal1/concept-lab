@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 02 — Semantic and Intent-Based Request Routing</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="ai-model-routing" data-lesson="2" data-lesson-id="semantic-intent-request-routing">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 02</span> · Intent Routing</span>
+
+  <h1 class="lesson-title">Semantic and Intent-Based Request Routing</h1>
+  <p class="lesson-lede">
+    Dynamic dispatch: semantic router architectures, embedding centroid matching, zero-shot intent classifiers, and routing tables.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to build fast, low-cost semantic routers to dispatch queries dynamically.</span>
+    <span><b>Mission link</b> Mastering semantic and intent-based request routing across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Semantic and Intent-Based Request Routing</h2>
+  <p>How does your application decide whether an incoming user prompt needs a Python coding agent, a customer billing tool, or a quick greeting response? <strong>You don't ask an expensive LLM to make the decision</strong>. You use a <strong>Semantic Router</strong>.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Dynamic dispatch: semantic router architectures, embedding centroid matching, zero-shot intent classifiers, and routing tables.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Semantic Routing Architecture</h2>
+  <p>How Semantic Routing operates:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Semantic Router vs LLM Classifier</h2>
+  <ul><li><strong>1. Pre-Computed Domain Centroids:</strong> You define route clusters with 5-10 sample utterances (e.g. `billing_route`, `coding_route`, `chitchat_route`) and compute their average embedding centroids.</li><li><strong>2. Microsecond Vector Matching:</strong> When a user query arrives, embed it and compute cosine similarity against each route centroid: $\text{score} = \cos(\vec{q}, \vec{c}_i)$.</li><li><strong>3. Instant Dynamic Dispatch:</strong> If similarity to `coding_route` exceeds 0.75, dispatch immediately to Claude 3.5 Sonnet with code tools! If similarity to `chitchat_route` matches, dispatch to a fast 8B model. Total routing overhead: <strong>under 15 milliseconds</strong>!</li></ul><pre><code># Semantic Routing in Python with semantic-router:
+from semantic_router import Route, RouteLayer
+from semantic_router.encoders import OpenAIEncoder
+
+# 1. Define route prototypes:
+coding_route = Route(name="code", utterances=["debug this python script", "write an SQL query", "fix KeyError"])
+billing_route = Route(name="billing", utterances=["refund my charge", "invoice payment failed", "change credit card"])
+
+# 2. Build Route Layer
+router = RouteLayer(encoder=OpenAIEncoder(), routes=[coding_route, billing_route])
+
+# 3. Dynamic Dispatch in 12ms:
+route_choice = router("My visa card was charged twice")
+# route_choice.name == 'billing' -> Dispatches to Billing Workflow!</code></pre><div class="callout"><p><strong>The Vector Speedup:</strong> Routing queries via embedding similarity is 50x faster and 100x cheaper than asking an LLM: 'Which category does this prompt belong to?'.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the semantic routing sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to build fast, low-cost semantic routers to dispatch queries dynamically.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where semantic and intent-based request routing applies.</li>
+    <li>Author a unit test or verification script exercising semantic and intent-based request routing.</li>
+    <li>Document team architectural conventions regarding semantic and intent-based request routing.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Semantic and Intent-Based Request Routing.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is a 'Semantic Router' in an AI application architecture?",
+    a: ["A high-speed dispatch component that inspects incoming prompt embeddings and routes the request to the optimal model or workflow in under 10ms","A physical internet cable router","A Wi-Fi antenna","A database query optimizer"],
+    c: 0,
+    why: "Semantic routers classify user intent in vector space to dispatch queries to specialized models or agents in milliseconds."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1. Incoming Query",
+            "lines": [
+                  "'Fix syntax error in auth.py'",
+                  "Embedded into 1536-dim vector"
+            ]
+      },
+      {
+            "title": "2. Cosine Centroid Match",
+            "lines": [
+                  "cos(Query, Coding) = 0.89",
+                  "cos(Query, Billing) = 0.21"
+            ]
+      },
+      {
+            "title": "3. Immediate Dispatch",
+            "lines": [
+                  "Routes to Coding Agent (Sonnet)",
+                  "Zero LLM routing overhead!"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Semantic and Intent-Based Request Routing",
+      "def execute_flow():",
+      "    # Dynamic dispatch: semantic router architectures, e...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Semantic and Intent-Based Request Routing"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "LLM Classifier Prompt"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Semantic Vector Router"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Semantic routers classify user intent by computing cosine similarity against pre-defined route {1} to dispatch requests in under 15 {2}."
+],
+    blanks: [
+      {
+            "a": [
+                  "centroids"
+            ],
+            "why": "Center vectors of route clusters"
+      },
+      {
+            "a": [
+                  "milliseconds"
+            ],
+            "why": "Unit of time (ms)"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why is using an embedding-based semantic router faster than asking an LLM 'Classify this query into Category A, B, or C'?",
+      a: ["Vector embedding and dot-product similarity execute in 10-15ms, whereas an LLM generation takes 500-1000ms and consumes token billing","Embeddings run without electricity","LLMs cannot classify text","Vector math is illegal in C++"],
+      c: 0,
+      why: "Vector similarity is an instant mathematical operation compared to multi-token autoregressive generation."
+    },
+    {
+      q: "What open-source Python library specializes in embedding-based semantic routing for AI applications?",
+      a: ["semantic-router (by Aurelio AI)","Photoshop","Git","React"],
+      c: 0,
+      why: "semantic-router is the dedicated open-source Python framework for vector-based route dispatch."
+    },
+    {
+      q: "What happens if an incoming query does not meet the similarity threshold for any defined route?",
+      a: ["The router dispatches to a default fallback route (e.g. general conversational assistant)","The computer shuts down","The query is deleted","The user is disconnected"],
+      c: 0,
+      why: "Default fallback routes handle out-of-distribution queries gracefully."
+    },
+    {
+      q: "How many sample utterances per route are typically needed to establish an effective route centroid?",
+      a: ["5 to 15 representative sample phrases per route","At least 1,000,000 phrases","Exactly 1 phrase","Zero phrases"],
+      c: 0,
+      why: "5-15 diverse phrases form an accurate semantic cluster centroid in high-dimensional vector space."
+    }
+  ]);
+</script>
+</body>
+</html>

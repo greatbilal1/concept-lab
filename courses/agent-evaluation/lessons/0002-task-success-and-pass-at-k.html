@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 02 — Task Success and Pass@K Metrics</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="agent-evaluation" data-lesson="2" data-lesson-id="task-success-and-pass-at-k">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 02</span> · Pass@K</span>
+
+  <h1 class="lesson-title">Task Success and Pass@K Metrics</h1>
+  <p class="lesson-lede">
+    Quantifying agent success: Task Success Rate, Pass@1 (single-shot reliability), Pass@K (sampling diversity), and cost trade-offs.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to measure, interpret, and optimize Task Success Rate and Pass@K metrics.</span>
+    <span><b>Mission link</b> Mastering task success and pass@k metrics across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Task Success and Pass@K Metrics</h2>
+  <p>In academic coding benchmarks, researchers often report <strong>Pass@K</strong> (e.g. Pass@5 or Pass@10): generate 10 independent candidate solutions, and if <em>any one</em> passes tests, count it as a success! While Pass@10 measures potential capability, in production software engineering, <strong>Pass@1 is what matters</strong>.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Quantifying agent success: Task Success Rate, Pass@1 (single-shot reliability), Pass@K (sampling diversity), and cost trade-offs.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Pass@1 vs Pass@K</h2>
+  <p>Understanding Task Success Metrics:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Cost-Adjusted Success Frontier</h2>
+  <ul><li><strong>Pass@1 (First-Attempt Reliability):</strong> The agent is given the task once. Does it successfully diagnose, edit, and verify the fix on attempt #1? Pass@1 reflects real-world developer experience: nobody wants an agent that fails 9 times and succeeds once!</li><li><strong>Pass@K (Sampling Ceiling):</strong> Generating $K$ parallel attempts. Pass@K evaluates the maximum theoretical capability of the model under majority voting or best-of-N selection.</li><li><strong>Cost-Adjusted Success:</strong> $\text{Success per Dollar} = \frac{\text{Successful Tasks}}{\text{Total Token Cost}}$. A model with 40% Pass@1 at $0.05/task often beats a model with 45% Pass@1 that costs $1.50/task!</li></ul><pre><code># Computing Pass@K Mathematically (Chen et al., 2021):
+# For N generated samples with c correct solutions:
+# Pass@K = 1 - [comb(N - c, k) / comb(N, k)]
+#
+# In Production Agent Engineering:
+# Measure Pass@1 across 100 benchmark issues.
+# Target: Pass@1 > 65% on internal repo tickets!</code></pre><div class="callout"><p><strong>The Production Metric:</strong> Focus your engineering on <strong>Pass@1</strong>. Improving Pass@1 from 35% to 65% transforms an agent from an annoying toy into an indispensable engineering teammate.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the Pass@K sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to measure, interpret, and optimize Task Success Rate and Pass@K metrics.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where task success and pass@k metrics applies.</li>
+    <li>Author a unit test or verification script exercising task success and pass@k metrics.</li>
+    <li>Document team architectural conventions regarding task success and pass@k metrics.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Task Success and Pass@K Metrics.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What does the 'Pass@1' metric measure when evaluating an autonomous coding agent?",
+    a: ["The percentage of benchmark coding tasks the agent resolves successfully on its first single attempt","The speed of the network cable","The percentage of passing students","The number of lines of code written"],
+    c: 0,
+    why: "Pass@1 measures first-try success rates, representing real-world autonomous reliability."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Pass@1 (Production Metric)",
+            "lines": [
+                  "Single attempt execution",
+                  "Measures true first-try reliability",
+                  "Reflects real developer experience"
+            ]
+      },
+      {
+            "title": "Pass@K (Academic Metric)",
+            "lines": [
+                  "Generate K parallel attempts",
+                  "Success if ANY 1 passes tests",
+                  "Evaluates theoretical capability ceiling"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Task Success and Pass@K Metrics",
+      "def execute_flow():",
+      "    # Quantifying agent success: Task Success Rate, Pass...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Task Success and Pass@K Metrics"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Model A (Frontier Heavy)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Model B (Efficient Specialist)"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "While Pass@K measures whether any candidate in K samples succeeds, {1} measures real-world first-attempt {2} on production tasks."
+],
+    blanks: [
+      {
+            "a": [
+                  "Pass@1"
+            ],
+            "why": "Single-attempt success rate"
+      },
+      {
+            "a": [
+                  "reliability"
+            ],
+            "why": "Dependable first-try performance"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why is Pass@1 considered the most important metric for developer productivity tools?",
+      a: ["Developers expect the agent to resolve the issue on the first run; waiting for 10 failed runs wastes developer time and patience","Pass@1 is required by law","Pass@1 uses no API tokens","Pass@1 compiles code to C"],
+      c: 0,
+      why: "First-try reliability defines real-world user trust and engineering velocity."
+    },
+    {
+      q: "What does a Pass@1 score of 70% on an internal repo benchmark mean?",
+      a: ["Out of 100 representative engineering tickets, the agent autonomously resolved and passed all tests on 70 of them on the first attempt","The agent was 70% fast","The agent wrote 70 lines of code","The agent used 70% of RAM"],
+      c: 0,
+      why: "Pass@1 measures the exact proportion of tasks resolved on the first autonomous attempt."
+    },
+    {
+      q: "Why do academic papers report Pass@100 instead of Pass@1?",
+      a: ["To demonstrate the model's upper-bound creative potential when paired with massive computational sampling","Because Pass@1 is illegal in research","Because 100 is a round number","Because Pass@100 uses fewer tokens"],
+      c: 0,
+      why: "Pass@K measures whether the correct solution exists within the model's sampling distribution."
+    },
+    {
+      q: "How does 'Best-of-N' reranking improve an agent's effective Pass@1 score in production?",
+      a: ["The system generates 3 candidate trajectories and uses an automated test suite or judge to select the passing candidate to deliver","It deletes failing runs","It makes the model run faster","It reduces GPU temperature"],
+      c: 0,
+      why: "Automated verification filters candidate runs, delivering only the passing trajectory to the user."
+    }
+  ]);
+</script>
+</body>
+</html>

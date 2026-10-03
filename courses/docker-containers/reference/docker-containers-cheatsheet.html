@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Docker & Containers — Cheat Sheet</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+<style>
+  .ref-toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0 8px; }
+  .ref-toc a { font-size: .8rem; border: 1px solid var(--border); background: #111a30; padding: 5px 11px; border-radius: 999px; color: var(--muted); text-decoration: none; border-bottom: 1px solid var(--border); }
+  .ref-toc a:hover { color: #fff; border-color: #3d5488; }
+  .lesson-wrap h2 { scroll-margin-top: 20px; }
+  .snippet { margin: 14px 0 22px; }
+  .snippet .lbl { font-size: .72rem; font-weight: 800; letter-spacing: .7px; text-transform: uppercase; color: var(--accent2); margin-bottom: 6px; }
+  .see { font-size: .82rem; color: var(--muted); margin: -6px 0 12px; }
+  .see a { color: var(--accent2); border-bottom: 0; }
+  .see a:hover { color: #fff; }
+  .snippet pre { padding-top: 34px; }
+  @media print { .snippet pre { padding-top: 18px; } }
+</style>
+</head>
+<body class="lesson-body" data-course="docker-containers">
+
+<div class="lesson-wrap">
+
+  <span class="lesson-kicker">Reference · Cheat sheet</span>
+  <h1 class="lesson-title">Docker & Containers — Cheat Sheet</h1>
+  <p class="lesson-lede">
+    The whole course on one page. Every snippet links back to the lesson that
+    teaches it.
+  </p>
+
+  <div class="ref-toc">
+    <a href="#sec-1">Production Multi-Stage Python Dockerfile</a>
+    <a href="#sec-2">Docker Compose with Service Healthcheck</a>
+    <a href="#sec-3">Automated Trivy Container Security Scan</a>
+    <a href="#sec-4">Isolated Docker Run Command</a>
+  </div>
+
+  <h2 id="sec-1"><span class="n">1</span>Production Multi-Stage Python Dockerfile</h2>
+  <div class="snippet">
+    <div class="lbl">Lean, non-root production pattern</div>
+    <pre><code>FROM python:3.12-slim AS builder
+WORKDIR /build
+COPY requirements.txt .
+RUN pip wheel --no-cache-dir --wheel-dir=/build/wheels -r requirements.txt
+
+FROM python:3.12-slim
+WORKDIR /app
+RUN useradd -u 1000 appuser
+COPY --from=builder /build/wheels /wheels
+RUN pip install --no-cache /wheels/* && rm -rf /wheels
+COPY --chown=appuser:appuser . .
+USER appuser
+CMD ["python", "main.py"]</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0003-production-dockerfiles-multistage-nonroot.html">Lesson 03 — Writing Production Dockerfiles: Multi-Stage Builds & Non-Root Users</a>.</p>
+
+  <h2 id="sec-2"><span class="n">2</span>Docker Compose with Service Healthcheck</h2>
+  <div class="snippet">
+    <div class="lbl">Declarative stack orchestration</div>
+    <pre><code>services:
+  api:
+    build: .
+    ports: ["8000:8000"]
+    depends_on:
+      db: { condition: service_healthy }
+  db:
+    image: postgres:16-alpine
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+volumes:
+  pgdata:</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0006-multi-container-docker-compose.html">Lesson 06 — Multi-Container Orchestration with Docker Compose</a>.</p>
+
+  <h2 id="sec-3"><span class="n">3</span>Automated Trivy Container Security Scan</h2>
+  <div class="snippet">
+    <div class="lbl">Blocking critical CVEs in CI</div>
+    <pre><code># Scan image and exit 1 if Critical vulnerabilities found:
+trivy image --exit-code 1 --severity CRITICAL company/api:latest</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0007-container-security-distroless-scanning.html">Lesson 07 — Container Security Hardening: Distroless, Capabilities, and Scanning</a>.</p>
+
+  <h2 id="sec-4"><span class="n">4</span>Isolated Docker Run Command</h2>
+  <div class="snippet">
+    <div class="lbl">Hardened container execution</div>
+    <pre><code>docker run --rm -i \
+    --network none \
+    --read-only \
+    --tmpfs /tmp:rw,size=64m \
+    --user 1000:1000 \
+    --cap-drop ALL \
+    python:3.12-slim python app.py</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0007-container-security-distroless-scanning.html">Lesson 07 — Container Security Hardening: Distroless, Capabilities, and Scanning</a>.</p>
+
+  <div class="lesson-foot">
+    <div class="links">
+      <a href="docker-containers-glossary.html">📖 Glossary</a>
+      <a href="../course.html">← Course map</a>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 05 — Cross-cutting concerns and decorators</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="separation-of-concerns" data-lesson="5" data-lesson-id="cross-cutting-concerns-and-decorators">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 05</span> · Cross-Cutting Concerns & Layers</span>
+
+  <h1 class="lesson-title">Cross-cutting concerns and decorators</h1>
+  <p class="lesson-lede">
+    Logging, authentication, caching, and rate limiting don't belong inside your business logic. Learn how to extract cross-cutting concerns using Python decorators and wrapper functions.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Extract cross-cutting concerns into reusable decorators and function wrappers</span>
+    <span><b>Mission link</b> Keeps domain functions focused strictly on business calculations without infrastructure clutter</span>
+  </div>
+
+  <h2><span class="n">1</span>The tangle of cross-cutting concerns</h2>
+  <p>A <b>Cross-Cutting Concern</b> is a requirement that spans across multiple modules and layers: logging, user authentication, timing metrics, input validation, and caching. If every function manually repeats 15 lines of logging and auth boilerplate, the actual 2 lines of business logic are buried.</p><p>The solution is the <b>Decorator Pattern</b>. In Python, decorators (<code>@decorator</code>) wrap around a function to inject cross-cutting behavior dynamically, leaving the core function 100% focused on business rules.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Decorators wrap functions to execute cross-cutting concerns without modifying core business code.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The decorator wrapping layer</h2>
+  <p>Visualise how nested decorators wrap cross-cutting behaviors around a pure domain core.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing decorator execution flow</h2>
+  <p>Trace how a timing decorator wraps an existing function cleanly without modifying its source.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of cross-cutting concerns and decorators.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can extract repetitive logging, authentication, and caching concerns into clean, reusable decorators.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Implement a custom @retry(attempts=3) decorator for network functions.</li>
+    <li>Wrap an existing business calculation with a timing decorator.</li>
+    <li>Ensure your decorators preserve function metadata using functools.wraps.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Bruce Eckel: *Decorators I: Introduction to Python Decorators* (Python 3 Patterns & Idioms).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What does the '@cached(ttl=60)' decorator do when placed above a slow calculation function?",
+    a: ["Intercepts the function call, returning cached results in 0ms on cache hits, and executing the function only on misses","Deletes the function from memory after 60 seconds","Calculates the result 60 times in parallel","Prints the function source code to the terminal"],
+    c: 0,
+    why: "Decorators intercept calls transparently, handling caching concerns without altering calculation logic."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Outer: @require_auth",
+            "lines": [
+                  "checks user permissions",
+                  "aborts with 401 if unauthenticated"
+            ]
+      },
+      {
+            "title": "Middle: @log_execution_time",
+            "lines": [
+                  "measures start and end time",
+                  "emits metric to Datadog"
+            ]
+      },
+      {
+            "title": "Inner: Core Function",
+            "lines": [
+                  "calculate_interest_rate()",
+                  "pure mathematical formula!",
+                  "ZERO logging or auth clutter!"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "def timeit(func):",
+      "    def wrapper(*args, **kwargs):",
+      "        start = time.perf_counter()",
+      "        result = func(*args, **kwargs) # core function runs here",
+      "        print(f'{func.__name__} took {time.perf_counter() - start:.4f}s')",
+      "        return result",
+      "    return wrapper"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "decorator_defined": "timeit takes target function as argument"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "pre_execution": "starts high-resolution timer"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "core_execution": "invokes original function with transparent arguments"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "post_execution": "logs execution time and returns original result"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "A concern that spans across multiple layers (like logging) is a <0>-cutting concern.",
+      "The Python syntax used to wrap functions with decorators begins with the symbol <1>.",
+      "Decorators wrap target functions to inject behavior without altering core <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "cross"
+            ],
+            "why": "Cross-cutting concerns cut across module boundaries."
+      },
+      {
+            "a": [
+                  "@",
+                  "at"
+            ],
+            "why": "@decorator is Python's decorator syntax."
+      },
+      {
+            "a": [
+                  "code",
+                  "logic"
+            ],
+            "why": "Decorators preserve original function logic."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why is 'functools.wraps' strongly recommended when authoring Python decorators?",
+      a: ["It copies original function metadata (like __name__, docstrings, and type annotations) onto the wrapper function, preventing debugging confusion","It makes decorators execute on multiple CPU threads","It turns off Python security warnings","It compiles Python into C++ code"],
+      c: 0,
+      why: "@wraps(func) ensures the decorated function retains its original name, docstring, and annotations."
+    },
+    {
+      q: "Which of the following is a classic example of a cross-cutting concern?",
+      a: ["Structured JSON logging, authorization checks, and performance metrics","Calculating the sales tax on an invoice","Rendering an HTML header template","Defining a database table primary key"],
+      c: 0,
+      why: "Logging and metrics apply universally across all features rather than belonging to one domain entity."
+    },
+    {
+      q: "What architectural problem occurs when cross-cutting concerns are NOT separated?",
+      a: ["Code Tangling: business logic becomes buried under dozens of lines of repetitive logging, auth, and error-handling boilerplate","The computer runs out of physical hard drive space","The database server reboots automatically","All variables become global singletons"],
+      c: 0,
+      why: "Tangling pollutes domain readability with infrastructure noise, making business logic hard to audit."
+    },
+    {
+      q: "Can multiple decorators be stacked on top of a single function?",
+      a: ["Yes, decorators can be stacked; they execute in bottom-up order (closest to the function first)","No, Python strictly limits functions to a single decorator only","Only on Linux computers","Only if the decorators have identical names"],
+      c: 0,
+      why: "Stacking applies wrappers in sequence: @dec1 over @dec2 wraps dec1(dec2(func))."
+    }
+  ]);
+</script>
+</body>
+</html>

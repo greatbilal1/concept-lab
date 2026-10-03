@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 05 — Reference-Based Metrics: BLEU, ROUGE, and BERTScore</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="ai-evaluation" data-lesson="5" data-lesson-id="reference-based-metrics-bleu-rouge-bertscore">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 05</span> · Reference Metrics</span>
+
+  <h1 class="lesson-title">Reference-Based Metrics: BLEU, ROUGE, and BERTScore</h1>
+  <p class="lesson-lede">
+    Classical and modern reference metrics: n-gram precision (BLEU), recall (ROUGE), and semantic embedding similarity (BERTScore).
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You understand the strengths and limitations of BLEU, ROUGE, and BERTScore.</span>
+    <span><b>Mission link</b> Mastering reference-based metrics: bleu, rouge, and bertscore across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Reference-Based Metrics: BLEU, ROUGE, and BERTScore</h2>
+  <p>Before LLM judges existed, machine translation and summarization relied on <strong>Reference-Based String Metrics</strong>. These algorithms compare a model's generated output against a human-written 'Golden Reference' document.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Classical and modern reference metrics: n-gram precision (BLEU), recall (ROUGE), and semantic embedding similarity (BERTScore).
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Reference Metrics Compared</h2>
+  <p>The three classic reference metrics:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Synonym Paraphrasing Challenge</h2>
+  <ul><li><strong>1. BLEU (Bilingual Evaluation Understudy):</strong> Measures <strong>n-gram precision</strong>. What percentage of 1-gram, 2-gram, 3-gram word combinations in the generated text appear in the reference? Standard for machine translation.</li><li><strong>2. ROUGE (Recall-Oriented Understudy for Gifting Evaluation):</strong> Measures <strong>n-gram recall</strong>. What percentage of the reference words appeared in the model's output? Standard for summarization (ROUGE-1, ROUGE-2, ROUGE-L).</li><li><strong>3. BERTScore (Semantic Similarity Breakthrough):</strong> Computes cosine similarity between contextual token embeddings of the generated text and reference text. <strong>Captures synonyms and paraphrasing!</strong></li></ul><pre><code># The Synonym Blindness of ROUGE/BLEU:
+Reference: "The physician administered the medication."
+Generated: "The doctor gave the medicine."
+
+# BLEU / ROUGE: Scores near 0.0! (Zero matching words except 'the'!).
+# BERTScore:   Scores 0.96! (Recognizes doctor==physician, medicine==medication!)</code></pre><div class="callout"><p><strong>Metric Evolution:</strong> Use ROUGE/BLEU for strict translation and extraction where exact wording matters. Use <strong>BERTScore</strong> or LLM judges for creative summaries and open-ended text.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the reference metrics sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You understand the strengths and limitations of BLEU, ROUGE, and BERTScore.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where reference-based metrics: bleu, rouge, and bertscore applies.</li>
+    <li>Author a unit test or verification script exercising reference-based metrics: bleu, rouge, and bertscore.</li>
+    <li>Document team architectural conventions regarding reference-based metrics: bleu, rouge, and bertscore.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Reference-Based Metrics: BLEU, ROUGE, and BERTScore.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is the key limitation of n-gram string overlap metrics like BLEU and ROUGE when evaluating generative AI?",
+    a: ["They measure exact word overlap; if the model writes a brilliant answer using different synonyms, BLEU/ROUGE will score it as a 0% failure","They are too expensive to compute","They only run on Linux","They require an LLM API call"],
+    c: 0,
+    why: "String overlap metrics penalize valid synonyms and paraphrases that do not share exact surface tokens."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "BLEU (Precision)",
+            "lines": [
+                  "Measures matching n-gram precision",
+                  "Heavily penalizes hallucinated words",
+                  "Best for: Machine translation"
+            ]
+      },
+      {
+            "title": "ROUGE (Recall)",
+            "lines": [
+                  "Measures captured reference n-grams",
+                  "Heavily penalizes omitted points",
+                  "Best for: Summarization (ROUGE-L)"
+            ]
+      },
+      {
+            "title": "BERTScore (Semantic)",
+            "lines": [
+                  "Matches token embedding vectors",
+                  "Celebrates valid synonyms & paraphrasing",
+                  "Immune to surface string variations"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Reference-Based Metrics: BLEU, ROUGE, and BERTScore",
+      "def execute_flow():",
+      "    # Classical and modern reference metrics: n-gram pre...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Reference-Based Metrics: BLEU, ROUGE, and BERTScore"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Gold: 'Automobile halted'"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "BERTScore Resolution"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "While BLEU and ROUGE evaluate surface n-gram overlap, {1} calculates token embedding cosine similarity to recognize valid {2}."
+],
+    blanks: [
+      {
+            "a": [
+                  "BERTScore"
+            ],
+            "why": "Embedding-based evaluation metric"
+      },
+      {
+            "a": [
+                  "synonyms"
+            ],
+            "why": "Different words with identical meaning"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What does ROUGE-L measure in text summarization evaluation?",
+      a: ["The Longest Common Subsequence (LCS) of words shared between the generated summary and the reference text","The length of the paragraph in characters","The size of the language model","The speed of the printer"],
+      c: 0,
+      why: "ROUGE-L evaluates the longest common sub-sequence, capturing sentence-level structure."
+    },
+    {
+      q: "Why is BERTScore considered vastly more aligned with human judgment than BLEU?",
+      a: ["It understands semantic equivalences and does not penalize models for choosing natural synonyms or rephrasing sentences","It runs on paper","It is an official government metric","It costs no compute"],
+      c: 0,
+      why: "Contextual token vector similarity rewards semantic meaning rather than literal spelling."
+    },
+    {
+      q: "When is BLEU still a valuable evaluation metric in modern AI pipelines?",
+      a: ["When evaluating formal machine translation or exact code symbol extraction where specific terminology is mandatory","When evaluating poetry","When testing creative brainstorming","When checking GPU clock speed"],
+      c: 0,
+      why: "Exact translation benchmarks benefit from precision-focused n-gram matching."
+    },
+    {
+      q: "What is the computational advantage of running ROUGE and BERTScore over LLM-as-a-Judge?",
+      a: ["They run locally on CPUs/GPUs in milliseconds without incurring third-party LLM API token costs","They use no electricity","They delete the test data","They compile code to C"],
+      c: 0,
+      why: "Reference metrics run locally and deterministically with zero API bills."
+    }
+  ]);
+</script>
+</body>
+</html>

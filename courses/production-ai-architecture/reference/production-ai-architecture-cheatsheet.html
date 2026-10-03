@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Production AI Architecture — Cheat Sheet</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+<style>
+  .ref-toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0 8px; }
+  .ref-toc a { font-size: .8rem; border: 1px solid var(--border); background: #111a30; padding: 5px 11px; border-radius: 999px; color: var(--muted); text-decoration: none; border-bottom: 1px solid var(--border); }
+  .ref-toc a:hover { color: #fff; border-color: #3d5488; }
+  .lesson-wrap h2 { scroll-margin-top: 20px; }
+  .snippet { margin: 14px 0 22px; }
+  .snippet .lbl { font-size: .72rem; font-weight: 800; letter-spacing: .7px; text-transform: uppercase; color: var(--accent2); margin-bottom: 6px; }
+  .see { font-size: .82rem; color: var(--muted); margin: -6px 0 12px; }
+  .see a { color: var(--accent2); border-bottom: 0; }
+  .see a:hover { color: #fff; }
+  .snippet pre { padding-top: 34px; }
+  @media print { .snippet pre { padding-top: 18px; } }
+</style>
+</head>
+<body class="lesson-body" data-course="production-ai-architecture">
+
+<div class="lesson-wrap">
+
+  <span class="lesson-kicker">Reference · Cheat sheet</span>
+  <h1 class="lesson-title">Production AI Architecture — Cheat Sheet</h1>
+  <p class="lesson-lede">
+    The whole course on one page. Every snippet links back to the lesson that
+    teaches it.
+  </p>
+
+  <div class="ref-toc">
+    <a href="#sec-1">FastAPI Async Job Submission (HTTP 202)</a>
+    <a href="#sec-2">Client Disconnect Detection in Streaming</a>
+    <a href="#sec-3">Hard Multi-Tenant Vector Search</a>
+    <a href="#sec-4">Redis Sliding Window Session Push</a>
+  </div>
+
+  <h2 id="sec-1"><span class="n">1</span>FastAPI Async Job Submission (HTTP 202)</h2>
+  <div class="snippet">
+    <div class="lbl">Decoupled task queue pattern</div>
+    <pre><code>@app.post("/api/v1/agent/run", status_code=202)
+async def submit_task(request: TaskRequest):
+    job = celery_app.send_task("agent_worker", args=[request.payload])
+    return {"job_id": job.id, "status": "ACCEPTED", "check_url": f"/tasks/{job.id}"}</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0002-async-job-queues-decoupled-processing.html">Lesson 02 — Async Job Queues and Decoupled Processing (Celery, BullMQ)</a>.</p>
+
+  <h2 id="sec-2"><span class="n">2</span>Client Disconnect Detection in Streaming</h2>
+  <div class="snippet">
+    <div class="lbl">Cancelling ghost streams to save tokens</div>
+    <pre><code>async def sse_generator(request: Request, prompt: str):
+    async for chunk in llm.stream(prompt):
+        if await request.is_disconnected():
+            logger.info('Client closed tab. Aborting generation!')
+            break
+        yield f"data: {json.dumps({'t': chunk.text})}\n\n"</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0003-real-time-stateful-streaming-sse-websockets.html">Lesson 03 — Real-Time Stateful Streaming with WebSockets and SSE</a>.</p>
+
+  <h2 id="sec-3"><span class="n">3</span>Hard Multi-Tenant Vector Search</h2>
+  <div class="snippet">
+    <div class="lbl">Preventing cross-tenant data leakage</div>
+    <pre><code>def search_tenant_docs(query_vector, tenant_id):
+    return vector_index.query(
+        vector=query_vector,
+        top_k=5,
+        filter={"tenant_id": {"$eq": tenant_id}} # Mandatory filter!
+    )</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0006-multi-tenant-isolation-data-partitioning.html">Lesson 06 — Multi-Tenant Isolation and Data Partitioning</a>.</p>
+
+  <h2 id="sec-4"><span class="n">4</span>Redis Sliding Window Session Push</h2>
+  <div class="snippet">
+    <div class="lbl">Stateless chat memory maintenance</div>
+    <pre><code>async def save_turn(session_id, user_msg, ai_msg, max_turns=10):
+    key = f"session:{session_id}:window"
+    await redis.rpush(key, json.dumps({'u': user_msg, 'a': ai_msg}))
+    await redis.ltrim(key, -max_turns, -1) # Keep last N turns
+    await redis.expire(key, 86400 * 7) # 7-day TTL</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0004-distributed-context-session-storage.html">Lesson 04 — Distributed Context and Session Storage (Redis, PostgreSQL)</a>.</p>
+
+  <div class="lesson-foot">
+    <div class="links">
+      <a href="production-ai-architecture-glossary.html">📖 Glossary</a>
+      <a href="../course.html">← Course map</a>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

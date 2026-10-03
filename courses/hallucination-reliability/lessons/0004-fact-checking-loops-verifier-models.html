@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 04 — Fact-Checking Loops and Verifier Models</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="hallucination-reliability" data-lesson="4" data-lesson-id="fact-checking-loops-verifier-models">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 04</span> · Verifier Models</span>
+
+  <h1 class="lesson-title">Fact-Checking Loops and Verifier Models</h1>
+  <p class="lesson-lede">
+    The generator-verifier architecture: using secondary critic models to audit, verify, and filter generated statements.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to implement generator-verifier fact-checking pipelines.</span>
+    <span><b>Mission link</b> Mastering fact-checking loops and verifier models across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Fact-Checking Loops and Verifier Models</h2>
+  <p>In publishing, writers do not publish their own work without an editor. Similarly, in high-reliability AI systems, <strong>the model that writes the text should not be the sole judge of its factual accuracy</strong>.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    The generator-verifier architecture: using secondary critic models to audit, verify, and filter generated statements.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Generator-Verifier Pipeline</h2>
+  <p>The <strong>Generator-Verifier Pattern</strong> creates a rigorous editorial pipeline:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Why Self-Correction Alone Often Fails</h2>
+  <ul><li><strong>Stage 1 (The Generator):</strong> A creative, fluent model (e.g. GPT-4o) drafts a complete, helpful answer based on prompt and context.</li><li><strong>Stage 2 (Claim Extraction):</strong> An automated parser breaks the draft answer into discrete atomic factual claims: `["Claim 1: Product has 2-year warranty", "Claim 2: Battery lasts 14 hours"]`.</li><li><strong>3. Stage 3 (The Verifier):</strong> A secondary, strictly skeptical model audits each individual claim against source documents: <em>'Does Document A explicitly support Claim 2?'</em></li><li><strong>Stage 4 (Repair or Redact):</strong> If Claim 2 is unverified or false, the verifier redacts it or loops back to the generator with an explicit correction!</li></ul><pre><code># The Generator-Verifier Workflow in Python:
+# 1. Primary Model drafts answer
+draft_answer = generator_model.generate(query, context)
+
+# 2. Extract atomic claims
+claims = extract_atomic_claims(draft_answer)
+
+# 3. Verifier audits claims
+unsupported_claims = []
+for claim in claims:
+    if not verifier_model.verify(context, claim):
+        unsupported_claims.append(claim)
+
+# 4. If any claim is unsupported, trigger automated repair!
+if unsupported_claims:
+    final_answer = generator_model.repair(draft_answer, unsupported_claims, context)</code></pre><div class="callout"><p><strong>The Editorial Separation:</strong> Decoupling generation from verification slashes factual error rates by up to 80% on complex legal and medical tasks.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the verifier models sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to implement generator-verifier fact-checking pipelines.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where fact-checking loops and verifier models applies.</li>
+    <li>Author a unit test or verification script exercising fact-checking loops and verifier models.</li>
+    <li>Document team architectural conventions regarding fact-checking loops and verifier models.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Fact-Checking Loops and Verifier Models.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is the 'Generator-Verifier' pattern in reliable AI systems?",
+    a: ["A primary model generates a draft answer, and a secondary specialized verifier model audits each claim against ground truth before delivery","Two models generating text at the same time","A generator that makes electricity for servers","A tool for compiling C code"],
+    c: 0,
+    why: "The generator-verifier architecture decouples creative text generation from independent factual verification."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1. Generator Model (Creative)",
+            "lines": [
+                  "Drafts complete, helpful answer",
+                  "Focuses on synthesis & user tone"
+            ]
+      },
+      {
+            "title": "2. Claim Extraction",
+            "lines": [
+                  "Decomposes draft into atomic claims",
+                  "Claim 1, Claim 2, Claim 3..."
+            ]
+      },
+      {
+            "title": "3. Verifier Model (Skeptical)",
+            "lines": [
+                  "Audits each claim against source docs",
+                  "Passes verified, flags ungrounded"
+            ]
+      },
+      {
+            "title": "4. Repair Gate",
+            "lines": [
+                  "Redacts or repairs unsupported claims",
+                  "Delivers 100% verified response"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Fact-Checking Loops and Verifier Models",
+      "def execute_flow():",
+      "    # The generator-verifier architecture: using seconda...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Fact-Checking Loops and Verifier Models"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Single Model Checking Itself"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Independent Verifier"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The generator-verifier architecture decomposes drafted answers into atomic claims and uses an independent {1} model to audit them against source {2}."
+],
+    blanks: [
+      {
+            "a": [
+                  "verifier"
+            ],
+            "why": "Skeptical fact-checking critic model"
+      },
+      {
+            "a": [
+                  "documents"
+            ],
+            "why": "Authoritative ground-truth context"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why is an independent verifier model more effective at catching errors than asking the generator model 'Did you make any mistakes?'",
+      a: ["Language models exhibit confirmation bias when reviewing their own generated text, while a fresh verifier evaluates claims without author bias","Verifier models run on quantum computers","Generator models cannot read their own text","It is required by Python syntax"],
+      c: 0,
+      why: "Independent verifiers evaluate statements objectively without authorial confirmation bias."
+    },
+    {
+      q: "What is an 'Atomic Claim' in fact-checking pipelines?",
+      a: ["A single, isolated factual proposition that can be independently verified as True or False (e.g. 'The warranty is 2 years')","A nuclear physics formula","A claim with an atomic number","A broken string in Python"],
+      c: 0,
+      why: "Decomposing answers into atomic propositions allows granular verification of individual facts."
+    },
+    {
+      q: "What should the verifier pipeline do if a claim is directly contradicted by source documentation?",
+      a: ["Strip the false claim immediately or trigger an automated repair prompt to regenerate that specific sentence","Post the error to social media","Delete the source document","Shut down the server"],
+      c: 0,
+      why: "Contradicted statements must be stripped or repaired before reaching the end user."
+    },
+    {
+      q: "How does using a smaller, specialized NLI model as the verifier keep latency low?",
+      a: ["A 200MB cross-encoder verifies atomic claims in 10-20ms, adding minimal overhead to the overall user request","It bypasses the internet","It deletes the prompt","It compiles Python to assembly"],
+      c: 0,
+      why: "Specialized verification models execute in milliseconds, preserving fast response times."
+    }
+  ]);
+</script>
+</body>
+</html>

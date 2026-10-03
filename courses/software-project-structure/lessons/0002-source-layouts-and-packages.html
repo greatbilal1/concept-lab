@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 02 — Source layouts and packages</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="software-project-structure" data-lesson="2" data-lesson-id="source-layouts-and-packages">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 02</span> · Anatomy of a Repository</span>
+
+  <h1 class="lesson-title">Source layouts and packages</h1>
+  <p class="lesson-lede">
+    Flat layout versus src-layout: why nesting your code under src/ protects you from accidental import bugs and broken packaging.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Implement a robust src-layout package structure for modern applications</span>
+    <span><b>Mission link</b> Prevents insidious import masking and packaging failures</span>
+  </div>
+
+  <h2><span class="n">1</span>The problem with flat layouts</h2>
+  <p>In a flat layout, your package directory sits directly in the project root alongside <code>setup.py</code> or <code>package.json</code>. When you run tests from the root, the interpreter imports your local uninstalled source files directly from the working directory.</p><p>This causes bugs that pass locally but fail in production: you test against raw local files, not the packaged and installed artifact. The <b>src-layout</b> forces tests to import the properly installed package.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    The src-layout guarantees that tests execute against the installed package rather than local working directory files.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Comparing layout patterns</h2>
+  <p>Contrast the vulnerability of flat layouts with the isolation provided by src-layout.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing package import resolution</h2>
+  <p>Trace how Python resolves imports when executing from a src-layout project.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your understanding of source package layouts.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can structure package namespaces cleanly under src/ to avoid local import pollution.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Inspect an existing project and verify whether it uses flat layout or src-layout.</li>
+    <li>Organize your code under a src/<package_name>/ hierarchy.</li>
+    <li>Run your test suite with the package installed in editable mode.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Hynek Schlawack, *Testing & Packaging: The src-layout* (hynek.me/articles/testing-packaging).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What subtle bug can occur when running tests against a flat root layout?",
+    a: ["Tests might import files from the local directory that were accidentally omitted from the install package","The CPU will execute the tests at half speed","The git commit history will be overwritten with random bytes","The computer network interface card will be disabled"],
+    c: 0,
+    why: "Flat layouts mask missing files in package manifests because local files are always importable from cwd."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Flat Layout (Fragile)",
+            "lines": [
+                  "root/my_package/",
+                  "root/tests/",
+                  "import my_package uses local folder"
+            ]
+      },
+      {
+            "title": "src-layout (Robust)",
+            "lines": [
+                  "root/src/my_package/",
+                  "root/tests/",
+                  "import my_package tests installed build"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Running: pytest tests/test_core.py",
+      "# Working directory is /repo",
+      "# 'src' is NOT in sys.path by default",
+      "# Interpreter must import installed package from site-packages / venv",
+      "import my_package   # succeeds only if package installed cleanly"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "cwd": "/repo"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "local_check": "no my_package directly in /repo"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "resolution": "imports installed distribution artifact"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Placing packages inside a dedicated src directory is called the <0> layout.",
+      "In Python, a folder becomes a regular package by including an __<1>__.py file.",
+      "Installing an editable local development package is done with pip install <2> ."
+],
+    blanks: [
+      {
+            "a": [
+                  "src",
+                  "src-layout"
+            ],
+            "why": "src-layout nests source packages under src/."
+      },
+      {
+            "a": [
+                  "init"
+            ],
+            "why": "__init__.py initializes a Python package namespace."
+      },
+      {
+            "a": [
+                  "-e"
+            ],
+            "why": "-e installs a package in editable mode linked to source."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the primary benefit of using a src/ layout in software repositories?",
+      a: ["It prevents local directory files from silently masking packaging and import errors during testing","It makes Python scripts execute without needing an interpreter installed","It automatically optimizes database queries for high traffic","It compresses image files to save disk storage space"],
+      c: 0,
+      why: "src-layout ensures you test the real installed distribution artifact rather than working directory files."
+    },
+    {
+      q: "What role does __init__.py play in Python package folders?",
+      a: ["It marks the directory as an importable Python package namespace and runs initialization","It tells the operating system to treat the folder as hidden","It compiles all Python files in the folder into machine code","It encrypts the source code to protect intellectual property"],
+      c: 0,
+      why: "__init__.py signals to Python that the folder should be treated as an importable module."
+    },
+    {
+      q: "What does 'pip install -e .' do in a development environment?",
+      a: ["Installs the local package in editable mode, linking changes directly to the virtualenv","Exports the package to the public PyPI repository immediately","Deletes all test files and logs from the repository","Converts the project into a mobile application"],
+      c: 0,
+      why: "Editable mode installs symlinks so code changes reflect immediately without reinstallation."
+    },
+    {
+      q: "Where should top-level CLI commands and executables be registered?",
+      a: ["In the project manifest under project.scripts or package.json bin","In temporary shell history files","Inside the database schema migration folder","In the root .gitignore file"],
+      c: 0,
+      why: "Manifests define CLI entry points so the package installer creates proper command wrappers."
+    }
+  ]);
+</script>
+</body>
+</html>

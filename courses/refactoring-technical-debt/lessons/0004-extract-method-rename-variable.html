@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 04 — Extract Method and Rename Variable</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="refactoring-technical-debt" data-lesson="4" data-lesson-id="extract-method-rename-variable">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 04</span> · Workhorse Refactorings</span>
+
+  <h1 class="lesson-title">Extract Method and Rename Variable</h1>
+  <p class="lesson-lede">
+    Applying the two most frequent refactorings: Extract Method to break monoliths and Rename Variable to clarify intent.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to transform monolithic code into clear functions with Extract Method and Rename Variable.</span>
+    <span><b>Mission link</b> Mastering extract method and rename variable across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Extract Method and Rename Variable</h2>
+  <p>If you master only two refactoring techniques from Martin Fowler's catalog, let them be <strong>Extract Method</strong> and <strong>Rename Variable</strong>. These two operations account for over 70% of day-to-day code cleanup.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Applying the two most frequent refactorings: Extract Method to break monoliths and Rename Variable to clarify intent.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Decomposition with Extract Method</h2>
+  <p>Whenever you see a code comment explaining what a 10-line block of code does, that is a code smell: <em>the code should explain itself!</em> Extract those 10 lines into a helper function whose name conveys the intent:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Rename Variable Evolution</h2>
+  <pre><code># BEFORE: Monolithic function with explanatory comments
+def process_order(order):
+    # Calculate subtotal with tax
+    sub = 0
+    for item in order.items:
+        sub += item.price * item.quantity
+    t = sub * 0.08
+    total = sub + t
+
+    # Send notification email to customer
+    msg = f"Your total is {total}"
+    smtp.send(order.email, "Receipt", msg)
+
+# AFTER: Extracted helper functions with expressive names
+def process_order(order):
+    total = calculate_order_total(order)
+    send_receipt_email(order.email, total)
+
+def calculate_order_total(order) -> float:
+    subtotal = sum(item.price * item.quantity for item in order.items)
+    tax = subtotal * 0.08
+    return subtotal + tax
+
+def send_receipt_email(email: str, total: float) -> None:
+    message = f"Your total is {total}"
+    smtp.send(email, "Receipt", message)</code></pre><p>The top-level `process_order` function now reads like plain English prose. You can understand its orchestrating responsibility in 3 seconds without wading through math and string formatting.</p><div class="callout"><p><strong>IDE Automation:</strong> Modern IDEs (VS Code, PyCharm) can perform Extract Method and Rename Symbol automatically across entire projects using AST analysis with zero risk of typos.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Fill in the workhorse refactoring terms</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to transform monolithic code into clear functions with Extract Method and Rename Variable.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where extract method and rename variable applies.</li>
+    <li>Author a unit test or verification script exercising extract method and rename variable.</li>
+    <li>Document team architectural conventions regarding extract method and rename variable.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Extract Method and Rename Variable.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Why is 'Extract Method' considered the single most important refactoring in software development?",
+    a: ["It turns large, incomprehensible functions into small, self-documenting pieces with clear single responsibilities","It automatically increases CPU clock speeds","It compiles Python functions into assembly language","It reduces the number of variables in RAM to zero"],
+    c: 0,
+    why: "Extract Method decomposes cognitive load, replacing comments with self-documenting function names."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Monolithic Code Block",
+            "lines": [
+                  "// 1. Math calculation",
+                  "for loop, multiplication, tax",
+                  "// 2. Email formatting",
+                  "string concat, smtp connection"
+            ]
+      },
+      {
+            "title": "Extracted Functions",
+            "lines": [
+                  "calculate_order_total()",
+                  "send_receipt_email()"
+            ]
+      },
+      {
+            "title": "Expressive Orchestration",
+            "lines": [
+                  "process_order() is 2 lines",
+                  "Clear intent, zero cognitive drag"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Extract Method and Rename Variable",
+      "def execute_flow():",
+      "    # Applying the two most frequent refactorings: Extra...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Extract Method and Rename Variable"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Cryptic"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Intention-Revealing"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Use {1} to decompose large blocks into named functions, and {2} to replace cryptic abbreviations with domain concepts."
+],
+    blanks: [
+      {
+            "a": [
+                  "Extract Method"
+            ],
+            "why": "Refactoring that creates helper functions"
+      },
+      {
+            "a": [
+                  "Rename Variable"
+            ],
+            "why": "Refactoring that improves naming clarity"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What code smell is often a direct sign that Extract Method is needed?",
+      a: ["A comment explaining what a block of code does, or a function longer than 20-30 lines doing multiple things","A function that has type annotations","A file with fewer than 50 lines","A test with two assertions"],
+      c: 0,
+      why: "Comments explaining code blocks usually indicate that the block should be an extracted, named function."
+    },
+    {
+      q: "Why is relying on automated IDE refactoring tools safer than manual copy-paste editing?",
+      a: ["IDE refactoring tools use Abstract Syntax Trees (ASTs) to rename and extract safely without typo bugs","IDE tools run in the cloud","Manual editing is disabled in modern editors","IDE tools require no CPU memory"],
+      c: 0,
+      why: "AST-aware refactoring tools update all references and parameters safely without scope errors."
+    },
+    {
+      q: "What makes a variable name 'intention-revealing'?",
+      a: ["It tells the reader why it exists, what it does, and how it is used without needing a comment","It contains at least 30 characters","It begins with an underscore","It is written in all uppercase letters"],
+      c: 0,
+      why: "Intention-revealing names communicate purpose and domain meaning immediately to the reader."
+    },
+    {
+      q: "What happens to the cognitive load of a function when helper methods are extracted?",
+      a: ["Cognitive load drops because the orchestrating function operates at a single, consistent level of abstraction","Cognitive load increases because there are more functions in the file","Cognitive load is unchanged","The function becomes impossible to test"],
+      c: 0,
+      why: "Operating at a single level of abstraction lets readers grasp overall logic without getting bogged down in low-level details."
+    }
+  ]);
+</script>
+</body>
+</html>

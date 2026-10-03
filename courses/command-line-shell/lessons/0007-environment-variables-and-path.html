@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 07 — Environment variables and PATH</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="command-line-shell" data-lesson="7" data-lesson-id="environment-variables-and-path">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 07</span> · Environment & Scripting</span>
+
+  <h1 class="lesson-title">Environment variables and PATH</h1>
+  <p class="lesson-lede">
+    How does the shell know where to find 'python' or 'git'? Master the PATH variable, environment inheritance, and configuration dotfiles.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Configure shell environment variables and modify $PATH resolution</span>
+    <span><b>Mission link</b> Eliminates 'command not found' errors across all developer tooling</span>
+  </div>
+
+  <h2><span class="n">1</span>Environment variable inheritance</h2>
+  <p>When a process spawns a child process, the child inherits a copy of the parent's <b>environment variables</b>. Variables created in a shell session remain private to that shell unless marked for export with <code>export KEY=value</code>.</p><p>The most important variable is <code>PATH</code>: a colon-separated list of directories. When you type <code>python</code>, the shell searches each directory in <code>$PATH</code> from left to right until it finds an executable binary named <code>python</code>.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    The shell finds executables by scanning the colon-separated directory list in $PATH from left to right.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Shell startup configuration files</h2>
+  <p>Learn which configuration files load when interactive login and non-login shells start up.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing PATH modification</h2>
+  <p>Trace how prepending a custom bin folder to PATH overrides a system tool.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Confirm your understanding of environment variables and PATH resolution.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can diagnose and resolve binary path collisions and configure custom toolchains with ease.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Print your current PATH variable using echo $PATH.</li>
+    <li>Locate where git is installed on your computer using which git.</li>
+    <li>Add an export statement to your ~/.zshrc or ~/.bashrc file.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    William Shotts, *The Linux Command Line*, Chapter 11: 'The Environment'.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "If PATH is '/usr/local/bin:/usr/bin', and 'python' exists in both, which one executes?",
+    a: ["The one in /usr/local/bin because it appears first","The one in /usr/bin because it has a shorter path","The shell prompts you to choose which one to run","Both run simultaneously in separate CPU threads"],
+    c: 0,
+    why: "PATH resolution halts at the first matching executable found in order from left to right."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "~/.bashrc or ~/.zshrc",
+            "lines": [
+                  "interactive shells",
+                  "aliases, prompt, functions"
+            ]
+      },
+      {
+            "title": "~/.profile or ~/.zprofile",
+            "lines": [
+                  "login shells",
+                  "PATH exports, environment setup"
+            ]
+      },
+      {
+            "title": "Current Session",
+            "lines": [
+                  "inherited environment",
+                  "exported child variables"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "which node          # /usr/bin/node (v14)",
+      "export PATH=\"$HOME/.nvm/versions/v20/bin:$PATH\"",
+      "which node          # /home/user/.nvm/versions/v20/bin/node (v20)",
+      "node --version      # v20.10.0"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "initial": "/usr/bin/node"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "path_update": "prepended custom version to front"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "resolution": "first match is now v20 binary"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "result": "active Node.js version is 20"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The command to make a variable available to child processes is <0>.",
+      "The command to show the filesystem location of an executable binary is <1>.",
+      "The delimiter separating directory paths inside $PATH is the <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "export"
+            ],
+            "why": "export marks variables for inheritance by child processes."
+      },
+      {
+            "a": [
+                  "which",
+                  "command -v"
+            ],
+            "why": "which searches PATH and displays the binary location."
+      },
+      {
+            "a": [
+                  ":",
+                  "colon"
+            ],
+            "why": "UNIX PATH entries are separated by colons."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What causes a 'command not found' shell error?",
+      a: ["The requested executable is not located in any directory listed in $PATH","The hard drive has been formatted to a read-only filesystem","The computer CPU does not support 64-bit operations","The operating system has exceeded its maximum process count"],
+      c: 0,
+      why: "If no directory in PATH contains an executable matching the name, the shell fails."
+    },
+    {
+      q: "Why should you prepend ($NEW:$PATH) rather than append ($PATH:$NEW) when overriding tools?",
+      a: ["Prepending ensures your custom tool is discovered first before system defaults","Appending causes an unrecoverable kernel panic error","Prepending takes less memory in the shell environment","Appending converts paths to relative coordinates"],
+      c: 0,
+      why: "Left-to-right scanning means the earliest directory in PATH takes precedence."
+    },
+    {
+      q: "What is the difference between FOO=bar and export FOO=bar?",
+      a: ["FOO=bar is only visible in current shell; export FOO=bar is inherited by child processes","export FOO=bar encrypts the variable value with TLS","FOO=bar writes the variable permanently into hardware BIOS","There is no difference between exported and non-exported variables"],
+      c: 0,
+      why: "export places the variable in the environment inherited by spawned subprocesses."
+    },
+    {
+      q: "Which file is the standard configuration file for an interactive Zsh shell?",
+      a: ["~/.zshrc","~/.bash_profile","/etc/shadow","/bin/zsh"],
+      c: 0,
+      why: "~/.zshrc is the user startup script loaded for every interactive Zsh session."
+    }
+  ]);
+</script>
+</body>
+</html>

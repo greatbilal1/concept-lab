@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 08 — The memory hierarchy</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="how-computers-work" data-lesson="8" data-lesson-id="the-memory-hierarchy">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 08</span> · The machine</span>
+
+  <h1 class="lesson-title">The memory hierarchy</h1>
+  <p class="lesson-lede">
+    Fast memory is tiny and expensive. Big memory is slow and cheap. The machine
+    solves this by stacking them — and the resulting hierarchy explains more about
+    real-world performance than any other single idea.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~12 min</span>
+    <span><b>Win</b> Compare latencies by orders of magnitude</span>
+    <span><b>Mission link</b> Why fast code is often about memory</span>
+  </div>
+
+  <h2><span class="n">1</span>The trade-off nobody escapes</h2>
+
+  <p>
+    A register can be read in under a nanosecond. A hard disk takes milliseconds.
+    That is a factor of roughly a million. You cannot build a machine where everything
+    is register-fast, because register-fast memory is physically enormous and
+    expensive.
+  </p>
+
+  <p>
+    So the machine does not choose. It uses <b>all</b> of them, arranged in layers,
+    and moves data between layers as needed.
+  </p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    The hierarchy is a bet: <b>small, fast, expensive</b> at the top;
+    <b>large, slow, cheap</b> at the bottom. Each layer caches the one below it.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The layers</h2>
+
+  <div id="diagram1"></div>
+
+  <p>
+    Each layer is bigger and slower than the one above. The CPU tries the top first,
+    and only descends when it misses. Because programs tend to reuse the same data
+    over and over, the top layers hit most of the time.
+  </p>
+
+  <div id="intro1"></div>
+
+  <h2><span class="n">3</span>Latency, in human terms</h2>
+
+  <p>
+    Numbers in nanoseconds are hard to feel. So scale everything up by a factor of a
+    billion — one nanosecond becomes one second:
+  </p>
+
+  <pre><code>register   1 ns   →  1 second
+L1 cache   1 ns   →  1 second
+RAM       100 ns  →  1.5 minutes
+SSD       100 µs  →  1.2 days
+disk       10 ms  →  4 months</code></pre>
+
+  <p>
+    Now the hierarchy is visceral. If a register access is reaching for a book on your
+    desk, a disk access is a four-month expedition. This is why caches exist, and why
+    a cache miss can cost more than a thousand arithmetic operations.
+  </p>
+
+  <div id="trace1"></div>
+
+  <div class="note good">
+    <span class="note-label">Locality</span>
+    Caches work because programs are predictable. <b>Temporal locality</b>: you reuse
+    the same variable soon. <b>Spatial locality</b>: you use the next element of an
+    array. Both mean the cache usually already has what you need.
+  </div>
+
+  <h2><span class="n">4</span>Compare the layers</h2>
+
+  <p>
+    Here is the win. Rank these four operations from fastest to slowest, and note how
+    many orders of magnitude separate them:
+  </p>
+
+  <pre><code>A. read a value from a register
+B. read a value from RAM
+C. read a value from an SSD
+D. read a value from a spinning disk</code></pre>
+
+  <p>
+    Answer: <code>A</code>, then <code>B</code>, then <code>C</code>, then
+    <code>D</code>. Register to RAM is about 100×. RAM to SSD is about 1,000×. SSD to
+    disk is about 100×. Stacked up, the top and bottom are roughly a million apart.
+  </p>
+
+  <div id="fill1"></div>
+
+  <h2><span class="n">5</span>Check yourself</h2>
+
+  <p>
+    Answer from memory — do not scroll back up. Each option has the same number of
+    words, so nothing gives the answer away.
+  </p>
+
+  <div id="quiz"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>
+      You can now name the layers of memory, put them in order, and explain why the
+      hierarchy exists. More importantly, you can now predict why some code is slow
+      before you run it — because you know that touching memory is often the expensive
+      part, not doing arithmetic.
+    </p>
+  </div>
+
+  <h2><span class="n">6</span>Do this next</h2>
+
+  <ol>
+    <li>
+      Write down the five layers from fastest to slowest, with a rough latency for
+      each. Do it from memory, then check.
+    </li>
+    <li>
+      Explain why a cache miss is expensive. What has to happen that does not happen
+      on a cache hit?
+    </li>
+    <li>
+      Think of a loop you have written that walks an array. Which kind of locality
+      does it exploit, and why does that make it fast?
+    </li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Read <a href="https://csapp.cs.cmu.edu/">_CS:APP_ Chapter 6 ("The Memory
+    Hierarchy")</a> — the definitive treatment, with real cache geometry. Then read
+    Ulrich Drepper's
+    <a href="https://people.freebsd.org/~lstewart/articles/cpumemory.pdf">"What Every
+    Programmer Should Know About Memory"</a> for the deep version.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher (me) anything — "what is a cache
+    line?", "how big is L1?", "what is virtual memory?". There are no bad questions
+    here.
+  </div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  /* the layers */
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      { title: "Registers", lines: ["bytes, ~1 ns", "inside the CPU"] },
+      { title: "Cache", lines: ["MBs, ~1–10 ns", "L1, L2, L3"] },
+      { title: "RAM", lines: ["GBs, ~100 ns", "main memory"] },
+      { title: "Disk / SSD", lines: ["TBs, µs–ms", "persistent storage"] }
+    ]
+  });
+
+  /* why the hierarchy works */
+  TeachWidgets.introCards("#intro1", {
+    cards: [
+      { ico: "⏱️", title: "Temporal locality", body: "You reuse the same value again soon after." },
+      { ico: "📐", title: "Spatial locality", body: "You use neighbours, like the next array element." },
+      { ico: "🎯", title: "High hit rate", body: "Locality means the fast layers usually have it." }
+    ]
+  });
+
+  /* predict-then-reveal */
+  TeachWidgets.predict("#predict1", {
+    q: "Which memory is fastest to read from?",
+    a: ["RAM", "Cache", "Disk"],
+    c: 1,
+    why: "Cache sits closest to the CPU and is far faster than RAM — which is exactly why it exists."
+  });
+
+  /* step-through trace of a cache lookup */
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "look in L1 cache",
+      "miss → look in L2",
+      "miss → look in RAM",
+      "found → copy up the chain"
+    ],
+    steps: [
+      { line: 0, vars: { L1: "miss", cost: "~1 ns" } },
+      { line: 1, vars: { L2: "miss", cost: "~10 ns" } },
+      { line: 2, vars: { RAM: "hit", cost: "~100 ns" } },
+      { line: 3, vars: { result: "value", total: "~111 ns" } }
+    ]
+  });
+
+  /* recall from memory: the hierarchy */
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the blanks",
+    lines: [
+      "The fastest memory is the <0> inside the CPU.",
+      "The largest, slowest layer is <1>.",
+      "Caches work because programs show <2>."
+    ],
+    blanks: [
+      { a: ["registers", "register"], why: "Registers are the top of the hierarchy — a handful of bytes, sub-nanosecond." },
+      { a: ["disk", "the disk", "ssd"], why: "Persistent storage is the biggest and slowest layer." },
+      { a: ["locality"], why: "Temporal and spatial locality are why caches hit so often." }
+    ]
+  });
+
+  /* the quiz — every option is exactly three words */
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why does a hierarchy exist?",
+      a: ["Fast memory is small", "Slow memory is broken", "Registers hold whole programs", "Caches are always empty"],
+      c: 0,
+      why: "Fast memory is tiny and costly, so layers trade size against speed."
+    },
+    {
+      q: "What is a cache miss?",
+      a: ["The data was absent", "The clock ticked late", "The register overflowed badly", "The disk was full"],
+      c: 0,
+      why: "A miss means the layer did not hold the data, so the CPU descends."
+    },
+    {
+      q: "What is spatial locality?",
+      a: ["Reusing the same value", "Using nearby memory addresses", "Storing data on disk", "Reading memory in order"],
+      c: 1,
+      why: "Spatial locality means you touch addresses near ones you just used."
+    },
+    {
+      q: "Which layer is largest?",
+      a: ["Registers", "Cache", "RAM", "Disk"],
+      c: 3,
+      why: "Disk storage is orders of magnitude larger than RAM, cache or registers."
+    }
+  ]);
+</script>
+</body>
+</html>

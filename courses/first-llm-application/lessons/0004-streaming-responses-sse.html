@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 04 — Streaming Responses for Fast User Experience (SSE)</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="first-llm-application" data-lesson="4" data-lesson-id="streaming-responses-sse">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 04</span> · Streaming</span>
+
+  <h1 class="lesson-title">Streaming Responses for Fast User Experience (SSE)</h1>
+  <p class="lesson-lede">
+    Real-time token streaming: Server-Sent Events (SSE), async generators, and slashing perceived user latency.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to implement real-time token streaming to deliver responsive user experiences.</span>
+    <span><b>Mission link</b> Mastering streaming responses for fast user experience (sse) across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Streaming Responses for Fast User Experience (SSE)</h2>
+  <p>If an LLM takes 5 seconds to generate a 200-word response, waiting 5 seconds for the entire block to arrive feels sluggish and frustrating. Users wonder if the server crashed.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Real-time token streaming: Server-Sent Events (SSE), async generators, and slashing perceived user latency.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Streaming vs Buffered Delivery</h2>
+  <p>When you enable <strong>Streaming</strong>, the model emits tokens one by one as they are sampled. The user begins reading within 400 milliseconds! This is enabled by <strong>Server-Sent Events (SSE)</strong>:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>HTTP Server-Sent Events (SSE) Pipeline</h2>
+  <pre><code># Streaming Tokens with the OpenAI Python SDK:
+response_stream = client.chat.completions.create(
+    model="gpt-4o-mini",
+    messages=[{"role": "user", "content": "Write a guide on Docker containers."}],
+    stream=True  # Enables real-time streaming!
+)
+
+for chunk in response_stream:
+    content = chunk.choices[0].delta.content
+    if content:
+        print(content, end="", flush=True) # Emits each word as it arrives!</code></pre><p>In web backends (FastAPI, Express), you yield tokens over an HTTP `text/event-stream` connection. The frontend reads the stream using `EventSource` or `fetch` with a `ReadableStream`, updating the DOM smoothly.</p><div class="callout"><p><strong>UX Psychology:</strong> Reading speed is roughly 5 words per second. When an LLM streams at 30-50 tokens per second, it outputs text faster than a human can read, creating the perception of instantaneous intelligence.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the streaming sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to implement real-time token streaming to deliver responsive user experiences.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where streaming responses for fast user experience (sse) applies.</li>
+    <li>Author a unit test or verification script exercising streaming responses for fast user experience (sse).</li>
+    <li>Document team architectural conventions regarding streaming responses for fast user experience (sse).</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Streaming Responses for Fast User Experience (SSE).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Why is streaming responses via Server-Sent Events (SSE) standard practice in production LLM applications?",
+    a: ["It displays words on the user's screen in real time as they are generated, reducing perceived latency from seconds to milliseconds","It makes the model run on paper","It cuts GPU electricity usage by 100%","It eliminates the need for internet"],
+    c: 0,
+    why: "Streaming delivers immediate visual feedback as tokens are emitted, transforming perceived responsiveness."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Buffered Full Response (Slow UX)",
+            "lines": [
+                  "User stares at spinner for 5.2 seconds",
+                  "Full paragraph appears all at once",
+                  "High perceived friction"
+            ]
+      },
+      {
+            "title": "Streaming via SSE (Snappy UX)",
+            "lines": [
+                  "First word appears in 400ms (TTFT)",
+                  "Text streams smoothly on screen",
+                  "User reads while remaining text generates"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Streaming Responses for Fast User Experience (SSE)",
+      "def execute_flow():",
+      "    # Real-time token streaming: Server-Sent Events (SSE...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Streaming Responses for Fast User Experience (SSE)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Client Browser"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Server Event Stream"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "step": "Model Generator"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Streaming uses HTTP {1} to deliver tokens to the frontend in real time, slashing {2} latency for users."
+],
+    blanks: [
+      {
+            "a": [
+                  "Server-Sent Events"
+            ],
+            "why": "text/event-stream SSE protocol"
+      },
+      {
+            "a": [
+                  "perceived"
+            ],
+            "why": "How fast the response feels to human eyes"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What parameter must be passed to client.chat.completions.create to enable streaming?",
+      a: ["stream=True","fast_mode=True","streaming=1","realtime=True"],
+      c: 0,
+      why: "Setting stream=True returns an iterable chunk stream rather than a single completed response object."
+    },
+    {
+      q: "What HTTP Content-Type header is used to stream Server-Sent Events to web browsers?",
+      a: ["text/event-stream","application/json","text/html","image/png"],
+      c: 0,
+      why: "The text/event-stream MIME type instructs browsers to keep the connection open for continuous events."
+    },
+    {
+      q: "Where in the streaming chunk object is the incremental text content located in the OpenAI SDK?",
+      a: ["chunk.choices(0).delta.content","chunk.full_text","chunk.data","chunk.output"],
+      c: 0,
+      why: "Incremental tokens are provided under choices[0].delta.content."
+    },
+    {
+      q: "When should streaming NOT be used?",
+      a: ["When executing background batch tasks, automated database extractions, or tasks that require validating full JSON before processing","When building chatbots","When using web browsers","When running on laptops"],
+      c: 0,
+      why: "Background tasks and JSON extraction require the full payload completed and validated before acting."
+    }
+  ]);
+</script>
+</body>
+</html>

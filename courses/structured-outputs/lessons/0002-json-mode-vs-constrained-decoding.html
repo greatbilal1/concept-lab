@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 02 — JSON Mode vs Constrained Decoding (Grammar Sampling)</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="structured-outputs" data-lesson="2" data-lesson-id="json-mode-vs-constrained-decoding">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 02</span> · Constrained Decoding</span>
+
+  <h1 class="lesson-title">JSON Mode vs Constrained Decoding (Grammar Sampling)</h1>
+  <p class="lesson-lede">
+    The evolution of structured generation: Prompting hints -> JSON Mode -> Grammar-Constrained Decoding (100% schema guarantee).
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You understand the mechanics and guarantees of grammar-based constrained decoding.</span>
+    <span><b>Mission link</b> Mastering json mode vs constrained decoding (grammar sampling) across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of JSON Mode vs Constrained Decoding (Grammar Sampling)</h2>
+  <p>Historically, getting an LLM to return JSON was a battle of prompt hacks: <em>'Return JSON. Do not write text. Please!'</em>. The evolution of structured output enforcement progressed across three distinct eras:</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    The evolution of structured generation: Prompting hints -> JSON Mode -> Grammar-Constrained Decoding (100% schema guarantee).
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Structured Output Evolution</h2>
+  <ul><li><strong>Era 1: Prompted JSON (Unreliable):</strong> Telling the model in text to output JSON. The model would still occasionally emit markdown fences or conversational preambles (85-90% reliability).</li><li><strong>Era 2: JSON Mode (Semi-Constrained):</strong> Provider flags (e.g. `response_format={"type": "json_object"}`). Forces the model to emit syntactically valid JSON, but <em>does not guarantee field names or types</em>. The model could emit `{}` or `{"random_key": 123}`!</li><li><strong>Era 3: Constrained Decoding / Structured Outputs (Guaranteed):</strong> Modern engines (OpenAI Structured Outputs, Outlines, Guidance, llama.cpp GBNF grammars). The model is constrained at the <strong>logit sampling level</strong>: any token that would violate the JSON Schema is masked to $-\infty$! <strong>100% mathematical schema compliance!</strong></li></ul>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>How Grammar Masking Works</h2>
+  <pre><code># OpenAI Structured Outputs with Pydantic:
+from pydantic import BaseModel
+
+class UserProfile(BaseModel):
+    name: str
+    age: int
+    roles: list[str]
+
+# Enforces 100% schema guarantee via constrained decoding:
+completion = client.beta.chat.completions.parse(
+    model="gpt-4o",
+    messages=[{"role": "user", "content": "Extract user profile: Bob is 32, admin and editor"}],
+    response_format=UserProfile # Guaranteed exact Pydantic instance!
+)
+user: UserProfile = completion.choices[0].message.parsed
+print(user.name)  # "Bob" (Strictly typed, 0% parse failure risk!)</code></pre><div class="callout"><p><strong>The Mathematical Guarantee:</strong> With constrained decoding, it is impossible for the model to emit invalid JSON, miss required fields, or invent unapproved keys. The grammar engine will not permit it to sample an illegal token!</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the constrained decoding sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You understand the mechanics and guarantees of grammar-based constrained decoding.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where json mode vs constrained decoding (grammar sampling) applies.</li>
+    <li>Author a unit test or verification script exercising json mode vs constrained decoding (grammar sampling).</li>
+    <li>Document team architectural conventions regarding json mode vs constrained decoding (grammar sampling).</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for JSON Mode vs Constrained Decoding (Grammar Sampling).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is 'Constrained Decoding' (or Grammar-Guided Sampling) in modern LLM serving?",
+    a: ["The inference engine masks out all vocabulary tokens that would violate the JSON schema grammar, mathematically guaranteeing 100% valid JSON","A prompt that asks nicely for JSON","A Python linter that runs after generation","A database constraint"],
+    c: 0,
+    why: "Constrained decoding modifies logit sampling dynamically to enforce Context-Free Grammar rules at every step."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Era 1: Prompted JSON",
+            "lines": [
+                  "'Please return JSON'",
+                  "85% reliability, frequent markdown fences & crashes"
+            ]
+      },
+      {
+            "title": "Era 2: JSON Mode",
+            "lines": [
+                  "Syntactically valid JSON guaranteed",
+                  "Field names & types still unconstrained"
+            ]
+      },
+      {
+            "title": "Era 3: Constrained Decoding",
+            "lines": [
+                  "Logit masking via Context-Free Grammars",
+                  "100% schema & type guarantee!"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing JSON Mode vs Constrained Decoding (Grammar Sampling)",
+      "def execute_flow():",
+      "    # The evolution of structured generation: Prompting ...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "JSON Mode vs Constrained Decoding (Grammar Sampling)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Token Position: Expecting Key"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Token Position: Expecting Integer"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Constrained decoding uses grammar masking at the {1} level to mathematically guarantee 100% compliance with defined JSON {2}."
+],
+    blanks: [
+      {
+            "a": [
+                  "logit"
+            ],
+            "why": "Raw probability score level"
+      },
+      {
+            "a": [
+                  "schemas"
+            ],
+            "why": "Structural data definitions"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the key limitation of basic 'JSON Mode' compared to true 'Structured Outputs'?",
+      a: ["JSON Mode guarantees valid JSON syntax, but does not guarantee that specific keys, required fields, or types match your schema","JSON Mode only works on numbers","JSON Mode is illegal in Python","JSON Mode runs 10x slower"],
+      c: 0,
+      why: "JSON Mode guarantees syntactic JSON, but allows arbitrary, unpredictable keys and missing fields."
+    },
+    {
+      q: "How does grammar-based constrained decoding (like Outlines or GBNF) enforce schema validity?",
+      a: ["It converts the JSON Schema into a finite state machine, dynamically masking invalid tokens to -infinity before sampling","It asks the user to check each token","It reboots the GPU on syntax errors","It deletes invalid words"],
+      c: 0,
+      why: "State machine grammars eliminate illegal tokens from the sampling distribution in real time."
+    },
+    {
+      q: "What method on OpenAI's beta client parses structured responses directly into Pydantic models?",
+      a: ["client.beta.chat.completions.parse()","client.chat.completions.create()","client.json()","client.pydantic()"],
+      c: 0,
+      why: "The beta .parse() method compiles Pydantic schemas into constrained decoding grammar contracts."
+    },
+    {
+      q: "Does constrained decoding reduce the model's creative intelligence?",
+      a: ["No; it guides formatting at the surface without impairing the model's underlying reasoning and comprehension capabilities","Yes; it reduces intelligence by 90%","It turns off the model weights","It forces models to output Spanish"],
+      c: 0,
+      why: "Grammar constraints guide output syntax while allowing unconstrained internal semantic reasoning."
+    }
+  ]);
+</script>
+</body>
+</html>

@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 01 — The Sequential Bottleneck of RNNs and LSTMs</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="transformers-attention" data-lesson="1" data-lesson-id="sequential-bottleneck-rnns">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 01</span> · Sequential Limits</span>
+
+  <h1 class="lesson-title">The Sequential Bottleneck of RNNs and LSTMs</h1>
+  <p class="lesson-lede">
+    Why Recurrent Neural Networks (RNNs) failed to scale: sequential unrolling, memory bottlenecks, and training latency.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You understand why sequential recurrent networks stalled and necessitated the attention revolution.</span>
+    <span><b>Mission link</b> Mastering the sequential bottleneck of rnns and lstms across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of The Sequential Bottleneck of RNNs and LSTMs</h2>
+  <p>Before 2017, natural language processing was dominated by <strong>Recurrent Neural Networks (RNNs)</strong> and <strong>LSTMs (Long Short-Term Memory)</strong>. An RNN processed text word-by-word, like a human reading a ticker tape: word 1 updates hidden state $h_1$; word 2 updates state $h_2$; word 3 updates state $h_3$.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Why Recurrent Neural Networks (RNNs) failed to scale: sequential unrolling, memory bottlenecks, and training latency.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Sequential Processing Bottleneck</h2>
+  <p>While biologically intuitive, RNNs suffered from two catastrophic bottlenecks that stalled AI progress:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Parallel GPU Starvation</h2>
+  <ul><li><strong>1. The Sequential Computation Bottleneck:</strong> Because $h_t = f(h_{t-1}, x_t)$, you <em>cannot compute step 500 until step 499 has finished!</em> GPUs have thousands of cores that want to compute everything in parallel; RNNs forced GPUs to sit idle waiting for sequential steps!</li><li><strong>2. The Fixed-Vector Information Bottleneck:</strong> The entire meaning of a 500-word paragraph had to be squashed into a single fixed-size hidden vector ($h_t$). By word 100, the network forgot words from the beginning (catastrophic forgetting).</li></ul><pre><code># The Sequential RNN Bottleneck (Cannot Parallelize!):
+# Time 1: Process "The"       -> h1
+# Time 2: Process "cat"       -> h2 (must wait for h1!)
+# Time 3: Process "sat"       -> h3 (must wait for h2!)
+# ...
+# Time 500: Process "mat"     -> h500 (GPU cores sit idle for 500 sequential ticks!)</code></pre><p>To scale models to billions of parameters across thousands of GPUs, computer science needed an architecture that could process <strong>all tokens in a sequence simultaneously in parallel</strong>.</p><div class="callout"><p><strong>The Breaking Point:</strong> LSTMs were a heroic patch on recurrent networks, but they could not overcome the fundamental physics of sequential computation on parallel hardware.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the sequential bottleneck sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You understand why sequential recurrent networks stalled and necessitated the attention revolution.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where the sequential bottleneck of rnns and lstms applies.</li>
+    <li>Author a unit test or verification script exercising the sequential bottleneck of rnns and lstms.</li>
+    <li>Document team architectural conventions regarding the sequential bottleneck of rnns and lstms.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for The Sequential Bottleneck of RNNs and LSTMs.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What was the fundamental architectural bottleneck that prevented RNNs and LSTMs from scaling to modern LLM sizes?",
+    a: ["Sequential processing: step T cannot be computed until step T-1 finishes, preventing parallel training across GPUs","RNNs could not process English words","LSTMs were prohibited by mathematical patents","Recurrent networks require analog computers"],
+    c: 0,
+    why: "Sequential token dependency prevents parallel GPU processing, causing massive training bottlenecks."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "RNN Sequential Pass (Slow)",
+            "lines": [
+                  "Token 1 -> Token 2 -> Token 3 -> Token 4",
+                  "Strict serial chain, GPU cores starved"
+            ]
+      },
+      {
+            "title": "Information Bottleneck",
+            "lines": [
+                  "Entire paragraph squashed into h_T vector",
+                  "Early context is lost and forgotten"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing The Sequential Bottleneck of RNNs and LSTMs",
+      "def execute_flow():",
+      "    # Why Recurrent Neural Networks (RNNs) failed to sca...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "The Sequential Bottleneck of RNNs and LSTMs"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "GPU Capability"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "RNN Constraint"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "RNNs could not scale because their sequential token dependency prevented {1} training on modern {2} hardware."
+],
+    blanks: [
+      {
+            "a": [
+                  "parallel"
+            ],
+            "why": "Simultaneous concurrent execution"
+      },
+      {
+            "a": [
+                  "GPU"
+            ],
+            "why": "Graphics Processing Unit tensor cores"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why was the sequential time-step dependency of RNNs problematic for GPU training?",
+      a: ["GPUs thrive on massive parallel matrix multiplications; sequential time dependencies force GPU cores to wait serially step-by-step","GPUs cannot run while loops","GPUs only process pixels, not text","Sequential dependencies cause memory corruption"],
+      c: 0,
+      why: "Serial time steps prevent parallel utilization of thousands of GPU processing cores."
+    },
+    {
+      q: "What is the 'information bottleneck' in standard sequence-to-sequence LSTMs?",
+      a: ["Compressing an entire long input text sequence into a single fixed-size hidden vector at the final time step","A slow internet cable between servers","A bottleneck in the power supply","A limit on dictionary size"],
+      c: 0,
+      why: "Forcing all information through a single vector causes severe context degradation on long texts."
+    },
+    {
+      q: "How did LSTMs attempt to combat vanishing gradients compared to vanilla RNNs?",
+      a: ["By introducing an internal cell state with additive forget, input, and output gates","By removing all activation functions","By training on only three words at a time","By using quantum computing"],
+      c: 0,
+      why: "The internal cell state provided an additive linear path for gradients across time steps."
+    },
+    {
+      q: "What revolutionary idea replaced sequential recurrent loops in 2017?",
+      a: ["Self-Attention: allowing every token to look at every other token directly in parallel","Using faster CPU clock speeds","Hand-coding grammatical syntax trees","Writing software in C"],
+      c: 0,
+      why: "Self-attention eliminated recurrence entirely, enabling full sequence parallelization."
+    }
+  ]);
+</script>
+</body>
+</html>

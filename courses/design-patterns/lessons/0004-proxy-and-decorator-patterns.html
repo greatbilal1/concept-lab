@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 04 — Proxy and Decorator patterns</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="design-patterns" data-lesson="4" data-lesson-id="proxy-and-decorator-patterns">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 04</span> · Structural Patterns</span>
+
+  <h1 class="lesson-title">Proxy and Decorator patterns</h1>
+  <p class="lesson-lede">
+    Control access or add behavior? Compare the Proxy pattern (controlling access, lazy loading, caching) with the Decorator pattern (adding dynamic responsibilities).
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Select between Proxy and Decorator patterns to control access or extend object behaviors</span>
+    <span><b>Mission link</b> Provides non-invasive interception of object operations</span>
+  </div>
+
+  <h2><span class="n">1</span>Same structure, different intent</h2>
+  <p>The <b>Proxy</b> and <b>Decorator</b> patterns have identical structural diagrams: both wrap an underlying target object and implement the exact same interface. What separates them is their <b>intent</b>.</p><p>A <b>Decorator</b> adds <i>new responsibilities or behaviors</i> to an object dynamically (e.g. adding compression and encryption to a data stream). A <b>Proxy</b> <i>controls access</i> to the underlying object (e.g. lazy-loading a heavy 50MB image on first access, caching results, or verifying user permissions before delegating).</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Decorator adds new behavior; Proxy controls access to the underlying object.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Proxy archetypes</h2>
+  <p>Understand the four classic real-world applications of the Proxy pattern.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing Virtual Proxy lazy loading</h2>
+  <p>Trace how a Virtual Proxy delays loading an expensive high-resolution image until render time.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of Proxy and Decorator patterns.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can implement Virtual, Protection, and Caching Proxies to guard access to sensitive or expensive resources.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Implement a CachingProxy that caches API responses in memory using the same interface.</li>
+    <li>Implement a VirtualProxy that defers opening a database connection until the first query executes.</li>
+    <li>Distinguish between JavaScript's native Proxy object and the GoF design pattern.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Erich Gamma et al., *Design Patterns*, 'Proxy' & 'Decorator'.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "An object intercepts calls to a database and checks if the user has admin rights before forwarding the call. Is this a Proxy or a Decorator?",
+    a: ["A Protection Proxy (its primary intent is controlling access to the underlying object)","A Decorator","A Factory","An Adapter"],
+    c: 0,
+    why: "Controlling access and enforcing authorization without changing the interface is the hallmark of a Protection Proxy."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Virtual Proxy",
+            "lines": [
+                  "lazy initialization",
+                  "loads heavy 50MB file only on first call"
+            ]
+      },
+      {
+            "title": "Protection Proxy",
+            "lines": [
+                  "access control & auth",
+                  "verifies permissions before forwarding"
+            ]
+      },
+      {
+            "title": "Caching Proxy",
+            "lines": [
+                  "transparent memoization",
+                  "returns cached results for identical inputs"
+            ]
+      },
+      {
+            "title": "Remote Proxy",
+            "lines": [
+                  "RPC network client",
+                  "makes remote network call look like local object"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "class LazyImageProxy(ImageInterface):",
+      "    def __init__(self, filename): self.filename = filename; self._real_image = None",
+      "    def display(self):",
+      "        if not self._real_image: # lazy load on first access!",
+      "            self._real_image = HighResImage(self.filename)",
+      "        self._real_image.display()"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "instantiation": "proxy created in 0.001ms; 50MB image NOT loaded yet"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "on_demand": "display() called -> loads heavy image from disk only now"
+            }
+      },
+      {
+            "line": 5,
+            "vars": {
+                  "delegation": "forwards render call to real image instance"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The pattern whose intent is controlling access to an object is the <0> pattern.",
+      "The pattern whose intent is adding dynamic behavior to an object is the <1> pattern.",
+      "A proxy that defers expensive loading until first use is a <2> proxy."
+],
+    blanks: [
+      {
+            "a": [
+                  "Proxy"
+            ],
+            "why": "Proxies manage and guard access."
+      },
+      {
+            "a": [
+                  "Decorator"
+            ],
+            "why": "Decorators augment object behavior."
+      },
+      {
+            "a": [
+                  "Virtual",
+                  "virtual"
+            ],
+            "why": "Virtual proxies implement lazy loading."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What separates a Proxy from a Decorator if their class diagrams look identical?",
+      a: ["Their architectural intent: Decorators add new responsibilities to an object; Proxies control and manage access to the object","Proxies are written in C; Decorators are written in Python","Proxies run in the cloud; Decorators run on mobile devices","There is no difference between them"],
+      c: 0,
+      why: "Intent defines the pattern: Decorators augment features; Proxies control access and lifecycle."
+    },
+    {
+      q: "What is a 'Virtual Proxy'?",
+      a: ["A placeholder object that delays the creation and loading of an expensive resource until it is actually accessed for the first time","A virtual reality headset","A proxy that deletes files","An anonymous internet VPN"],
+      c: 0,
+      why: "Virtual proxies optimize performance by deferring expensive object construction until first use."
+    },
+    {
+      q: "How does JavaScript's built-in 'new Proxy(target, handler)' relate to the GoF Proxy pattern?",
+      a: ["It is a meta-programming mechanism that intercepts fundamental operations (get, set, apply) on objects, easily implementing the GoF Proxy pattern","It is completely unrelated in every way","It is a tool that deletes browser cookies","It is deprecated in modern ECMAScript"],
+      c: 0,
+      why: "JS Proxy traps provide native runtime hooks to implement logging, validation, and access proxies."
+    },
+    {
+      q: "Can a client tell whether it is interacting with a Proxy or the Real Subject if properly designed?",
+      a: ["No, both implement the exact same interface; the client cannot tell the difference (transparency)","Yes, the proxy always adds 'Proxy_' to every method name","Yes, proxies run in slow motion","Clients must always be rewritten to support proxies"],
+      c: 0,
+      why: "Interface polymorphism ensures that clients treat the proxy identically to the real object."
+    }
+  ]);
+</script>
+</body>
+</html>

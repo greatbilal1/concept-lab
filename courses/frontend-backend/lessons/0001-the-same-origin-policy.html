@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 01 — The Same-Origin Policy</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="frontend-backend" data-lesson="1" data-lesson-id="the-same-origin-policy">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 01</span> · The Network Boundary & CORS</span>
+
+  <h1 class="lesson-title">The Same-Origin Policy</h1>
+  <p class="lesson-lede">
+    Why does the browser block JavaScript from reading data from another domain? Discover the Same-Origin Policy (SOP), the foundational security barrier of the web.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Determine whether two URLs share the same origin and explain SOP protections</span>
+    <span><b>Mission link</b> The cornerstone security boundary separating different web applications</span>
+  </div>
+
+  <h2><span class="n">1</span>The origin definition</h2>
+  <p>A web browser is a shared environment where you might have your bank open in one tab and an untrusted entertainment site in another. What stops a malicious script on <code>evil.com</code> from reading your bank account balance?</p><p>The answer is the <b>Same-Origin Policy (SOP)</b>. The browser defines an <b>Origin</b> as the exact tuple of <b>Scheme + Host + Port</b> (e.g. <code>https://bank.com:443</code>). By default, scripts running on one origin cannot inspect or read data returned from a different origin.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    An origin is defined by scheme, host, and port; the browser blocks cross-origin reading by default.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Comparing origin comparisons</h2>
+  <p>Evaluate which URL pairs share an origin and which trigger cross-origin boundaries.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing the SOP boundary block</h2>
+  <p>Trace how the browser blocks JavaScript from inspecting cross-origin fetch responses.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of Same-Origin rules.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can accurately identify origin boundaries and understand why the browser restricts cross-domain data reading.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Check window.location.origin in your browser console on different websites.</li>
+    <li>Compare whether two subdomains (e.g. docs.github.com vs github.com) share an origin.</li>
+    <li>Explain why embedding an image via <img> is allowed while reading it via fetch() is restricted.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    W3C: *The Web Origin Concept* (RFC 6454).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Do 'http://example.com' and 'https://example.com' share the same origin?",
+    a: ["No, because their schemes (http vs https) and default ports (80 vs 443) are different","Yes, because their host names are identical","Yes, if they are hosted on the same server","Only on mobile devices"],
+    c: 0,
+    why: "Scheme, host, and port must all match exactly for two URLs to share the same origin."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Target: https://api.com:443",
+            "lines": [
+                  "Base reference origin",
+                  "scheme=https, host=api.com, port=443"
+            ]
+      },
+      {
+            "title": "Same Origin (Allowed)",
+            "lines": [
+                  "https://api.com/v1/users",
+                  "https://api.com:443/docs (same tuple)"
+            ]
+      },
+      {
+            "title": "Cross Origin (Blocked)",
+            "lines": [
+                  "http://api.com (different scheme)",
+                  "https://sub.api.com (different host)",
+                  "https://api.com:8080 (different port)"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Running on origin https://myapp.com",
+      "fetch('https://otherdomain.com/data.json')",
+      "# Request is sent over network by browser",
+      "# Response arrives from server",
+      "# Browser checks SOP: Origins do NOT match and no CORS headers exist!",
+      "# Browser blocks JavaScript: TypeError: Failed to fetch (CORS block)"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "origin": "https://myapp.com"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "target": "https://otherdomain.com"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "check": "SOP rejects access to response payload"
+            }
+      },
+      {
+            "line": 5,
+            "vars": {
+                  "exception": "JavaScript promise rejected for security"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The three parts defining an origin are scheme, host, and <0>.",
+      "The browser security rule restricting cross-domain access is the Same-<1> Policy.",
+      "Different subdomains (e.g. app.com vs api.com) are considered <2>-origin."
+],
+    blanks: [
+      {
+            "a": [
+                  "port"
+            ],
+            "why": "Scheme, host, and port define the origin tuple."
+      },
+      {
+            "a": [
+                  "Origin"
+            ],
+            "why": "Same-Origin Policy (SOP) is the core security boundary."
+      },
+      {
+            "a": [
+                  "cross"
+            ],
+            "why": "Different host labels constitute different origins."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What three components define a web origin?",
+      a: ["Protocol (scheme), Hostname, and Port number","Path, Query string, and Hash fragment","IP address, MAC address, and Subnet mask","Username, Password, and Database name"],
+      c: 0,
+      why: "An origin is strictly defined by the tuple of scheme, host, and port."
+    },
+    {
+      q: "Why does the Same-Origin Policy exist in modern web browsers?",
+      a: ["To prevent malicious websites from stealing sensitive authenticated data from other websites you visit","To speed up the rendering of CSS animations","To force web developers to purchase SSL certificates","To prevent mobile phones from overheating"],
+      c: 0,
+      why: "Without SOP, any website you visit could freely read emails or banking pages open in other tabs."
+    },
+    {
+      q: "Does the Same-Origin Policy prevent a browser from sending a cross-origin request across the wire?",
+      a: ["No, the browser often sends the request; SOP prevents JavaScript from READING the response","Yes, the network card physically refuses to transmit the packet","Yes, DNS resolution is blocked for all other domains","Only on wireless Wi-Fi connections"],
+      c: 0,
+      why: "A crucial distinction: the request often reaches the server; the browser blocks the script from reading it."
+    },
+    {
+      q: "Are 'https://example.com' and 'https://example.com:8443' the same origin?",
+      a: ["No, because the port numbers (443 default vs 8443) are different","Yes, because their host names and schemes match","Yes, if they use the same SSL certificate","Only on mobile Safari"],
+      c: 0,
+      why: "A different port number represents a different origin boundary."
+    }
+  ]);
+</script>
+</body>
+</html>

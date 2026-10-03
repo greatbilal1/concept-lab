@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 02 — Fast In-Memory Unit Tests</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="unit-integration-testing" data-lesson="2" data-lesson-id="fast-in-memory-unit-tests">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 02</span> · Test Performance</span>
+
+  <h1 class="lesson-title">Fast In-Memory Unit Tests</h1>
+  <p class="lesson-lede">
+    Designing lightning-fast unit tests that provide immediate feedback during active coding.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to keep unit tests running in milliseconds.</span>
+    <span><b>Mission link</b> Mastering fast in-memory unit tests across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Fast In-Memory Unit Tests</h2>
+  <p>A test suite's value is directly proportional to how often developers run it. If your unit tests run in 2 seconds, you will run them after every two lines of code you change. If they take 45 seconds, you will run them once before opening a pull request.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Designing lightning-fast unit tests that provide immediate feedback during active coding.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Feedback Loop Speed</h2>
+  <p>To keep unit tests fast:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>In-Memory Streaming</h2>
+  <ul><li><strong>No Network:</strong> Never make HTTP calls or DNS lookups in unit tests.</li><li><strong>No Disk I/O:</strong> Avoid writing physical files; use `io.StringIO` or in-memory virtual filesystems.</li><li><strong>No Sleeps:</strong> Replace `time.sleep()` with deterministic logic or mock clocks.</li><li><strong>Pure Functions:</strong> Isolate core domain calculations into pure functions that take data and return data.</li></ul><pre><code># Fast in-memory testing with StringIO
+import io
+
+def parse_config_stream(stream):
+    return {line.split("=")[0]: line.split("=")[1].strip() for line in stream if "=" in line}
+
+def test_parse_config_fast():
+    # No disk access needed! Pure memory buffer
+    sample_data = io.StringIO("HOST=localhost\nPORT=8080\n")
+    config = parse_config_stream(sample_data)
+    assert config == {"HOST": "localhost", "PORT": "8080"}</code></pre><div class="callout"><p><strong>Target Metric:</strong> Individual unit tests should complete in under 5 milliseconds. A suite of 500 unit tests should finish in under 2 seconds.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the test performance sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to keep unit tests running in milliseconds.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where fast in-memory unit tests applies.</li>
+    <li>Author a unit test or verification script exercising fast in-memory unit tests.</li>
+    <li>Document team architectural conventions regarding fast in-memory unit tests.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Fast In-Memory Unit Tests.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Why must unit test suites run in under 5 to 10 seconds?",
+    a: ["If tests take longer, developers stop running them frequently on every local edit","The test runner crashes after 10 seconds","Continuous integration servers reject long runs","Python garbage collection freezes execution"],
+    c: 0,
+    why: "Fast execution keeps developers in flow state; slow suites destroy feedback frequency."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "< 3 Seconds",
+            "lines": [
+                  "Run on every file save",
+                  "Instant defect discovery"
+            ]
+      },
+      {
+            "title": "10 - 30 Seconds",
+            "lines": [
+                  "Run before git commit",
+                  "Context switching begins"
+            ]
+      },
+      {
+            "title": "> 2 Minutes",
+            "lines": [
+                  "Run only in CI",
+                  "High regression triage cost"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Fast In-Memory Unit Tests",
+      "def execute_flow():",
+      "    # Designing lightning-fast unit tests that provide i...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Fast In-Memory Unit Tests"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Physical Disk"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Virtual Buffer"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "step": "Outcome"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "To keep unit tests fast, avoid physical disk I/O by using {1} and eliminate network calls by using {2}."
+],
+    blanks: [
+      {
+            "a": [
+                  "memory buffers"
+            ],
+            "why": "In-memory data structures like StringIO"
+      },
+      {
+            "a": [
+                  "mocks"
+            ],
+            "why": "Test doubles for external services"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "How does using io.StringIO improve test execution speed?",
+      a: ["It avoids filesystem I/O system calls by operating entirely within process memory","It compresses text into binary format","It encrypts file contents","It caches files across git branches"],
+      c: 0,
+      why: "In-memory string buffers avoid filesystem overhead, speeding up tests significantly."
+    },
+    {
+      q: "What is the psychological consequence of a test suite that takes over 5 minutes to run?",
+      a: ["Developers abandon local test runs and rely on CI, slowing down the development cycle","Developers write more tests to compensate","Developers switch from Python to C","Code coverage increases automatically"],
+      c: 0,
+      why: "Slow feedback discourages frequent local execution, leading to delayed defect detection."
+    },
+    {
+      q: "What is a pure function and why is it ideal for unit testing?",
+      a: ["A function that depends only on its inputs and has no side effects, making it trivial to test deterministically","A function that has no return value","A function written in assembly","A function decorated with @pure"],
+      c: 0,
+      why: "Pure functions have zero side effects and produce predictable outputs for given inputs."
+    },
+    {
+      q: "How can you profile slow tests in pytest?",
+      a: ["Run pytest with the --durations flag to report the slowest tests","Measure test speed using a stopwatch","Check git commit timestamps","Inspect the CPU fan speed"],
+      c: 0,
+      why: "pytest --durations=10 displays the 10 slowest tests and their setup times."
+    }
+  ]);
+</script>
+</body>
+</html>

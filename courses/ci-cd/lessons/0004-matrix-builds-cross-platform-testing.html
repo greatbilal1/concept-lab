@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 04 — Matrix Builds and Cross-Platform Testing</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="ci-cd" data-lesson="4" data-lesson-id="matrix-builds-cross-platform-testing">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 04</span> · Matrix Builds</span>
+
+  <h1 class="lesson-title">Matrix Builds and Cross-Platform Testing</h1>
+  <p class="lesson-lede">
+    Scaling test coverage: the matrix strategy (`strategy.matrix`), cross-version testing (Python 3.10, 3.11, 3.12), and multi-OS runners.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to scale testing coverage using GitHub Actions matrix strategies and cross-platform runners.</span>
+    <span><b>Mission link</b> Mastering matrix builds and cross-platform testing across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Matrix Builds and Cross-Platform Testing</h2>
+  <p>If you build an open-source library, a CLI tool, or an enterprise SDK, your users don't all run Python 3.12 on Ubuntu. Some run Python 3.10 on Windows; others run Python 3.11 on macOS. How do you guarantee your code works across all of them without writing 9 separate workflow files? <strong>You use a Matrix Build</strong>.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Scaling test coverage: the matrix strategy (`strategy.matrix`), cross-version testing (Python 3.10, 3.11, 3.12), and multi-OS runners.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Combinatorial Matrix Expansion</h2>
+  <p>How the GitHub Actions Matrix Strategy works:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Fail-Fast Strategy</h2>
+  <ul><li><strong>1. The Matrix Dimension:</strong> Define arrays of variables under `strategy.matrix`: language versions, database engines, or operating systems.</li><li><strong>2. Combinatorial Expansion:</strong> GitHub Actions automatically multiplies the dimensions: 3 Python versions $\times$ 2 OS runners = <strong>6 parallel jobs spawned instantly!</strong></li><li><strong>3. Fail-Fast Control (`fail-fast: false`):</strong> By default, if Job #1 fails, GitHub cancels all other matrix jobs. Setting `fail-fast: false` allows all jobs to complete so you can see the complete compatibility scorecard!</li><li><strong>4. Inclusions and Exclusions:</strong> Customize specific matrix permutations using `include` and `exclude` keys.</li></ul><pre><code># Multi-Version Cross-OS Matrix Workflow:
+jobs:
+  compatibility-matrix:
+    name: Test (Python ${{ matrix.python-version }} on ${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false # Let all combinations finish!
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python-version: ["3.10", "3.11", "3.12"]
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: pip install -r requirements.txt && pytest</code></pre><div class="callout"><p><strong>The Matrix Power:</strong> A 10-line matrix block tests your application across 9 independent platform permutations concurrently in under 2 minutes.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the matrix builds sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to scale testing coverage using GitHub Actions matrix strategies and cross-platform runners.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where matrix builds and cross-platform testing applies.</li>
+    <li>Author a unit test or verification script exercising matrix builds and cross-platform testing.</li>
+    <li>Document team architectural conventions regarding matrix builds and cross-platform testing.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Matrix Builds and Cross-Platform Testing.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is a 'Matrix Build' in GitHub Actions?",
+    a: ["A configuration strategy that automatically duplicates a single job definition across a matrix of multiple operating systems and language versions in parallel","A movie about virtual reality","A mathematical array calculation tool","A method for encrypting code"],
+    c: 0,
+    why: "Matrix builds run a single job across permutations of OSs and runtimes (e.g. Ubuntu, Windows, macOS x Python 3.10, 3.11, 3.12)."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Matrix Definition",
+            "lines": [
+                  "os: [ubuntu, macos, windows]",
+                  "python: [3.10, 3.11, 3.12]"
+            ]
+      },
+      {
+            "title": "Automated Job Expansion (9 Parallel Runners!)",
+            "lines": [
+                  "Job 1: Ubuntu + 3.10 | Job 2: Ubuntu + 3.11 | Job 3: Ubuntu + 3.12",
+                  "Job 4: macOS + 3.10  | Job 5: macOS + 3.11  | Job 6: macOS + 3.12",
+                  "Job 7: Windows + 3.10| Job 8: Windows + 3.11| Job 9: Windows + 3.12"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Matrix Builds and Cross-Platform Testing",
+      "def execute_flow():",
+      "    # Scaling test coverage: the matrix strategy (`strat...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Matrix Builds and Cross-Platform Testing"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "fail-fast: true (Default)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "fail-fast: false (Diagnostic)"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "GitHub Actions matrix strategies spawn parallel jobs across combinations of operating systems and runtime versions, using {1} controls to collect full {2} scorecards."
+],
+    blanks: [
+      {
+            "a": [
+                  "fail-fast"
+            ],
+            "why": "Option controlling whether to abort sibling jobs on failure"
+      },
+      {
+            "a": [
+                  "compatibility"
+            ],
+            "why": "Multi-platform verification results"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "How many total parallel jobs will be spawned by a matrix defining 'os: [ubuntu, windows]' and 'node: [18, 20, 22]'?",
+      a: ["6 jobs (2 operating systems x 3 Node versions)","5 jobs","1 job","18 jobs"],
+      c: 0,
+      why: "Matrix configurations compute the Cartesian product of all defined variable dimensions (2 x 3 = 6)."
+    },
+    {
+      q: "What happens when 'fail-fast: false' is configured in a matrix strategy?",
+      a: ["If one permutation fails (e.g. Python 3.10 on Windows), the other matrix jobs continue running to completion rather than being cancelled","The build runs twice as fast","The pipeline ignores all failures","The build never times out"],
+      c: 0,
+      why: "fail-fast: false ensures all matrix permutations run to completion for diagnostic visibility."
+    },
+    {
+      q: "Why is testing across multiple operating systems critical for CLI utilities or file-processing libraries?",
+      a: ["Different operating systems handle file path separators (\\ vs /), line endings (CRLF vs LF), and permissions differently","Windows runs Python in French","macOS does not have terminals","Linux cannot read files"],
+      c: 0,
+      why: "Path separators, line endings, and OS-specific syscalls frequently cause cross-platform defects."
+    },
+    {
+      q: "How does GitHub Actions charge compute minutes for macOS runners compared to standard Linux runners?",
+      a: ["macOS runners consume 10x more billing minutes per minute of execution compared to Linux runners","macOS runners are free","Both cost exactly the same","Linux costs 10x more than macOS"],
+      c: 0,
+      why: "macOS runners carry a 10x multiplier on GitHub Actions billing due to specialized Apple hardware costs."
+    }
+  ]);
+</script>
+</body>
+</html>

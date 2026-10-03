@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 06 — Self-Correction, Error Recovery, and Circuit Breakers</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="ai-agents" data-lesson="6" data-lesson-id="self-correction-circuit-breakers">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 06</span> · Error Recovery</span>
+
+  <h1 class="lesson-title">Self-Correction, Error Recovery, and Circuit Breakers</h1>
+  <p class="lesson-lede">
+    Building resilient agent loops: automated error reflection, recovery protocols, thrashing detection, and circuit breakers.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to design self-correction loops and robust multi-layered circuit breakers.</span>
+    <span><b>Mission link</b> Mastering self-correction, error recovery, and circuit breakers across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Self-Correction, Error Recovery, and Circuit Breakers</h2>
+  <p>Autonomous agents are resilient, but they are not infallible. When an agent encounters an unfixable bug (e.g. an external API is down, or a test has contradictory requirements), it can enter an infinite loop of frantic, circular edits. In AI engineering, this is called <strong>Thrashing</strong>.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Building resilient agent loops: automated error reflection, recovery protocols, thrashing detection, and circuit breakers.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Four Circuit Breaker Layers</h2>
+  <p>A production agent architecture must enforce four layers of <strong>Circuit Breakers and Recovery Protocols</strong>:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>The Self-Reflection Pause</h2>
+  <ul><li><strong>1. Turn Count Circuit Breaker:</strong> Strict limit on maximum turns (e.g. `max_turns = 15`). Once exceeded, execution halts immediately.</li><li><strong>2. Cost & Token Budget Breaker:</strong> Cap cumulative token spend per task (e.g. max $2.00 or 150k tokens). Prevents runaway API billing.</li><li><strong>3. Repetition & Thrashing Detector:</strong> If an agent emits the exact same tool call three times consecutively, or modifies the same file back-and-forth, trip the breaker!</li><li><strong>4. Reflection & Self-Correction Protocol:</strong> Before throwing an error, require the agent to execute a <strong>Reflection Step</strong>: <em>'Analyze why your last 2 attempts failed. State what went wrong and try a completely different approach.'</em></li></ul><pre><code># Circuit Breaker Protection Pattern:
+def evaluate_circuit_breakers(state):
+    if state["turns"] >= 15:
+        raise CircuitBreakerTripped("Maximum turn limit reached (15 turns).")
+        
+    if state["cumulative_cost"] >= 2.00:
+        raise CircuitBreakerTripped("Token budget ceiling reached ($2.00).")
+        
+    if state["consecutive_tool_failures"] >= 3:
+        # Route to human intervention gate!
+        return "escalate_to_human"</code></pre><div class="callout"><p><strong>The Safety Law:</strong> Never deploy an agent without hard financial and operational circuit breakers. Bounding the worst-case failure is what makes autonomy safe.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the circuit breaker sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to design self-correction loops and robust multi-layered circuit breakers.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where self-correction, error recovery, and circuit breakers applies.</li>
+    <li>Author a unit test or verification script exercising self-correction, error recovery, and circuit breakers.</li>
+    <li>Document team architectural conventions regarding self-correction, error recovery, and circuit breakers.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Self-Correction, Error Recovery, and Circuit Breakers.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is a 'Circuit Breaker' in an autonomous agent execution loop?",
+    a: ["A hard safety constraint that halts automated execution when error thresholds, token budgets, or turn counts are exceeded","An electrical switch on a wall","A tool for breaking computer monitors","A feature in web browsers"],
+    c: 0,
+    why: "Circuit breakers bound failures, stopping runaway loops and returning control to human engineers safely."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1. Turn Limit Breaker",
+            "lines": [
+                  "Max 15 turns per task",
+                  "Stops infinite execution loops"
+            ]
+      },
+      {
+            "title": "2. Financial Budget Breaker",
+            "lines": [
+                  "Max $2.00 token spend per task",
+                  "Prevents runaway cloud API bills"
+            ]
+      },
+      {
+            "title": "3. Thrashing Detector",
+            "lines": [
+                  "Catches identical repeating tool calls",
+                  "Detects circular code churn"
+            ]
+      },
+      {
+            "title": "4. Human Escalation Gate",
+            "lines": [
+                  "Pauses workflow safely",
+                  "Alerts human engineer with diagnostic trace"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Self-Correction, Error Recovery, and Circuit Breakers",
+      "def execute_flow():",
+      "    # Building resilient agent loops: automated error re...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Self-Correction, Error Recovery, and Circuit Breakers"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Attempt 1 & 2 Failed"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Reflection Prompt Injected"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "step": "Fresh Breakthrough"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Circuit breakers safeguard autonomous agent loops by bounding maximum turns, capping token {1}, and halting execution when {2} loops are detected."
+],
+    blanks: [
+      {
+            "a": [
+                  "budgets"
+            ],
+            "why": "Financial and token spending ceilings"
+      },
+      {
+            "a": [
+                  "thrashing"
+            ],
+            "why": "Circular, repetitive failure cycles"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is 'Agent Thrashing'?",
+      a: ["An unrecoverable failure state where an agent makes circular, guessing edits back and forth without resolving the root cause","A physical hardware defect","A high volume of git commits","A fast computer processor"],
+      c: 0,
+      why: "Thrashing occurs when an agent gets trapped in repetitive, contradictory trial-and-error cycles."
+    },
+    {
+      q: "Why is a financial budget circuit breaker essential for autonomous agent systems?",
+      a: ["It guarantees that a runaway loop or unexpected recursion cannot generate unbounded API bills exceeding a fixed dollar ceiling","It is required by banks","It makes APIs free","It turns off the internet"],
+      c: 0,
+      why: "Financial caps protect companies from unexpected multi-thousand dollar API billing spikes."
+    },
+    {
+      q: "What does a 'Reflection Step' prompt an agent to do after repeated failures?",
+      a: ["Stop making immediate code edits, analyze the underlying pattern of past failures, and explicitly hypothesize a new strategy","Apologize to the user","Delete the code editor","Restart the computer"],
+      c: 0,
+      why: "Reflection forces the model to deliberate on root causes rather than continuing blind trial-and-error."
+    },
+    {
+      q: "When a circuit breaker trips, what should the system return to the user?",
+      a: ["A clear diagnostic summary explaining which breaker tripped, what the agent accomplished, and the active blocker","A blank screen","An unhandled Python crash","A fake success message"],
+      c: 0,
+      why: "Actionable summaries allow human engineers to understand the failure and intervene cleanly."
+    }
+  ]);
+</script>
+</body>
+</html>

@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 05 — Objects, references, and properties</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="javascript-fundamentals" data-lesson="5" data-lesson-id="objects-references-and-properties">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 05</span> · Objects & Collections</span>
+
+  <h1 class="lesson-title">Objects, references, and properties</h1>
+  <p class="lesson-lede">
+    Objects are not copied; they are referenced. Discover the memory mechanics behind reference equality, property access, and shallow versus deep copying.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Prevent accidental mutation bugs using immutability patterns and cloning</span>
+    <span><b>Mission link</b> Eliminates the single most common cause of unintended side-effect bugs</span>
+  </div>
+
+  <h2><span class="n">1</span>Values versus references in memory</h2>
+  <p>When you assign a primitive (like a number), JavaScript copies the value. When you assign an object, array, or function, JavaScript copies only the <b>memory address reference</b>.</p><p>If two variables point to the same object reference, mutating one variable mutates the other! This causes subtle bugs where modifying data in one component unexpectedly corrupts state in another.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Object variables hold memory references; assigning an object shares the reference, not a copy.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Shallow copying versus deep copying</h2>
+  <p>Understand why the spread operator ({...obj}) is only a shallow copy, leaving nested objects shared.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing object mutation bugs</h2>
+  <p>Trace how a shallow copy leaves nested address objects linked between original and copy.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of object reference behavior.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can write pure functions that update object state without introducing accidental mutation side effects.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Test reference equality between two identical literal objects ({ a: 1 } === { a: 1 }).</li>
+    <li>Deep clone an object containing nested arrays using structuredClone().</li>
+    <li>Observe how Object.freeze() blocks property mutation.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    MDN Web Docs: *Working with Objects* & *structuredClone* (developer.mozilla.org).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "const a = { x: 1 }; const b = a; b.x = 99; What is a.x?",
+    a: ["99 (both a and b point to the exact same object)","1 (a is unchanged)","undefined","NaN"],
+    c: 0,
+    why: "'b = a' copies the reference; modifying b.x mutates the shared underlying object in memory."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Shallow Copy ({...obj})",
+            "lines": [
+                  "duplicates top-level properties",
+                  "nested objects/arrays remain shared references!"
+            ]
+      },
+      {
+            "title": "Deep Copy (structuredClone)",
+            "lines": [
+                  "recursively clones all nested objects",
+                  "completely isolated memory graph"
+            ]
+      },
+      {
+            "title": "Reference Equality (===)",
+            "lines": [
+                  "returns true ONLY if memory address matches",
+                  "{ a: 1 } === { a: 1 } is FALSE!"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "const original = { user: 'Ada', address: { city: 'London' } };",
+      "const shallow = { ...original };",
+      "shallow.address.city = 'Paris'; # mutates nested shared reference!",
+      "console.log(original.address.city); # 'Paris' (unexpected side effect!)"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "original": "object with nested address"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "shallow": "top-level cloned, address reference shared"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "mutation": "mutated city in shared address object"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "result": "original was silently corrupted"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Copying only top-level properties creates a <0> copy.",
+      "The modern native browser API to create a true deep clone is <1>Clone().",
+      "To prevent any property modifications on an object, call Object.<2>()."
+],
+    blanks: [
+      {
+            "a": [
+                  "shallow"
+            ],
+            "why": "Shallow copies leave nested objects shared."
+      },
+      {
+            "a": [
+                  "structured"
+            ],
+            "why": "structuredClone() performs a native deep copy."
+      },
+      {
+            "a": [
+                  "freeze"
+            ],
+            "why": "Object.freeze() makes top-level properties read-only."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why does '{ a: 1 } === { a: 1 }' evaluate to false in JavaScript?",
+      a: ["Each object literal creates a distinct object at a different memory address, and === checks reference identity","The values inside the curly braces are evaluated in reverse","JavaScript does not support the triple equals operator on objects","The curly braces cancel each other out"],
+      c: 0,
+      why: "For reference types, === checks whether both operands point to the exact same memory location."
+    },
+    {
+      q: "What is the limitation of copying an object using the spread operator ({...obj})?",
+      a: ["It only creates a shallow copy; nested objects and arrays are copied by reference and remain shared","It converts all numbers into strings","It only copies the first three properties","It is deprecated in modern ECMAScript"],
+      c: 0,
+      why: "The spread operator copies values at depth 1; nested references still point to the original objects."
+    },
+    {
+      q: "What does the native 'structuredClone(obj)' function do?",
+      a: ["Performs a full deep copy, recursively duplicating all nested objects and arrays","Converts the object into an SQL query string","Deletes all private variables from the object","Freezes the object so it cannot be read"],
+      c: 0,
+      why: "structuredClone creates an entirely independent deep duplicate of the object graph."
+    },
+    {
+      q: "How can you safely access a deeply nested property that might be null or undefined?",
+      a: ["Using optional chaining: user?.address?.city","Using three exclamation marks: !!!user","Wrapping the code in a while loop","Renaming the property to 'safe'"],
+      c: 0,
+      why: "Optional chaining (?.) short-circuits to undefined without throwing a TypeError."
+    }
+  ]);
+</script>
+</body>
+</html>

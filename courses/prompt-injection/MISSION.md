@@ -1,0 +1,3 @@
+# Mission — Prompt Injection & AI Security
+
+Master the science of defending generative AI systems against adversarial prompt injection. Understand direct jailbreaks and indirect data poisoning attacks, identify data exfiltration channels via Markdown images and tool calls, prevent system prompt leaking, engineer structural nonce delimiters that make tag breakouts impossible, deploy pre-prompt safety classifiers, architect provably isolated Dual-LLM systems, and execute automated red teaming using PyRIT and Garak.

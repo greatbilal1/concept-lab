@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 06 — JSON in Python</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="python-files-json-data" data-lesson="6" data-lesson-id="json-in-python">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 06</span> · Formats</span>
+
+  <h1 class="lesson-title">JSON in Python</h1>
+  <p class="lesson-lede">
+    Four functions do all the work, and the only real difficulty is remembering
+    which one takes a string and which one takes a file. This lesson fixes that
+    permanently.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Never mix up dumps and dump</span>
+    <span><b>Mission link</b> Move data in and out of Python</span>
+  </div>
+
+  <h2><span class="n">1</span>Four functions, two directions</h2>
+
+  <p>
+    The <code>json</code> module gives you two pairs. The <b>s</b> in
+    <code>dumps</code> and <code>loads</code> stands for <b>string</b> — those work
+    on text in memory. Without the <b>s</b>, they work on files.
+  </p>
+
+  <div id="intro1"></div>
+
+  <p>
+    That single letter is the whole distinction. <code>dumps</code> returns a
+    string; <code>dump</code> writes to a file object. Mixing them up is the most
+    common JSON mistake in Python.
+  </p>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Serialising and deserialising</h2>
+
+  <p>
+    Turning Python objects into JSON text is <b>serialisation</b>. Turning JSON
+    text back into Python objects is <b>deserialisation</b>. The mapping is almost
+    one-to-one:
+  </p>
+
+  <pre><code>import json
+
+data = {"name": "Ada", "tags": ["math"], "active": True}
+
+text = json.dumps(data)          # dict -> str
+back = json.loads(text)          # str  -> dict
+
+with open("out.json", "w") as f:
+    json.dump(data, f, indent=2) # dict -> file
+
+with open("out.json") as f:
+    loaded = json.load(f)        # file -> dict</code></pre>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">3</span>The type mapping</h2>
+
+  <p>
+    Python and JSON agree on most things, and the disagreements are worth knowing
+    before they surprise you.
+  </p>
+
+  <div id="diagram1"></div>
+
+  <p>
+    <code>None</code> becomes <code>null</code>, <code>True</code> becomes
+    <code>true</code>, and a tuple becomes an array — it does not come back as a
+    tuple. That last one is a real trap: the round trip is not always identity.
+  </p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    <code>dumps</code>/<code>loads</code> work on <b>strings</b>;
+    <code>dump</code>/<code>load</code> work on <b>files</b>. The trailing
+    <b>s</b> is the only difference.
+  </div>
+
+  <h2><span class="n">4</span>Making it readable</h2>
+
+  <p>
+    By default <code>dumps</code> produces one long line. <code>indent=2</code>
+    pretty-prints it, and <code>sort_keys=True</code> makes the output stable so
+    diffs are meaningful:
+  </p>
+
+  <pre><code>print(json.dumps(data, indent=2, sort_keys=True))</code></pre>
+
+  <div class="note good">
+    <span class="note-label">Why this matters later</span>
+    Stable, indented output is what makes JSON files reviewable in version
+    control. A one-line dump produces a diff that shows everything changed when
+    only one value did.
+  </div>
+
+  <h2><span class="n">5</span>Check yourself</h2>
+
+  <p>
+    Answer from memory — do not scroll back up. Each option has the same number of
+    words, so nothing gives the answer away.
+  </p>
+
+  <div id="fill1"></div>
+  <div id="quiz"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>
+      You can now move data between Python and JSON in both directions, choose the
+      right function every time, and produce output that is readable and stable.
+    </p>
+  </div>
+
+  <h2><span class="n">6</span>Do this next</h2>
+
+  <ol>
+    <li>
+      Serialise a dictionary with <code>dumps</code>, then deserialise it with
+      <code>loads</code> and confirm it matches.
+    </li>
+    <li>
+      Write the same dictionary to a file with <code>dump</code> and read it back
+      with <code>load</code>.
+    </li>
+    <li>
+      Serialise a tuple and observe what type comes back. Note the difference.
+    </li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Read the Python docs on the
+    <a href="https://docs.python.org/3/library/json.html">json module</a>,
+    especially the conversion table between Python and JSON types.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher (me) anything — "how do I serialise
+    a date?", "what is a custom encoder?", "why does it fail on sets?". There are
+    no bad questions here.
+  </div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  /* the four functions */
+  TeachWidgets.introCards("#intro1", {
+    cards: [
+      { ico: "📤", title: "dumps / loads", body: "Work on strings held in memory." },
+      { ico: "💾", title: "dump / load", body: "Work on file objects opened with open()." },
+      { ico: "🔤", title: "The trailing s", body: "s means string — that is the only difference." }
+    ]
+  });
+
+  /* predict-then-reveal */
+  TeachWidgets.predict("#predict1", {
+    q: "What does `json.dumps(data)` return?",
+    a: ["A file object", "A JSON string", "A dictionary copy"],
+    c: 1,
+    why: "dumps returns a string; dump is the version that writes to a file object."
+  });
+
+  /* step-through trace of a round trip */
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "data = {\"name\": \"Ada\", \"active\": True}",
+      "text = json.dumps(data)",
+      "  -> '{\"name\": \"Ada\", \"active\": true}'",
+      "back = json.loads(text)",
+      "  -> {'name': 'Ada', 'active': True}"
+    ],
+    steps: [
+      { line: 0, vars: { data: "dict" } },
+      { line: 1, vars: { text: "str" } },
+      { line: 2, vars: { note: "True -> true" } },
+      { line: 3, vars: { back: "dict" } },
+      { line: 4, vars: { note: "true -> True" } }
+    ]
+  });
+
+  /* the type mapping */
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      { title: "dict / list", lines: ["object / array", "round trips cleanly"] },
+      { title: "None / bool", lines: ["null / true false", "case changes"] },
+      { title: "tuple", lines: ["becomes an array", "returns as a list"] }
+    ]
+  });
+
+  /* recall from memory */
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — the four functions",
+    lines: [
+      "Python to string uses <code>json.<0>()</code>",
+      "String to Python uses <code>json.<1>()</code>",
+      "Python to file uses <code>json.<2>()</code>"
+    ],
+    blanks: [
+      { a: ["dumps"], why: "dumps serialises a Python object into a JSON string." },
+      { a: ["loads"], why: "loads deserialises a JSON string into a Python object." },
+      { a: ["dump"], why: "dump writes a Python object as JSON into a file object." }
+    ]
+  });
+
+  /* the quiz — every option is exactly three words */
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What does dumps return?",
+      a: ["A file object", "A JSON string", "A dictionary copy", "A byte buffer"],
+      c: 1,
+      why: "dumps returns a string; dump is the file-writing variant."
+    },
+    {
+      q: "What does load take?",
+      a: ["A JSON string", "An open file object", "A dictionary object", "A file path string"],
+      c: 1,
+      why: "load reads from a file object; loads reads from a string."
+    },
+    {
+      q: "What does None become?",
+      a: ["The string None", "The literal null", "An empty object", "It is dropped"],
+      c: 1,
+      why: "Python's None maps to JSON's null during serialisation."
+    }
+    {
+      q: "What does a tuple become?",
+      a: ["A JSON object", "A JSON array", "A JSON string", "A JSON number"],
+      c: 1,
+      why: "Tuples serialise to arrays and come back as lists, so the round trip is not identity."
+    }
+  ]);
+</script>
+</body>
+</html>

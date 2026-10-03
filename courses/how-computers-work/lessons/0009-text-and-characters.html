@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 09 — Text and characters</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="how-computers-work" data-lesson="9" data-lesson-id="text-and-characters">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 09</span> · Data</span>
+
+  <h1 class="lesson-title">Text and characters</h1>
+  <p class="lesson-lede">
+    The machine only stores numbers. So how does it store the word "hello"? The answer
+    is a lookup table agreed on decades ago — and the story of how that table grew to
+    cover every writing system on Earth.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Encode a word in ASCII and hex</span>
+    <span><b>Mission link</b> Why text is just numbers</span>
+  </div>
+
+  <h2><span class="n">1</span>An arbitrary agreement</h2>
+
+  <p>
+    There is nothing about the letter <code>A</code> that suggests the number 65. It is
+    a convention — a table that says "when you see 65, draw an A". That table is
+    <b>ASCII</b>, and it was standardised in 1963.
+  </p>
+
+  <pre><code>65  =  A        97  =  a
+66  =  B        98  =  b
+67  =  C        99  =  c
+...
+48  =  '0'      32  =  space</code></pre>
+
+  <p>
+    Notice that uppercase and lowercase differ by exactly <b>32</b>. That is not a
+    coincidence — it is a single bit. Flipping bit 5 of a letter's code toggles its
+    case, which is why case conversion is so cheap.
+  </p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Text is not special. A string is a sequence of numbers, each one an index into a
+    character table. The machine never sees letters.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Seven bits was not enough</h2>
+
+  <p>
+    ASCII uses seven bits, giving 128 characters. That covers English comfortably and
+    almost nothing else. French accents, Greek, Cyrillic, Arabic, Chinese — all
+    outside the table.
+  </p>
+
+  <p>
+    For years, everyone invented their own extensions, and text broke constantly
+    whenever it crossed a border. The fix was <b>Unicode</b>: one giant table
+    assigning a number — a <b>code point</b> — to every character in every writing
+    system.
+  </p>
+
+  <div id="diagram1"></div>
+
+  <p>
+    But a code point is just an abstract number. You still need to store it as bytes.
+    That is <b>UTF-8</b>.
+  </p>
+
+  <div id="intro1"></div>
+
+  <h2><span class="n">3</span>UTF-8: variable width, backwards compatible</h2>
+
+  <p>
+    UTF-8 encodes a code point in one to four bytes, depending on how large it is.
+    Small values — the ASCII range — take one byte. Larger ones take more.
+  </p>
+
+  <pre><code>0xxxxxxx                              → 1 byte   (ASCII, 0–127)
+110xxxxx 10xxxxxx                     → 2 bytes
+1110xxxx 10xxxxxx 10xxxxxx            → 3 bytes
+11110xxx 10xxxxxx 10xxxxxx 10xxxxxx   → 4 bytes</code></pre>
+
+  <p>
+    The leading bits are a length marker. A byte starting with <code>0</code> is a
+    complete one-byte character; a byte starting with <code>10</code> is a
+    continuation. This is self-synchronising: you can jump into the middle of a stream
+    and find the next character boundary.
+  </p>
+
+  <div class="note good">
+    <span class="note-label">The clever part</span>
+    Every ASCII file is already valid UTF-8, byte for byte. That backwards
+    compatibility is why UTF-8 took over the world instead of a cleaner but
+    incompatible design.
+  </div>
+
+  <h2><span class="n">4</span>Encode a word</h2>
+
+  <p>
+    Here is the win. Encode the word <code>cat</code> in ASCII, then in hex:
+  </p>
+
+  <pre><code>c  =  99  =  0x63
+a  =  97  =  0x61
+t  = 116  =  0x74
+
+"cat"  =  63 61 74</code></pre>
+
+  <p>
+    Three characters, three bytes, six hex digits. Now try <code>Cat</code> — the
+    first byte becomes <code>0x43</code>, because <code>C</code> is 67 and
+    <code>c</code> is 99. One bit changed.
+  </p>
+
+  <div id="trace1"></div>
+
+  <div id="fill1"></div>
+
+  <h2><span class="n">5</span>Check yourself</h2>
+
+  <p>
+    Answer from memory — do not scroll back up. Each option has the same number of
+    words, so nothing gives the answer away.
+  </p>
+
+  <div id="quiz"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>
+      You can now encode and decode text by hand, explain why ASCII was not enough,
+      and describe how UTF-8 stays compatible with it. You have also learned the
+      general lesson: <b>every data type is a convention</b>. The bytes are always
+      just bytes; the meaning is an agreement.
+    </p>
+  </div>
+
+  <h2><span class="n">6</span>Do this next</h2>
+
+  <ol>
+    <li>
+      Encode your own first name in ASCII, then in hex. Check the byte count matches
+      the character count.
+    </li>
+    <li>
+      Work out the ASCII code for <code>Z</code> from the table. Then work out
+      <code>z</code> without looking — remember the difference of 32.
+    </li>
+    <li>
+      Explain why a file of English text is roughly one byte per character, but a file
+      of Chinese text is roughly three. Which UTF-8 length is being used?
+    </li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Read the <a href="https://developer.mozilla.org/en-US/docs/Glossary/UTF-8">MDN
+    entry on UTF-8</a> and the
+    <a href="https://www.unicode.org/standard/standard.html">Unicode Standard</a>
+    overview. For the encoding tables themselves, see
+    <a href="https://www.asciitable.com/">asciitable.com</a>.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher (me) anything — "what is a code
+    point?", "why does emoji take four bytes?", "what is a BOM?". There are no bad
+    questions here.
+  </div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  /* ASCII to Unicode to UTF-8 */
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      { title: "ASCII", lines: ["128 characters", "English only"] },
+      { title: "Unicode", lines: ["every character", "one giant table"] },
+      { title: "UTF-8", lines: ["1 to 4 bytes", "how it is stored"] }
+    ]
+  });
+
+  /* what text really is */
+  TeachWidgets.introCards("#intro1", {
+    cards: [
+      { ico: "🔢", title: "Code point", body: "The number Unicode assigns to one character." },
+      { ico: "📏", title: "Variable width", body: "One to four bytes, depending on the value." },
+      { ico: "🔗", title: "Compatible", body: "Plain ASCII files are already valid UTF-8." }
+    ]
+  });
+
+  /* predict-then-reveal */
+  TeachWidgets.predict("#predict1", {
+    q: "How does a computer store the letter A?",
+    a: ["As a shape", "As the number 65", "As a sound"],
+    c: 1,
+    why: "ASCII assigns 65 to uppercase A. The machine stores the number; the font draws the shape."
+  });
+
+  /* step-through trace of encoding */
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "char = 'c'",
+      "code = 99",
+      "hex  = 0x63",
+      "bytes = 63 61 74"
+    ],
+    steps: [
+      { line: 0, vars: { char: "c" } },
+      { line: 1, vars: { char: "c", code: "99" } },
+      { line: 2, vars: { code: "99", hex: "0x63" } },
+      { line: 3, vars: { word: "cat", bytes: "63 61 74" } }
+    ]
+  });
+
+  /* recall from memory: ASCII */
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the codes",
+    lines: [
+      "Uppercase A is the number <0>.",
+      "Lowercase a is the number <1>.",
+      "The difference between them is <2>."
+    ],
+    blanks: [
+      { a: ["65"], why: "ASCII assigns 65 to uppercase A." },
+      { a: ["97"], why: "Lowercase a is 97 — exactly 32 more than uppercase." },
+      { a: ["32"], why: "The case difference is 32, which is a single bit flip." }
+    ]
+  });
+
+  /* the quiz — every option is exactly three words */
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is ASCII?",
+      a: ["A character encoding table", "A memory chip type", "A programming language type", "A compression algorithm type"],
+      c: 0,
+      why: "ASCII is the table mapping numbers to characters for English text."
+    },
+    {
+      q: "Why was Unicode created?",
+      a: ["ASCII was too slow", "ASCII covered too little", "ASCII used too much", "ASCII was not standard"],
+      c: 1,
+      why: "ASCII's 128 characters could not represent the world's writing systems."
+    },
+    {
+      q: "How many bytes is UTF-8?",
+      a: ["Always one byte", "Always four bytes", "One to four", "Exactly two bytes"],
+      c: 2,
+      why: "UTF-8 uses one to four bytes depending on the code point's size."
+    },
+    {
+      q: "What is a code point?",
+      a: ["A number for a character", "A byte in a file", "A type of text encoding", "A shape of a glyph"],
+      c: 0,
+      why: "A code point is Unicode's numeric identifier for one character."
+    }
+  ]);
+</script>
+</body>
+</html>

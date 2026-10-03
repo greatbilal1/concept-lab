@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 06 — Shared state and globals</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="procedural-programming" data-lesson="6" data-lesson-id="shared-state-and-globals">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 06</span> · Structure</span>
+
+  <h1 class="lesson-title">Shared state and globals</h1>
+  <p class="lesson-lede">
+    Once a program has several procedures, they need to share data. The easy way is a
+    global variable — and it is also the way that quietly breaks the promise each
+    procedure made in Lesson 05.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Replace a global with a parameter and a return</span>
+    <span><b>Mission link</b> Reduce reliance on globals</span>
+  </div>
+
+  <h2><span class="n">1</span>What a global is</h2>
+
+  <p>
+    A <b>global variable</b> is a variable defined at the top level of the file,
+    outside any procedure. Every procedure in the file can read it, and with the
+    <code>global</code> statement, write it too.
+  </p>
+
+  <pre><code>total = 0
+
+def add_price(price):
+    global total
+    total = total + price
+
+add_price(4)
+add_price(8)
+print(total)   # 12</code></pre>
+
+  <p>
+    It works, and it is short. But look at <code>add_price</code>: its name says it
+    adds a price, yet it also changes something outside itself. That is a hidden
+    effect, and it is the problem.
+  </p>
+
+  <div id="diagram1"></div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Why globals hurt</h2>
+
+  <p>
+    A procedure that reads or writes a global is no longer a self-contained step. To
+    understand it, you must also read the top of the file. To test it, you must set
+    up the global first. And two procedures that share a global are now coupled
+    through it.
+  </p>
+
+  <pre><code># to understand add_price, you must also read this
+total = 0
+
+def add_price(price):
+    global total
+    total = total + price</code></pre>
+
+  <p>
+    This is a <b>hidden dependency</b>: the procedure depends on something that is
+    not in its parameter list. The dependency is real, but it is invisible at the
+    call site.
+  </p>
+
+  <div class="note warn">
+    <span class="note-label">Watch out</span>
+    A global makes a procedure's behaviour depend on the order of calls. Call
+    <code>add_price</code> twice and you get a different answer than calling it once
+    — even though the argument is the same.
+  </div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">3</span>Pass it in, return it out</h2>
+
+  <p>
+    The fix is the data contract from Lessons 03 and 04: pass the state in as a
+    parameter, and return the new state. Now the procedure is honest about what it
+    needs and what it produces.
+  </p>
+
+  <pre><code>def add_price(total, price):
+    return total + price
+
+total = 0
+total = add_price(total, 4)
+total = add_price(total, 8)
+print(total)   # 12</code></pre>
+
+  <p>
+    The procedure no longer touches anything outside itself. Its name, its
+    parameters, and its return value tell the whole story. The state still exists —
+    it is just passed explicitly instead of hidden.
+  </p>
+
+  <div id="intro1"></div>
+
+  <h2><span class="n">4</span>Remove a global</h2>
+
+  <p>
+    Here is the win for today. The lab below uses a global. Rewrite it to pass the
+    total in and return the new total, then check the output is the same.
+  </p>
+
+  <div id="lab1"></div>
+
+  <div id="fill1"></div>
+
+  <h2><span class="n">5</span>Check yourself</h2>
+
+  <p>
+    Answer from memory — do not scroll back up. Each option has the same number of
+    words, so nothing gives the answer away.
+  </p>
+
+  <div id="quiz"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>
+      You can spot a global and replace it with a parameter and a return. That keeps
+      every procedure honest about what it needs and what it produces — the promise
+      from Lesson 05, kept. The next lesson takes the same idea up a level, to whole
+      files of procedures.
+    </p>
+  </div>
+
+  <h2><span class="n">6</span>Do this next</h2>
+
+  <ol>
+    <li>
+      Find a global variable in your own code and rewrite the procedures that use it
+      to take it as a parameter.
+    </li>
+    <li>
+      Write two procedures that share a global, then rewrite them so they share
+      nothing.
+    </li>
+    <li>
+      Explain in one sentence why a procedure that reads a global is harder to test
+      than one that takes a parameter.
+    </li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Read <a href="https://docs.python.org/3/reference/simple_stmts.html#the-global-statement">Python — The global statement</a>.
+    It is the official description of what <code>global</code> actually does, and why
+    it is needed at all.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher (me) anything — "are globals ever
+    fine?", "what is a constant?", "what is a closure?". There are no bad questions
+    here.
+  </div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  /* global vs passed-in */
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      { title: "global", lines: ["total = 0", "at top level"] },
+      { title: "procedure", lines: ["add_price(price)", "reads and writes it"] },
+      { title: "hidden", lines: ["not in parameters"] },
+      { title: "coupled", lines: ["order now matters"] }
+    ]
+  });
+
+  /* predict-then-reveal */
+  TeachWidgets.predict("#predict1", {
+    q: "What is a dependency not in the parameter list?",
+    a: ["A hidden dependency", "A fast dependency", "A tested dependency", "A private dependency"],
+    c: 0,
+    why: "A hidden dependency is a real dependency that is invisible at the call site."
+  });
+
+  /* step through the global version */
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "total = 0",
+      "def add_price(price):",
+      "    global total",
+      "    total = total + price",
+      "add_price(4)",
+      "add_price(8)"
+    ],
+    steps: [
+      { line: 0, vars: { total: "0" } },
+      { line: 1, vars: { action: "define add_price" } },
+      { line: 4, vars: { action: "call add_price", price: "4" } },
+      { line: 3, vars: { total: "4" } },
+      { line: 5, vars: { action: "call add_price", price: "8" } },
+      { line: 3, vars: { total: "12" } }
+    ]
+  });
+
+  /* three costs of a global */
+  TeachWidgets.introCards("#intro1", {
+    cards: [
+      { ico: "🕵️", title: "Hidden input", body: "The procedure depends on something not listed in its parameters." },
+      { ico: "🔗", title: "Coupling", body: "Two procedures sharing a global are tied together through it." },
+      { ico: "🔀", title: "Order matters", body: "The result depends on how many times the procedure was called before." }
+    ]
+  });
+
+  /* the tiny interpreter */
+  TeachWidgets.lab("#lab1", {
+    label: "Run it — replace the global with a parameter and a return",
+    starter: "total = 0\n\ndef add_price(price):\n    global total\n    total = total + price\n\nadd_price(4)\nadd_price(8)\nprint(total)"
+  });
+
+  /* recall from memory */
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the blanks",
+    lines: [
+      "A variable at the top level is <0>",
+      "A dependency not in the parameters is <1>",
+      "The fix is to pass state in and <2> it out"
+    ],
+    blanks: [
+      { a: ["global"], why: "A global variable is defined at the top level, outside any procedure." },
+      { a: ["hidden"], why: "A hidden dependency is a real dependency that is invisible at the call site." },
+      { a: ["return"], why: "Passing state in and returning the new state keeps the procedure self-contained." }
+    ]
+  });
+
+  /* the quiz — every option is exactly three words */
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is a global variable?",
+      a: ["Defined at top level", "Defined inside a procedure", "Passed as an argument", "Returned from a procedure"],
+      c: 0,
+      why: "A global variable is defined at the top level of the file, outside any procedure."
+    },
+    {
+      q: "What is a hidden dependency?",
+      a: ["A dependency not listed here", "A dependency that is fast", "A dependency that is tested", "A dependency that is private"],
+      c: 0,
+      why: "A hidden dependency is a real dependency that is invisible at the call site."
+    },
+    {
+      q: "Why do globals make testing hard?",
+      a: ["The setup must come first", "The code runs much slower", "The names get too long", "The file becomes much larger"],
+      c: 0,
+      why: "To test a procedure that reads a global, you must set up the global first."
+    },
+    {
+      q: "What replaces a global?",
+      a: ["A parameter and return", "A longer variable name", "A second global variable", "A comment above it"],
+      c: 0,
+      why: "Passing state in as a parameter and returning the new state removes the hidden dependency."
+    }
+  ]);
+</script>
+</body>
+</html>

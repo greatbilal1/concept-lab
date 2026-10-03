@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 05 — Common Table Expressions (CTEs)</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="sql-joins" data-lesson="5" data-lesson-id="subqueries-and-common-table-expressions-ctes">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 05</span> · Subqueries & CTEs</span>
+
+  <h1 class="lesson-title">Common Table Expressions (CTEs)</h1>
+  <p class="lesson-lede">
+    Stop writing unreadable nested subqueries inside subqueries. Master Common Table Expressions (WITH clauses) to write modular, readable, maintainable SQL pipelines.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Structure complex multi-step queries using Common Table Expressions (CTEs)</span>
+    <span><b>Mission link</b> The standard tool for clean, readable, professional SQL query composition</span>
+  </div>
+
+  <h2><span class="n">1</span>The WITH clause revolution</h2>
+  <p>When an SQL query requires multiple stages of filtering and aggregation, nesting subqueries five levels deep creates a nightmare of inside-out reading. Nobody can understand where the brackets start and end.</p><p><b>Common Table Expressions (CTEs)</b>, defined using the <code>WITH</code> keyword, allow you to define named temporary result sets at the top of your query. You read from top to bottom, like sequential variable assignments in Python or JavaScript.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    CTEs define named temporary result sets using WITH, making complex queries readable from top to bottom.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Nested subquery versus CTE comparison</h2>
+  <p>Contrast the chaotic inside-out nesting of subqueries with the linear readability of CTEs.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing a multi-stage CTE query</h2>
+  <p>Trace how two chained CTEs calculate monthly totals and filter high spenders cleanly.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of CTE syntax.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can decompose complex analytical queries into modular, readable CTE pipelines that team members can maintain easily.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Refactor an unreadable nested subquery into a clean WITH clause.</li>
+    <li>Chain two CTEs together where the second CTE queries the first CTE.</li>
+    <li>Inspect whether your database engine materializes or inlines CTEs using EXPLAIN.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    PostgreSQL Documentation: *WITH Queries (Common Table Expressions)* (postgresql.org/docs/current/queries-with.html).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What keyword initiates a Common Table Expression (CTE) in standard SQL?",
+    a: ["WITH","LET","DEFINE","TABLE"],
+    c: 0,
+    why: "The WITH keyword introduces one or more Common Table Expressions at the beginning of a query."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Nested Subqueries (Inside-Out)",
+            "lines": [
+                  "SELECT * FROM (SELECT * FROM (SELECT...",
+                  "bracket matching nightmare",
+                  "impossible to debug or refactor"
+            ]
+      },
+      {
+            "title": "CTE Pipeline (Top-to-Bottom)",
+            "lines": [
+                  "WITH regional_sales AS (...),",
+                  "top_customers AS (...) ",
+                  "SELECT * FROM top_customers;"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "WITH monthly_totals AS (",
+      "    SELECT user_id, SUM(amount) AS total",
+      "    FROM orders GROUP BY user_id",
+      "),",
+      "vip_users AS (",
+      "    SELECT user_id FROM monthly_totals WHERE total >= 1000",
+      ")",
+      "SELECT users.name, monthly_totals.total",
+      "FROM users",
+      "JOIN monthly_totals ON users.id = monthly_totals.user_id",
+      "WHERE users.id IN (SELECT user_id FROM vip_users);"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "cte_1": "monthly_totals computes customer sums"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "cte_2": "vip_users filters to customers with >= 1000"
+            }
+      },
+      {
+            "line": 7,
+            "vars": {
+                  "main": "main query joins users to clean named CTE blocks"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "A Common Table Expression is created with the <0> keyword.",
+      "The acronym CTE stands for Common Table <1>.",
+      "Multiple CTEs are separated from each other by a <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "WITH"
+            ],
+            "why": "WITH introduces CTE definitions."
+      },
+      {
+            "a": [
+                  "Expression"
+            ],
+            "why": "CTE stands for Common Table Expression."
+      },
+      {
+            "a": [
+                  ",",
+                  "comma"
+            ],
+            "why": "Commas separate multiple CTE declarations under a single WITH."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the primary readability advantage of CTEs over nested subqueries?",
+      a: ["CTEs let you read and compose query logic sequentially from top to bottom, rather than reading inside-out","CTEs make queries execute on the graphics card GPU","CTEs eliminate the need for primary keys","CTEs automatically encrypt database backups"],
+      c: 0,
+      why: "CTEs break complex queries into named, modular steps read in chronological order."
+    },
+    {
+      q: "Can a CTE be referenced multiple times within the same main query?",
+      a: ["Yes, you can join to the same CTE multiple times in the main query without repeating the subquery text","No, a CTE can only be queried exactly once","Only on Oracle databases","Only if the CTE contains fewer than five rows"],
+      c: 0,
+      why: "CTEs are reusable within the query scope, eliminating duplicate subquery definitions."
+    },
+    {
+      q: "How do you define multiple CTEs in a single query?",
+      a: ["Use a single WITH keyword at the top, and separate each named CTE with a comma: WITH cte1 AS (...), cte2 AS (...)","Type the WITH keyword before every single CTE","Separate CTEs with a semicolon","Multiple CTEs are forbidden in SQL"],
+      c: 0,
+      why: "A single WITH statement introduces all comma-separated CTE definitions before the main SELECT."
+    },
+    {
+      q: "Does a CTE create a permanent table on the database disk?",
+      a: ["No, a CTE exists only for the duration of that single query execution and is discarded immediately after","Yes, it creates a physical table in the public schema","Yes, unless you explicitly run DROP CTE","Only if it contains more than 10,000 rows"],
+      c: 0,
+      why: "CTEs are transient query-scoped views; they leave zero persistent footprint on disk."
+    }
+  ]);
+</script>
+</body>
+</html>

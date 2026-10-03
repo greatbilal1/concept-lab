@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 07 — Async/await syntax and mechanics</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="browser-events-async" data-lesson="7" data-lesson-id="async-await-syntax-and-mechanics">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 07</span> · Async/Await & Concurrency</span>
+
+  <h1 class="lesson-title">Async/await syntax and mechanics</h1>
+  <p class="lesson-lede">
+    Write asynchronous code that reads like synchronous code. Master the async and await keywords, error handling with try/catch, and the underlying Promise engine.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Author clean asynchronous functions using async/await and standard try/catch blocks</span>
+    <span><b>Mission link</b> The standard modern syntax for reading and writing asynchronous JavaScript</span>
+  </div>
+
+  <h2><span class="n">1</span>Syntactic sugar over Promises</h2>
+  <p>The <code>async/await</code> syntax introduced in ES2017 is not a new concurrency model: it is ergonomic <b>syntactic sugar built directly on top of Promises</b>. An <code>async function</code> always returns a Promise.</p><p>Inside an async function, the <code>await</code> keyword pauses execution of that function until the awaited Promise settles. While paused, the underlying single thread is <b>not blocked</b>: it returns to the event loop and handles other tasks.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    await pauses the local async function without blocking the main browser thread.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Comparing .then() with async/await</h2>
+  <p>Observe how async/await transforms Promise chaining into clean, linear code.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing await execution suspension</h2>
+  <p>Trace how await pauses the function and yields the thread back to the main event loop.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of async/await syntax.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can write readable, sequential asynchronous logic using async/await and handle errors with standard try/catch blocks.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Refactor an existing Promise .then() chain into an async/await function.</li>
+    <li>Wrap an awaited fetch call in a try/catch/finally block.</li>
+    <li>Verify that calling an async function without await returns a Promise.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    MDN Web Docs: *async function* (developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What does an async function return if you write 'async function getNumber() { return 42; }'?",
+    a: ["A Promise that resolves with the value 42","The literal number 42 directly","undefined","A callback function"],
+    c: 0,
+    why: "Any value returned from an async function is automatically wrapped in a resolved Promise."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Promise Chain (.then)",
+            "lines": [
+                  "fetch(url)",
+                  "  .then(res => res.json())",
+                  "  .then(data => render(data))",
+                  "  .catch(err => ...);"
+            ]
+      },
+      {
+            "title": "async / await (Linear)",
+            "lines": [
+                  "try {",
+                  "  const res = await fetch(url);",
+                  "  const data = await res.json();",
+                  "} catch (err) { ... }"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "async function load() {",
+      "    console.log('1. Start load');",
+      "    const data = await fetchData(); # function pauses here!",
+      "    console.log('3. Data loaded');",
+      "}",
+      "load();",
+      "console.log('2. Main script continues');"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "log_1": "'1. Start load'"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "suspended": "load() yields execution back to caller"
+            }
+      },
+      {
+            "line": 6,
+            "vars": {
+                  "log_2": "'2. Main script continues' runs synchronously"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "resumed": "'3. Data loaded' runs when fetchData settles"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The keyword placed before a function to allow await is <0>.",
+      "The operator that pauses an async function until a Promise settles is <1>.",
+      "Errors in async/await functions are caught using standard try/<2> blocks."
+],
+    blanks: [
+      {
+            "a": [
+                  "async"
+            ],
+            "why": "async declares an asynchronous function."
+      },
+      {
+            "a": [
+                  "await"
+            ],
+            "why": "await pauses until the promise settles."
+      },
+      {
+            "a": [
+                  "catch"
+            ],
+            "why": "try/catch handles promise rejections natively."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What does the 'await' keyword do when placed before a Promise?",
+      a: ["Pauses execution of the enclosing async function until the Promise settles, while letting the browser thread handle other tasks","Blocks the entire computer operating system until data arrives","Converts the Promise into a synchronous while loop","Forces the Promise to settle immediately without waiting"],
+      c: 0,
+      why: "await suspends only the local async function; the main event loop continues processing other work."
+    },
+    {
+      q: "How are rejected Promises handled when using async/await?",
+      a: ["The rejected reason is thrown as a standard JavaScript exception that can be caught with try/catch","The browser crashes with a fatal error screen","The function restarts from line 1 automatically","Rejections cannot be caught when using async/await"],
+      c: 0,
+      why: "await unwraps rejections into thrown exceptions, making standard try/catch work seamlessly."
+    },
+    {
+      q: "Can the 'await' keyword be used outside of an async function?",
+      a: ["Only at the top level of modern JavaScript ES Modules (Top-Level Await)","Yes, anywhere in any JavaScript file","No, never under any circumstances","Only inside HTML <script> tags"],
+      c: 0,
+      why: "Top-Level Await is supported in ES Modules; non-module scripts require an enclosing async function."
+    },
+    {
+      q: "What common mistake creates an accidental sequential bottleneck when using async/await?",
+      a: ["Awaiting independent operations one after another instead of launching them in parallel with Promise.all()","Using try/catch blocks around network requests","Naming the function with an uppercase letter","Returning an object from an async function"],
+      c: 0,
+      why: "Awaiting independent requests sequentially forces them to run one-by-one, doubling total latency."
+    }
+  ]);
+</script>
+</body>
+</html>

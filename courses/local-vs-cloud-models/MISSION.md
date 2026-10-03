@@ -1,0 +1,3 @@
+# Mission — Local Models vs Cloud Models
+
+Master the strategic and operational physics of on-premise AI. Run models locally with Ollama and llama.cpp, calculate exact VRAM requirements, navigate weight quantization (GGUF, AWQ), evaluate legal compliance and data sovereignty (HIPAA, GDPR), deploy offline edge models in disconnected environments, conduct rigorous Total Cost of Ownership (TCO) analyses, design hybrid local-cloud architectures, and deploy serverless vLLM clusters on cloud GPUs.

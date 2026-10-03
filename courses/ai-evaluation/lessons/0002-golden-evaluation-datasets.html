@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 02 — Golden Evaluation Datasets: Curation and Diversity</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="ai-evaluation" data-lesson="2" data-lesson-id="golden-evaluation-datasets">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 02</span> · Golden Datasets</span>
+
+  <h1 class="lesson-title">Golden Evaluation Datasets: Curation and Diversity</h1>
+  <p class="lesson-lede">
+    Constructing evaluation datasets: representative sampling, edge cases, synthetic generation, and dataset versioning.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to curate and maintain diverse, high-signal golden evaluation datasets.</span>
+    <span><b>Mission link</b> Mastering golden evaluation datasets: curation and diversity across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Golden Evaluation Datasets: Curation and Diversity</h2>
+  <p>Your evaluations are only as truthful as the dataset you test against. If your eval dataset consists of 10 easy, softball questions, your model will score 100% while failing in production. A <strong>Golden Evaluation Dataset</strong> is an authoritative benchmark representing real-world distribution complexity.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Constructing evaluation datasets: representative sampling, edge cases, synthetic generation, and dataset versioning.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Golden Dataset Composition</h2>
+  <p>Four principles for curating golden eval datasets:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Version-Controlled Eval Assets</h2>
+  <ul><li><strong>1. Production Sampling:</strong> Pull real user queries from anonymized production logs (with consent and PII scrubbing). Real human queries contain typos, weird slang, and unexpected ambiguities that synthetic tests miss.</li><li><strong>2. Boundary Edge Cases:</strong> Deliberately inject tough edge cases: empty strings, adversarial prompt injections, conflicting instructions, and non-English text.</li><li><strong>3. Balanced Category Coverage:</strong> Ensure all core tasks (e.g. 20% billing, 30% tech support, 20% refunds, 30% account management) are represented proportionally.</li><li><strong>4. Golden Labels & Grading Criteria:</strong> Pair each input with either exact ground-truth values (for extraction/math) or detailed grading rubrics (for qualitative answers).</li></ul><pre><code># Structure of a Golden Eval Record (JSONL):
+{
+  "eval_id": "tc_042",
+  "input": "My order ORD-992 was charged $50 but my receipt says $40. Refund the difference.",
+  "domain": "billing_dispute",
+  "expected_intent": "PARTIAL_REFUND",
+  "expected_entities": {"order_id": "ORD-992", "refund_amount_cents": 1000},
+  "grading_criteria": "Must extract correct order ID and calculate exact $10 difference."
+}</code></pre><div class="callout"><p><strong>The Scale Rule:</strong> Start small! A carefully curated, human-verified golden dataset of <strong>50 to 100 examples</strong> provides vastly higher diagnostic signal than 10,000 unverified noisy web rows.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the golden datasets sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to curate and maintain diverse, high-signal golden evaluation datasets.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where golden evaluation datasets: curation and diversity applies.</li>
+    <li>Author a unit test or verification script exercising golden evaluation datasets: curation and diversity.</li>
+    <li>Document team architectural conventions regarding golden evaluation datasets: curation and diversity.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Golden Evaluation Datasets: Curation and Diversity.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What makes an evaluation dataset 'Golden' in production AI engineering?",
+    a: ["It contains a curated, representative, and human-verified collection of real-world inputs paired with verified ground-truth standards","It is stored on a gold-plated hard drive","It was created by Google executives","It contains 100 million rows"],
+    c: 0,
+    why: "A golden dataset is a high-signal, human-verified benchmark set capturing core tasks and critical edge cases."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Production Logs (60%)",
+            "lines": [
+                  "Real customer queries & typos",
+                  "Captures actual user behavior"
+            ]
+      },
+      {
+            "title": "Hard Edge Cases (25%)",
+            "lines": [
+                  "Boundary conditions & weird formatting",
+                  "Tests system resilience"
+            ]
+      },
+      {
+            "title": "Adversarial Probes (15%)",
+            "lines": [
+                  "Prompt injections & trick questions",
+                  "Evaluates safety & guardrails"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Golden Evaluation Datasets: Curation and Diversity",
+      "def execute_flow():",
+      "    # Constructing evaluation datasets: representative s...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Golden Evaluation Datasets: Curation and Diversity"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "evals/golden_v1.jsonl"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "evals/golden_v2.jsonl"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Golden evaluation datasets reflect real-world distribution by combining production query logs with adversarial {1} cases and human-verified {2}."
+],
+    blanks: [
+      {
+            "a": [
+                  "edge"
+            ],
+            "why": "Boundary conditions and unusual inputs"
+      },
+      {
+            "a": [
+                  "labels"
+            ],
+            "why": "Ground-truth answers or rubrics"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why is pulling real production logs essential when building an evaluation dataset?",
+      a: ["Real users express queries with unforeseen slang, misspellings, and ambiguities that developers fail to imagine in synthetic prompts","Production logs are free","It reduces database storage","Production logs compile Python to C"],
+      c: 0,
+      why: "Real customer queries reflect true natural distribution and unexpected linguistic edge cases."
+    },
+    {
+      q: "Why must Personally Identifiable Information (PII) be scrubbed from production logs before adding them to an eval set?",
+      a: ["To protect customer privacy and comply with privacy regulations (GDPR/HIPAA) before committing data to test repositories","PII makes tests run slower","PII causes compiler errors","PII is copyrighted by OpenAI"],
+      c: 0,
+      why: "Sanitizing PII prevents committing confidential user data to shared engineering repositories."
+    },
+    {
+      q: "How many verified examples are typically sufficient for an effective initial golden eval dataset?",
+      a: ["50 to 100 high-quality, diverse examples","At least 10,000,000 examples","Exactly 1 example","Zero examples"],
+      c: 0,
+      why: "50-100 high-quality examples provide immediate, actionable regression detection with fast execution."
+    },
+    {
+      q: "What should happen to the golden dataset when an unexpected bug slips through into production?",
+      a: ["Add the failing production case to the golden dataset immediately so the eval suite tests against it on all future runs","Delete the golden dataset","Ignore the bug","Restart the server"],
+      c: 0,
+      why: "Expanding the eval dataset with real failure cases ensures the system builds permanent regression immunity."
+    }
+  ]);
+</script>
+</body>
+</html>

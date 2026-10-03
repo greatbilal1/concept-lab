@@ -1,0 +1,3 @@
+# Mission — How LLMs Work
+
+Demystify the complete scientific and engineering pipeline of Large Language Models. Master autoregressive next-token prediction, explore petabyte-scale data filtering and supercomputing clusters, dissect Byte-Pair Encoding tokenizers, understand Chinchilla scaling laws, transform base models with Supervised Fine-Tuning, align behavior with Direct Preference Optimization (DPO), leverage test-time compute in reasoning models, and trace final token emission math.

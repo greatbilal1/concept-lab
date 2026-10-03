@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 03 — Standard streams and redirection</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="command-line-shell" data-lesson="3" data-lesson-id="standard-streams-and-redirection">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 03</span> · Streams & Pipes</span>
+
+  <h1 class="lesson-title">Standard streams and redirection</h1>
+  <p class="lesson-lede">
+    Everything in UNIX is a stream of bytes. Learn how file descriptors 0, 1, and 2 allow you to redirect inputs and outputs anywhere.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Redirect standard output and standard error to files and /dev/null</span>
+    <span><b>Mission link</b> Mastery of I/O streams is the foundation of composable toolchains</span>
+  </div>
+
+  <h2><span class="n">1</span>The three standard file descriptors</h2>
+  <p>Every process launched in a POSIX system starts with three standard I/O streams open: <b>standard input</b> (stdin, fd 0), <b>standard output</b> (stdout, fd 1), and <b>standard error</b> (stderr, fd 2).</p><p>By default, stdin comes from the keyboard, while stdout and stderr both print to the terminal screen. Redirection operators allow you to detach these streams and connect them to files or null devices.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Standard error is separated from standard output so diagnostics never corrupt data streams.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The redirection operator matrix</h2>
+  <p>Understand the standard redirection operators used across all POSIX shells.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing stream separation</h2>
+  <p>Trace how redirecting stdout to a file leaves stderr printing diagnostics to the terminal.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Confirm your memory of standard stream redirection operators.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can separate data output from error logs and redirect streams cleanly using file descriptors.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Redirect the output of a command to a file using > and verify it with cat.</li>
+    <li>Append three lines to an existing file using >>.</li>
+    <li>Discard unwanted noisy output by redirecting to /dev/null.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    The Open Group Base Specifications Issue 7 / POSIX.1-2017: *Redirection*.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What happens if you run 'command > out.log' and the command fails with an error?",
+    a: ["The error message is saved into out.log","The error message still prints to your terminal screen","The computer halts execution immediately","The file out.log is deleted permanently"],
+    c: 1,
+    why: "'>' only redirects stdout (fd 1); stderr (fd 2) remains connected to the screen unless redirected."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "> file",
+            "lines": [
+                  "redirect stdout (1)",
+                  "overwrites target file"
+            ]
+      },
+      {
+            "title": ">> file",
+            "lines": [
+                  "redirect stdout (1)",
+                  "appends to target file"
+            ]
+      },
+      {
+            "title": "2> file",
+            "lines": [
+                  "redirect stderr (2)",
+                  "captures errors only"
+            ]
+      },
+      {
+            "title": "&> file",
+            "lines": [
+                  "redirect both (1 & 2)",
+                  "merges output and errors"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Program prints 'result: 42' to stdout and 'warn: slow query' to stderr",
+      "python script.py > results.txt 2> warnings.log",
+      "cat results.txt     # result: 42",
+      "cat warnings.log    # warn: slow query"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "fd1": "results.txt",
+                  "fd2": "warnings.log"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "stdout_content": "'result: 42'"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "stderr_content": "'warn: slow query'"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Standard input has file descriptor number <0>.",
+      "Standard output has file descriptor number <1>.",
+      "Standard error has file descriptor number <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "0"
+            ],
+            "why": "File descriptor 0 is standard input (stdin)."
+      },
+      {
+            "a": [
+                  "1"
+            ],
+            "why": "File descriptor 1 is standard output (stdout)."
+      },
+      {
+            "a": [
+                  "2"
+            ],
+            "why": "File descriptor 2 is standard error (stderr)."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the difference between '>' and '>>' in shell redirection?",
+      a: ["'>' overwrites the file; '>>' appends new content to the end of the file","'>' works on text files; '>>' only works on binary compiled files","'>' redirects standard error; '>>' redirects standard input","There is no difference between the two operators"],
+      c: 0,
+      why: "Single bracket truncates and overwrites; double bracket appends without erasing."
+    },
+    {
+      q: "How do you silence both stdout and stderr completely?",
+      a: ["command > /dev/null 2>&1","command --silent-mode","delete command","cat command | null"],
+      c: 0,
+      why: "Redirecting stdout to /dev/null and merging stderr (2>&1) discards all output."
+    },
+    {
+      q: "Why does UNIX separate standard error (fd 2) from standard output (fd 1)?",
+      a: ["To allow diagnostic and error logs to be viewed without corrupting piped data streams","To prevent computer memory leaks in long-running processes","Because CPUs only support two execution threads simultaneously","To comply with federal data encryption guidelines"],
+      c: 0,
+      why: "If errors were mixed with stdout, downstream pipes would parse error strings as valid data."
+    },
+    {
+      q: "What file descriptor does '2>' redirect?",
+      a: ["Standard error (stderr)","Standard input (stdin)","Standard output (stdout)","Network socket stream"],
+      c: 0,
+      why: "The prefix 2 specifically binds to file descriptor 2 (stderr)."
+    }
+  ]);
+</script>
+</body>
+</html>

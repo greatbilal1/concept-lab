@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 14 — Designing a system</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="oop" data-lesson="14" data-lesson-id="designing-a-system">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 14</span> · Putting it together</span>
+
+  <h1 class="lesson-title">Designing a system</h1>
+  <p class="lesson-lede">
+    You have every tool now. This lesson is about the order you reach for them: start
+    from the nouns, decide the relationships, protect the state, then add the Python
+    conveniences. Design is a sequence of small decisions, not one big one.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~15 min</span>
+    <span><b>Win</b> Design a small system end to end</span>
+    <span><b>Mission link</b> Your real project</span>
+  </div>
+
+  <h2><span class="n">1</span>Start from the nouns</h2>
+
+  <p>
+    Read the requirement and underline the nouns. They are your candidate classes.
+  </p>
+
+  <div class="note">
+    <span class="note-label">The requirement</span>
+    "A library lends books to members. Each book has a title and a number of copies.
+    A member can borrow a book if a copy is available. The library should be able to
+    list what is currently on loan."
+  </div>
+
+  <p>
+    Nouns: <b>library</b>, <b>book</b>, <b>member</b>, <b>loan</b>. Verbs:
+    <b>lend</b>, <b>borrow</b>, <b>list</b>. Nouns become classes; verbs become
+    methods.
+  </p>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Decide the relationships</h2>
+
+  <p>
+    For each pair, ask is-a or has-a.
+  </p>
+
+  <table>
+    <tr><th>Pair</th><th>Relationship</th><th>Tool</th></tr>
+    <tr><td>Library / Book</td><td>has-a</td><td>Composition</td></tr>
+    <tr><td>Member / Loan</td><td>has-a</td><td>Composition</td></tr>
+    <tr><td>Ebook / Book</td><td>is-a</td><td>Inheritance</td></tr>
+    <tr><td>Any item / describe</td><td>contract</td><td>Abstraction</td></tr>
+  </table>
+
+  <div class="note good">
+    <span class="note-label">The rule of thumb</span>
+    Default to composition. Reach for inheritance only when the is-a test clearly
+    passes and you genuinely want the parent's behaviour.
+  </div>
+
+  <h2><span class="n">3</span>The finished design</h2>
+
+  <pre><code>from abc import ABC, abstractmethod
+from dataclasses import dataclass, field
+
+class Item(ABC):
+    @abstractmethod
+    def describe(self): ...
+
+@dataclass
+class Book(Item):
+    title: str
+    copies: int = 0
+
+    def describe(self):
+        return f"{self.title} ({self.copies} copies)"
+
+class Library:
+    def __init__(self, name):
+        self.name = name
+        self._items = []
+        self._loans = []
+
+    def add(self, item):
+        self._items.append(item)
+
+    def borrow(self, title, member):
+        for item in self._items:
+            if item.title == title and item.copies &gt; 0:
+                item.copies -= 1
+                self._loans.append((title, member))
+                return True
+        return False
+
+    @property
+    def on_loan(self):
+        return [title for title, _ in self._loans]</code></pre>
+
+  <div class="note">
+    <span class="note-label">Read it back</span>
+    Abstraction (<code>Item</code>), dataclass (<code>Book</code>), composition
+    (<code>Library</code> holds items), encapsulation (<code>_items</code>,
+    <code>_loans</code>), properties (<code>on_loan</code>), and polymorphism
+    (<code>describe</code>). Every lesson is in this one file.
+  </div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Check yourself</h2>
+
+  <p>
+    Answer from memory. Every option has the same number of words.
+  </p>
+
+  <div id="quiz"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>
+      You can now take a plain-English requirement, find the nouns, choose the
+      relationships, protect the state, and add Python conveniences — in that order.
+      That is the whole course, applied once, end to end.
+    </p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+
+  <ol>
+    <li>
+      Write the requirement for your own project in one sentence and underline the
+      nouns.
+    </li>
+    <li>
+      For each pair of nouns, write "is-a" or "has-a" and pick the tool.
+    </li>
+    <li>
+      Build the smallest version that works — one class, one method, one test. Then
+      grow it.
+    </li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Read <a href="https://docs.python.org/3/tutorial/classes.html">The Python
+    Tutorial → Classes</a> end to end. You now know enough to read it as a review
+    rather than a mystery.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask me anything — "review my design?", "is this class
+    too big?", "should this be a dataclass?". Bring me your real project and I will
+    help you shape it.
+  </div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What do the nouns become?",
+    a: ["The methods of the system", "The classes of the system", "The tests of the system"],
+    c: 1,
+    why: "Nouns are the things in the system, so they become classes. Verbs become methods."
+  });
+
+  TeachWidgets.trace("#trace1", {
+    label: "Trace the borrow call",
+    code: [
+      "lib = Library(\"City\")",
+      "lib.add(Book(\"Dune\", 2))",
+      "lib.borrow(\"Dune\", \"ana\")",
+      "lib.on_loan"
+    ],
+    steps: [
+      { line: 0, vars: { "lib.name": "\"City\"", "lib._items": "[]", "lib._loans": "[]" } },
+      { line: 1, vars: { "lib._items": "[Book('Dune', 2)]", "lib._loans": "[]" } },
+      { line: 2, vars: { "item.copies": "1", "lib._loans": "[('Dune', 'ana')]" } },
+      { line: 3, vars: { "on_loan": "['Dune']" } }
+    ]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Where does design start?",
+      a: ["With the nouns first", "With the tests first", "With the database first", "With the file layout"],
+      c: 0,
+      why: "Nouns in the requirement are your candidate classes — that is where design starts."
+    },
+    {
+      q: "Which relationship is default?",
+      a: ["Inheritance, always preferred here", "Composition, usually preferred here", "Abstraction, always preferred here", "Neither, they are equal"],
+      c: 1,
+      why: "Default to composition; use inheritance only when the is-a test clearly passes."
+    },
+    {
+      q: "Why protect state?",
+      a: ["To make code shorter here now", "To keep rules in one place", "To make it run faster now", "To hide the class name now"],
+      c: 1,
+      why: "Encapsulation keeps the rules about valid state inside the class, in one place."
+    },
+    {
+      q: "What comes last?",
+      a: ["The relationships", "The conveniences", "The nouns", "The requirements"],
+      c: 1,
+      why: "Add Python conveniences like dunders and properties after the design is sound."
+    }
+  ]);
+</script>
+</body>
+</html>

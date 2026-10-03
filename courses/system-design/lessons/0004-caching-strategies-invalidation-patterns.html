@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 04 — Caching Strategies: Read-Through, Write-Behind, and Cache Invalidation</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="system-design" data-lesson="4" data-lesson-id="caching-strategies-invalidation-patterns">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 04</span> · Caching Strategies</span>
+
+  <h1 class="lesson-title">Caching Strategies: Read-Through, Write-Behind, and Cache Invalidation</h1>
+  <p class="lesson-lede">
+    High-speed data layers: Cache-Aside, Read-Through, Write-Through, Write-Behind (Write-Back), and the two hard problems: cache invalidation.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to design caching architectures using Cache-Aside, Write-Through, Write-Behind, and eviction policies.</span>
+    <span><b>Mission link</b> Mastering caching strategies: read-through, write-behind, and cache invalidation across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Caching Strategies: Read-Through, Write-Behind, and Cache Invalidation</h2>
+  <p><em>'There are only two hard things in Computer Science: cache invalidation and naming things.'</em> — Phil Karlton. A cache placed in front of a database can increase read throughput by <strong>50x</strong> and drop latency from 30ms to <strong>0.8ms</strong>. But if your caching strategy is flawed, users will read stale data or corrupt records.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    High-speed data layers: Cache-Aside, Read-Through, Write-Through, Write-Behind (Write-Back), and the two hard problems: cache invalidation.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Four Caching Patterns</h2>
+  <p>The Four Foundational Caching Patterns:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Cache Eviction on Mutation</h2>
+  <ul><li><strong>1. Cache-Aside (Lazy Loading — Industry Standard):</strong> Application reads from Redis. On Miss: Reads from DB $\rightarrow$ Writes to Redis with TTL $\rightarrow$ Returns data. <em>Advantage:</em> Only requested data is cached.</li><li><strong>2. Read-Through / Write-Through:</strong> The application treats the cache as the main data store. When a write occurs, the cache updates the database <strong>synchronously</strong> before confirming. <em>Advantage:</em> Data in cache is never stale! <em>Trade-off:</em> Higher write latency.</li><li><strong>3. Write-Behind (Write-Back):</strong> Writes go directly to the fast in-memory cache, and the cache writes asynchronously to the database in batches. <em>Advantage:</em> Blazingly fast writes! <em>Hazard:</em> If the cache crashes before flushing, <strong>data is lost permanently</strong>!</li><li><strong>4. Cache Invalidation Strategies:</strong> Time-to-Live (TTL expiration), Explicit Cache Eviction on write (`cache.delete(user_id)`), and Cache Purge webhooks.</li></ul><pre><code># The Cache-Aside Pattern in Python:
+async def get_user_profile(user_id: int) -> dict:
+    cache_key = f"user:{user_id}:profile"
+    
+    # 1. Check Redis Cache first (Sub-millisecond access!)
+    cached = await redis.get(cache_key)
+    if cached:
+        return json.loads(cached) # 0.8ms CACHE HIT!
+        
+    # 2. CACHE MISS -> Fetch from PostgreSQL Database (25ms)
+    profile_data = await db.fetch_user(user_id)
+    
+    # 3. Save to Redis with 1-hour TTL & return to user
+    await redis.set(cache_key, json.dumps(profile_data), ex=3600)
+    return profile_data</code></pre><div class="callout"><p><strong>The Mutation Rule:</strong> Whenever an entity is updated in the database, explicitly <strong>evict (delete)</strong> its cache key immediately. Deleting the key forces the next read to fetch fresh data, preventing stale reads.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the caching sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to design caching architectures using Cache-Aside, Write-Through, Write-Behind, and eviction policies.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where caching strategies: read-through, write-behind, and cache invalidation applies.</li>
+    <li>Author a unit test or verification script exercising caching strategies: read-through, write-behind, and cache invalidation.</li>
+    <li>Document team architectural conventions regarding caching strategies: read-through, write-behind, and cache invalidation.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Caching Strategies: Read-Through, Write-Behind, and Cache Invalidation.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is the 'Cache-Aside' (Lazy Loading) pattern in system architecture?",
+    a: ["The application checks the cache first; on a cache miss, it reads from the database, writes the result to the cache, and returns it to the user","The cache is placed on the side of the server rack","Data is cached in a browser cookie","The cache deletes all data"],
+    c: 0,
+    why: "Cache-Aside queries the cache first, lazily loading data from the database only on cache misses."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1. Cache-Aside (Lazy)",
+            "lines": [
+                  "App reads cache -> Miss -> Reads DB -> Saves cache",
+                  "Caches only actively queried data, resilient"
+            ]
+      },
+      {
+            "title": "2. Write-Through",
+            "lines": [
+                  "Writes update Cache & DB synchronously",
+                  "Zero stale data, higher write latency"
+            ]
+      },
+      {
+            "title": "3. Write-Behind (Write-Back)",
+            "lines": [
+                  "Writes hit Cache only -> Async batch write to DB",
+                  "Ultra-fast writes, risk of data loss on crash!"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Caching Strategies: Read-Through, Write-Behind, and Cache Invalidation",
+      "def execute_flow():",
+      "    # High-speed data layers: Cache-Aside, Read-Through,...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Caching Strategies: Read-Through, Write-Behind, and Cache Invalidation"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "User Updates Email"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The Cache-Aside pattern queries the cache first and lazily loads from the database on a miss, while explicit cache {1} on write updates prevents users from reading {2} data."
+],
+    blanks: [
+      {
+            "a": [
+                  "eviction"
+            ],
+            "why": "Deleting the cached key"
+      },
+      {
+            "a": [
+                  "stale"
+            ],
+            "why": "Outdated or obsolete"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What risk arises if a system uses the 'Write-Behind' (Write-Back) caching pattern and the cache node crashes before flushing to the database?",
+      a: ["Permanent data loss: writes stored only in volatile cache RAM that were not yet flushed to the persistent database are lost","The database is deleted","The server catches fire","The network speed drops"],
+      c: 0,
+      why: "Write-behind holds uncommitted mutations in volatile memory; crashes before disk sync lose data."
+    },
+    {
+      q: "Why is setting a Time-to-Live (TTL) on every cached key considered a mandatory defensive practice?",
+      a: ["It acts as a safety backstop ensuring stale data is eventually evicted even if an application bug misses an explicit cache eviction event","It makes the cache faster","It compresses the cache size","TTLs are required by Redis syntax"],
+      c: 0,
+      why: "TTLs guarantee eventual freshness, preventing orphaned or un-evicted keys from persisting forever."
+    },
+    {
+      q: "What is 'Cache Penetration' and how is it prevented?",
+      a: ["When queries for non-existent keys bypass the cache and hit the database repeatedly; prevented by caching null values or using Bloom filters","A physical break-in at a server room","A memory corruption bug","A slow network router"],
+      c: 0,
+      why: "Cache penetration occurs when requests for missing keys hit the database; caching nulls prevents repeated lookups."
+    },
+    {
+      q: "What is a 'Bloom Filter' in high-throughput caching systems?",
+      a: ["A space-efficient probabilistic data structure that tests whether an element is definitely NOT in a dataset before querying disk","A graphics rendering filter","A type of plant in an office","An audio filter"],
+      c: 0,
+      why: "Bloom filters quickly identify if a key does not exist, preventing unnecessary database lookups."
+    }
+  ]);
+</script>
+</body>
+</html>

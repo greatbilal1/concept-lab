@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 02 — Inner joins versus outer joins</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="sql-joins" data-lesson="2" data-lesson-id="inner-joins-versus-outer-joins">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 02</span> · Outer Joins & Missing Data</span>
+
+  <h1 class="lesson-title">Inner joins versus outer joins</h1>
+  <p class="lesson-lede">
+    Where did my customers go? Discover why INNER JOIN silently drops records, and how LEFT JOIN preserves every row from your primary table with NULL padding.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Select between INNER and LEFT joins to preserve records with optional relationships</span>
+    <span><b>Mission link</b> Eliminates the most common bug in business reporting queries: dropped rows</span>
+  </div>
+
+  <h2><span class="n">1</span>The tragedy of the dropped row</h2>
+  <p>A manager asks: <i>'List all customers and their total order count.'</i> You write an <code>INNER JOIN</code>. Your query looks great, but your report shows 800 customers when the database has 1,000 customers. What happened?</p><p>The 200 new customers who have not placed an order yet were <b>silently erased from your report!</b> When relationships are optional, you must use a <b>LEFT OUTER JOIN</b>: it returns <i>all</i> rows from the left table, inserting <code>NULL</code> for the right table columns if no match exists.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Use LEFT JOIN whenever child records are optional, ensuring parent rows are never dropped.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>INNER JOIN versus LEFT JOIN</h2>
+  <p>Contrast the strict intersection of INNER JOIN with the inclusive preservation of LEFT JOIN.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing LEFT JOIN row preservation</h2>
+  <p>Trace how a LEFT JOIN keeps all three users while correctly displaying NULL for user 3.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of outer joins.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can write comprehensive reports using LEFT JOIN that accurately preserve parent records with zero child activity.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Generate a customer order report using LEFT JOIN and COUNT(orders.id).</li>
+    <li>Observe how COUNT(*) reports 1 order for a customer with 0 orders due to the NULL row.</li>
+    <li>Fix the count by switching to COUNT(orders.id) to report 0.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Alan Beaulieu, *Learning SQL*, Chapter 10: 'Outer Joins'.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What appears in the 'orders.id' column for a customer with zero orders in a LEFT JOIN?",
+    a: ["NULL","The number 0","An empty text string ''","The query throws an unhandled exception"],
+    c: 0,
+    why: "When a LEFT JOIN finds no matching child record, it pads all right-side columns with NULL."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "INNER JOIN",
+            "lines": [
+                  "Only users WITH orders",
+                  "Users with 0 orders dropped!"
+            ]
+      },
+      {
+            "title": "LEFT JOIN",
+            "lines": [
+                  "ALL users preserved",
+                  "users without orders get NULL on order columns"
+            ]
+      },
+      {
+            "title": "Reporting Rule",
+            "lines": [
+                  "Always LEFT JOIN when counting:",
+                  "COUNT(orders.id) yields 0 instead of dropping!"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "SELECT u.name, o.id AS order_id",
+      "FROM users u",
+      "LEFT JOIN orders o ON u.id = o.user_id;"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "target": "fetch all users, optional orders"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "left_table": "users u (all rows preserved)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "result": "Ada -> Order 101, Bob -> Order 102, Charlie -> NULL"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The join that preserves all rows from the left table is <0> JOIN.",
+      "When a LEFT JOIN finds no match, it fills missing columns with <1>.",
+      "To count child items without counting NULLs, use COUNT(o.<2>)."
+],
+    blanks: [
+      {
+            "a": [
+                  "LEFT",
+                  "LEFT OUTER"
+            ],
+            "why": "LEFT JOIN preserves all left-side rows."
+      },
+      {
+            "a": [
+                  "NULL"
+            ],
+            "why": "Missing joined values are padded with NULL."
+      },
+      {
+            "a": [
+                  "id"
+            ],
+            "why": "COUNT(column) skips NULLs; COUNT(*) would count 1 row."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why does 'SELECT u.name, COUNT(*) FROM users u LEFT JOIN orders o ON ... GROUP BY u.name' report 1 order for users with zero orders?",
+      a: ["COUNT(*) counts the single preserved user row containing NULL order columns; use COUNT(o.id) instead","Because SQL adds 1 to all counts automatically","Because LEFT JOIN duplicates all rows","Because zero is not a valid number in SQL"],
+      c: 0,
+      why: "COUNT(*) counts rows in the group (which is 1 row with NULLs); COUNT(o.id) skips NULL and returns 0."
+    },
+    {
+      q: "When should you choose a LEFT JOIN over an INNER JOIN?",
+      a: ["Whenever you want to retain all rows from the primary table even if they have no matching child records","Whenever you want the query to run faster on the CPU","Only when joining tables that have identical column names","Only on Friday afternoon deploys"],
+      c: 0,
+      why: "LEFT JOIN is mandatory whenever the relationship is optional (e.g. users who might have 0 orders)."
+    },
+    {
+      q: "What is the difference between LEFT JOIN and RIGHT JOIN?",
+      a: ["LEFT JOIN preserves all rows from the first table; RIGHT JOIN preserves all rows from the second table","LEFT JOIN works on numbers; RIGHT JOIN works on text","RIGHT JOIN is faster because computers read from right to left","There is no difference between them"],
+      c: 0,
+      why: "RIGHT JOIN is simply the mirror image of LEFT JOIN; most teams standardize on LEFT JOIN for readability."
+    },
+    {
+      q: "What does the keyword 'OUTER' mean in 'LEFT OUTER JOIN'?",
+      a: ["It is completely optional syntactic sugar; LEFT JOIN and LEFT OUTER JOIN are 100% identical in SQL","It forces the query to use an external cloud database","It encrypts the joined columns","It sorts the results in reverse order"],
+      c: 0,
+      why: "The word OUTER is optional noise; LEFT JOIN is identical to LEFT OUTER JOIN."
+    }
+  ]);
+</script>
+</body>
+</html>

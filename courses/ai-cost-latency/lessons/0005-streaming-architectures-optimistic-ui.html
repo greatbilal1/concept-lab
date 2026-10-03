@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 05 — Streaming Architectures and Optimistic UI Rendering</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="ai-cost-latency" data-lesson="5" data-lesson-id="streaming-architectures-optimistic-ui">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 05</span> · Streaming UX</span>
+
+  <h1 class="lesson-title">Streaming Architectures and Optimistic UI Rendering</h1>
+  <p class="lesson-lede">
+    Conquering perceived latency: Server-Sent Events (SSE), WebSocket streaming, typewriter smoothing, and optimistic UI updates.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to design responsive streaming architectures and smooth perceived latency with SSE.</span>
+    <span><b>Mission link</b> Mastering streaming architectures and optimistic ui rendering across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Streaming Architectures and Optimistic UI Rendering</h2>
+  <p>Human perception is psychological. If a user clicks 'Submit' and stares at a frozen spinner for 4.5 seconds, they perceive the application as broken or slow. But if the first word appears in <strong>250 milliseconds</strong> and streams smoothly across the screen, the user perceives the application as <strong>blazingly fast</strong>—even if total generation takes 4.5 seconds!</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Conquering perceived latency: Server-Sent Events (SSE), WebSocket streaming, typewriter smoothing, and optimistic UI updates.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Blocking Wait vs Streaming Perception</h2>
+  <p>Production Streaming Architecture:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Agent Progress Event Stream</h2>
+  <ul><li><strong>1. Server-Sent Events (SSE):</strong> The industry standard for one-way token streaming over HTTP. Uses `Content-Type: text/event-stream`. Lightweight, firewall-friendly, and reconnects automatically.</li><li><strong>2. Typewriter Smoothing:</strong> Raw token streams arrive in erratic bursts (3 tokens, pause 40ms, 1 token). Frontend smoothers buffer tokens and emit them at a consistent human reading cadence (30-40 words/minute).</li><li><strong>3. Optimistic UI Updates:</strong> Immediately render the user's message in the chat timeline, play a typing sound, and display a subtle skeleton loader while the first SSE chunk arrives.</li><li><strong>4. Streaming Tool Call Artifacts:</strong> When an agent runs tools, stream structured progress events: <em>'Searching documentation...'</em> $\rightarrow$ <em>'Found 3 articles...'</em> $\rightarrow$ <em>'Synthesizing answer...'</em>. Transparency eliminates anxiety.</li></ul><pre><code># Fast Server-Sent Events (SSE) in FastAPI:
+from fastapi.responses import StreamingResponse
+
+@app.post("/api/chat/stream")
+async def stream_chat(prompt: str):
+    async def event_generator():
+        stream = await openai_client.chat.completions.create(
+            model="gpt-4o-mini", messages=[{"role": "user", "content": prompt}], stream=True
+        )
+        async for chunk in stream:
+            token = chunk.choices[0].delta.content or ""
+            yield f"data: {json.dumps({'token': token})}\n\n"
+            
+    return StreamingResponse(event_generator(), media_type="text/event-stream")</code></pre><div class="callout"><p><strong>The UX Rule:</strong> In consumer and enterprise chat, never block on complete generation. Always stream with Server-Sent Events.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the streaming UX sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to design responsive streaming architectures and smooth perceived latency with SSE.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where streaming architectures and optimistic ui rendering applies.</li>
+    <li>Author a unit test or verification script exercising streaming architectures and optimistic ui rendering.</li>
+    <li>Document team architectural conventions regarding streaming architectures and optimistic ui rendering.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Streaming Architectures and Optimistic UI Rendering.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Why is streaming tokens via Server-Sent Events (SSE) vastly superior to waiting for full JSON responses in user-facing AI products?",
+    a: ["Perceived latency drops from 4 seconds down to 200 milliseconds, because the user sees the model start typing almost instantly","Streaming uses fewer tokens","Streaming makes models smarter","Streaming eliminates server costs"],
+    c: 0,
+    why: "Streaming transforms a multi-second blocking wait into an immediate, engaging typewriter response."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Blocking JSON Response (Frustrating)",
+            "lines": [
+                  "User waits 4.8 seconds staring at spinner",
+                  "Perceived as sluggish and unresponsive"
+            ]
+      },
+      {
+            "title": "Streaming SSE (Engaging)",
+            "lines": [
+                  "First token appears in 220ms (TTFT)",
+                  "Streams smoothly at reading speed",
+                  "Perceived as instantaneous!"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Streaming Architectures and Optimistic UI Rendering",
+      "def execute_flow():",
+      "    # Conquering perceived latency: Server-Sent Events (...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Streaming Architectures and Optimistic UI Rendering"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Event 1"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Event 2"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "step": "Event 3"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Streaming architectures use Server-Sent {1} to deliver tokens incrementally, dropping perceived latency to sub-second {2}."
+],
+    blanks: [
+      {
+            "a": [
+                  "Events"
+            ],
+            "why": "SSE protocol"
+      },
+      {
+            "a": [
+                  "TTFT"
+            ],
+            "why": "Time-to-First-Token duration"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the primary advantage of Server-Sent Events (SSE) over WebSockets for text generation streaming?",
+      a: ["SSE operates over standard HTTP/HTTPS with automatic reconnection, simpler server architecture, and better compatibility with corporate proxies","SSE runs in binary","SSE costs zero money","WebSockets are forbidden in browsers"],
+      c: 0,
+      why: "SSE is a lightweight, one-way HTTP standard ideal for unidirectional token streaming."
+    },
+    {
+      q: "What is 'Typewriter Smoothing' in frontend chat user interfaces?",
+      a: ["A frontend rendering buffer that smooths out bursty network packet arrivals into a steady, pleasant reading pace","Making the computer play mechanical keyboard sounds","Converting text to uppercase","Spellchecking generated words"],
+      c: 0,
+      why: "Buffer smoothing ensures text appears fluid and natural to read rather than in jarring token chunks."
+    },
+    {
+      q: "Why is streaming intermediate status events essential during multi-step agent workflows?",
+      a: ["It keeps the user informed of active agent progress (e.g. 'Querying database...'), preventing users from abandoning the session","It speeds up Python","It reduces GPU memory usage","It makes database queries free"],
+      c: 0,
+      why: "Transparent progress updates eliminate user uncertainty during complex multi-step reasoning."
+    },
+    {
+      q: "What MIME type must be set in the HTTP response header for Server-Sent Events?",
+      a: ["text/event-stream","application/json","text/html","application/octet-stream"],
+      c: 0,
+      why: "The text/event-stream header signals to the browser client that incoming data is a persistent SSE event stream."
+    }
+  ]);
+</script>
+</body>
+</html>

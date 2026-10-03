@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 05 — Hash tables</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="data-structures" data-lesson="5" data-lesson-id="hash-tables">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 05</span> · Keyed lookup</span>
+
+  <h1 class="lesson-title">Hash tables</h1>
+  <p class="lesson-lede">
+    An array is fast when you know the <b>index</b>. But most of the time you do
+    not — you know a <b>name</b>. A hash table closes that gap: it turns a key
+    into an index, so lookup by name is as fast as lookup by position.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Explain collisions and why resizing keeps lookups fast</span>
+    <span><b>Mission link</b> Turning a key into an address</span>
+  </div>
+
+  <h2><span class="n">1</span>From key to slot</h2>
+
+  <p>
+    A hash table is an array underneath, plus one extra idea: a <b>hash
+    function</b> that converts a key into an array index. Give it the key
+    <code>"alice"</code> and it hands back a number like <code>3</code>. Store the
+    value at slot 3, and later you can find it again by hashing the same key.
+  </p>
+
+  <div id="diagram1"></div>
+
+  <p>
+    The same key always produces the same index — that is the only guarantee the
+    hash function has to make. It does not need to be random or reversible, just
+    <b>consistent</b>.
+  </p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    A hash table trades a little computation (hashing the key) for a huge saving
+    (jumping straight to the right slot instead of searching).
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Collisions</h2>
+
+  <p>
+    Two different keys can hash to the same slot. This is a <b>collision</b>, and
+    it is not a bug — with a finite table and unlimited possible keys, collisions
+    are guaranteed. The question is only how you handle them.
+  </p>
+
+  <p>
+    The common answer is <b>chaining</b>: each slot holds a small list, and
+    colliding keys simply share the slot. Lookup hashes the key, goes to the slot,
+    then scans the short list:
+  </p>
+
+  <pre><code>slots[3] = [("alice", 30), ("bob", 25)]
+# hash("alice") -> 3, then scan the list</code></pre>
+
+  <p>
+    The other answer is <b>probing</b>: if the slot is taken, look at the next
+    one, and the next, until you find a free space.
+  </p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">3</span>Load factor and resizing</h2>
+
+  <p>
+    As you add items, the slots fill up and the chains grow longer. The ratio of
+    stored items to slots is the <b>load factor</b>. When it climbs too high,
+    lookups slow down — a chain of ten items is a linear scan.
+  </p>
+
+  <p>
+    So the table <b>resizes</b>: it allocates a bigger array and rehashes every
+    key into it. That single operation is expensive, but it happens rarely, so the
+    <b>amortised</b> cost of an insert stays near constant.
+  </p>
+
+  <div id="intro1"></div>
+
+  <div class="note good">
+    <span class="note-label">Why this matters</span>
+    Resizing is why hash tables can promise O(1) average lookup while still
+    occasionally doing O(n) work. The average is what you feel in practice.
+  </div>
+
+  <h2><span class="n">4</span>Python's dict</h2>
+
+  <p>
+    You have been using a hash table all along. Python's <code>dict</code> is one,
+    written <code>{key: value}</code>. Lookup, insert and delete are all
+    near-constant time on average:
+  </p>
+
+  <pre><code>ages = {"alice": 30, "bob": 25}
+ages["alice"]        # 30 — hash the key, jump to the slot
+ages["carol"] = 41   # insert
+"bob" in ages        # True — membership is a lookup</code></pre>
+
+  <p>
+    The catch: keys must be <b>hashable</b> — immutable and consistent. Strings,
+    numbers and tuples qualify; lists do not, because a list can change after you
+    hash it.
+  </p>
+
+  <div id="lab1"></div>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>
+      You can explain how a key becomes an index, why collisions are unavoidable,
+      and how chaining and resizing keep lookups fast. You also know that
+      <code>dict</code> is a hash table, and why its keys must be immutable.
+    </p>
+  </div>
+
+  <h2><span class="n">5</span>Check yourself</h2>
+
+  <p>
+    Answer from memory — do not scroll back up. Each option has the same number of
+    words, so nothing gives the answer away.
+  </p>
+
+  <div id="quiz"></div>
+
+  <h2><span class="n">6</span>Do this next</h2>
+
+  <ol>
+    <li>
+      Build a tiny hash table with a list of 10 slots and a hash function of
+      <code>len(key) % 10</code>. Insert five keys and print the slots.
+    </li>
+    <li>
+      Find two short strings that land in the same slot with that function, and
+      explain what your table does with them.
+    </li>
+    <li>
+      Try using a list as a dict key and read the error. Explain in one sentence
+      why Python refuses.
+    </li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Read <a href="https://docs.python.org/3/tutorial/datastructures.html#dictionaries">Python — Dictionaries</a>.
+    It states the hashability requirement and the average-case cost of the
+    operations this lesson describes.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher (me) anything — "what makes a good
+    hash function?", "why is dict order preserved now?", "what is a set
+    underneath?". There are no bad questions here.
+  </div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  /* the shape of a hash table */
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      { title: "key", lines: ["\"alice\""] },
+      { title: "hash", lines: ["key -> number"] },
+      { title: "slot 3", lines: ["stores the value"] },
+      { title: "value", lines: ["30"] }
+    ]
+  });
+
+  /* predict-then-reveal */
+  TeachWidgets.predict("#predict1", {
+    q: "What does a hash function turn a key into?",
+    a: ["An array index", "A sorted list", "A linked node"],
+    c: 0,
+    why: "The hash function's whole job is to map a key onto a slot number in the underlying array."
+  });
+
+  /* step through a collision */
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "hash(\"alice\")  # -> 3",
+      "slots[3] = [(\"alice\", 30)]",
+      "hash(\"bob\")    # -> 3 too",
+      "slots[3].append((\"bob\", 25))"
+    ],
+    steps: [
+      { line: 0, vars: { key: "alice", slot: "3" } },
+      { line: 1, vars: { "slots[3]": "[alice]" } },
+      { line: 2, vars: { key: "bob", slot: "3", note: "collision" } },
+      { line: 3, vars: { "slots[3]": "[alice, bob]" } }
+    ]
+  });
+
+  /* three things a hash table gives you */
+  TeachWidgets.introCards("#intro1", {
+    cards: [
+      { ico: "🎯", title: "Direct jump", body: "The hash function computes the slot, so no searching is needed." },
+      { ico: "🔗", title: "Chains absorb", body: "Colliding keys share a slot and are scanned as a short list." },
+      { ico: "📈", title: "Resize keeps it fast", body: "Growing the table keeps chains short and lookups near constant." }
+    ]
+  });
+
+  /* the tiny interpreter */
+  TeachWidgets.lab("#lab1", {
+    label: "Run it — a dict is a hash table",
+    starter: "ages = {\"alice\": 30, \"bob\": 25}\nprint(ages[\"alice\"])\nages[\"carol\"] = 41\nprint(ages)\nprint(\"bob\" in ages)\nprint(len(ages))"
+  });
+
+  /* recall from memory */
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the hash table",
+    lines: [
+      "A hash function turns a key into an <0>",
+      "Two keys landing in one slot is a <1>",
+      "The ratio of items to slots is the <2>"
+    ],
+    blanks: [
+      { a: ["index"], why: "The hash function maps a key onto a slot number." },
+      { a: ["collision"], why: "A collision is two different keys hashing to the same slot." },
+      { a: ["load factor"], why: "Load factor is stored items divided by available slots." }
+    ]
+  });
+
+  /* the quiz — every option has equal word count */
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What does a hash function map?",
+      a: ["A key into a slot", "A value into a key", "A list into a set", "A node into a tree"],
+      c: 0,
+      why: "The hash function converts a key into an index in the underlying array."
+    },
+    {
+      q: "What is a collision?",
+      a: ["Two keys, one slot", "One key, two slots", "Two keys, two slots", "One key, one slot"],
+      c: 0,
+      why: "A collision happens when two different keys hash to the same index."
+    },
+    {
+      q: "What does resizing do?",
+      a: ["It grows the table", "It sorts the table", "It empties the table", "It copies the table"],
+      c: 0,
+      why: "Resizing allocates a larger array and rehashes every key into it."
+    },
+    {
+      q: "What is a dict good at?",
+      a: ["Look up by key", "Look up by index", "Look up by position", "Look up by order"],
+      c: 0,
+      why: "A dict is a hash table, so it shines at finding a value from its key."
+    }
+  ]);
+</script>
+</body>
+</html>

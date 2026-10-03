@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 03 — Bulk Codemods and AST Transformations with AI</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="ai-assisted-refactoring" data-lesson="3" data-lesson-id="bulk-codemods-ast-transforms">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 03</span> · Codemods</span>
+
+  <h1 class="lesson-title">Bulk Codemods and AST Transformations with AI</h1>
+  <p class="lesson-lede">
+    Combining Abstract Syntax Tree (AST) tools (LibCST, jscodeshift) with LLM reasoning for massive codebase migrations.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to combine AI agents with AST codemods for scalable codebase migrations.</span>
+    <span><b>Mission link</b> Mastering bulk codemods and ast transformations with ai across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Bulk Codemods and AST Transformations with AI</h2>
+  <p>When migrating 500 files to a new framework version (e.g. React class components to hooks, or SQLAlchemy 1.4 to 2.0), raw text regex search-and-replace is a disaster. Regex doesn't know scope, comments, or nested expressions. It replaces strings inside comments and breaks code syntax.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Combining Abstract Syntax Tree (AST) tools (LibCST, jscodeshift) with LLM reasoning for massive codebase migrations.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>AST Codemod vs Regex Search-and-Replace</h2>
+  <p>The professional approach pairs <strong>AST Codemods with LLMs</strong>:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>The Agent-Codemod Hybrid Workflow</h2>
+  <ul><li><strong>AST Codemod (Deterministic Machine):</strong> Uses libraries like `LibCST` (Python) or `jscodeshift` (JavaScript) to parse code into a syntax tree, rewrite nodes systematically, and preserve formatting.</li><li><strong>AI Agent (Semantic Helper):</strong> Writes the AST codemod script, inspects edge cases that the codemod couldn't handle, and fixes nuances that require semantic reasoning.</li></ul><pre><code># Prompting an Agent to Author a LibCST Codemod:
+"Write a LibCST transformer script that rewrites all calls to `db.query(User).filter(...)`
+into modern SQLAlchemy 2.0 `db.execute(select(User).where(...))`.
+Ensure comments and whitespace are preserved.
+Test the transformer against tests/test_fixtures.py before applying to src/."</code></pre><p>By having the agent write an AST codemod rather than editing 500 files by hand, you get 100% deterministic, repeatable transformations that run in seconds across your entire repository.</p><div class="callout"><p><strong>The Scale Rule:</strong> If a refactoring affects more than 20 files, have the agent author an AST codemod script rather than editing files individually.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the codemod sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to combine AI agents with AST codemods for scalable codebase migrations.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where bulk codemods and ast transformations with ai applies.</li>
+    <li>Author a unit test or verification script exercising bulk codemods and ast transformations with ai.</li>
+    <li>Document team architectural conventions regarding bulk codemods and ast transformations with ai.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Bulk Codemods and AST Transformations with AI.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Why is combining AST codemods with LLMs superior to using regex string search-and-replace for large migrations?",
+    a: ["AST tools understand the structural syntax tree of code, eliminating syntax breakage and false positive replacements","Regex is illegal in commercial software","AST tools run in the cloud","Regex only works on HTML"],
+    c: 0,
+    why: "AST tools operate on code structure rather than raw characters, making bulk transforms syntax-safe."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Regex Search-and-Replace (Fragile)",
+            "lines": [
+                  "Matches text inside strings & comments",
+                  "Breaks nested parenthesis & indentation",
+                  "High regression risk"
+            ]
+      },
+      {
+            "title": "AST Codemod (Syntax-Safe)",
+            "lines": [
+                  "Parses code into abstract syntax tree",
+                  "Transforms specific AST nodes",
+                  "100% syntactically valid result"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Bulk Codemods and AST Transformations with AI",
+      "def execute_flow():",
+      "    # Combining Abstract Syntax Tree (AST) tools (LibCST...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Bulk Codemods and AST Transformations with AI"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "1. Agent Writes Codemod"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "2. Run Across 500 Files"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "step": "3. Agent Polishes Nuances"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "AST codemods operate on the structural {1} of code, ensuring that bulk transformations preserve {2} validity."
+],
+    blanks: [
+      {
+            "a": [
+                  "syntax tree"
+            ],
+            "why": "Abstract representation of code structure"
+      },
+      {
+            "a": [
+                  "syntactic"
+            ],
+            "why": "Valid programming language grammar"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is an Abstract Syntax Tree (AST)?",
+      a: ["A tree representation of the abstract syntactic structure of source code written in a programming language","A botanical diagram of fruit trees","A database schema diagram","A git commit network graph"],
+      c: 0,
+      why: "An AST represents program structure hierarchically for compilers and analysis tools."
+    },
+    {
+      q: "What library is commonly used in the Python ecosystem for lossless syntax tree codemods?",
+      a: ["LibCST","requests","django","numpy"],
+      c: 0,
+      why: "LibCST parses and transforms Python syntax trees while preserving comments and whitespace."
+    },
+    {
+      q: "Why is having an agent write a codemod better than having it manually edit 500 files?",
+      a: ["A codemod is deterministic, fast, testable, and can be rerun repeatedly across branches","It consumes 100x more tokens","It deletes all git branches","Manual editing is faster"],
+      c: 0,
+      why: "Codemods execute in seconds across massive repositories with guaranteed structural consistency."
+    },
+    {
+      q: "How do you verify that an AST codemod script is safe before running it across the whole repo?",
+      a: ["Test the codemod on a representative fixture file and verify that the output compiles and passes tests","Run it directly on production servers","Delete the test suite","Ask someone on Twitter"],
+      c: 0,
+      why: "Testing codemods on isolated fixture files proves correctness before widespread execution."
+    }
+  ]);
+</script>
+</body>
+</html>

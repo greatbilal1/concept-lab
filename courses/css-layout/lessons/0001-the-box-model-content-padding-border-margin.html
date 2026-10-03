@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 01 — The box model: content, padding, border, margin</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="css-layout" data-lesson="1" data-lesson-id="the-box-model-content-padding-border-margin">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 01</span> · The Box Model</span>
+
+  <h1 class="lesson-title">The box model: content, padding, border, margin</h1>
+  <p class="lesson-lede">
+    In CSS, everything is a box. Master the four concentric layers — content, padding, border, and margin — that govern all element geometry.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Calculate element dimensions and account for margin collapsing</span>
+    <span><b>Mission link</b> The foundation of all layout geometry and spacing on the web</span>
+  </div>
+
+  <h2><span class="n">1</span>The four concentric boxes</h2>
+  <p>Every element rendered on a web page is composed of four concentric nested rectangles: <b>Content</b> (the text or image), <b>Padding</b> (clear space inside the border), <b>Border</b> (the outline around padding), and <b>Margin</b> (clear space outside the border separating neighboring elements).</p><p>A critical rule: <b>Vertical margins collapse</b>. If one paragraph has <code>margin-bottom: 20px</code> and the next has <code>margin-top: 30px</code>, the space between them is not 50px — it collapses to the largest value, 30px.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    The box model nests Content within Padding, Border, and Margin; vertical margins collapse.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The concentric layer diagram</h2>
+  <p>Visualise how the four layers wrap around an element from outside to inside.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing total width calculation</h2>
+  <p>Trace how the legacy content-box model calculates the total physical footprint of an element.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of box model layers.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can calculate element dimensions accurately and predict margin collapsing behavior.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Open DevTools and inspect the computed box model diagram of an element.</li>
+    <li>Observe margin collapsing between two paragraphs by changing margin values.</li>
+    <li>Notice how background colors fill the padding area but stop at the border.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    W3C: *CSS Box Model Module Level 3* (w3.org/TR/css-box-3).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "A box has margin-bottom: 24px, and the next box has margin-top: 16px. What is the vertical gap between them?",
+    a: ["24px (the larger margin)","40px (sum of both)","8px (difference)","0px"],
+    c: 0,
+    why: "In normal flow, adjoining vertical margins collapse to the maximum of the two values."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Margin (outer)",
+            "lines": [
+                  "transparent buffer",
+                  "collapses vertically with neighbors"
+            ]
+      },
+      {
+            "title": "Border",
+            "lines": [
+                  "solid / dashed outline",
+                  "visual boundary"
+            ]
+      },
+      {
+            "title": "Padding",
+            "lines": [
+                  "internal breathing room",
+                  "shares element background color"
+            ]
+      },
+      {
+            "title": "Content (inner)",
+            "lines": [
+                  "text, images, children",
+                  "core width and height"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "width = 200        # content width",
+      "padding = 20 * 2    # left + right = 40",
+      "border = 5 * 2      # left + right = 10",
+      "margin = 15 * 2     # left + right = 30",
+      "total_footprint = 200 + 40 + 10 + 30 # 280px total width on screen"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "content": "200px"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "with_padding": "240px"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "with_border": "250px"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "total": "280px rendered width"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The spacing between content and the border is <0>.",
+      "The spacing outside the border separating adjacent elements is <1>.",
+      "The behavior where adjacent vertical margins combine into one is <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "padding"
+            ],
+            "why": "Padding provides internal spacing inside the border."
+      },
+      {
+            "a": [
+                  "margin"
+            ],
+            "why": "Margin provides external spacing outside the border."
+      },
+      {
+            "a": [
+                  "collapsing"
+            ],
+            "why": "Margin collapsing combines adjoining vertical margins."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Does background-color apply to the margin area of an element?",
+      a: ["No, margins are always completely transparent buffers","Yes, background-color extends to the outer margin edge","Only on mobile web browsers","Yes, if the element has display: block"],
+      c: 0,
+      why: "Background colors fill the content and padding areas up to the border; margins are transparent."
+    },
+    {
+      q: "Under what condition does margin collapsing occur?",
+      a: ["Between adjoining vertical margins of block-level elements in normal flow","Between horizontal left and right margins of inline elements","Between flex items inside a flex container","Between elements styled with display: grid"],
+      c: 0,
+      why: "Margin collapsing only occurs vertically between normal-flow block elements."
+    },
+    {
+      q: "What is the innermost layer of the CSS box model?",
+      a: ["Content","Padding","Border","Margin"],
+      c: 0,
+      why: "Content sits at the core, surrounded successively by padding, border, and margin."
+    },
+    {
+      q: "How can you prevent margin collapsing between a parent element and its first child?",
+      a: ["Add padding or a border to the parent element, or use display: flow-root","Set the text color to transparent","Delete the child element","Increase the computer screen brightness"],
+      c: 0,
+      why: "Any padding, border, or new formatting context separates the margins and stops collapsing."
+    }
+  ]);
+</script>
+</body>
+</html>

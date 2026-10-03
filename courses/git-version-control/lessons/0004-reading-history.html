@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 04 — Reading history</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="git-version-control" data-lesson="4" data-lesson-id="reading-history">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 04</span> · History & commits</span>
+
+  <h1 class="lesson-title">Reading history</h1>
+  <p class="lesson-lede">
+    A history you cannot read is just storage. This lesson is how to ask Git
+    what happened, and how to read the answer.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~12 min</span>
+    <span><b>Win</b> Read a log, inspect a commit, and compare two points</span>
+    <span><b>Mission link</b> Reading history is the skill behind every recovery</span>
+  </div>
+
+  <h2><span class="n">1</span>The log is a list of commits</h2>
+
+  <p>
+    <code>git log</code> prints the commit history, newest first. By default it
+    is verbose — full ids, authors, dates, and messages. The first thing to learn
+    is how to make it readable:
+  </p>
+
+  <pre><code>git log --oneline</code></pre>
+
+  <p>
+    That gives one line per commit: a short id and the message. This is the view
+    you will use most often. It answers "what happened, in order?" at a glance.
+  </p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    <code>git log --oneline</code> is the default way to read history. Learn it
+    first and reach for the verbose form only when you need detail.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Inspecting one commit</h2>
+
+  <p>
+    When a line in the log catches your eye, ask Git to expand it:
+  </p>
+
+  <pre><code>git show a3f9c21</code></pre>
+
+  <p>
+    <code>git show</code> prints the commit's metadata and the exact changes it
+    introduced. This is how you answer "what did that commit actually do?" — the
+    question a saved-copies folder could never answer.
+  </p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Comparing two points</h2>
+
+  <p>
+    History is not only a list; it is a set of comparable states. <code>git
+    diff</code> can compare any two commits, not just the working tree:
+  </p>
+
+  <pre><code>git diff a3f9c21 b7e2d10</code></pre>
+
+  <p>
+    That shows everything that changed between those two snapshots. You can also
+    use names like <code>HEAD</code> (the current commit) and <code>HEAD~1</code>
+    (its parent). These relative names are how you will refer to "the previous
+    version" without copying long ids.
+  </p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+
+  <p>Recall the key facts from memory before the quiz.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <b>✓ Your win for today</b>
+    You can read a one-line log, expand a single commit, and diff any two points
+    in history.
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Run <code>git log --oneline</code> in a repository and read the messages top to bottom.</li>
+    <li>Pick a commit and run <code>git show</code> on it. Identify what changed.</li>
+    <li>Run <code>git diff HEAD~1 HEAD</code> and describe the change in one sentence.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Pro Git, Chapter 2 — "Viewing the Commit History" (git-scm.com/book).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "You run git log --oneline. Which commit appears at the top?",
+    a: [
+      "The most recent commit",
+      "The very first commit",
+      "The largest commit made",
+      "A randomly chosen commit"
+    ],
+    c: 0,
+    why: "git log lists commits newest first, so the top line is the most recent. The oldest commit is at the bottom."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      { title: "git log --oneline", lines: ["a3f9c21 rewrite intro", "b7e2d10 first draft"] },
+      { title: "git show a3f9c21", lines: ["metadata + message", "the exact changes"] },
+      { title: "git diff A B", lines: ["everything between", "two snapshots"] }
+    ]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    label: "Relative names in history",
+    code: [
+      "HEAD        -> a3f9c21",
+      "HEAD~1      -> b7e2d10",
+      "HEAD~2      -> 4c1a8e0"
+    ],
+    steps: [
+      { line: 0, vars: { HEAD: "a3f9c21" } },
+      { line: 1, vars: { HEAD: "a3f9c21", "HEAD~1": "b7e2d10" } },
+      { line: 2, vars: { HEAD: "a3f9c21", "HEAD~1": "b7e2d10", "HEAD~2": "4c1a8e0" } }
+    ]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the blanks",
+    lines: [
+      "The compact history view is <0>.",
+      "To expand one commit you run <1>.",
+      "The current commit is named <2>.",
+      "Its parent is named <3>."
+    ],
+    blanks: [
+      { a: ["git log --oneline"], why: "The --oneline flag gives one line per commit." },
+      { a: ["git show"], why: "git show prints a commit's metadata and its changes." },
+      { a: ["HEAD"], why: "HEAD is a name for the commit you are currently on." },
+      { a: ["HEAD~1"], why: "HEAD~1 means one commit before HEAD." }
+    ]
+  });
+
+  /* the quiz — every option must have the SAME number of words */
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "In what order does git log list commits?",
+      a: ["The newest commit first", "The oldest commit first", "In strict alphabetical order", "In a random order"],
+      c: 0,
+      why: "git log shows the newest commit at the top and walks backwards in time."
+    },
+    {
+      q: "What is a commit id?",
+      a: ["A unique identifier for commit", "A branch name for commit", "A file name for commit", "A tag name for commit"],
+      c: 0,
+      why: "The id is a hash that uniquely identifies the commit. Branch, file, and tag names are different kinds of names."
+    },
+    {
+      q: "What does HEAD refer to?",
+      a: ["The current branch pointer", "The remote branch pointer", "The oldest commit made", "The staging area index"],
+      c: 0,
+      why: "HEAD points at the commit you are currently on — normally the tip of your current branch."
+    },
+    {
+      q: "What does git log --oneline give you?",
+      a: ["It shows one line each", "It shows the full diffs", "It shows only the authors", "It shows only the dates"],
+      c: 0,
+      why: "The --oneline flag compresses each commit to a single line: short id plus message."
+    }
+  ]);
+</script>
+</body>
+</html>

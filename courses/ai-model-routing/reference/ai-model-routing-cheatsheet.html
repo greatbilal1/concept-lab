@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Model Routing & Fallbacks — Cheat Sheet</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+<style>
+  .ref-toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0 8px; }
+  .ref-toc a { font-size: .8rem; border: 1px solid var(--border); background: #111a30; padding: 5px 11px; border-radius: 999px; color: var(--muted); text-decoration: none; border-bottom: 1px solid var(--border); }
+  .ref-toc a:hover { color: #fff; border-color: #3d5488; }
+  .lesson-wrap h2 { scroll-margin-top: 20px; }
+  .snippet { margin: 14px 0 22px; }
+  .snippet .lbl { font-size: .72rem; font-weight: 800; letter-spacing: .7px; text-transform: uppercase; color: var(--accent2); margin-bottom: 6px; }
+  .see { font-size: .82rem; color: var(--muted); margin: -6px 0 12px; }
+  .see a { color: var(--accent2); border-bottom: 0; }
+  .see a:hover { color: #fff; }
+  .snippet pre { padding-top: 34px; }
+  @media print { .snippet pre { padding-top: 18px; } }
+</style>
+</head>
+<body class="lesson-body" data-course="ai-model-routing">
+
+<div class="lesson-wrap">
+
+  <span class="lesson-kicker">Reference · Cheat sheet</span>
+  <h1 class="lesson-title">AI Model Routing & Fallbacks — Cheat Sheet</h1>
+  <p class="lesson-lede">
+    The whole course on one page. Every snippet links back to the lesson that
+    teaches it.
+  </p>
+
+  <div class="ref-toc">
+    <a href="#sec-1">Semantic Router Utterance Matcher</a>
+    <a href="#sec-2">LiteLLM Proxy Multi-Provider Fallback</a>
+    <a href="#sec-3">Circuit Breaker Failover Logic</a>
+    <a href="#sec-4">EWMA Latency Update Calculation</a>
+  </div>
+
+  <h2 id="sec-1"><span class="n">1</span>Semantic Router Utterance Matcher</h2>
+  <div class="snippet">
+    <div class="lbl">12ms vector space intent dispatch</div>
+    <pre><code>from semantic_router import Route, RouteLayer
+from semantic_router.encoders import OpenAIEncoder
+code_route = Route(name="code", utterances=["fix KeyError", "write python code"])
+router = RouteLayer(encoder=OpenAIEncoder(), routes=[code_route])
+choice = router("Syntax error in line 42")
+if choice.name == 'code': dispatch_to_sonnet()</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0002-semantic-intent-request-routing.html">Lesson 02 — Semantic and Intent-Based Request Routing</a>.</p>
+
+  <h2 id="sec-2"><span class="n">2</span>LiteLLM Proxy Multi-Provider Fallback</h2>
+  <div class="snippet">
+    <div class="lbl">Declarative YAML config</div>
+    <pre><code>model_list:
+  - model_name: gpt-4o
+    litellm_params: { model: openai/gpt-4o, api_key: os.environ/OPENAI_KEY }
+  - model_name: gpt-4o
+    litellm_params: { model: anthropic/claude-3-5-sonnet, api_key: os.environ/ANTHROPIC_KEY }
+router_settings:
+  fallbacks: [{"gpt-4o": ["claude-3-5-sonnet"]}]</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0007-enterprise-gateway-proxies-litellm.html">Lesson 07 — Enterprise Gateway Proxies: LiteLLM, Portkey</a>.</p>
+
+  <h2 id="sec-3"><span class="n">3</span>Circuit Breaker Failover Logic</h2>
+  <div class="snippet">
+    <div class="lbl">Instant failover on degradation</div>
+    <pre><code>for provider in [primary, backup_1, backup_2]:
+    if breaker[provider.id].is_open(): continue
+    try:
+        return await provider.call(prompt)
+    except (RateLimitError, APIConnectionError):
+        breaker[provider.id].record_failure()</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0004-provider-fallbacks-circuit-breakers.html">Lesson 04 — Provider Fallbacks and Circuit Breakers</a>.</p>
+
+  <h2 id="sec-4"><span class="n">4</span>EWMA Latency Update Calculation</h2>
+  <div class="snippet">
+    <div class="lbl">Real-time rolling latency tracker</div>
+    <pre><code>ALPHA = 0.3
+def update_ewma(current_ewma, latest_latency_ms):
+    return (ALPHA * latest_latency_ms) + ((1.0 - ALPHA) * current_ewma)</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0005-active-latency-error-routing.html">Lesson 05 — Active Latency and Error Rate Routing</a>.</p>
+
+  <div class="lesson-foot">
+    <div class="links">
+      <a href="ai-model-routing-glossary.html">📖 Glossary</a>
+      <a href="../course.html">← Course map</a>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

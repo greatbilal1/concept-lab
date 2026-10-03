@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 02 — The Peril of Plausible-Looking Hallucinations</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="trusting-ai-generated-code" data-lesson="2" data-lesson-id="plausible-hallucinations">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 02</span> · Hallucinations</span>
+
+  <h1 class="lesson-title">The Peril of Plausible-Looking Hallucinations</h1>
+  <p class="lesson-lede">
+    Unmasking plausible-looking hallucinations: fabricated API parameters, non-existent libraries, and bogus regexes.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to detect and defend against plausible-looking AI code hallucinations.</span>
+    <span><b>Mission link</b> Mastering the peril of plausible-looking hallucinations across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of The Peril of Plausible-Looking Hallucinations</h2>
+  <p>A syntax error is noisy: your compiler halts, prints red text, and points to line 12. A <strong>plausible hallucination</strong>, however, is completely silent. The code looks beautiful, reads naturally, compiles without warnings, and fails only when edge cases strike in production.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Unmasking plausible-looking hallucinations: fabricated API parameters, non-existent libraries, and bogus regexes.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Anatomy of a Plausible Hallucination</h2>
+  <p>Common varieties of plausible code hallucinations include:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Detecting Silent Hallucinations</h2>
+  <ul><li><strong>Phantom API Parameters:</strong> Inventing parameters that sound completely logical (e.g. `stripe.Charge.create(..., auto_retry=True)`). The parameter is ignored by the SDK, and retries never occur!</li><li><strong>Invented Standard Library Methods:</strong> Calling `datetime.now().is_leap_year()`. It sounds like it should exist in Python, but it raises an `AttributeError` at runtime!</li><li><strong>Flawed Regular Expressions:</strong> Generating an email or phone regex that passes basic tests but is vulnerable to catastrophic backtracking (ReDoS) or matches invalid input.</li></ul><pre><code># THE PHANTOM PARAMETER HALLUCINATION:
+# Agent code looks flawless:
+client.upload_file(
+    bucket="my-bucket",
+    key="data.csv",
+    file_path="/tmp/data.csv",
+    encrypt_at_rest=True # HALLUCINATION! The AWS SDK ignores this unrecognized kwarg!
+)
+# Result: Data is uploaded unencrypted in violation of compliance!</code></pre><div class="callout"><p><strong>The Verification Rule:</strong> Never assume an API parameter exists just because its name sounds logical. Verify every third-party SDK method against official documentation!</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the hallucination sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to detect and defend against plausible-looking AI code hallucinations.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where the peril of plausible-looking hallucinations applies.</li>
+    <li>Author a unit test or verification script exercising the peril of plausible-looking hallucinations.</li>
+    <li>Document team architectural conventions regarding the peril of plausible-looking hallucinations.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for The Peril of Plausible-Looking Hallucinations.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What makes an AI code hallucination particularly insidious compared to an ordinary syntax error?",
+    a: ["It uses convincing variable names and fluent structure that look 100% correct to human eyes while being subtly wrong","It deletes the computer operating system","It changes the color of the IDE","It makes the network disconnect"],
+    c: 0,
+    why: "Plausible hallucinations mimic correct syntax, bypassing visual human inspection without throwing errors."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Plausible Appearance",
+            "lines": [
+                  "`client.fetch(..., timeout_seconds=10)`",
+                  "Sounds completely idiomatic & clean"
+            ]
+      },
+      {
+            "title": "SDK Reality",
+            "lines": [
+                  "SDK parameter is actually `timeout=10`",
+                  "kwargs silently ignores `timeout_seconds`!"
+            ]
+      },
+      {
+            "title": "Production Consequence",
+            "lines": [
+                  "Zero timeout applied",
+                  "Connections hang indefinitely under load"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing The Peril of Plausible-Looking Hallucinations",
+      "def execute_flow():",
+      "    # Unmasking plausible-looking hallucinations: fabric...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "The Peril of Plausible-Looking Hallucinations"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Mypy / TypeScript"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Integration Tests"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Plausible hallucinations are dangerous because they mimic correct {1} while inventing non-existent parameters that fail {2} at runtime."
+],
+    blanks: [
+      {
+            "a": [
+                  "syntax"
+            ],
+            "why": "Grammar and code structure"
+      },
+      {
+            "a": [
+                  "silently"
+            ],
+            "why": "Without raising loud warnings"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is a 'phantom parameter' hallucination?",
+      a: ["An imaginary argument invented by the model that sounds logical but is ignored or rejected by the real library SDK","A ghost inside the computer","A parameter that changes its name every week","A feature in modern IDEs"],
+      c: 0,
+      why: "Models generate statistically plausible parameter names that do not exist in real API schemas."
+    },
+    {
+      q: "Why does strict static type checking (like Mypy with no-untyped-defs) catch phantom parameters?",
+      a: ["The type checker validates keyword arguments against real function signatures and flags unexpected kwargs","It deletes the hallucinated code","It rewrites Python into Java","It reduces file sizes"],
+      c: 0,
+      why: "Strict type checkers compare call-site arguments against verified function signatures."
+    },
+    {
+      q: "What is ReDoS (Regular Expression Denial of Service)?",
+      a: ["A vulnerability where a poorly designed regex causes catastrophic backtracking on certain inputs, consuming 100% CPU","A tool that restarts the computer","A feature in web browsers","A git merge conflict"],
+      c: 0,
+      why: "Catastrophic backtracking freezes CPU threads when processing crafted input strings."
+    },
+    {
+      q: "How should an engineer verify complex regex patterns generated by an AI model?",
+      a: ["Test the regex against positive, negative, and adversarial inputs using automated test suites and regex analyzers","Assume it works if it looks long","Ask the AI if the regex is correct","Never use regex"],
+      c: 0,
+      why: "Empirical testing with edge-case strings proves regular expression correctness and safety."
+    }
+  ]);
+</script>
+</body>
+</html>

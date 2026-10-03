@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 01 — Files are streams of bytes</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="python-files-json-data" data-lesson="1" data-lesson-id="files-are-streams">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 01</span> · Files</span>
+
+  <h1 class="lesson-title">Files are streams of bytes</h1>
+  <p class="lesson-lede">
+    Everything you will do with data starts with one idea: a file is not a
+    document, it is a stream of bytes with a position. Get that picture right and
+    the rest of this course is detail.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Open, read and close a file</span>
+    <span><b>Mission link</b> Data outlives the program</span>
+  </div>
+
+  <h2><span class="n">1</span>A file is bytes on disk</h2>
+
+  <p>
+    When your program ends, its variables vanish. A file is how data survives that
+    ending. On disk a file is just a named sequence of bytes — no structure, no
+    types, no rows. Any meaning is something your program imposes when it reads.
+  </p>
+
+  <p>
+    Python gives you a <b>file handle</b> from <code>open()</code>. The handle is
+    not the file; it is a connection to it, with a <b>position</b> that moves as
+    you read.
+  </p>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Open, read, close</h2>
+
+  <p>
+    The three-step shape is always the same, and the third step is the one people
+    forget:
+  </p>
+
+  <pre><code>f = open("notes.txt", "r")   # open
+text = f.read()              # read
+f.close()                    # close — releases the handle</code></pre>
+
+  <p>
+    Forgetting <code>close()</code> leaks a handle. On a small script you may never
+    notice; in a long-running program you will run out of them. Lesson 3 shows the
+    form that closes for you.
+  </p>
+
+  <div id="intro1"></div>
+
+  <h2><span class="n">3</span>The position moves</h2>
+
+  <p>
+    Reading is not a lookup — it is a walk. Each read advances the position, so a
+    second <code>read()</code> returns what comes next, not the same text again.
+  </p>
+
+  <div id="trace1"></div>
+
+  <p>
+    This is why <code>f.read()</code> twice gives you the whole file and then an
+    empty string. The handle is exhausted, not broken.
+  </p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    A file handle is a <b>cursor over bytes</b>. Reading moves the cursor forward;
+    it never rewinds on its own.
+  </div>
+
+  <h2><span class="n">4</span>Text mode vs binary mode</h2>
+
+  <p>
+    <code>open()</code> defaults to text mode, which decodes bytes into
+    <code>str</code> using an encoding. Binary mode gives you raw
+    <code>bytes</code> with no decoding at all.
+  </p>
+
+  <div id="diagram1"></div>
+
+  <p>
+    Use text mode for anything a human reads or writes. Use binary mode for images,
+    archives, and any format whose bytes are not characters.
+  </p>
+
+  <div class="note good">
+    <span class="note-label">Why this matters later</span>
+    Every format in this course — JSON, CSV, plain text — is built on this one
+    primitive. When a file "looks wrong", the cause is almost always the encoding
+    or the mode, not the format.
+  </div>
+
+  <h2><span class="n">5</span>Check yourself</h2>
+
+  <p>
+    Answer from memory — do not scroll back up. Each option has the same number of
+    words, so nothing gives the answer away.
+  </p>
+
+  <div id="fill1"></div>
+  <div id="quiz"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>
+      You can now open a file, read it, and close it, and you can explain why a
+      second read returns nothing. That mental model — a cursor over bytes — is the
+      foundation for everything that follows.
+    </p>
+  </div>
+
+  <h2><span class="n">6</span>Do this next</h2>
+
+  <ol>
+    <li>
+      Create a small text file and read it twice in one program. Confirm the second
+      read is empty.
+    </li>
+    <li>
+      Open the same file in binary mode and print the type of what you get back.
+      Notice it is <code>bytes</code>, not <code>str</code>.
+    </li>
+    <li>
+      Deliberately forget <code>close()</code> and read the docs on why it matters.
+    </li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Read the Python docs on
+    <a href="https://docs.python.org/3/tutorial/inputoutput.html#reading-and-writing-files">reading and writing files</a>,
+    which covers modes, encoding and the file object.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher (me) anything — "what is a file
+    descriptor?", "why does read() take a size?", "what happens if the file does
+    not exist?". There are no bad questions here.
+  </div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  /* the three steps */
+  TeachWidgets.introCards("#intro1", {
+    cards: [
+      { ico: "🔓", title: "open()", body: "Returns a handle connected to the file on disk." },
+      { ico: "📖", title: "read()", body: "Returns the bytes or text and advances the position." },
+      { ico: "🔒", title: "close()", body: "Releases the handle so the operating system can reuse it." }
+    ]
+  });
+
+  /* predict-then-reveal */
+  TeachWidgets.predict("#predict1", {
+    q: "You call `f.read()` twice on the same handle. What does the second call return?",
+    a: ["The same text again", "An empty string", "An error is raised"],
+    c: 1,
+    why: "Reading advances the position to the end, so the second read has nothing left to return."
+  });
+
+  /* step-through trace of the position */
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "f = open(\"notes.txt\")",
+      "f.read()   -> \"hello world\"",
+      "  position now at end",
+      "f.read()   -> \"\"",
+      "f.close()"
+    ],
+    steps: [
+      { line: 0, vars: { handle: "open", position: 0 } },
+      { line: 1, vars: { returned: "hello world" } },
+      { line: 2, vars: { position: 11 } },
+      { line: 3, vars: { returned: "empty string" } },
+      { line: 4, vars: { handle: "closed" } }
+    ]
+  });
+
+  /* text vs binary */
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      { title: "Bytes on disk", lines: ["68 65 6c 6c 6f", "no meaning yet"] },
+      { title: "Text mode", lines: ["decode with encoding", "you get str"] },
+      { title: "Binary mode", lines: ["no decoding", "you get bytes"] }
+    ]
+  });
+
+  /* recall from memory */
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — the three steps",
+    lines: [
+      "Get a handle with <code><0>(\"notes.txt\")</code>",
+      "Read the contents with <code>f.<1>()</code>",
+      "Release the handle with <code>f.<2>()</code>"
+    ],
+    blanks: [
+      { a: ["open"], why: "open() returns a file handle connected to the file." },
+      { a: ["read"], why: "read() returns the contents and advances the position." },
+      { a: ["close"], why: "close() releases the handle back to the operating system." }
+    ]
+  });
+
+  /* the quiz — every option is exactly three words */
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is a file on disk?",
+      a: ["A named byte sequence", "A structured table", "A Python object", "A type of variable"],
+      c: 0,
+      why: "On disk a file is just a named sequence of bytes; any structure is imposed by the reader."
+    },
+    {
+      q: "What does open() return?",
+      a: ["The file contents", "A file handle", "A file path", "A byte string"],
+      c: 1,
+      why: "open() returns a handle — a connection to the file with a moving position."
+    },
+    {
+      q: "Why read twice fails?",
+      a: ["The handle is closed", "The position moved on", "The file was deleted", "The mode is wrong"],
+      c: 1,
+      why: "Reading advances the position to the end, so the second read finds nothing left."
+    }
+    {
+      q: "Why is a file a stream?",
+      a: ["It stores only text", "It is read in order", "It lives in memory", "It is always compressed"],
+      c: 1,
+      why: "A file is a sequence of bytes read in order, not a random-access structure."
+    }
+  ]);
+</script>
+</body>
+</html>

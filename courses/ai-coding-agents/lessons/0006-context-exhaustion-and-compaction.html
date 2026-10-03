@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 06 — Context Window Exhaustion and Compaction</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="ai-coding-agents" data-lesson="6" data-lesson-id="context-exhaustion-and-compaction">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 06</span> · Context Budget</span>
+
+  <h1 class="lesson-title">Context Window Exhaustion and Compaction</h1>
+  <p class="lesson-lede">
+    Managing context degradation, token limits, conversation truncation, and strategic summarization.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to manage context exhaustion and compaction during agent tasks.</span>
+    <span><b>Mission link</b> Mastering context window exhaustion and compaction across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Context Window Exhaustion and Compaction</h2>
+  <p>Even with massive context windows (128k, 200k, 1M tokens), more context is not always better. Research on <strong>attention degradation</strong> demonstrates that language models perform best when their context window contains a high concentration of relevant signal.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Managing context degradation, token limits, conversation truncation, and strategic summarization.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Context Degradation Curve</h2>
+  <p>When an agent executes 30 terminal commands, each returning 500 lines of test output, the context becomes flooded with noisy logs. This leads to two critical problems:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Compaction Checkpoint Flow</h2>
+  <ul><li><strong>Lost in the Middle:</strong> Important constraints stated at the beginning of the prompt get drowned out by recent terminal spam.</li><li><strong>Context Exhaustion:</strong> Approaching the hard token limit forces aggressive truncation, cutting off early decisions.</li></ul><p>Sophisticated agent architectures employ <strong>Context Compaction</strong>:</p><pre><code># The Compaction Transformation
+# BEFORE: 45 raw terminal outputs (42,000 tokens of test traces)
+# AFTER: Structured summary checkpoint (600 tokens):
+# "Session checkpoint: Fixed auth tokens, updated User schema.
+#  Current status: 14/15 tests passing. Failing test: test_billing_invoice()"</code></pre><p>Compaction replaces hundreds of turns of trial-and-error with an authoritative checkpoint, resetting the context budget while preserving essential progress.</p><div class="callout"><p><strong>Practical Tip:</strong> When working with coding agents on big tasks, don't let one conversation run for 100 turns. Start a fresh session with a clear summary prompt after completing each major milestone!</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the context management sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to manage context exhaustion and compaction during agent tasks.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where context window exhaustion and compaction applies.</li>
+    <li>Author a unit test or verification script exercising context window exhaustion and compaction.</li>
+    <li>Document team architectural conventions regarding context window exhaustion and compaction.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Context Window Exhaustion and Compaction.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is 'context rot' or attention degradation in long agent sessions?",
+    a: ["As the context window fills with thousands of lines of terminal logs and diffs, the model's ability to recall subtle initial instructions drops","The hard drive sector where context is stored rots physically","The Python interpreter leaks memory during long sessions","The internet router drops packets"],
+    c: 0,
+    why: "Massive token noise dilutes attention, causing the model to lose track of initial constraints."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Low Token Volume (10k)",
+            "lines": [
+                  "High attention focus",
+                  "Follows subtle instructions perfectly"
+            ]
+      },
+      {
+            "title": "Moderate Volume (50k)",
+            "lines": [
+                  "Good performance",
+                  "Occasional misses on edge constraints"
+            ]
+      },
+      {
+            "title": "Saturated Volume (120k+)",
+            "lines": [
+                  "High distraction from terminal noise",
+                  "Prone to loops and amnesia"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Context Window Exhaustion and Compaction",
+      "def execute_flow():",
+      "    # Managing context degradation, token limits, conver...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Context Window Exhaustion and Compaction"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "1. Saturated Context"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "2. Generate Checkpoint"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "step": "3. Compact History"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "To prevent attention degradation and context exhaustion, long agent sessions use {1} to replace verbose logs with concise {2}."
+],
+    blanks: [
+      {
+            "a": [
+                  "compaction"
+            ],
+            "why": "Compressing history into summaries"
+      },
+      {
+            "a": [
+                  "checkpoints"
+            ],
+            "why": "Milestone summaries of state"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What causes 'attention degradation' in large context windows?",
+      a: ["Excessive noisy text (like verbose test logs and diffs) diluting the model's focus on critical constraints","The model's weights changing dynamically","CPU thermal throttling","Exceeding the speed of light in optical cables"],
+      c: 0,
+      why: "Attention mechanisms must distribute probability weights; excessive noise weakens attention on key instructions."
+    },
+    {
+      q: "How does context compaction benefit a multi-step coding task?",
+      a: ["It frees up token capacity while preserving the distilled record of decisions, completed tasks, and current blockers","It makes the model run without internet","It deletes all git branches","It prevents syntax errors permanently"],
+      c: 0,
+      why: "Compaction distills hundreds of noisy turns into a compact, actionable state summary."
+    },
+    {
+      q: "What is the 'Lost in the Middle' phenomenon?",
+      a: ["The tendency of LLMs to recall information at the beginning and end of long contexts much better than information in the middle","A bug in git merge drivers","Losing internet connection during inference","Forgetting to close quotation marks in code"],
+      c: 0,
+      why: "Attention distributions naturally peak at prompt beginnings and recent turns, weakening retrieval in the middle."
+    },
+    {
+      q: "When is the ideal time for a human engineer to start a fresh agent session?",
+      a: ["After completing a major logical milestone or PR component, passing the distilled checkpoint into the new prompt","After every single tool call","Only once per month","Never; one session should run forever"],
+      c: 0,
+      why: "Fresh sessions with clean checkpoints provide the highest intelligence and lowest latency."
+    }
+  ]);
+</script>
+</body>
+</html>

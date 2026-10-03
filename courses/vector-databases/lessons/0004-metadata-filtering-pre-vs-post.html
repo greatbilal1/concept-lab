@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 04 — Metadata Filtering: Pre-Filtering vs Post-Filtering</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="vector-databases" data-lesson="4" data-lesson-id="metadata-filtering-pre-vs-post">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 04</span> · Filtered Search</span>
+
+  <h1 class="lesson-title">Metadata Filtering: Pre-Filtering vs Post-Filtering</h1>
+  <p class="lesson-lede">
+    The filtered vector search challenge: Pre-filtering (filter then search) vs Post-filtering (search then filter) vs Single-Stage HNSW.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You understand the challenges and solutions of filtered vector search across enterprise databases.</span>
+    <span><b>Mission link</b> Mastering metadata filtering: pre-filtering vs post-filtering across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Metadata Filtering: Pre-Filtering vs Post-Filtering</h2>
+  <p>In real-world enterprise software, you never do raw vector search alone. You do <strong>Filtered Vector Search</strong>: <em>'Find the 5 most similar documents, BUT ONLY where `department == "finance"` AND `created_year >= 2024`.'</em></p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    The filtered vector search challenge: Pre-filtering (filter then search) vs Post-filtering (search then filter) vs Single-Stage HNSW.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Filtered Vector Search Strategies</h2>
+  <p>Combining metadata filtering with vector indexing is notoriously difficult:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Multi-Tenant Isolation</h2>
+  <ul><li><strong>1. Post-Filtering (Naive & Flawed):</strong> Run vector search first to find the top 50 candidates, then filter by metadata. <em>Fatal Flaw:</em> If only 1% of your documents belong to 'finance', all 50 candidates might be engineering docs! The user gets an empty result even though finance docs exist in the database!</li><li><strong>2. Pre-Filtering (Slow):</strong> Find all matching metadata rows first, then do a flat brute-force vector search over the filtered subset. <em>Flaw:</em> Bypasses the fast HNSW index, resulting in slow sequential scans.</li><li><strong>3. Single-Stage Filtered HNSW (Modern Standard):</strong> Used by pgvector, Qdrant, and Pinecone. The HNSW graph traversal is <strong>filter-aware in real time</strong>: as the search hops from node to node, it inspects metadata masks, exploring only nodes that satisfy the metadata filter!</li></ul><pre><code># Single-Stage Filtered Vector Search in SQL (pgvector):
+SELECT id, content, 1 - (embedding <=> :query_vector) AS similarity
+FROM documents
+WHERE tenant_id = 'acme_corp'          -- Relational metadata filter
+  AND status = 'published'
+ORDER BY embedding <=> :query_vector  -- HNSW vector similarity
+LIMIT 5;</code></pre><div class="callout"><p><strong>The Engineering Choice:</strong> Modern vector engines solve this through single-stage filtered HNSW or payload-indexing, ensuring you get both sub-second graph speed AND 100% strict metadata filtering.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the metadata filtering sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You understand the challenges and solutions of filtered vector search across enterprise databases.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where metadata filtering: pre-filtering vs post-filtering applies.</li>
+    <li>Author a unit test or verification script exercising metadata filtering: pre-filtering vs post-filtering.</li>
+    <li>Document team architectural conventions regarding metadata filtering: pre-filtering vs post-filtering.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Metadata Filtering: Pre-Filtering vs Post-Filtering.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Why does naive 'Post-Filtering' (searching Top-K vectors first, then filtering by metadata) fail when filters are restrictive?",
+    a: ["If you search Top-10 vectors and then filter by tenant_id, all 10 candidates might belong to other tenants, returning zero results!","Post-filtering is illegal in SQL","Metadata cannot be filtered","Post-filtering crashes the GPU"],
+    c: 0,
+    why: "Post-filtering risks returning zero results if none of the top-K nearest neighbors match the metadata filter."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Post-Filtering (Flawed)",
+            "lines": [
+                  "Find top 20 vectors first -> Filter by tenant",
+                  "Fails if no top vectors match filter (Empty results!)"
+            ]
+      },
+      {
+            "title": "Pre-Filtering (Slow)",
+            "lines": [
+                  "Filter 5,000 rows first -> Brute-force scan",
+                  "Bypasses fast HNSW graph index"
+            ]
+      },
+      {
+            "title": "Single-Stage Filtered HNSW",
+            "lines": [
+                  "Graph navigation respects metadata mask in real time",
+                  "Fast, accurate, and 100% compliant"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Metadata Filtering: Pre-Filtering vs Post-Filtering",
+      "def execute_flow():",
+      "    # The filtered vector search challenge: Pre-filterin...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Metadata Filtering: Pre-Filtering vs Post-Filtering"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "User Query (Tenant A)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Secure Result"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Single-stage filtered vector search navigates the HNSW graph while checking metadata {1} in real time, preventing empty results from {2} filtering."
+],
+    blanks: [
+      {
+            "a": [
+                  "masks"
+            ],
+            "why": "Filter bitmasks during graph traversal"
+      },
+      {
+            "a": [
+                  "post"
+            ],
+            "why": "Filtering after vector search"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What happens in post-filtering if a user searches for a rare topic with a very restrictive metadata filter?",
+      a: ["The vector search fills the Top-K with popular irrelevant documents, and filtering removes them all, returning an empty result","The database creates fake documents","The server crashes","The user is charged double"],
+      c: 0,
+      why: "Post-filtering fails when the intersection between vector nearest neighbors and metadata filters is small."
+    },
+    {
+      q: "How does Qdrant or pgvector implement single-stage filtered vector search?",
+      a: ["By creating an inverted payload index and consulting the filter mask during the HNSW graph traversal hops","By running two separate databases","By converting text into SQL","By asking human operators to filter"],
+      c: 0,
+      why: "Filter-aware graph traversal only explores nodes that satisfy the pre-computed metadata mask."
+    },
+    {
+      q: "Why is multi-tenant metadata filtering critical for enterprise security in RAG?",
+      a: ["It prevents customer A from accidentally retrieving and viewing sensitive private documents belonging to customer B","It makes the database faster","It reduces electric bills","It is required by Python syntax"],
+      c: 0,
+      why: "Metadata filtering enforces hard cross-tenant isolation boundaries in shared database tables."
+    },
+    {
+      q: "Can you filter on multiple metadata fields simultaneously (e.g. tenant_id AND date AND author)?",
+      a: ["Yes; vector databases support standard SQL Boolean combinations (AND, OR, NOT) over metadata attributes","No; only one filter is allowed","Only in JavaScript","Only on weekends"],
+      c: 0,
+      why: "Modern vector engines support rich Boolean filtering expressions alongside similarity search."
+    }
+  ]);
+</script>
+</body>
+</html>

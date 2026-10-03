@@ -1,0 +1,3 @@
+# Mission — When to Trust AI-Generated Code
+
+Navigate the frontiers of software trust and accountability in the AI era. Calibrate review scrutiny based on blast radius, unmask plausible hallucinations, ground belief in deterministic compilers and test suites, isolate tool execution in sandboxes, audit cryptographic code, avoid licensing compliance traps, cultivate engineering intuition, and uphold the Accountability Principle.

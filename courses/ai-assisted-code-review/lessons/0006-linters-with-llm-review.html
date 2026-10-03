@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 06 — Combining Static Analysis Linters with LLM Review</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="ai-assisted-code-review" data-lesson="6" data-lesson-id="linters-with-llm-review">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 06</span> · Integrated Pipeline</span>
+
+  <h1 class="lesson-title">Combining Static Analysis Linters with LLM Review</h1>
+  <p class="lesson-lede">
+    Building a multi-layered review pipeline: deterministic linters for syntax/types, LLMs for reasoning and architecture.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to build a layered review pipeline pairing linters with LLMs.</span>
+    <span><b>Mission link</b> Mastering combining static analysis linters with llm review across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Combining Static Analysis Linters with LLM Review</h2>
+  <p>A common mistake in AI engineering is asking a language model to do things that deterministic tools already do perfectly for free. Asking an LLM: <em>'Are there any unused imports or formatting errors?'</em> wastes money and invites hallucinations.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Building a multi-layered review pipeline: deterministic linters for syntax/types, LLMs for reasoning and architecture.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Two-Tier Review Pipeline</h2>
+  <p>The gold standard for code quality is a <strong>Two-Layer Review Pipeline</strong>:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Cost and Efficiency Optimization</h2>
+  <ul><li><strong>Layer 1: Deterministic Static Analysis (Fast & Free):</strong> Linters (Ruff, ESLint), Type Checkers (Mypy, TypeScript), and Security Scanners (Bandit, Semgrep). These tools execute in 200ms, have 0% hallucination rate, and enforce syntax, types, and formatting with mathematical certainty.</li><li><strong>Layer 2: LLM Reasoning Review (Deep & Semantic):</strong> Evaluates business logic, architectural compliance, edge cases, naming clarity, and security threat models.</li></ul><pre><code># The Two-Layer CI Review Pipeline:
+# Step 1: Run deterministic gates (Must pass 100% before LLM is called)
+$ ruff check src/
+$ mypy src/
+$ semgrep --config=p/owasp-top-ten src/
+
+# Step 2: Feed clean, passing diff to LLM for semantic review
+$ ai-review --diff=HEAD~1 --context=copilot-instructions.md</code></pre><p>By ensuring all code entering the LLM review is already syntactically pristine and type-safe, the LLM can dedicate 100% of its attention to semantic architecture and logic.</p><div class="callout"><p><strong>Pipeline Rule:</strong> Never trigger an expensive LLM review call if static linters or type checkers are failing. Fix mechanical errors first!</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the integrated review pipeline sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to build a layered review pipeline pairing linters with LLMs.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where combining static analysis linters with llm review applies.</li>
+    <li>Author a unit test or verification script exercising combining static analysis linters with llm review.</li>
+    <li>Document team architectural conventions regarding combining static analysis linters with llm review.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Combining Static Analysis Linters with LLM Review.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Why is combining deterministic linters (Ruff, ESLint, Mypy) with LLMs superior to using an LLM alone?",
+    a: ["Linters provide 100% deterministic, zero-hallucination checks for syntax and types, letting LLMs focus on complex reasoning","Linters are written in English","LLMs refuse to review code without linters","Linters make the GPU run cooler"],
+    c: 0,
+    why: "Deterministic static analysis tools never hallucinate, providing a solid foundation for LLM reasoning."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Tier 1: Static Analysis (0 Tokens)",
+            "lines": [
+                  "Ruff, Mypy, Semgrep, ESLint",
+                  "100% deterministic, 0% hallucinations",
+                  "Checks syntax, types, formatting"
+            ]
+      },
+      {
+            "title": "Tier 2: LLM Semantic Review",
+            "lines": [
+                  "Reasons over business logic & intent",
+                  "Evaluates architecture & edge cases",
+                  "Audits threat models & naming"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Combining Static Analysis Linters with LLM Review",
+      "def execute_flow():",
+      "    # Building a multi-layered review pipeline: determin...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Combining Static Analysis Linters with LLM Review"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Broken Types or Syntax"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Pristine Code"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "An integrated review pipeline uses deterministic {1} for syntax and types, reserving LLM calls for semantic {2} and architecture."
+],
+    blanks: [
+      {
+            "a": [
+                  "linters"
+            ],
+            "why": "Static analysis tools like Ruff or ESLint"
+      },
+      {
+            "a": [
+                  "reasoning"
+            ],
+            "why": "Evaluating logic, intent, and design"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the primary advantage of static type checkers (like Mypy or TypeScript) over LLM review?",
+      a: ["They mathematically prove type safety across the entire codebase without any possibility of hallucination","They are trained on billions of parameters","They write unit tests automatically","They cost $20 per run"],
+      c: 0,
+      why: "Type checkers use formal type systems to guarantee type consistency deterministically."
+    },
+    {
+      q: "Why should CI pipelines run linters and tests before triggering an AI review agent?",
+      a: ["To avoid wasting token costs and review cycles on broken code that fails basic syntax or compilation checks","Because GitHub blocks AI tools from running first","To give the AI model time to sleep","Because linters require internet access"],
+      c: 0,
+      why: "Failing mechanical checks should be resolved before spending compute on semantic review."
+    },
+    {
+      q: "What unique capability does an LLM reviewer provide that static linters cannot?",
+      a: ["Evaluating whether code satisfies high-level business requirements and conforms to architectural intent","Checking indentation spaces","Sorting import statements","Finding missing semicolons"],
+      c: 0,
+      why: "Linters check syntax and AST rules; LLMs reason about semantics, design, and business intent."
+    },
+    {
+      q: "How does pre-filtering with linters improve the quality of LLM review comments?",
+      a: ["The model is not distracted by trivial formatting errors and focuses entirely on substantive logic and architecture","It increases model temperature","It reduces GPU clock speed","It turns off the terminal"],
+      c: 0,
+      why: "Removing formatting noise allows the model to concentrate attention on high-level concerns."
+    }
+  ]);
+</script>
+</body>
+</html>

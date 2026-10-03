@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI-Assisted Debugging — Cheat Sheet</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+<style>
+  .ref-toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0 8px; }
+  .ref-toc a { font-size: .8rem; border: 1px solid var(--border); background: #111a30; padding: 5px 11px; border-radius: 999px; color: var(--muted); text-decoration: none; border-bottom: 1px solid var(--border); }
+  .ref-toc a:hover { color: #fff; border-color: #3d5488; }
+  .lesson-wrap h2 { scroll-margin-top: 20px; }
+  .snippet { margin: 14px 0 22px; }
+  .snippet .lbl { font-size: .72rem; font-weight: 800; letter-spacing: .7px; text-transform: uppercase; color: var(--accent2); margin-bottom: 6px; }
+  .see { font-size: .82rem; color: var(--muted); margin: -6px 0 12px; }
+  .see a { color: var(--accent2); border-bottom: 0; }
+  .see a:hover { color: #fff; }
+  .snippet pre { padding-top: 34px; }
+  @media print { .snippet pre { padding-top: 18px; } }
+</style>
+</head>
+<body class="lesson-body" data-course="ai-assisted-debugging">
+
+<div class="lesson-wrap">
+
+  <span class="lesson-kicker">Reference · Cheat sheet</span>
+  <h1 class="lesson-title">AI-Assisted Debugging — Cheat Sheet</h1>
+  <p class="lesson-lede">
+    The whole course on one page. Every snippet links back to the lesson that
+    teaches it.
+  </p>
+
+  <div class="ref-toc">
+    <a href="#sec-1">Minimal Reproducible Example Pattern</a>
+    <a href="#sec-2">Automated Git Bisect Script</a>
+    <a href="#sec-3">Anti-Sycophancy Prompt Directive</a>
+    <a href="#sec-4">Regression Sentinel Template</a>
+  </div>
+
+  <h2 id="sec-1"><span class="n">1</span>Minimal Reproducible Example Pattern</h2>
+  <div class="snippet">
+    <div class="lbl">Isolating trigger logic</div>
+    <pre><code># repro_bug.py (Zero dependencies, runs standalone)
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
+# Minimal trigger:
+date = datetime(2024, 2, 29)
+assert (date + relativedelta(years=1)) == datetime(2025, 2, 28)</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0003-minimal-reproducible-examples.html">Lesson 03 — Isolating Minimal Reproducible Examples for the Agent</a>.</p>
+
+  <h2 id="sec-2"><span class="n">2</span>Automated Git Bisect Script</h2>
+  <div class="snippet">
+    <div class="lbl">Binary search regression hunt</div>
+    <pre><code>git bisect start
+git bisect bad HEAD
+git bisect good v2.4.0
+git bisect run pytest tests/test_orders.py
+# Exits when bad commit is isolated!</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0005-bisection-git-debugging.html">Lesson 05 — Bisection and Git Debugging with Agents</a>.</p>
+
+  <h2 id="sec-3"><span class="n">3</span>Anti-Sycophancy Prompt Directive</h2>
+  <div class="snippet">
+    <div class="lbl">Guarding test integrity</div>
+    <pre><code># Always include in bug-fix prompts:
+"You must resolve this defect strictly by modifying production code in src/.
+Do NOT weaken assertions, catch-and-pass exceptions, or edit test files in tests/."</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0007-sycophantic-false-fixes.html">Lesson 07 — Guarding Against Sycophantic False Fixes</a>.</p>
+
+  <h2 id="sec-4"><span class="n">4</span>Regression Sentinel Template</h2>
+  <div class="snippet">
+    <div class="lbl">Permanent automated defense</div>
+    <pre><code>def test_regression_issue_482():
+    """Issue #482: Canadian tax table KeyError on checkout."""
+    cart = Cart(user=User(country='CA'), amount=100)
+    # Verify previously crashing condition succeeds:
+    assert calculate_tax(cart) == 5.0</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0008-codifying-root-cause-into-test.html">Lesson 08 — Codifying the Root Cause into a Regression Test</a>.</p>
+
+  <div class="lesson-foot">
+    <div class="links">
+      <a href="ai-assisted-debugging-glossary.html">📖 Glossary</a>
+      <a href="../course.html">← Course map</a>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

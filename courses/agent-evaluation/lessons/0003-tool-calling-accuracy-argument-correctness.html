@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 03 — Tool Calling Accuracy and Argument Correctness</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="agent-evaluation" data-lesson="3" data-lesson-id="tool-calling-accuracy-argument-correctness">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 03</span> · Tool Evaluation</span>
+
+  <h1 class="lesson-title">Tool Calling Accuracy and Argument Correctness</h1>
+  <p class="lesson-lede">
+    Evaluating tool invocation: Tool Selection Accuracy, Schema Validity Rate, and Argument Value Correctness.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to evaluate tool selection, schema validity, and argument correctness.</span>
+    <span><b>Mission link</b> Mastering tool calling accuracy and argument correctness across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Tool Calling Accuracy and Argument Correctness</h2>
+  <p>Before an agent can solve a multi-step task, it must master the mechanics of its tools. If an agent tries to search files by calling <code>execute_sql_query()</code>, or passes a string to an integer parameter, the trajectory fails immediately.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Evaluating tool invocation: Tool Selection Accuracy, Schema Validity Rate, and Argument Value Correctness.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Three Tool Evaluation Dimensions</h2>
+  <p>Tool evaluation measures three sequential quality gates:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Evaluating Tool Call Failure Modes</h2>
+  <ul><li><strong>1. Tool Selection Accuracy:</strong> Given the active state and goal, did the agent choose the optimal tool? (e.g. choosing `grep_search` to find a symbol rather than doing a slow full file read).</li><li><strong>2. Schema Validity Rate:</strong> Did the generated arguments parse cleanly against the tool's JSON Schema? (Zero schema validation errors allowed!).</li><li><strong>3. Argument Value Correctness:</strong> Were the parameter values accurate and effective? (e.g. Did `file_path` point to an actual existing file? Did `regex` compile without errors?).</li></ul><pre><code># The Tool Evaluation Metric Suite:
+# Tool Selection Accuracy: = (Correct Tool Invocations) / (Total Tool Calls) [Target: > 98%]
+# Schema Validity Rate:    = (Valid JSON Schema Calls) / (Total Tool Calls) [Target: 100%]
+# Argument Precision:      = (Valid File Paths & Values) / (Total Arguments) [Target: > 95%]</code></pre><div class="callout"><p><strong>Diagnostic Power:</strong> If your agent is failing tasks, check Schema Validity first. If schema validity is below 100%, the agent is tripping over syntax before it even begins thinking.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the tool evaluation sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to evaluate tool selection, schema validity, and argument correctness.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where tool calling accuracy and argument correctness applies.</li>
+    <li>Author a unit test or verification script exercising tool calling accuracy and argument correctness.</li>
+    <li>Document team architectural conventions regarding tool calling accuracy and argument correctness.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Tool Calling Accuracy and Argument Correctness.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What three distinct dimensions should be measured when evaluating an agent's tool-calling capability?",
+    a: ["Tool Selection Accuracy (right tool?), Schema Validity Rate (valid JSON?), and Argument Correctness (right parameters?)","Speed, Color, and Weight","RAM, Disk, and CPU","There is only one dimension"],
+    c: 0,
+    why: "Tool evaluation assesses tool selection, syntactic schema compliance, and semantic argument accuracy."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1. Tool Selection (Intent)",
+            "lines": [
+                  "Did agent pick the right function?",
+                  "e.g. grep_search vs list_dir"
+            ]
+      },
+      {
+            "title": "2. Schema Validity (Syntax)",
+            "lines": [
+                  "Did arguments match JSON Schema?",
+                  "Must be 100% error-free"
+            ]
+      },
+      {
+            "title": "3. Argument Precision (Values)",
+            "lines": [
+                  "Did file path exist?",
+                  "Were regex patterns valid?"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Tool Calling Accuracy and Argument Correctness",
+      "def execute_flow():",
+      "    # Evaluating tool invocation: Tool Selection Accurac...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Tool Calling Accuracy and Argument Correctness"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Wrong Tool Selected"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Schema Type Error"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Tool evaluation measures whether the agent picked the right tool, whether arguments satisfied the {1} schema, and whether parameter {2} were accurate."
+],
+    blanks: [
+      {
+            "a": [
+                  "JSON"
+            ],
+            "why": "JavaScript Object Notation schema contract"
+      },
+      {
+            "a": [
+                  "values"
+            ],
+            "why": "Concrete argument parameters like file paths"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What causes an agent to have low Tool Selection Accuracy?",
+      a: ["Overlapping, ambiguous, or poorly written tool descriptions in the tool registry that confuse the model","The computer hard drive is full","The tool is written in Python","The internet was disconnected"],
+      c: 0,
+      why: "Ambiguous tool descriptions cause models to confuse similar tools (e.g. read_file vs grep)."
+    },
+    {
+      q: "What should the target Schema Validity Rate be for a production-ready agent?",
+      a: ["100% (zero schema validation errors permitted during execution)","50%","75%","Schema validity does not matter"],
+      c: 0,
+      why: "Schema errors represent avoidable syntactic bugs that disrupt execution loops."
+    },
+    {
+      q: "How does Constrained Decoding help achieve 100% Schema Validity in tool calls?",
+      a: ["It dynamically masks out all tokens that would violate the tool's JSON Schema during generation","It makes the tool run for free","It deletes invalid tools","It turns off the CPU"],
+      c: 0,
+      why: "Constrained decoding physically prevents the model from sampling invalid schema tokens."
+    },
+    {
+      q: "What is an 'Argument Hallucination' in tool calling?",
+      a: ["When the model passes imaginary file paths, nonexistent database IDs, or fabricated URLs as arguments","A tool with no arguments","A tool that takes too long","A compiler error"],
+      c: 0,
+      why: "Argument hallucination occurs when the model invents plausible but fictitious parameter values."
+    }
+  ]);
+</script>
+</body>
+</html>

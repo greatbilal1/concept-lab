@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Embeddings Explained — Cheat Sheet</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+<style>
+  .ref-toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0 8px; }
+  .ref-toc a { font-size: .8rem; border: 1px solid var(--border); background: #111a30; padding: 5px 11px; border-radius: 999px; color: var(--muted); text-decoration: none; border-bottom: 1px solid var(--border); }
+  .ref-toc a:hover { color: #fff; border-color: #3d5488; }
+  .lesson-wrap h2 { scroll-margin-top: 20px; }
+  .snippet { margin: 14px 0 22px; }
+  .snippet .lbl { font-size: .72rem; font-weight: 800; letter-spacing: .7px; text-transform: uppercase; color: var(--accent2); margin-bottom: 6px; }
+  .see { font-size: .82rem; color: var(--muted); margin: -6px 0 12px; }
+  .see a { color: var(--accent2); border-bottom: 0; }
+  .see a:hover { color: #fff; }
+  .snippet pre { padding-top: 34px; }
+  @media print { .snippet pre { padding-top: 18px; } }
+</style>
+</head>
+<body class="lesson-body" data-course="embeddings">
+
+<div class="lesson-wrap">
+
+  <span class="lesson-kicker">Reference · Cheat sheet</span>
+  <h1 class="lesson-title">Embeddings Explained — Cheat Sheet</h1>
+  <p class="lesson-lede">
+    The whole course on one page. Every snippet links back to the lesson that
+    teaches it.
+  </p>
+
+  <div class="ref-toc">
+    <a href="#sec-1">Cosine Similarity Calculation</a>
+    <a href="#sec-2">Sentence Transformers Encoding</a>
+    <a href="#sec-3">Matryoshka Dimension Slicing</a>
+    <a href="#sec-4">UMAP 2D Projection</a>
+  </div>
+
+  <h2 id="sec-1"><span class="n">1</span>Cosine Similarity Calculation</h2>
+  <div class="snippet">
+    <div class="lbl">Normalized directional similarity</div>
+    <pre><code>import numpy as np
+def cosine_sim(u, v):
+    return np.dot(u, v) / (np.linalg.norm(u) * np.linalg.norm(v))
+# For unit-normalized vectors: sim = np.dot(u, v)</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0003-distance-metrics-cosine-dot-euclidean.html">Lesson 03 — Distance Metrics: Cosine Similarity, Dot Product, Euclidean</a>.</p>
+
+  <h2 id="sec-2"><span class="n">2</span>Sentence Transformers Encoding</h2>
+  <div class="snippet">
+    <div class="lbl">Generating document embeddings</div>
+    <pre><code>from sentence_transformers import SentenceTransformer
+model = SentenceTransformer('all-MiniLM-L6-v2')
+embeddings = model.encode(['Sentence 1', 'Sentence 2'])
+# Returns numpy array of shape (2, 384)</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0005-sentence-document-embeddings.html">Lesson 05 — Sentence and Document Embeddings</a>.</p>
+
+  <h2 id="sec-3"><span class="n">3</span>Matryoshka Dimension Slicing</h2>
+  <div class="snippet">
+    <div class="lbl">80% RAM and storage reduction</div>
+    <pre><code># Truncate 3,072D vector down to 512D:
+full_vector = get_embedding(text) # 3072 dims
+sliced_vector = full_vector[:512]
+# Re-normalize to unit length:
+sliced_vector = sliced_vector / np.linalg.norm(sliced_vector)</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0008-practical-embedding-models.html">Lesson 08 — Practical Embedding Models and Best Practices</a>.</p>
+
+  <h2 id="sec-4"><span class="n">4</span>UMAP 2D Projection</h2>
+  <div class="snippet">
+    <div class="lbl">Visualizing semantic clusters</div>
+    <pre><code>import umap
+reducer = umap.UMAP(n_neighbors=15, min_dist=0.1, metric='cosine')
+coords_2d = reducer.fit_transform(embeddings_1536d)</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0007-visualizing-high-dimensions-tsne-umap.html">Lesson 07 — Visualizing High Dimensions: t-SNE and UMAP</a>.</p>
+
+  <div class="lesson-foot">
+    <div class="links">
+      <a href="embeddings-glossary.html">📖 Glossary</a>
+      <a href="../course.html">← Course map</a>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

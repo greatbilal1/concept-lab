@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 08 — Importing and reusing</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="procedural-programming" data-lesson="8" data-lesson-id="importing-and-reusing">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 08</span> · Modules</span>
+
+  <h1 class="lesson-title">Importing and reusing</h1>
+  <p class="lesson-lede">
+    A module is only useful if another file can use it. <code>import</code> is how one
+    file reaches into another — and how the same procedure gets reused across a whole
+    program instead of being copied.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Import a module and call its procedures</span>
+    <span><b>Mission link</b> Reuse steps across files</span>
+  </div>
+
+  <h2><span class="n">1</span>import brings a module in</h2>
+
+  <p>
+    <code>import prices</code> makes the whole module available under its name. You
+    then reach its procedures through the module name, which keeps the origin of each
+    call visible.
+  </p>
+
+  <pre><code># main.py
+import prices
+
+data = prices.load()
+print(prices.total(data))</code></pre>
+
+  <p>
+    <code>prices.total</code> says exactly where <code>total</code> came from. That
+    clarity is the reason to prefer this form over pulling names in directly.
+  </p>
+
+  <div id="diagram1"></div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>from ... import, and aliases</h2>
+
+  <p>
+    <code>from prices import total</code> brings one name in directly, so you call
+    <code>total(data)</code> without the module prefix. An <b>alias</b> renames the
+    module on import, which is handy for long names.
+  </p>
+
+  <pre><code>from prices import total
+import prices as pr
+
+print(total([4, 8, 15]))     # 27
+print(pr.load())             # [4, 8, 15]</code></pre>
+
+  <p>
+    Both forms work. The trade-off is clarity: <code>from ... import</code> is
+    shorter, but it hides where the name came from. When two modules define the same
+    name, that hiding causes real confusion.
+  </p>
+
+  <div class="note warn">
+    <span class="note-label">Watch out</span>
+    <code>from prices import total</code> copies the name into your file. If two
+    modules both export <code>total</code>, the second import silently wins. The
+    module-prefixed form avoids this entirely.
+  </div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">3</span>Circular imports</h2>
+
+  <p>
+    A <b>circular import</b> happens when two modules import each other. Python
+    starts loading one, hits the import of the other, which imports the first again
+    before it has finished — and the name is not there yet.
+  </p>
+
+  <pre><code># a.py
+import b
+def use_b():
+    return b.helper()
+
+# b.py
+import a          # circular!
+def helper():
+    return a.use_b()</code></pre>
+
+  <p>
+    The fix is almost always structural: the two modules are too tangled. Move the
+    shared procedure into a third module that both can import, so the dependency
+    points one way.
+  </p>
+
+  <div id="intro1"></div>
+
+  <h2><span class="n">4</span>Import and reuse</h2>
+
+  <p>
+    Here is the win for today. The lab below imports a module and calls its
+    procedures. Try the module-prefixed form, then the <code>from ... import</code>
+    form, and compare how readable each call is.
+  </p>
+
+  <div id="lab1"></div>
+
+  <div id="fill1"></div>
+
+  <h2><span class="n">5</span>Check yourself</h2>
+
+  <p>
+    Answer from memory — do not scroll back up. Each option has the same number of
+    words, so nothing gives the answer away.
+  </p>
+
+  <div id="quiz"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>
+      You can import a module and reuse its procedures from another file, and you
+      know the trade-off between the two import forms. That is how a program grows
+      past one file without copying code. The next lesson is about where this whole
+      style starts to strain.
+    </p>
+  </div>
+
+  <h2><span class="n">6</span>Do this next</h2>
+
+  <ol>
+    <li>
+      Split a script into two modules and import one from the other, using the
+      module-prefixed form.
+    </li>
+    <li>
+      Rewrite one import as <code>from ... import</code> and note what you lose in
+      clarity.
+    </li>
+    <li>
+      Create a circular import on purpose, read the error, then fix it by moving the
+      shared procedure into a third module.
+    </li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Read <a href="https://docs.python.org/3/tutorial/modules.html#more-on-modules">Python — More on Modules</a>.
+    It covers the import forms, aliases, and the module search path.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher (me) anything — "what is __init__.py?",
+    "what is a relative import?", "why is circular import an error?". There are no bad
+    questions here.
+  </div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  /* import forms */
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      { title: "module", lines: ["prices.py"] },
+      { title: "import", lines: ["import prices"] },
+      { title: "call", lines: ["prices.total(data)"] },
+      { title: "origin", lines: ["visible in the call"] }
+    ]
+  });
+
+  /* predict-then-reveal */
+  TeachWidgets.predict("#predict1", {
+    q: "Which import form keeps the origin visible?",
+    a: ["import prices", "from prices import total", "from prices import *", "import total"],
+    c: 0,
+    why: "The module-prefixed form keeps the origin of each name visible at the call site."
+  });
+
+  /* step through an import */
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "import prices",
+      "data = prices.load()",
+      "print(prices.total(data))"
+    ],
+    steps: [
+      { line: 0, vars: { action: "load module prices" } },
+      { line: 1, vars: { action: "call prices.load" } },
+      { line: 1, vars: { data: "[4, 8, 15]" } },
+      { line: 2, vars: { action: "call prices.total", returned: "27" } },
+      { line: 2, vars: { printed: "27" } }
+    ]
+  });
+
+  /* three things import gives you */
+  TeachWidgets.introCards("#intro1", {
+    cards: [
+      { ico: "🔗", title: "Reuse", body: "One procedure serves many files instead of being copied around." },
+      { ico: "🏷️", title: "Aliases", body: "A module can be renamed on import, which helps with long names." },
+      { ico: "⚠️", title: "Circular risk", body: "Two modules importing each other is a sign the split is wrong." }
+    ]
+  });
+
+  /* the tiny interpreter */
+  TeachWidgets.lab("#lab1", {
+    label: "Run it — try both import forms",
+    starter: "# pretend prices.py defines load() and total()\nimport prices\n\ndata = prices.load()\nprint(prices.total(data))"
+  });
+
+  /* recall from memory */
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the blanks",
+    lines: [
+      "import prices makes the whole <0> available",
+      "Renaming a module on import is an <1>",
+      "Two modules importing each other is a <2> import"
+    ],
+    blanks: [
+      { a: ["module"], why: "import prices makes the whole module available under its name." },
+      { a: ["alias"], why: "An alias renames a module on import, e.g. import prices as pr." },
+      { a: ["circular"], why: "A circular import happens when two modules import each other." }
+    ]
+  });
+
+  /* the quiz — every option is exactly three words */
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What does import prices do?",
+      a: ["Makes the module available", "Runs the module twice", "Copies every procedure out", "Deletes the module file"],
+      c: 0,
+      why: "import prices makes the whole module available under its name."
+    },
+    {
+      q: "Which form keeps origin visible?",
+      a: ["import prices module here", "from prices import total", "from prices import *", "import total module here"],
+      c: 0,
+      why: "The module-prefixed form keeps the origin of each name visible at the call site."
+    },
+    {
+      q: "What is an alias?",
+      a: ["A renamed module", "A copied procedure", "A hidden dependency", "A circular import"],
+      c: 0,
+      why: "An alias renames a module on import, e.g. import prices as pr."
+    },
+    {
+      q: "What causes a circular import?",
+      a: ["Two modules importing each other", "One module importing twice here", "A module with no guard", "A module with no procedures"],
+      c: 0,
+      why: "A circular import happens when two modules import each other, so neither finishes loading."
+
+    }
+  ]);
+</script>
+</body>
+</html>

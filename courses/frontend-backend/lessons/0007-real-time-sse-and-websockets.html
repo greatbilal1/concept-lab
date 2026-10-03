@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 07 — Real-time communication: SSE and WebSockets</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="frontend-backend" data-lesson="7" data-lesson-id="real-time-sse-and-websockets">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 07</span> · Real-Time & Offline Resilience</span>
+
+  <h1 class="lesson-title">Real-time communication: SSE and WebSockets</h1>
+  <p class="lesson-lede">
+    When HTTP polling is too slow: compare Short Polling, Long Polling, Server-Sent Events (SSE), and WebSockets for live chat, notifications, and streaming.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Select between Polling, Server-Sent Events, and WebSockets based on communication requirements</span>
+    <span><b>Mission link</b> Guides protocol selection for live, streaming, and collaborative web applications</span>
+  </div>
+
+  <h2><span class="n">1</span>Moving beyond request-response</h2>
+  <p>Traditional HTTP requires the client to ask before the server can speak. For live features like chat, stock tickers, or AI token streaming, repeated polling (<code>setInterval(fetch, 1000)</code>) wastes massive bandwidth on empty responses.</p><p>For unidirectional server-to-client streaming (like AI text tokens or live sports scores), <b>Server-Sent Events (SSE)</b> is lightweight, runs over standard HTTP, and has automatic reconnection. For bidirectional, low-latency communication (like multiplayer games or collaborative editing), <b>WebSockets</b> establishes a full-duplex TCP channel.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Use SSE for unidirectional server-to-client streaming; use WebSockets for bidirectional full-duplex communication.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The real-time protocol spectrum</h2>
+  <p>Compare the four approaches to delivering real-time updates to web clients.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing an SSE event stream</h2>
+  <p>Trace how a server streams events over a persistent HTTP connection using text/event-stream.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your recall of real-time communication protocols.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can choose the optimal real-time communication protocol for any feature, avoiding wasteful polling architectures.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Stream text chunks from a backend endpoint using text/event-stream.</li>
+    <li>Consume the stream in frontend JavaScript using the EventSource API.</li>
+    <li>Inspect an active WebSocket frame stream in DevTools Network WS panel.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    MDN Web Docs: *Server-sent events* & *Writing WebSocket client applications* (developer.mozilla.org).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Which protocol is the most lightweight and native choice for streaming AI text responses from server to client?",
+    a: ["Server-Sent Events (SSE) using the standard EventSource API over HTTP","Opening a new WebSocket connection for every word","Sending an email to the client for each token","Polling every 1 millisecond using setInterval"],
+    c: 0,
+    why: "SSE runs over plain HTTP, supports streaming text natively, and requires no protocol upgrade."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Short Polling",
+            "lines": [
+                  "fetch every 5s",
+                  "wasteful on empty checks",
+                  "simplest to implement"
+            ]
+      },
+      {
+            "title": "Server-Sent Events (SSE)",
+            "lines": [
+                  "text/event-stream over HTTP",
+                  "unidirectional (server -> client)",
+                  "built-in auto reconnect"
+            ]
+      },
+      {
+            "title": "WebSockets (ws://)",
+            "lines": [
+                  "protocol upgrade to full duplex",
+                  "bidirectional (client <-> server)",
+                  "ideal for chat and gaming"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Client opens stream: const es = new EventSource('/api/live-scores');",
+      "# Server responds: Content-Type: text/event-stream",
+      "data: {'match': 'Arsenal vs Chelsea', 'score': '1-0'}\\n\\n",
+      "# 10 seconds later, server sends next event over SAME connection:",
+      "data: {'match': 'Arsenal vs Chelsea', 'score': '1-1'}\\n\\n"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "connection": "single HTTP persistent connection opened"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "mime": "Content-Type: text/event-stream active"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "event_1": "client EventSource onmessage fires with score 1-0"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "event_2": "client receives score 1-1 without making new requests"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The unidirectional streaming protocol over HTTP is Server-Sent <0>.",
+      "The browser JavaScript API for receiving SSE streams is Event<1>.",
+      "The full-duplex bidirectional protocol initiated via an HTTP upgrade is <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "Events",
+                  "SSE"
+            ],
+            "why": "Server-Sent Events streams data from server to client."
+      },
+      {
+            "a": [
+                  "Source"
+            ],
+            "why": "window.EventSource is the standard SSE client interface."
+      },
+      {
+            "a": [
+                  "WebSocket",
+                  "WebSockets"
+            ],
+            "why": "WebSockets provides two-way socket communication."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the primary architectural limitation of Server-Sent Events (SSE)?",
+      a: ["It is strictly unidirectional: only the server can push data to the client; client sends data via standard HTTP","It cannot transmit text strings","It only works on desktop Windows computers","It requires purchasing dedicated hardware servers"],
+      c: 0,
+      why: "SSE is one-way (server to client); sending data upstream requires separate HTTP requests."
+    },
+    {
+      q: "Why are WebSockets preferred over HTTP polling for multiplayer online games?",
+      a: ["WebSockets provide bidirectional, full-duplex communication with negligible per-frame header overhead","WebSockets automatically encrypt all audio chat","WebSockets run without electrical power","WebSockets guarantee that players never lose connection"],
+      c: 0,
+      why: "Zero HTTP header overhead and sub-millisecond bidirectional sockets are vital for gaming."
+    },
+    {
+      q: "What happens if a network hiccup breaks an active EventSource (SSE) connection?",
+      a: ["The browser's native EventSource client automatically attempts to reconnect and resumes listening","The web browser window closes immediately","The operating system reboots","The user must manually refresh the web page"],
+      c: 0,
+      why: "EventSource includes built-in exponential reconnect logic and last-event-id tracking."
+    },
+    {
+      q: "How does a WebSocket connection begin its lifecycle?",
+      a: ["As a standard HTTP GET request with an 'Upgrade: websocket' header, upgrading the socket to binary framing","By opening an SSH terminal session","By sending an email to the server administrator","Through a Bluetooth wireless handshake"],
+      c: 0,
+      why: "WebSockets initiate via an HTTP 101 Switching Protocols handshake before switching to framing."
+    }
+  ]);
+</script>
+</body>
+</html>

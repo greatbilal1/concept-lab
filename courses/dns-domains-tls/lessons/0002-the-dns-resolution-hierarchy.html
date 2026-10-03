@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 02 — The DNS resolution hierarchy</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="dns-domains-tls" data-lesson="2" data-lesson-id="the-dns-resolution-hierarchy">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 02</span> · Domain Names & Resolution</span>
+
+  <h1 class="lesson-title">The DNS resolution hierarchy</h1>
+  <p class="lesson-lede">
+    When you type a URL, how does your computer find the right IP in 20 milliseconds? Follow a recursive resolver as it walks the global DNS hierarchy.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Trace the four steps of recursive DNS resolution from root to authoritative server</span>
+    <span><b>Mission link</b> Explains how billions of lookups execute without crashing central servers</span>
+  </div>
+
+  <h2><span class="n">1</span>The four actors of DNS resolution</h2>
+  <p>A DNS lookup involves four distinct servers collaborating in sequence: the <b>DNS Recurser</b> (your ISP or 8.8.8.8), the <b>Root Server</b>, the <b>TLD Server</b>, and the <b>Authoritative Nameserver</b>.</p><p>The recurser does the legwork: it asks the root <i>'Where is .com?'</i>, asks the .com TLD <i>'Where is example.com?'</i>, and finally asks example.com's authoritative server <i>'What is the IP of api.example.com?'</i></p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Recursive resolvers do the iterative detective work of querying root, TLD, and authoritative servers.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The recursive lookup sequence</h2>
+  <p>Visualise the four iterative hops made by a recursive resolver to answer a query.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing resolution with dig +trace</h2>
+  <p>Trace the live output of dig +trace following the resolution path down the global tree.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your recall of DNS resolution actors.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can trace recursive DNS queries step-by-step and diagnose which nameserver layer is failing during an outage.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Run dig +trace yourfavoriteblog.com and observe the 4 delegation layers.</li>
+    <li>Test an explicit resolver query using dig @1.1.1.1 example.com.</li>
+    <li>Compare query time between a cached response and an uncached query.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    IETF RFC 1035: *Domain Names — Implementation and Specification*.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Which server holds the definitive, final source-of-truth IP address for a domain?",
+    a: ["The domain authoritative nameserver","Your home Wi-Fi router cache","The root DNS server","Your local operating system browser history"],
+    c: 0,
+    why: "Authoritative nameservers are the designated source of truth for records in that zone."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1. Client -> Resolver",
+            "lines": [
+                  "'What is api.example.com?'",
+                  "resolver checks local cache"
+            ]
+      },
+      {
+            "title": "2. Resolver -> Root",
+            "lines": [
+                  "'Where is .com?'",
+                  "Root replies: Ask Verisign TLD"
+            ]
+      },
+      {
+            "title": "3. Resolver -> TLD",
+            "lines": [
+                  "'Where is example.com?'",
+                  "TLD replies: Ask ns1.cloudflare.com"
+            ]
+      },
+      {
+            "title": "4. Resolver -> Auth",
+            "lines": [
+                  "'What is api.example.com?'",
+                  "Auth replies: 93.184.216.34 (200 OK)"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# dig +trace example.com",
+      "1. .                    NS   a.root-servers.net",
+      "2. com.                 NS   a.gtld-servers.net",
+      "3. example.com.         NS   a.iana-servers.net",
+      "4. example.com.         A    93.184.216.34"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "queried": "root server ( . )"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "queried": "TLD registry (.com)"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "queried": "authoritative nameserver"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "result": "A record IP address delivered to client"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The server that performs queries on behalf of client devices is a <0> resolver.",
+      "The server holding the master records for a domain is the <1> nameserver.",
+      "The terminal diagnostic tool used to trace DNS lookups is <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "recursive"
+            ],
+            "why": "Recursive resolvers query the hierarchy iteratively."
+      },
+      {
+            "a": [
+                  "authoritative"
+            ],
+            "why": "Authoritative nameservers hold definitive zone records."
+      },
+      {
+            "a": [
+                  "dig"
+            ],
+            "why": "dig (Domain Information Groper) is the standard DNS test utility."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the difference between a recursive resolver and an authoritative nameserver?",
+      a: ["A resolver queries the hierarchy on behalf of users; an authoritative server holds the definitive records","A resolver is written in C; an authoritative server is written in JavaScript","A resolver only works for IPv6; an authoritative server only works for IPv4","There is no difference between the two"],
+      c: 0,
+      why: "Resolvers investigate; authoritative nameservers answer with definitive zone truth."
+    },
+    {
+      q: "What does 'dig +trace' show that a normal 'dig' command does not?",
+      a: ["The full iterative query delegation path from root servers down to authoritative servers","The physical GPS coordinates of the website headquarters","The server internal database schema passwords","The user personal browsing history"],
+      c: 0,
+      why: "+trace disables resolver caching and forces an iterative walkthrough from the root."
+    },
+    {
+      q: "Why do public recursive resolvers like 1.1.1.1 or 8.8.8.8 exist?",
+      a: ["To provide fast, cached, secure DNS lookups independent of local ISP resolvers","To replace web servers and host HTML websites directly","To assign home Wi-Fi passwords to neighborhood users","To mine cryptocurrency using idle network packets"],
+      c: 0,
+      why: "Public resolvers offer high-performance global caching and privacy protections."
+    },
+    {
+      q: "What happens if all authoritative nameservers for a domain go offline?",
+      a: ["Once cached TTL expires, resolvers can no longer resolve the domain and lookups fail (SERVFAIL)","The domain automatically gets deleted from the registrar","The website continues running normally without any interruption forever","All computers on the internet crash"],
+      c: 0,
+      why: "Without authoritative servers, resolvers cannot refresh records once cache TTL expires."
+    }
+  ]);
+</script>
+</body>
+</html>

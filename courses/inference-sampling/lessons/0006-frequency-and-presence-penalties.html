@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 06 — Frequency and Presence Penalties: Reducing Repetition</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="inference-sampling" data-lesson="6" data-lesson-id="frequency-and-presence-penalties">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 06</span> · Penalties</span>
+
+  <h1 class="lesson-title">Frequency and Presence Penalties: Reducing Repetition</h1>
+  <p class="lesson-lede">
+    Preventing loops: how Frequency Penalties (proportional) and Presence Penalties (one-shot) penalize repeated tokens.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to use frequency and presence penalties to eliminate repetitive text loops.</span>
+    <span><b>Mission link</b> Mastering frequency and presence penalties: reducing repetition across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Frequency and Presence Penalties: Reducing Repetition</h2>
+  <p>One of the most frustrating failure modes in language generation is the <strong>Repetition Loop</strong>: the model gets stuck in a rut, repeatedly using the same phrase (e.g. <em>'delve into', 'testament to', 'furthermore'</em>) or looping on identical sentences.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Preventing loops: how Frequency Penalties (proportional) and Presence Penalties (one-shot) penalize repeated tokens.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Frequency vs Presence Penalty</h2>
+  <p>To combat repetition, API providers introduce <strong>Logit Penalties</strong>:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Code Generation Caution</h2>
+  <ul><li><strong>Frequency Penalty:</strong> Directly penalizes tokens based on their <strong>count of appearances</strong> in the generated text so far: $\text{logit}_{new} = \text{logit} - (c \times \text{count})$. The more a token is repeated, the harsher its penalty. Discourages repeating the exact same word multiple times!</li><li><strong>Presence Penalty:</strong> Applies a <strong>flat, one-shot penalty</strong> to any token that has appeared at least once: $\text{logit}_{new} = \text{logit} - p$ if $\text{count} > 0$. Encourages introducing new topics and wider vocabulary!</li></ul><pre><code># Applying Logit Penalties in OpenAI API:
+response = client.chat.completions.create(
+    model="gpt-4o",
+    messages=[{"role": "user", "content": "Write an article on renewable energy"}],
+    frequency_penalty=0.5, # Discourages repeating the word 'energy' 50 times
+    presence_penalty=0.3   # Encourages introducing new related subtopics (solar, wind, grid)
+)</code></pre><div class="callout"><p><strong>Warning for Code Generation:</strong> In programming, repeating variable names and keywords (like `def`, `return`, `self`) is mandatory! Setting high penalties on code tasks will cause syntax errors as the model tries to avoid repeating `return`!</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the penalty sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to use frequency and presence penalties to eliminate repetitive text loops.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where frequency and presence penalties: reducing repetition applies.</li>
+    <li>Author a unit test or verification script exercising frequency and presence penalties: reducing repetition.</li>
+    <li>Document team architectural conventions regarding frequency and presence penalties: reducing repetition.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Frequency and Presence Penalties: Reducing Repetition.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is the difference between a Frequency Penalty and a Presence Penalty?",
+    a: ["Frequency penalty scales proportionally with how many times a token has appeared; presence penalty applies a flat one-shot penalty if the token appeared at all","Frequency penalty only applies to vowels","Presence penalty measures physical distance","There is no difference"],
+    c: 0,
+    why: "Frequency penalty punishes repeated tokens progressively; presence penalty applies a flat penalty for existing once."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Frequency Penalty (Count-Based)",
+            "lines": [
+                  "Penalizes each repetition: - (c * count)",
+                  "Word used 5 times gets 5x penalty",
+                  "Stops repetitive phrase looping"
+            ]
+      },
+      {
+            "title": "Presence Penalty (One-Shot)",
+            "lines": [
+                  "Flat penalty if count > 0",
+                  "Applies equally regardless of repetition count",
+                  "Encourages branching into fresh topics"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Frequency and Presence Penalties: Reducing Repetition",
+      "def execute_flow():",
+      "    # Preventing loops: how Frequency Penalties (proport...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Frequency and Presence Penalties: Reducing Repetition"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Natural Language (Helpful)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Code Generation (Dangerous!)"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "While frequency penalties scale with token {1} to stop phrase looping, presence penalties apply a flat penalty to encourage new {2}."
+],
+    blanks: [
+      {
+            "a": [
+                  "count"
+            ],
+            "why": "Number of times a word has appeared"
+      },
+      {
+            "a": [
+                  "topics"
+            ],
+            "why": "Fresh conceptual vocabulary"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why should frequency and presence penalties be kept at 0.0 when generating source code or JSON?",
+      a: ["Code inherently requires repeating keywords, variable names, and syntax structures (like 'return', 'self', brackets)","Compilers reject penalized tokens","Penalties make code run slower","Penalties are illegal in Python"],
+      c: 0,
+      why: "Programming languages rely on repeated identifiers and keywords; penalties break valid syntax."
+    },
+    {
+      q: "What range of values is standard for frequency and presence penalties in the OpenAI API?",
+      a: ["Between -2.0 and +2.0 (with standard subtle adjustments between 0.1 and 0.5)","Between 0 and 1,000","Always exactly 10.0","Negative numbers are forbidden"],
+      c: 0,
+      why: "Values between 0.1 and 0.5 gently discourage repetition without distorting grammar."
+    },
+    {
+      q: "What happens if you set frequency_penalty to +2.0 (maximum)?",
+      a: ["The model will aggressively contort grammar and invent bizarre synonyms to avoid repeating any word twice","The model shuts down","The model outputs only numbers","The computer restarts"],
+      c: 0,
+      why: "Extreme penalties force the model to avoid necessary common words, degrading fluency."
+    },
+    {
+      q: "What is a 'Logit Bias' in model sampling APIs?",
+      a: ["A dictionary explicitly adding or subtracting a fixed numerical bias to specific target token IDs","A bias against certain computer brands","A bias in the training dataset","A compiler error"],
+      c: 0,
+      why: "Logit bias allows developers to forcibly ban (-100) or compel (+100) specific tokens."
+    }
+  ]);
+</script>
+</body>
+</html>

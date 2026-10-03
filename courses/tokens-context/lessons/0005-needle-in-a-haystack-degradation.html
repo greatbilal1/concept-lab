@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 05 — Needle-in-a-Haystack: Retrieval Degradation in Long Contexts</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="tokens-context" data-lesson="5" data-lesson-id="needle-in-a-haystack-degradation">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 05</span> · NIAH Testing</span>
+
+  <h1 class="lesson-title">Needle-in-a-Haystack: Retrieval Degradation in Long Contexts</h1>
+  <p class="lesson-lede">
+    Auditing long-context recall: the Needle-in-a-Haystack test, depth percentages, and attention retrieval degradation.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to evaluate and interpret Needle-in-a-Haystack long-context retrieval benchmarks.</span>
+    <span><b>Mission link</b> Mastering needle-in-a-haystack: retrieval degradation in long contexts across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Needle-in-a-Haystack: Retrieval Degradation in Long Contexts</h2>
+  <p>Just because a model provider advertises a 128,000-token context window does not mean the model can effectively <em>use</em> all 128k tokens. In late 2023, independent AI researcher Greg Kamradt popularized the <strong>Needle-in-a-Haystack (NIAH) Test</strong> to empirically measure long-context retrieval fidelity.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Auditing long-context recall: the Needle-in-a-Haystack test, depth percentages, and attention retrieval degradation.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The NIAH Heatmap Grid</h2>
+  <p>The test protocol is straightforward:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Single-Needle vs Multi-Hop Reasoning</h2>
+  <ul><li><strong>The Haystack:</strong> A massive collection of neutral text (e.g. Paul Graham essays or public documents) scaled from 1,000 to 128,000 tokens.</li><li><strong>The Needle:</strong> A completely random, isolated fact inserted at a specific depth percentage (e.g. <em>'The best thing to do in San Francisco is eat a sandwich in Dolores Park on a sunny day.'</em>).</li><li><strong>The Query:</strong> At the very end of the prompt, ask: <em>'What is the best thing to do in San Francisco?'</em></li></ul><pre><code># The NIAH Pressure Grid (Context Length vs Depth %):
+# Length \ Depth |  0% (Top) | 25% | 50% (Mid) | 75% | 100% (Bottom)
+# 8k tokens       |   GREEN   | GREEN |   GREEN   | GREEN |    GREEN
+# 32k tokens      |   GREEN   | GREEN |   GREEN   | GREEN |    GREEN
+# 64k tokens      |   GREEN   | YELLOW|    RED    | YELLOW|    GREEN
+# 128k tokens     |   GREEN   |  RED  |  DARK RED |  RED  |    GREEN
+# Notice the U-shaped degradation in the middle at long lengths!</code></pre><p>While frontier models (GPT-4o, Claude 3.5) achieve near-100% green on simple NIAH tests, when the task requires <strong>Multi-Hop Reasoning</strong> (connecting three different needles placed across the document), accuracy drops dramatically past 32k tokens.</p><div class="callout"><p><strong>The Real-World Rule:</strong> Simple fact retrieval works well in long context; complex multi-step reasoning across thousands of lines requires RAG or structured prompting.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the needle test sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to evaluate and interpret Needle-in-a-Haystack long-context retrieval benchmarks.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where needle-in-a-haystack: retrieval degradation in long contexts applies.</li>
+    <li>Author a unit test or verification script exercising needle-in-a-haystack: retrieval degradation in long contexts.</li>
+    <li>Document team architectural conventions regarding needle-in-a-haystack: retrieval degradation in long contexts.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Needle-in-a-Haystack: Retrieval Degradation in Long Contexts.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is a 'Needle-in-a-Haystack' (NIAH) benchmark in LLM evaluation?",
+    a: ["Placing a single specific fact (the needle) at various depths inside a massive text document (the haystack) and testing if the model can retrieve it","Finding a metal needle on a farm","Testing hard drive magnetic sectors","A benchmark for sewing robots"],
+    c: 0,
+    why: "NIAH tests whether a model can retrieve a targeted fact across varying context lengths and placement depths."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Top Depth (0-15%)",
+            "lines": [
+                  "Near 100% retrieval accuracy",
+                  "System instructions & early context"
+            ]
+      },
+      {
+            "title": "The Middle (40-60%)",
+            "lines": [
+                  "Attention drops on complex tasks",
+                  "Red zone where facts can be lost"
+            ]
+      },
+      {
+            "title": "Bottom Depth (85-100%)",
+            "lines": [
+                  "Near 100% retrieval accuracy",
+                  "Recent turns & immediate queries"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Needle-in-a-Haystack: Retrieval Degradation in Long Contexts",
+      "def execute_flow():",
+      "    # Auditing long-context recall: the Needle-in-a-Hays...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Needle-in-a-Haystack: Retrieval Degradation in Long Contexts"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Single Needle (Easy)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Multi-Hop Reasoning (Hard)"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The Needle-in-a-Haystack test evaluates whether models can retrieve isolated facts placed at varying {1} percentages across long {2} lengths."
+],
+    blanks: [
+      {
+            "a": [
+                  "depth"
+            ],
+            "why": "Position inside the document (0% to 100%)"
+      },
+      {
+            "a": [
+                  "context"
+            ],
+            "why": "Total token sequence volume"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What does a red cell in a Needle-in-a-Haystack evaluation heatmap represent?",
+      a: ["A failure where the model could not retrieve or recall the target needle placed at that specific length and depth","The GPU overheated","The text contained a typo","The prompt was deleted"],
+      c: 0,
+      why: "Red indicates a failed retrieval where the model overlooked the inserted needle."
+    },
+    {
+      q: "Why does a model score 100% on single-needle retrieval but fail on complex code refactoring in long context?",
+      a: ["Refactoring requires multi-hop reasoning, tracking dependencies, and synthesizing multiple facts rather than finding one isolated string","Refactoring uses C++","The model hates code","Code files are too long"],
+      c: 0,
+      why: "Synthesizing cross-file logic across depth is vastly harder than spotting a single isolated sentence."
+    },
+    {
+      q: "At what placement depth in a 100k-token prompt is an unanchored fact most likely to be overlooked?",
+      a: ["Around the 40% to 60% middle depth (the Lost in the Middle zone)","At 0% (the first line)","At 100% (the last line)","Models never overlook facts"],
+      c: 0,
+      why: "Attention distributions naturally thin in the middle of long sequences."
+    },
+    {
+      q: "How can an engineer ensure a critical constraint is not missed in a 50k-token prompt?",
+      a: ["Place the constraint in the system prompt at the top AND restate it as a final reminder at the bottom","Write the constraint in Pig Latin","Put 10 exclamation marks on it","Delete the other 49k tokens"],
+      c: 0,
+      why: "The Sandwich Pattern places critical constraints at both high-recall boundaries."
+    }
+  ]);
+</script>
+</body>
+</html>

@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 06 — Cost-Constrained Optimization and SLA Routing</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="ai-model-routing" data-lesson="6" data-lesson-id="cost-constrained-sla-routing">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 06</span> · SLA Routing</span>
+
+  <h1 class="lesson-title">Cost-Constrained Optimization and SLA Routing</h1>
+  <p class="lesson-lede">
+    Balancing business budgets: Service Level Agreements (SLAs), routing by customer tier (Free vs Enterprise), and cost ceilings.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to design tier-based SLA routing that protects margins and satisfies contracts.</span>
+    <span><b>Mission link</b> Mastering cost-constrained optimization and sla routing across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Cost-Constrained Optimization and SLA Routing</h2>
+  <p>In a SaaS application, not all requests are created equal. A user on a $0/month Free Tier should not consume $0.05 of GPT-4o compute on every click; your business will go bankrupt. Conversely, an Enterprise customer paying $50,000/year expects sub-second responses and flawless frontier intelligence.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Balancing business budgets: Service Level Agreements (SLAs), routing by customer tier (Free vs Enterprise), and cost ceilings.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Customer Tier Routing Architecture</h2>
+  <p><strong>Cost-Constrained & SLA Routing</strong> enforces business tiering:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Monthly Budget Envelopes</h2>
+  <ul><li><strong>1. Customer Tier Alignment:</strong> Tag requests with `user_tier`:<ul><li><em>Free / Anonymous Tier:</em> Routed to self-hosted Llama-3-8B or GPT-4o-mini. Strict max_tokens=150. Enforces low cost ($0.0001/query).</li><li><em>Pro / Enterprise Tier:</em> Routed to Claude 3.5 Sonnet or GPT-4o. High token budgets, prioritized concurrency queues, and strict latency SLAs (&lt; 1.5s).</li></ul></li><li><strong>2. Real-Time Monthly Budget Envelopes:</strong> If a customer's usage approaches 90% of their monthly contract budget, smoothly degrade non-critical queries to the workhorse tier while alerting their account manager!</li><li><strong>3. Service Level Agreement (SLA) Guarantees:</strong> Route queries dynamically to satisfy contractual latency SLAs (e.g. 99.9% of VIP queries must return in &lt; 2.0s).</li></ul><pre><code># Tier-Based SLA Dispatcher in Python:
+async def route_by_customer_tier(request: QueryRequest, customer: Customer) -> str:
+    # Free tier -> High throughput, ultra-low cost
+    if customer.tier == "FREE":
+        return await dispatch_model("gpt-4o-mini", request.prompt, max_tokens=200)
+        
+    # Enterprise tier -> Frontier reasoning with priority queue
+    if customer.tier == "ENTERPRISE":
+        return await dispatch_model("claude-3-5-sonnet", request.prompt, max_tokens=1000, priority="HIGH")</code></pre><div class="callout"><p><strong>The Unit Economics Rule:</strong> Never serve free users with frontier models. Align model intelligence and compute cost directly with contract revenue.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the SLA routing sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to design tier-based SLA routing that protects margins and satisfies contracts.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where cost-constrained optimization and sla routing applies.</li>
+    <li>Author a unit test or verification script exercising cost-constrained optimization and sla routing.</li>
+    <li>Document team architectural conventions regarding cost-constrained optimization and sla routing.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Cost-Constrained Optimization and SLA Routing.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "How should an enterprise AI architecture route requests based on customer tier (e.g. Free Tier vs Enterprise VIP)?",
+    a: ["Route Free users to fast, inexpensive models (mini/open-source) and reserve expensive frontier reasoning models for paying Enterprise users","Give Free users fake answers","Ban Free users completely","Charge Free users after the query"],
+    c: 0,
+    why: "Tier-based SLA routing aligns infrastructure cost directly with customer revenue, protecting SaaS gross margins."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Free Tier User ($0/mo)",
+            "lines": [
+                  "Route: Llama-3-8B / GPT-4o-mini",
+                  "Cost: $0.0001 per query",
+                  "Protects SaaS gross margins"
+            ]
+      },
+      {
+            "title": "Enterprise VIP ($50k/yr)",
+            "lines": [
+                  "Route: Claude 3.5 Sonnet / GPT-4o",
+                  "Priority queue, high token budgets",
+                  "Delivers premium flagship SLA"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Cost-Constrained Optimization and SLA Routing",
+      "def execute_flow():",
+      "    # Balancing business budgets: Service Level Agreemen...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Cost-Constrained Optimization and SLA Routing"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Budget < 80%"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Budget >= 95%"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "SLA routing protects business gross margins by routing free users to high-efficiency models and reserving {1} intelligence for paying {2} customers."
+],
+    blanks: [
+      {
+            "a": [
+                  "frontier"
+            ],
+            "why": "Top flagship model capabilities"
+      },
+      {
+            "a": [
+                  "enterprise"
+            ],
+            "why": "High-value paying accounts"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What happens to a SaaS startup's profit margins if it serves free trial users with unconstrained GPT-4o frontier calls?",
+      a: ["Gross margins turn negative; the company loses money on every free user interaction, creating an unsustainable business model","The company gets acquired","Servers become free","The model gets smarter"],
+      c: 0,
+      why: "Frontier models on free tiers incur unsustainable costs that quickly deplete capital."
+    },
+    {
+      q: "How does priority queueing support Enterprise Service Level Agreements (SLAs)?",
+      a: ["Enterprise requests bypass standard worker queues and are processed immediately by dedicated GPU pools","It makes queries free","It deletes other users","It turns off logging"],
+      c: 0,
+      why: "Priority queues guarantee rapid processing for contractually bound VIP users."
+    },
+    {
+      q: "What is a 'Soft Budget Degradation' in AI SaaS billing?",
+      a: ["When a user exceeds their quota, non-critical queries are routed to faster, cheaper models rather than cutting off access entirely","Deleting the customer's account","Sending a legal notice","Restarting the database"],
+      c: 0,
+      why: "Soft degradation maintains user productivity on a lower-cost tier without abrupt service termination."
+    },
+    {
+      q: "Why is tagging every request with 'customer_id' and 'tier' essential for the router?",
+      a: ["It enables the routing engine to apply tier-specific model policies, rate limits, and cost accounting rules dynamically","It is required by git","It formats the text in HTML","It encrypts the hard drive"],
+      c: 0,
+      why: "Metadata tags drive policy decisions and financial accounting across the routing layer."
+    }
+  ]);
+</script>
+</body>
+</html>

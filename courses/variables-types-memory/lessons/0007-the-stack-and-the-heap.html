@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 07 — The stack and the heap</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="variables-types-memory" data-lesson="7" data-lesson-id="the-stack-and-the-heap">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 07</span> · Memory</span>
+
+  <h1 class="lesson-title">The stack and the heap</h1>
+  <p class="lesson-lede">
+    Memory is not one undifferentiated pool. It is organised into two regions with
+    very different rules: the stack, which is fast and automatic, and the heap,
+    which is flexible and managed. Knowing which is which explains lifetimes.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~11 min</span>
+    <span><b>Win</b> Say where a value lives</span>
+    <span><b>Mission link</b> Why local names vanish</span>
+  </div>
+
+  <h2><span class="n">1</span>Two regions of memory</h2>
+
+  <p>
+    The <b>stack</b> is a region of memory organised like a stack of plates: things
+    are pushed on and popped off in order. It holds the <b>frames</b> of function
+    calls — the local names and the references they hold. It is fast and its
+    lifetime is automatic.
+  </p>
+
+  <p>
+    The <b>heap</b> is a large, unordered region where objects live. When you create
+    a list or a string, the object itself is placed on the heap, and a reference to
+    it is stored in a stack frame. The heap is flexible but needs managing.
+  </p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">2</span>A frame is a call's workspace</h2>
+
+  <p>
+    Every time a function is called, a new <b>frame</b> is pushed onto the stack.
+    The frame holds that call's local names. When the function returns, its frame is
+    popped, and its local names disappear with it.
+  </p>
+
+  <pre><code>def double(n):
+    result = n * 2    # n and result live in this frame
+    return result
+
+double(5)             # frame pushed, then popped
+print(result)         # NameError — result is gone</code></pre>
+
+  <p>
+    This is why local names cannot be seen from outside. They were never global;
+    they lived in a frame that no longer exists.
+  </p>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">3</span>References bridge the two</h2>
+
+  <p>
+    The stack and the heap are connected by references. A frame on the stack holds
+    names; each name holds a reference to an object on the heap. The object outlives
+    the frame if something else still refers to it.
+  </p>
+
+  <pre><code>def make():
+    items = [1, 2, 3]   # list lives on the heap
+    return items        # reference escapes the frame
+
+data = make()           # data now refers to the list
+print(data)             # [1, 2, 3] — the list survived</code></pre>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    The <b>stack</b> holds frames and references; the <b>heap</b> holds the objects
+    themselves. A value survives a function call if a reference to it escapes.
+  </div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Why the split exists</h2>
+
+  <p>
+    The split is a trade-off. Stack memory is fast to allocate and free because it
+    is just a pointer that moves up and down, but it is limited in size and its
+    lifetime is tied to the call. Heap memory is flexible — objects can be any size
+    and live as long as needed — but allocating and reclaiming it costs more.
+  </p>
+
+  <div id="intro1"></div>
+
+  <div id="fill1"></div>
+
+  <h2><span class="n">5</span>Check yourself</h2>
+
+  <p>
+    Answer from memory — do not scroll back up. Each option has the same number of
+    words, so nothing gives the answer away.
+  </p>
+
+  <div id="quiz"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>
+      You can now say where any value lives — a frame on the stack or an object on
+      the heap — and explain why local names vanish when a function returns. That
+      sets up the final memory lesson, where we ask what happens to heap objects
+      nobody refers to any more.
+    </p>
+  </div>
+
+  <h2><span class="n">6</span>Do this next</h2>
+
+  <ol>
+    <li>
+      Write a function that creates a list and returns it. Explain which part lived
+      on the stack and which on the heap.
+    </li>
+    <li>
+      Write a function that creates a list and does <i>not</i> return it. Explain
+      what happens to the list once the frame is popped.
+    </li>
+    <li>
+      Draw a stack frame and a heap object for <code>data = make()</code>, with an
+      arrow from the name to the object.
+    </li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Read <a href="https://docs.python.org/3/reference/executionmodel.html">Python — "Execution model"</a>.
+    Its sections on "Naming and binding" and "Resolution of names" describe frames
+    and how local names are created and destroyed with each call.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher (me) anything — "why is the stack
+    fast?", "what is a frame exactly?", "can a heap object outlive its frame?".
+    There are no bad questions here.
+  </div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  /* stack and heap */
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      { title: "stack", lines: ["frames", "names + refs"] },
+      { title: "→", lines: ["reference"] },
+      { title: "heap", lines: ["objects", "lists, strings"] }
+    ]
+  });
+
+  /* the three ideas */
+  TeachWidgets.introCards("#intro1", {
+    cards: [
+      { ico: "📚", title: "Stack", body: "Fast, ordered, automatic. Holds frames and the names inside them." },
+      { ico: "🏔️", title: "Heap", body: "Large, flexible, managed. Holds the objects that names refer to." },
+      { ico: "🪟", title: "Frame", body: "One call's workspace, pushed on entry and popped on return." }
+    ]
+  });
+
+  /* predict-then-reveal */
+  TeachWidgets.predict("#predict1", {
+    q: "Where does a list object live?",
+    a: ["On the stack", "On the heap", "In the frame"],
+    c: 1,
+    why: "The object itself lives on the heap. The stack frame holds only the name and its reference to the object."
+  });
+
+  /* step-through: a frame pushed and popped */
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "def make():",
+      "    items = [1, 2, 3]",
+      "    return items",
+      "data = make()"
+    ],
+    steps: [
+      { line: 0, vars: { "stack": "make defined" } },
+      { line: 1, vars: { "frame": "items → [1, 2, 3]" } },
+      { line: 2, vars: { "returning": "reference escapes" } },
+      { line: 3, vars: { "frame": "popped", data: "→ [1, 2, 3]" } }
+    ]
+  });
+
+  /* recall from memory */
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the blanks",
+    lines: [
+      "The stack holds <0> and the names inside them.",
+      "The heap holds the <1> themselves.",
+      "A value survives a call if a <2> to it escapes."
+    ],
+    blanks: [
+      { a: ["frames", "frame"], why: "Each function call pushes a frame onto the stack, holding that call's local names." },
+      { a: ["objects", "object", "values"], why: "Objects such as lists and strings live on the heap, referred to from stack frames." },
+      { a: ["reference", "pointer"], why: "If a reference to the object escapes the frame, the object stays alive on the heap." }
+    ]
+  });
+
+  /* the quiz — every option is exactly three words */
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What does the stack hold?",
+      a: ["The heap objects", "The call frames", "The type rules", "The garbage collector"],
+      c: 1,
+      why: "The stack holds call frames, each containing that call's local names and references."
+    },
+    {
+      q: "What does the heap hold?",
+      a: ["The call frames", "The local names", "The objects themselves", "The references only"],
+      c: 2,
+      why: "Objects such as lists and strings live on the heap; frames hold references to them."
+    },
+    {
+      q: "What is a frame?",
+      a: ["A heap object here", "A call's own workspace", "A type of reference", "A memory address here"],
+      c: 1,
+      why: "A frame is one function call's workspace, pushed on entry and popped on return."
+    },
+    {
+      q: "Why do local names vanish?",
+      a: ["The heap is cleared", "The frame is popped", "The type is lost", "The reference is copied"],
+      c: 1,
+      why: "Local names live in the frame, so when the function returns and the frame is popped, they disappear."
+    }
+  ]);
+</script>
+</body>
+</html>

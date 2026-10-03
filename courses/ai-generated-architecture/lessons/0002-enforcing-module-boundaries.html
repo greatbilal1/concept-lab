@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 02 — Enforcing Module Boundaries and Dependency Directions</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="ai-generated-architecture" data-lesson="2" data-lesson-id="enforcing-module-boundaries">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 02</span> · Module Boundaries</span>
+
+  <h1 class="lesson-title">Enforcing Module Boundaries and Dependency Directions</h1>
+  <p class="lesson-lede">
+    Establishing rigid dependency directions: domain core, application services, and infrastructure adapters.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to enforce clean module boundaries and inward dependency directions.</span>
+    <span><b>Mission link</b> Mastering enforcing module boundaries and dependency directions across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Enforcing Module Boundaries and Dependency Directions</h2>
+  <p>The foundational principle of durable software architecture is the <strong>Dependency Inversion Principle</strong>, formalized in Hexagonal (Ports & Adapters) and Clean Architecture: <em>high-level business policies must not depend on low-level implementation details. Both should depend on abstractions.</em></p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Establishing rigid dependency directions: domain core, application services, and infrastructure adapters.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Clean Architecture Rings</h2>
+  <p>When directing AI agents, you must enforce a strict <strong>Inward Dependency Direction</strong>:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Preventing Dependency Inversion Leaks</h2>
+  <ul><li><strong>Domain Core (Center):</strong> Entities, value objects, and business calculations. Zero imports from frameworks, databases, or HTTP libraries! Pure Python/TypeScript.</li><li><strong>Application Services (Middle):</strong> Orchestrates workflows, coordinates domain objects, and defines interfaces (Ports).</li><li><strong>Infrastructure & Adapters (Outer Ring):</strong> PostgreSQL repositories, FastAPI routes, Stripe clients, and Redis caches. These implement the interfaces defined by the inner layers.</li></ul><pre><code># The Inward Dependency Hierarchy:
+# [Outer] src/infrastructure/postgres_repo.py -> Implements UserRepository
+# [Middle] src/application/user_service.py     -> Calls UserRepository interface
+# [Center] src/domain/user.py                 -> PURE DOMAIN (No framework imports!)</code></pre><p>If an agent attempts to import `from src.infrastructure.db import Session` inside `src/domain/user.py`, reject the change immediately. That is an outward dependency leak!</p><div class="callout"><p><strong>Boundary Constraint:</strong> State in your instructions: <em>'Files in src/domain/ must NEVER import from src/api/ or src/infrastructure/.'</em></p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the module boundary sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to enforce clean module boundaries and inward dependency directions.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where enforcing module boundaries and dependency directions applies.</li>
+    <li>Author a unit test or verification script exercising enforcing module boundaries and dependency directions.</li>
+    <li>Document team architectural conventions regarding enforcing module boundaries and dependency directions.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Enforcing Module Boundaries and Dependency Directions.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "In Clean / Hexagonal Architecture, which direction should module dependencies always point?",
+    a: ["Inward toward the core domain model; outer layers depend on inner layers, never the reverse","Outward toward the database","In circular loops between all files","Dependencies should be random"],
+    c: 0,
+    why: "The Dependency Rule states that source code dependencies must only point inward toward domain business rules."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Infrastructure (Outer)",
+            "lines": [
+                  "FastAPI, PostgreSQL, Redis",
+                  "Depends inward on Application"
+            ]
+      },
+      {
+            "title": "Application Services",
+            "lines": [
+                  "Use case orchestration",
+                  "Defines repository interfaces"
+            ]
+      },
+      {
+            "title": "Domain Core (Center)",
+            "lines": [
+                  "Pure business rules & entities",
+                  "Zero external dependencies"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Enforcing Module Boundaries and Dependency Directions",
+      "def execute_flow():",
+      "    # Establishing rigid dependency directions: domain c...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Enforcing Module Boundaries and Dependency Directions"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Contaminated Domain"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Pure Domain Model"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "In clean architecture, source code dependencies must point {1} toward the pure {2} model."
+],
+    blanks: [
+      {
+            "a": [
+                  "inward"
+            ],
+            "why": "Toward the architectural center"
+      },
+      {
+            "a": [
+                  "domain"
+            ],
+            "why": "Core business logic entities"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why must the domain layer contain zero imports from database or HTTP frameworks?",
+      a: ["To ensure business logic can be tested in memory without dependencies and remains immune to framework changes","Because Python forbids importing external packages in classes","To make files smaller on disk","Because databases cannot store pure objects"],
+      c: 0,
+      why: "Decoupled domain models are testable, reusable, and resilient against technology churn."
+    },
+    {
+      q: "What is a 'Port' in Hexagonal Architecture?",
+      a: ["An abstract interface or protocol defined by the application layer that infrastructure adapters must implement","A TCP network socket like 8080","A USB connector on a laptop","A git remote URL"],
+      c: 0,
+      why: "Ports are abstract interface seams that decouple core logic from external systems."
+    },
+    {
+      q: "What should an agent do when domain logic needs to persist data to a database?",
+      a: ["Call an abstract repository interface defined in the application layer, without knowing about SQL or ORMs","Write a raw SQL query inside the domain entity","Connect to PostgreSQL via a socket directly","Save data to a text file in /tmp/"],
+      c: 0,
+      why: "The domain communicates through abstract interfaces; concrete persistence lives in adapters."
+    },
+    {
+      q: "How can dependency direction rules be enforced automatically in CI?",
+      a: ["Using architecture linters like import-linter in Python or dependency-cruiser in JavaScript","Running unit tests with -v","Rebooting the build runner","Checking git commit author names"],
+      c: 0,
+      why: "Architecture linters analyze the import AST graph and fail CI if forbidden imports occur."
+    }
+  ]);
+</script>
+</body>
+</html>

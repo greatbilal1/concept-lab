@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 03 — Where Python looks for modules</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="python-modules-packages" data-lesson="3" data-lesson-id="the-import-search-path">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 03</span> · Imports</span>
+
+  <h1 class="lesson-title">Where Python looks for modules</h1>
+  <p class="lesson-lede">
+    "ModuleNotFoundError" is the most common error in Python, and it is almost
+    never about the module. It is about the search. This lesson shows you the list
+    Python walks, in order, and why your file is not on it.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Diagnose any import error</span>
+    <span><b>Mission link</b> Debugging beats guessing</span>
+  </div>
+
+  <h2><span class="n">1</span>The search is a list, not a guess</h2>
+
+  <p>
+    When you write <code>import helpers</code>, Python does not scan your disk. It
+    walks an ordered list of directories called <b><code>sys.path</code></b>, left
+    to right, and stops at the first match. If nothing matches, you get
+    <code>ModuleNotFoundError</code>.
+  </p>
+
+  <p>
+    You can print that list at any time. It is the single most useful debugging
+    command in this whole course:
+  </p>
+
+  <pre><code>import sys
+for p in sys.path:
+    print(p)</code></pre>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>What is on the list, in order</h2>
+
+  <p>
+    The list is built at startup, and the order is the whole story. Earlier entries
+    win. Here is what you will typically see:
+  </p>
+
+  <div id="intro1"></div>
+
+  <p>
+    The first entry is the one that surprises people. When you run
+    <code>python main.py</code>, the directory containing <code>main.py</code> is
+    placed at the front of the path. That is why a script can import its neighbours
+    with no configuration at all.
+  </p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    The <b>first</b> match wins. A file named <code>json.py</code> sitting next to
+    your script will beat the standard library's <code>json</code>, because your
+    directory is earlier in the list.
+  </div>
+
+  <h2><span class="n">3</span>Watch the search happen</h2>
+
+  <p>
+    Here is the same import traced through the path, entry by entry. Notice that
+    the search stops the moment it finds a match — later entries are never checked.
+  </p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>The cache sits in front of the path</h2>
+
+  <p>
+    There is one more layer. Before Python touches <code>sys.path</code> at all, it
+    checks <b><code>sys.modules</code></b> — a dictionary of everything already
+    imported in this process. If the name is there, the search never happens.
+  </p>
+
+  <p>
+    This is why editing a module and re-running an import inside a long-lived
+    process (a notebook, a REPL, a server) does not pick up your change. The cache
+    is holding the old object. Restart the process, or use
+    <code>importlib.reload</code>.
+  </p>
+
+  <div id="diagram1"></div>
+
+  <div class="note good">
+    <span class="note-label">Why this matters later</span>
+    Every "it works in my terminal but not in the test runner" bug is a
+    <code>sys.path</code> difference. Every "my edit did nothing" bug is the module
+    cache. Knowing these two mechanisms turns a class of mysterious failures into
+    a two-line check.
+  </div>
+
+  <h2><span class="n">5</span>Check yourself</h2>
+
+  <p>
+    Answer from memory — do not scroll back up. Each option has the same number of
+    words, so nothing gives the answer away.
+  </p>
+
+  <div id="fill1"></div>
+  <div id="quiz"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>
+      You can now print <code>sys.path</code>, read it top to bottom, and explain
+      any import failure in terms of what is and is not on that list. No more
+      guessing, no more random <code>pip install</code>s.
+    </p>
+  </div>
+
+  <h2><span class="n">6</span>Do this next</h2>
+
+  <ol>
+    <li>
+      Run <code>python -c "import sys; print('\n'.join(sys.path))"</code> and
+      identify which entry is your current directory.
+    </li>
+    <li>
+      Create a file called <code>random.py</code> next to a script that imports
+      <code>random</code>. Watch the standard library lose. Then delete it.
+    </li>
+    <li>
+      In a REPL, import a module, edit the file on disk, and import it again.
+      Confirm nothing changed, then try <code>importlib.reload</code>.
+    </li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Read the Python docs on
+    <a href="https://docs.python.org/3/reference/import.html">the import system</a>,
+    especially "The module cache" and "Searching". It is dense but definitive.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher (me) anything — "how do I add a
+    directory to sys.path properly?", "what is PYTHONPATH?", "why is the script
+    directory first?". There are no bad questions here.
+  </div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  /* what is on sys.path, in order */
+  TeachWidgets.introCards("#intro1", {
+    cards: [
+      { ico: "📂", title: "Script directory", body: "The folder holding the file you ran. Always first." },
+      { ico: "🌍", title: "PYTHONPATH", body: "Extra directories you set in the environment, if any." },
+      { ico: "📚", title: "Standard library", body: "The bundled modules that ship with your interpreter." },
+      { ico: "📦", title: "site-packages", body: "Where pip installs third-party packages for this environment." }
+    ]
+  });
+
+  /* predict-then-reveal */
+  TeachWidgets.predict("#predict1", {
+    q: "You create `json.py` next to your script. What happens when you `import json`?",
+    a: ["The standard library wins", "Your local file wins", "Python raises an error"],
+    c: 1,
+    why: "The script's own directory is first on sys.path, so your json.py shadows the standard library module. This is called shadowing, and it is a classic bug."
+  });
+
+  /* step-through trace of the path search */
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "import helpers",
+      "  check sys.modules -> miss",
+      "  check ./ (script dir) -> helpers.py FOUND",
+      "  stop searching",
+      "  bind helpers"
+    ],
+    steps: [
+      { line: 0, vars: { statement: "import helpers" } },
+      { line: 1, vars: { cache: "miss" } },
+      { line: 2, vars: { checked: "./", result: "helpers.py" } },
+      { line: 3, vars: { remaining: "not checked" } },
+      { line: 4, vars: { bound: "helpers -> module" } }
+    ]
+  });
+
+  /* cache in front of the path */
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      { title: "1. sys.modules", lines: ["already imported?", "return it"] },
+      { title: "2. sys.path", lines: ["walk in order", "first match wins"] },
+      { title: "3. Not found", lines: ["ModuleNotFoundError", "search failed"] }
+    ]
+  });
+
+  /* recall from memory */
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — the search order",
+    lines: [
+      "The ordered list of search directories is called <0>",
+      "The dictionary of already-imported modules is called <1>",
+      "The <2> entry on the path is the directory of the script you ran."
+    ],
+    blanks: [
+      { a: ["sys.path"], why: "sys.path is the list Python walks, left to right." },
+      { a: ["sys.modules"], why: "sys.modules is the cache checked before any search." },
+      { a: ["first", "1"], why: "The script's own directory is inserted at the front of sys.path." }
+    ]
+  });
+
+  /* the quiz — every option is exactly three words */
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is sys.path?",
+      a: ["A dictionary of modules", "An ordered search list", "A file of settings", "A cache of imports"],
+      c: 1,
+      why: "sys.path is the ordered list of directories Python walks when resolving an import."
+    },
+    {
+      q: "Which entry wins a clash?",
+      a: ["The last one found", "The first one found", "The largest module file", "The newest file found"],
+      c: 1,
+      why: "Python stops at the first match, so earlier entries on sys.path take priority."
+    },
+    {
+      q: "What is checked first?",
+      a: ["The sys.path list", "The sys.modules cache", "The standard library", "The site packages folder"],
+      c: 1,
+      why: "sys.modules is consulted before any filesystem search, so cached modules are returned immediately."
+    },
+    {
+      q: "Why does editing a module not take effect?",
+      a: ["The cache holds the old module", "The path list is wrong", "The file was not saved", "The interpreter is broken"],
+      c: 0,
+      why: "A long-lived process keeps the old module object in sys.modules, so a restart or reload is needed."
+    }
+  ]);
+</script>
+</body>
+</html>

@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 06 — Promise chaining and error handling</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="browser-events-async" data-lesson="6" data-lesson-id="promise-chaining-and-error-handling">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 06</span> · Promises & States</span>
+
+  <h1 class="lesson-title">Promise chaining and error handling</h1>
+  <p class="lesson-lede">
+    Linear asynchronous pipelines without nesting. Learn how Promise chaining transforms data, handles errors gracefully, and coordinates concurrent jobs with Promise.all.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Chain multiple asynchronous tasks and coordinate concurrent operations with Promise combinators</span>
+    <span><b>Mission link</b> Prevents callback nesting and coordinates parallel network operations</span>
+  </div>
+
+  <h2><span class="n">1</span>Flattening the pyramid</h2>
+  <p>Every call to <code>.then()</code> returns a <b>brand new Promise</b>. If you return a value from <code>.then()</code>, the next <code>.then()</code> receives that value. If you return another Promise, the chain waits for that inner Promise to settle before continuing.</p><p>Errors fall through the chain automatically until they encounter a <code>.catch()</code> handler. This mirrors synchronous <code>try/catch</code> blocks across multi-step asynchronous workflows.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    .then() returns a new Promise; errors bubble down the chain until caught.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The four Promise combinators</h2>
+  <p>Understand the four built-in methods for orchestrating multiple concurrent Promises.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing error fallthrough in a chain</h2>
+  <p>Trace how an error on step 1 bypasses step 2 and is caught cleanly by the trailing catch block.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of Promise combinators.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can orchestrate complex, multi-step asynchronous workflows and parallel network requests cleanly.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Fetch two independent API endpoints in parallel using Promise.all().</li>
+    <li>Implement a 3-second request timeout using Promise.race() against a delayed rejection.</li>
+    <li>Use Promise.allSettled() to report on multiple batch operations where some may fail.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    MDN Web Docs: *Promise concurrency* (developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise#promise_concurrency).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "In Promise.all([p1, p2, p3]), what happens if p2 rejects with an error?",
+    a: ["Promise.all rejects immediately with p2's error, without waiting for p1 or p3 to finish","Promise.all ignores p2 and returns [p1, p3]","Promise.all retries p2 three times automatically","The browser crashes"],
+    c: 0,
+    why: "Promise.all is fail-fast: if any promise rejects, the entire combined promise rejects immediately."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Promise.all()",
+            "lines": [
+                  "all must succeed",
+                  "fails fast if ANY rejects"
+            ]
+      },
+      {
+            "title": "Promise.allSettled()",
+            "lines": [
+                  "waits for all to finish",
+                  "never rejects; returns status array"
+            ]
+      },
+      {
+            "title": "Promise.race()",
+            "lines": [
+                  "first to settle (fulfill OR reject)",
+                  "useful for request timeouts"
+            ]
+      },
+      {
+            "title": "Promise.any()",
+            "lines": [
+                  "first to FULFILL successfully",
+                  "ignores rejections unless ALL fail"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "fetchUser(1)",
+      "    .then(user => fetchOrders(user.id)) # step 1 fails (throws error)",
+      "    .then(orders => renderOrders(orders)) # SKIPPED!",
+      "    .catch(err => console.error('Caught error:', err.message));"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "start": "fetching user"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "error": "fetchOrders threw NetworkError"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "skipped": "renderOrders bypassed automatically"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "handled": "error caught cleanly in catch block"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The combinator requiring all promises to succeed is Promise.<0>().",
+      "The combinator that waits for all promises and never rejects is Promise.<1>().",
+      "The combinator settling with the fastest promise is Promise.<2>()."
+],
+    blanks: [
+      {
+            "a": [
+                  "all"
+            ],
+            "why": "Promise.all() fails fast on the first rejection."
+      },
+      {
+            "a": [
+                  "allSettled"
+            ],
+            "why": "Promise.allSettled() returns status records for all."
+      },
+      {
+            "a": [
+                  "race"
+            ],
+            "why": "Promise.race() adopts the result of the quickest settlement."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the primary advantage of Promise.allSettled() over Promise.all()?",
+      a: ["It never rejects, allowing you to inspect which requests succeeded and which failed in a batch","It runs fifty percent faster than Promise.all","It can only be used with image downloads","It automatically retries failed network requests"],
+      c: 0,
+      why: "allSettled waits for all promises to finish and provides { status, value/reason } for each."
+    },
+    {
+      q: "What happens if a .catch() block returns a regular value?",
+      a: ["The promise chain recovers from the error and the next .then() receives the value","The promise chain is permanently terminated","A new error is thrown automatically","The computer outputs an alert dialog"],
+      c: 0,
+      why: "Catching an error and returning a fallback value recovers the chain into a fulfilled state."
+    },
+    {
+      q: "Why is chaining .then() calls superior to nesting .then() inside .then()?",
+      a: ["It keeps asynchronous code linear and flat, eliminating nested pyramid indentation","It uses less CPU battery power on mobile phones","Nested then calls are forbidden by modern compilers","Chaining converts promises into synchronous functions"],
+      c: 0,
+      why: "Flat chains are easy to read, refactor, and handle with a single unified catch block."
+    },
+    {
+      q: "What does Promise.resolve(42) return?",
+      a: ["A Promise immediately fulfilled with the value 42","The raw number 42","An empty array","A function that returns 42"],
+      c: 0,
+      why: "Promise.resolve wraps any value into an already-fulfilled Promise object."
+    }
+  ]);
+</script>
+</body>
+</html>

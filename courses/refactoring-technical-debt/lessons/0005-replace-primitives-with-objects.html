@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 05 — Replacing Primitives with Objects and Value Objects</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="refactoring-technical-debt" data-lesson="5" data-lesson-id="replace-primitives-with-objects">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 05</span> · Primitive Obsession</span>
+
+  <h1 class="lesson-title">Replacing Primitives with Objects and Value Objects</h1>
+  <p class="lesson-lede">
+    Curing 'Primitive Obsession' by encapsulating raw strings, numbers, and tuples into immutable Value Objects.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to cure Primitive Obsession using expressive, immutable Value Objects.</span>
+    <span><b>Mission link</b> Mastering replacing primitives with objects and value objects across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Replacing Primitives with Objects and Value Objects</h2>
+  <p>In many codebases, you will find email addresses passed around as raw `str`, financial prices as raw `float`, and geographical coordinates as tuples `(float, float)`. This is the classic code smell known as <strong>Primitive Obsession</strong>.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Curing 'Primitive Obsession' by encapsulating raw strings, numbers, and tuples into immutable Value Objects.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Primitive Obsession vs Value Objects</h2>
+  <p>Why is primitive obsession dangerous?</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Type Safety and Integrity</h2>
+  <ul><li><strong>Missing Validation:</strong> Every function that accepts an `email: str` must repeat the regex validation, or assume someone else already validated it.</li><li><strong>Accidental Misuse:</strong> You can pass a `user_id: int` into a function expecting an `account_id: int`, and Python won't complain until production data corrupts!</li><li><strong>Floating-Point Inaccuracy:</strong> Using `float` for money leads to notorious rounding bugs (e.g. `0.1 + 0.2 == 0.30000000000000004`).</li></ul><p>The solution is to introduce <strong>Value Objects</strong>: small, immutable objects whose equality is based on their value, not memory identity:</p><pre><code># REFACTOR: From primitive obsession to a clean Value Object
+from dataclasses import dataclass
+import re
+
+@dataclass(frozen=True)
+class Email:
+    address: str
+
+    def __post_init__(self):
+        if not re.match(r"^[^@]+@[^@]+\.[^@]+$", self.address):
+            raise ValueError(f"Invalid email format: {self.address}")
+
+# Now, if an Email instance exists, it is GUARANTEED to be valid!
+def send_newsletter(recipient: Email):
+    # Zero validation needed here! The type contract guarantees correctness.
+    mailer.send(recipient.address)</code></pre><div class="callout"><p><strong>Rule of Value Objects:</strong> Value Objects should be <strong>frozen (immutable)</strong>. If you want to change an email or add money, return a new Value Object instance rather than mutating the existing one.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the Value Object sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to cure Primitive Obsession using expressive, immutable Value Objects.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where replacing primitives with objects and value objects applies.</li>
+    <li>Author a unit test or verification script exercising replacing primitives with objects and value objects.</li>
+    <li>Document team architectural conventions regarding replacing primitives with objects and value objects.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Replacing Primitives with Objects and Value Objects.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is the code smell known as 'Primitive Obsession'?",
+    a: ["Relying excessively on raw primitives (strings, ints, dicts) for domain concepts like Money, Email, or Coordinates","Using primitive types in assembly language","Obsessively writing unit tests for integers","Refusing to use third-party libraries"],
+    c: 0,
+    why: "Primitive obsession occurs when domain concepts with business rules are represented as raw unvalidated strings or numbers."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Primitive Obsession",
+            "lines": [
+                  "price: float = 19.99",
+                  "currency: str = 'USD'",
+                  "Zero built-in rules or validation"
+            ]
+      },
+      {
+            "title": "Value Object",
+            "lines": [
+                  "money = Money(19.99, 'USD')",
+                  "Guarantees rounding & validation",
+                  "Immutable (frozen)"
+            ]
+      },
+      {
+            "title": "Benefit",
+            "lines": [
+                  "Impossible to create invalid money",
+                  "Expressive domain arithmetic"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Replacing Primitives with Objects and Value Objects",
+      "def execute_flow():",
+      "    # Curing 'Primitive Obsession' by encapsulating raw ...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Replacing Primitives with Objects and Value Objects"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Primitives (Dangerous)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Value Objects (Safe)"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Curing primitive obsession with immutable {1} guarantees domain validation at construction and prevents accidental parameter {2}."
+],
+    blanks: [
+      {
+            "a": [
+                  "Value Objects"
+            ],
+            "why": "Domain objects defined by value rather than identity"
+      },
+      {
+            "a": [
+                  "swapping"
+            ],
+            "why": "Passing arguments in the wrong order"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What defines the equality of a Value Object?",
+      a: ["Its structural data and properties, rather than its memory address or identity","Its database primary key integer","Its creation timestamp","The memory pointer address in RAM"],
+      c: 0,
+      why: "Two Money(10, 'USD') objects are equal because their values match, regardless of memory identity."
+    },
+    {
+      q: "Why should Value Objects almost always be immutable (e.g. frozen=True)?",
+      a: ["Immutability prevents unexpected side effects when instances are shared across functions and threads","Python only allows immutable classes to be compiled","Immutable objects bypass garbage collection","To prevent users from reading object attributes"],
+      c: 0,
+      why: "Immutable value objects can be passed freely without fear of hidden external mutation."
+    },
+    {
+      q: "Why is representing financial currency as float an anti-pattern?",
+      a: ["Binary floating-point representation cannot represent decimal fractions like 0.1 exactly, causing rounding errors","Python floats cannot store numbers larger than 100","Floats run 100x slower than strings","Databases refuse to store floats"],
+      c: 0,
+      why: "Binary floating-point arithmetic introduces rounding inaccuracies that corrupt financial balances."
+    },
+    {
+      q: "What happens when an invalid string is passed to a well-designed Email Value Object constructor?",
+      a: ["It raises a validation ValueError immediately, ensuring invalid instances can never exist in the system","It quietly converts the string to None","It crashes the operating system","It prompts the user to retype the email"],
+      c: 0,
+      why: "Validating at construction ensures that if a Value Object exists, it is guaranteed to be valid."
+    }
+  ]);
+</script>
+</body>
+</html>

@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 03 — Cross-Site Scripting (XSS): Stored, Reflected, and DOM-Based</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="web-security" data-lesson="3" data-lesson-id="cross-site-scripting-xss-stored-reflected-dom">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 03</span> · XSS Defenses</span>
+
+  <h1 class="lesson-title">Cross-Site Scripting (XSS): Stored, Reflected, and DOM-Based</h1>
+  <p class="lesson-lede">
+    Client-side compromise: Stored XSS, Reflected XSS, DOM-based XSS, context-aware output encoding, and DOMPurify.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to diagnose, exploit, and prevent Stored, Reflected, and DOM-Based XSS attacks.</span>
+    <span><b>Mission link</b> Mastering cross-site scripting (xss): stored, reflected, and dom-based across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Cross-Site Scripting (XSS): Stored, Reflected, and DOM-Based</h2>
+  <p>While SQL Injection targets the server's database, <strong>Cross-Site Scripting (XSS) targets other users' browsers</strong>. If an attacker can inject malicious JavaScript into your web application, that script executes with the full privileges of the victim: it can read session cookies, steal auth tokens from `localStorage`, log keystrokes, and execute unauthorized actions.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Client-side compromise: Stored XSS, Reflected XSS, DOM-based XSS, context-aware output encoding, and DOMPurify.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Three XSS Variants</h2>
+  <p>The Three Flavors of XSS:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Automatic Escaping vs Dangerous Inners</h2>
+  <ul><li><strong>1. Stored XSS (Persistent — Most Dangerous):</strong> Malicious script is saved in the database (e.g. a blog comment or user profile bio: <code>&lt;script&gt;stealTokens()&lt;/script&gt;</code>). Every user who views that profile executes the attack!</li><li><strong>2. Reflected XSS:</strong> Malicious script is reflected off the server via query parameters (e.g. `https://bank.com/search?q=<script>...`). Delivered via phishing links.</li><li><strong>3. DOM-Based XSS:</strong> The vulnerability exists entirely on the client side: JavaScript code reads an untrusted source (`location.hash`) and writes it directly to an unsafe sink (`element.innerHTML = hash`).</li></ul><p>The Modern Defenses:</p><ul><li><strong>Context-Aware HTML Escaping:</strong> Modern frontend frameworks (React, Vue, Angular) automatically escape HTML by default when rendering variables: `<div>{userInput}</div>` converts `&lt;` to `&amp;lt;`.</li><li><strong>Sanitizing Rich Text with DOMPurify:</strong> If you must render user HTML, always scrub it with `DOMPurify.sanitize(dirtyHtml)`.</li><li><strong>HttpOnly Cookie Flag:</strong> Marks session cookies so client-side JavaScript <strong>cannot read them</strong>, rendering token-stealing XSS ineffective!</li></ul><pre><code>// Sanitizing User HTML before rendering in React:
+import DOMPurify from 'dompurify';
+
+function SafeUserBio({ rawBioHtml }) {
+    // DOMPurify strips malicious <script>, onload, and onerror handlers!
+    const cleanHtml = DOMPurify.sanitize(rawBioHtml);
+    return <div dangerouslySetInnerHTML={{ __html: cleanHtml }} />;
+}</code></pre><div class="callout"><p><strong>The HttpOnly Shield:</strong> Store sensitive authentication tokens in <code>HttpOnly</code> cookies rather than <code>localStorage</code>. An XSS attacker cannot steal a cookie that JavaScript cannot see.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the XSS sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to diagnose, exploit, and prevent Stored, Reflected, and DOM-Based XSS attacks.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where cross-site scripting (xss): stored, reflected, and dom-based applies.</li>
+    <li>Author a unit test or verification script exercising cross-site scripting (xss): stored, reflected, and dom-based.</li>
+    <li>Document team architectural conventions regarding cross-site scripting (xss): stored, reflected, and dom-based.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Cross-Site Scripting (XSS): Stored, Reflected, and DOM-Based.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is 'Cross-Site Scripting' (XSS) in web applications?",
+    a: ["A vulnerability where an application injects untrusted user input into an HTML page without proper encoding, allowing attacker JavaScript to execute in victims' browsers","A style sheet bug in CSS","A broken hyperlink between two websites","A technique for writing fast JavaScript"],
+    c: 0,
+    why: "XSS enables attackers to execute arbitrary JavaScript in the victim's browser, stealing session tokens or defacing pages."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Stored XSS (Persistent)",
+            "lines": [
+                  "Script saved in database (comments/bios)",
+                  "Executes for EVERY user who loads page",
+                  "High severity, widespread impact"
+            ]
+      },
+      {
+            "title": "Reflected XSS",
+            "lines": [
+                  "Script reflected in error message or search",
+                  "Delivered via malicious phishing URL"
+            ]
+      },
+      {
+            "title": "DOM-Based XSS",
+            "lines": [
+                  "Client JS writes to unsafe sink (innerHTML)",
+                  "Executes entirely in the browser"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Cross-Site Scripting (XSS): Stored, Reflected, and DOM-Based",
+      "def execute_flow():",
+      "    # Client-side compromise: Stored XSS, Reflected XSS,...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Cross-Site Scripting (XSS): Stored, Reflected, and DOM-Based"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Standard React: {userInput}"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Unsafe: innerHTML / dangerouslySetInnerHTML"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Cross-Site Scripting allows attackers to run arbitrary JavaScript in browsers, but storing tokens in {1} cookies prevents scripts from stealing session {2}."
+],
+    blanks: [
+      {
+            "a": [
+                  "HttpOnly"
+            ],
+            "why": "Cookie flag blocking JavaScript access"
+      },
+      {
+            "a": [
+                  "credentials"
+            ],
+            "why": "Authentication tokens and cookies"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why is storing JWT auth tokens in browser 'localStorage' risky compared to 'HttpOnly' cookies?",
+      a: ["Any XSS vulnerability on the site allows malicious JavaScript to read localStorage and steal the JWT instantly, whereas HttpOnly cookies cannot be read by JavaScript","localStorage is slower","localStorage has a 5-byte limit","localStorage deletes tokens on reload"],
+      c: 0,
+      why: "JavaScript has full read access to localStorage, making it vulnerable to extraction via XSS."
+    },
+    {
+      q: "What open-source JavaScript library is the gold standard for sanitizing HTML to prevent XSS?",
+      a: ["DOMPurify","jQuery","React","Lodash"],
+      c: 0,
+      why: "DOMPurify is a fast, heavily audited library that strips malicious tags and attributes from HTML strings."
+    },
+    {
+      q: "How does React prevent XSS by default when using standard JSX syntax like '<h1>{user_name}</h1>'?",
+      a: ["React automatically encodes and escapes special HTML characters (&, <, >, \", ') before inserting strings into the DOM","React deletes user names","React runs on the server only","React bans JavaScript"],
+      c: 0,
+      why: "React treats standard JSX expressions as text strings, escaping all HTML entities automatically."
+    },
+    {
+      q: "What is an 'Unsafe DOM Sink' in JavaScript web development?",
+      a: ["A property or function (like element.innerHTML, document.write, or eval) that interprets strings as executable code or HTML markup","A kitchen sink in an office","A broken CSS file","A slow network socket"],
+      c: 0,
+      why: "DOM sinks parse and execute input as markup or code, creating XSS vulnerabilities when fed unvalidated data."
+    }
+  ]);
+</script>
+</body>
+</html>

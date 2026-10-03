@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 07 — Protocols and Callables</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="python-type-hints" data-lesson="7" data-lesson-id="protocols-and-callables">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 07</span> · Generics</span>
+
+  <h1 class="lesson-title">Protocols and Callables</h1>
+  <p class="lesson-lede">
+    Not every type is a class you inherit from. Protocols describe shape, and
+    <code>Callable</code> describes functions — both without touching the code they
+    describe.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~12 min</span>
+    <span><b>Win</b> Type duck-typed code</span>
+    <span><b>Mission link</b> Interfaces without inheritance</span>
+  </div>
+
+  <h2><span class="n">1</span>Structural typing</h2>
+
+  <p>
+    Python has always been duck-typed: if it has the method, it works. Protocols
+    give that idea a name the checker understands:
+  </p>
+
+  <pre><code>class Sized(Protocol):
+    def __len__(self) -> int: ...
+
+def show(x: Sized) -> None:
+    print(len(x))</code></pre>
+
+  <p>
+    Anything with a <code>__len__</code> satisfies <code>Sized</code> — a list, a
+    string, a dict. No inheritance required, and no change to those classes.
+  </p>
+
+  <div id="intro1"></div>
+
+  <h2><span class="n">2</span>Callable</h2>
+
+  <p>
+    Functions are values, and <code>Callable</code> types them. The brackets list
+    the parameter types, then the return type:
+  </p>
+
+  <pre><code>def apply(f: Callable[[int], str], n: int) -> str:
+    return f(n)</code></pre>
+
+  <div id="predict1"></div>
+
+  <p>
+    <code>Callable[[int], str]</code> reads as "takes an int, returns a str". It is
+    how you annotate callbacks, sort keys and decorators.
+  </p>
+
+  <h2><span class="n">3</span>Protocols in practice</h2>
+
+  <p>
+    Protocols shine at boundaries: a function that only needs
+    <code>.read()</code> should not demand a full <code>File</code>. Annotating it
+    with a protocol that has <code>read</code> lets callers pass a file, a socket,
+    or a test double.
+  </p>
+
+  <div id="diagram1"></div>
+
+  <p>
+    That is the payoff: your functions depend on the smallest shape they actually
+    need, and the checker enforces it.
+  </p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Shape over lineage</h2>
+
+  <p>
+    Inheritance says "is a". Protocols say "behaves like". For most Python code the
+    second is both more accurate and more flexible, because it does not force you to
+    modify classes you do not own.
+  </p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Protocols describe shape, not lineage. <code>Callable[[A], B]</code> types a
+    function value. Both let you annotate code you cannot change.
+  </div>
+
+  <h2><span class="n">5</span>Check yourself</h2>
+
+  <p>
+    Answer from memory — do not scroll back up. Each option has the same number of
+    words, so nothing gives the answer away.
+  </p>
+
+  <div id="fill1"></div>
+  <div id="quiz"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>
+      You can define a protocol, annotate a callback with <code>Callable</code>, and
+      explain why structural typing is often better than inheritance.
+    </p>
+  </div>
+
+  <h2><span class="n">6</span>Do this next</h2>
+
+  <ol>
+    <li>Find a function that only uses one method of its argument.</li>
+    <li>Write a protocol with just that method and annotate the parameter.</li>
+    <li>Annotate a callback parameter with <code>Callable</code>.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Read the
+    <a href="https://docs.python.org/3/library/typing.html">typing module docs</a>
+    on <code>Protocol</code> and <code>Callable</code>, and
+    <a href="https://peps.python.org/pep-0544/">PEP 544</a>.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher (me) anything — "when is a protocol
+    overkill?", "can protocols have attributes?", "what about *args in Callable?".
+    There are no bad questions here.
+  </div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  /* structural typing */
+  TeachWidgets.introCards("#intro1", {
+    cards: [
+      { ico: "🧩", title: "Protocol", body: "A shape, not a base class." },
+      { ico: "📞", title: "Callable", body: "The type of a function value." },
+      { ico: "🦆", title: "Duck typing", body: "If it has the method, it fits." }
+    ]
+  });
+
+  /* predict-then-reveal */
+  TeachWidgets.predict("#predict1", {
+    q: "What does Callable[[int], str] describe?",
+    a: ["A list of ints", "A function int to str", "A dict of ints"],
+    c: 1,
+    why: "The brackets list parameter types, then the return type: takes an int, returns a str."
+  });
+
+  /* protocols */
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      { title: "Protocol", lines: ["needs one method", "no inheritance"] },
+      { title: "File", lines: ["has read()", "satisfies it"] },
+      { title: "Test double", lines: ["has read()", "satisfies it"] }
+    ]
+  });
+
+  /* step-through trace */
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "class Sized(Protocol):",
+      "  def __len__(self) -> int: ...",
+      "def show(x: Sized) -> None:",
+      "  print(len(x))",
+      "show([1, 2, 3])"
+    ],
+    steps: [
+      { line: 0, vars: { Sized: "protocol" } },
+      { line: 1, vars: { method: "__len__" } },
+      { line: 2, vars: { x: "Sized" } },
+      { line: 3, vars: { call: "len(x)" } },
+      { line: 4, vars: { arg: "list satisfies Sized" } }
+    ]
+  });
+
+  /* recall from memory */
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — shapes",
+    lines: [
+      "A shape-based type is a <0>",
+      "A function value is typed with <1>",
+      "Matching by shape is called <2> typing"
+    ],
+    blanks: [
+      { a: ["Protocol", "protocol"], why: "A Protocol describes the methods an object must have." },
+      { a: ["Callable"], why: "Callable types a function value with its parameters and return." },
+      { a: ["structural"], why: "Structural typing matches by interface shape, not inheritance." }
+    ]
+  });
+
+  /* the quiz — every option is exactly three words */
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What does a Protocol describe?",
+      a: ["A base class hierarchy", "The required method shape", "A runtime validation rule", "A serialisation format"],
+      c: 1,
+      why: "A Protocol describes the methods an object must have, without inheritance."
+    },
+    {
+      q: "What does Callable type?",
+      a: ["A list of values", "A function value", "A class instance", "A dictionary key"],
+      c: 1,
+      why: "Callable types a function value, listing its parameters and return type."
+    },
+    {
+      q: "What is structural typing?",
+      a: ["Matching by inheritance", "Matching by interface shape", "Matching by value type", "Matching by module path"],
+      c: 1,
+      why: "Structural typing matches types by the shape of their interface."
+    },
+    {
+      q: "Do protocols need inheritance?",
+      a: ["Yes, always required", "No, shape is enough", "Only for classes", "Only for functions"],
+      c: 1,
+      why: "A class satisfies a Protocol by having the right methods, with no inheritance needed."
+    }
+  ]);
+</script>
+</body>
+</html>

@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 05 — Self-Healing and Automated Retry Strategies</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="reliable-ai-systems" data-lesson="5" data-lesson-id="self-healing-automated-retry-strategies">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 05</span> · Self-Healing</span>
+
+  <h1 class="lesson-title">Self-Healing and Automated Retry Strategies</h1>
+  <p class="lesson-lede">
+    Resilience mechanics: Exponential Backoff with Full Jitter, distinguishing retryable vs fatal errors, and automated prompt repair.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to design self-healing retry strategies using exponential backoff and randomized jitter.</span>
+    <span><b>Mission link</b> Mastering self-healing and automated retry strategies across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Self-Healing and Automated Retry Strategies</h2>
+  <p>When an API endpoint returns an error, naive software does one of two wrong things: either it gives up immediately (fragile), or it retries immediately in an aggressive tight loop (which amplifies the outage and gets your IP banned).</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Resilience mechanics: Exponential Backoff with Full Jitter, distinguishing retryable vs fatal errors, and automated prompt repair.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Fixed Retries vs Full Jitter Backoff</h2>
+  <p><strong>Self-Healing Engineering</strong> uses mathematical retry patterns:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Retryable vs Fatal Errors</h2>
+  <ul><li><strong>1. Distinguishing Error Types:</strong> Never retry fatal 4xx errors! HTTP 400 (Bad Request), 401 (Invalid Key), and 403 (Forbidden) will <em>never</em> succeed on retry. Only retry <strong>transient errors</strong>: HTTP 429 (Rate Limit), 500 (Internal Error), 502/503 (Bad Gateway), and TCP timeouts.</li><li><strong>2. Exponential Backoff with Full Jitter (AWS Standard):</strong> Delay increases exponentially with randomized spread: $T = \text{random}(0, \min(\text{max\_wait}, \text{base} \times 2^{\text{attempt}}))$. Spreads retries evenly!</li><li><strong>3. Self-Healing Schema Repair:</strong> If an LLM emits JSON with a missing bracket, pass the broken text and the parser error to a fast mini-model to self-heal in 150ms rather than failing the user request!</li></ul><pre><code># Exponential Backoff with Full Jitter in Python (Tenacity):
+from tenacity import retry, wait_random_exponential, stop_after_attempt, retry_if_exception_type
+import openai
+
+@retry(
+    wait=wait_random_exponential(min=1, max=60), # Backoff with full random jitter!
+    stop=stop_after_attempt(5),                 # Max 5 attempts
+    retry=retry_if_exception_type((
+        openai.RateLimitError, openai.APIConnectionError, openai.InternalServerError
+    ))
+)
+async def self_healing_model_completion(prompt: str):
+    return await client.chat.completions.create(model="gpt-4o", messages=[...])</code></pre><div class="callout"><p><strong>The Thundering Herd Rule:</strong> Never retry at fixed intervals (e.g. exactly 1.0s, 2.0s, 4.0s). Always apply randomized full jitter to prevent retry collisions.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the self-healing sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to design self-healing retry strategies using exponential backoff and randomized jitter.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where self-healing and automated retry strategies applies.</li>
+    <li>Author a unit test or verification script exercising self-healing and automated retry strategies.</li>
+    <li>Document team architectural conventions regarding self-healing and automated retry strategies.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Self-Healing and Automated Retry Strategies.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Why is 'Exponential Backoff with Full Jitter' standard practice when retrying rate-limited API calls?",
+    a: ["Adding randomized jitter spreads retry attempts across time, preventing thundering herds where thousands of clients retry at the exact same millisecond","Jitter makes internet cables faster","Jitter encrypts the data","Jitter is required by Python syntax"],
+    c: 0,
+    why: "Randomized jitter prevents 'thundering herds' by desynchronizing concurrent retry spikes."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Fixed Retries (Thundering Herd)",
+            "lines": [
+                  "1,000 clients fail at once",
+                  "All 1,000 retry simultaneously at T=1.0s",
+                  "Collapses provider API again!"
+            ]
+      },
+      {
+            "title": "Exponential Backoff + Full Jitter",
+            "lines": [
+                  "Retries randomized between 0s and 2^N s",
+                  "Spreads load smoothly across time",
+                  "Allows provider to recover gracefully"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Self-Healing and Automated Retry Strategies",
+      "def execute_flow():",
+      "    # Resilience mechanics: Exponential Backoff with Ful...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Self-Healing and Automated Retry Strategies"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Retryable (Transient)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Non-Retryable (Fatal)"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Self-healing retry strategies combine exponential backoff with full {1} to prevent thundering herds, retrying only transient {2} errors."
+],
+    blanks: [
+      {
+            "a": [
+                  "jitter"
+            ],
+            "why": "Randomized time spread"
+      },
+      {
+            "a": [
+                  "network"
+            ],
+            "why": "Transient communication and rate-limit faults"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is a 'Thundering Herd' problem in distributed API architectures?",
+      a: ["When thousands of failed clients retry requests at the exact same synchronized timestamp, immediately crashing the recovering server again","A crowd of people running in an office","A computer virus","A sound effect in a game"],
+      c: 0,
+      why: "Synchronized retries create massive traffic spikes that knock recovering servers back offline."
+    },
+    {
+      q: "Why should an application NEVER retry an HTTP 401 Unauthorized error?",
+      a: ["HTTP 401 indicates invalid or expired credentials; retrying will never succeed without updating the API key and only wastes time","HTTP 401 is an AI error","HTTP 401 deletes the database","HTTP 401 is illegal in Python"],
+      c: 0,
+      why: "Authentication errors are permanent configuration defects that cannot resolve via retries."
+    },
+    {
+      q: "What popular open-source Python library provides declarative, battle-tested retry decorators with jitter support?",
+      a: ["Tenacity","Photoshop","React","Flask"],
+      c: 0,
+      why: "Tenacity is the leading Python retry library for robust backoff and exception filtering."
+    },
+    {
+      q: "How does self-healing schema repair recover from minor model formatting slips?",
+      a: ["It detects JSON validation errors, formats a corrective prompt with the specific parser error, and asks a fast model to fix the syntax","It deletes the user's message","It reboots the computer","It shuts down the web server"],
+      c: 0,
+      why: "Automated repair loops fix minor syntax slips in milliseconds without troubling users."
+    }
+  ]);
+</script>
+</body>
+</html>

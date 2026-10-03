@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 05 — Handling Missing Fields, Nulls, and Schema Mismatches</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="structured-outputs" data-lesson="5" data-lesson-id="handling-missing-fields-nulls">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 05</span> · Missing Data</span>
+
+  <h1 class="lesson-title">Handling Missing Fields, Nulls, and Schema Mismatches</h1>
+  <p class="lesson-lede">
+    Handling the messy reality of data: optional attributes, nullable fields, default values, and schema mismatch defenses.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to design defensive schemas that handle missing data honestly without hallucinations.</span>
+    <span><b>Mission link</b> Mastering handling missing fields, nulls, and schema mismatches across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Handling Missing Fields, Nulls, and Schema Mismatches</h2>
+  <p>A critical trap in structured output engineering is <strong>Over-Constraining Required Fields</strong>. If you tell an LLM that <code>phone_number: str</code> is strictly required, and you feed it an email that contains no phone number, what will the model do?</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Handling the messy reality of data: optional attributes, nullable fields, default values, and schema mismatch defenses.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Required vs Nullable Fields</h2>
+  <p>Because the schema grammar forces it to emit a string, the model will <strong>hallucinate a fake phone number</strong> (e.g. <code>"555-0199"</code>) just to satisfy your schema!</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Default Collections Pattern</h2>
+  <p>To prevent hallucinated data, author schemas with defensive nullability:</p><ul><li><strong>1. Explicit Nullable Types:</strong> Use `str | None = None` in Python or `z.string().nullable()` in TypeScript for any attribute that might be missing in real documents.</li><li><strong>2. Explicit Sentinel Explanations:</strong> Add field descriptions guiding the model: <em>'Phone number if present in document, otherwise null.'</em></li><li><strong>3. Sensible Defaults:</strong> Use default values for collections: `tags: list[str] = Field(default_factory=list)`. An empty list `[]` is vastly cleaner to handle downstream than `null`.</li></ul><pre><code># Defensive Schema Design (Preventing Hallucinations):
+class ContactDetails(BaseModel):
+    name: str = Field(description="Full name of the contact person")
+    # Nullable fields: Model outputs null instead of inventing fake data!
+    phone: str | None = Field(default=None, description="Phone number if present, else null")
+    department: str | None = Field(default=None, description="Department if stated, else null")
+    notes: list[str] = Field(default_factory=list, description="Extracted notes (empty if none)")</code></pre><div class="callout"><p><strong>The Honesty Law:</strong> Allowing fields to be `null` gives the model the mathematical freedom to be honest when information is absent.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the missing fields sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to design defensive schemas that handle missing data honestly without hallucinations.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where handling missing fields, nulls, and schema mismatches applies.</li>
+    <li>Author a unit test or verification script exercising handling missing fields, nulls, and schema mismatches.</li>
+    <li>Document team architectural conventions regarding handling missing fields, nulls, and schema mismatches.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Handling Missing Fields, Nulls, and Schema Mismatches.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What happens if an extraction schema declares a field as non-nullable 'phone: str' but the source document contains no phone number?",
+    a: ["The model will either hallucinate a fake phone number to satisfy the strict schema, or fail validation with an error","The model shuts down the computer","The model writes a letter to the customer","The phone number is found on the internet"],
+    c: 0,
+    why: "Strict non-nullable constraints force models to fabricate plausible fake data if real data is absent."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Strict Required (phone: str)",
+            "lines": [
+                  "Document has no phone number",
+                  "Model forced to emit string -> INVENTS '555-0199'! (Fake data)"
+            ]
+      },
+      {
+            "title": "Defensive Nullable (phone: str | None)",
+            "lines": [
+                  "Document has no phone number",
+                  "Model emits null honestly -> Zero hallucination!"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Handling Missing Fields, Nulls, and Schema Mismatches",
+      "def execute_flow():",
+      "    # Handling the messy reality of data: optional attri...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Handling Missing Fields, Nulls, and Schema Mismatches"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Nullable List (tags: list | None)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Default Empty List (tags = [])"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Making fields nullable gives models the mathematical permission to return {1} when data is absent, preventing forced {2}."
+],
+    blanks: [
+      {
+            "a": [
+                  "null"
+            ],
+            "why": "None or null value"
+      },
+      {
+            "a": [
+                  "hallucinations"
+            ],
+            "why": "Fabricating fake data to satisfy schemas"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why does making a field strictly required in a schema sometimes cause hallucinations?",
+      a: ["The model is grammatically forced to output a value of that type, so it invents a plausible fake value if the source text lacks one","The model gets angry","The computer processor fails","Required fields are illegal in JSON"],
+      c: 0,
+      why: "Grammar constraints enforce that the field must be emitted; missing source data leads to fabrication."
+    },
+    {
+      q: "What is the recommended default value for array fields in Pydantic extraction schemas?",
+      a: ["Field(default_factory=list), ensuring the field defaults to an empty list () rather than null","None","A list with 10 zeros","False"],
+      c: 0,
+      why: "Defaulting to an empty list avoids downstream NoneType errors when iterating over collections."
+    },
+    {
+      q: "How does explicit Field(description='...') text guide null handling?",
+      a: ["It tells the model under what exact conditions it should emit null (e.g. 'Set to null if not explicitly mentioned in the text')","It deletes the field","It turns off the linter","It converts null to zero"],
+      c: 0,
+      why: "Clear instructions explicitly authorize the model to emit null when information is missing."
+    },
+    {
+      q: "What Python typing syntax represents a nullable string in Python 3.10+?",
+      a: ["str | None","Nullable(str)","string?","void*"],
+      c: 0,
+      why: "Python 3.10+ uses union syntax `str | None` to represent optional/nullable types cleanly."
+    }
+  ]);
+</script>
+</body>
+</html>

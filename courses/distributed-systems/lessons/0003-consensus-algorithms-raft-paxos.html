@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 03 — Consensus Algorithms: Paxos, Raft, and Distributed State Machines</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="distributed-systems" data-lesson="3" data-lesson-id="consensus-algorithms-raft-paxos">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 03</span> · Consensus & Raft</span>
+
+  <h1 class="lesson-title">Consensus Algorithms: Paxos, Raft, and Distributed State Machines</h1>
+  <p class="lesson-lede">
+    Achieving agreement: the consensus problem, Replicated State Machines (RSM), Paxos foundations, and the understandable Raft protocol.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You understand distributed consensus, Replicated State Machines, quorum mechanics, and the Raft protocol.</span>
+    <span><b>Mission link</b> Mastering consensus algorithms: paxos, raft, and distributed state machines across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Consensus Algorithms: Paxos, Raft, and Distributed State Machines</h2>
+  <p>If you have five independent database nodes, how do they agree on who is the Leader? If two nodes both declare themselves Leader at the same time (<strong>The Split-Brain Problem</strong>), they will accept conflicting writes, corrupting the database permanently. <strong>Distributed Consensus</strong> is the mathematical algorithm that makes agreement infallible.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Achieving agreement: the consensus problem, Replicated State Machines (RSM), Paxos foundations, and the understandable Raft protocol.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Raft State Machine Lifecycle</h2>
+  <p>The Raft Consensus Protocol (Ongaro & Ousterhout, Stanford):</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Preventing Split-Brain via Quorum</h2>
+  <ul><li><strong>1. Designed for Understandability:</strong> Paxos was historically notoriously difficult to implement. Raft decomposes consensus into three clear sub-problems: <em>Leader Election</em>, <em>Log Replication</em>, and <em>Safety</em>.</li><li><strong>2. Three Node Roles:</strong> Every node is in one of three states: <em>Follower</em>, <em>Candidate</em>, or <em>Leader</em>.</li><li><strong>3. Quorum Rule ($N/2 + 1$):</strong> In a cluster of $5$ nodes, any decision (electing a leader, committing a log entry) requires agreement from a <strong>Quorum of at least 3 nodes</strong> ($5/2 + 1 = 3$). A 5-node cluster survives the complete death of 2 nodes without data loss!</li><li><strong>4. Log Replication & Commit Index:</strong> The Leader accepts client writes, appends them to its log, and sends `AppendEntries` RPCs to followers. Once a majority of followers acknowledge, the entry is committed to the <strong>Replicated State Machine (RSM)</strong>!</li></ul><pre><code># The Raft Quorum Mathematics:
+# Cluster Size (N) | Quorum Majority (N/2 + 1) | Max Tolerated Node Failures (F)
+# --------------------------------------------------------------------------------
+# 3 nodes          | 2 nodes                    | 1 node failure survived
+# 5 nodes          | 3 nodes                    | 2 node failures survived (Industry Standard!)
+# 7 nodes          | 4 nodes                    | 3 node failures survived</code></pre><div class="callout"><p><strong>The Odd Number Rule:</strong> Always deploy consensus clusters (etcd, ZooKeeper, Consul) in odd numbers (3, 5, or 7 nodes). An even number (e.g. 4 nodes) requires 3 for quorum, offering the exact same fault tolerance as 3 nodes with higher cost and split risk.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the consensus sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You understand distributed consensus, Replicated State Machines, quorum mechanics, and the Raft protocol.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where consensus algorithms: paxos, raft, and distributed state machines applies.</li>
+    <li>Author a unit test or verification script exercising consensus algorithms: paxos, raft, and distributed state machines.</li>
+    <li>Document team architectural conventions regarding consensus algorithms: paxos, raft, and distributed state machines.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Consensus Algorithms: Paxos, Raft, and Distributed State Machines.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What problem do distributed consensus algorithms like Raft and Paxos solve?",
+    a: ["Enabling a cluster of distributed servers to reliably agree on a sequence of state transitions (an append-only log) even if some nodes fail","Encrypting files on a hard drive","Compressing database records","Formatting source code in Python"],
+    c: 0,
+    why: "Consensus algorithms allow independent servers to reach infallible agreement on shared state despite node failures."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1. Follower (Normal State)",
+            "lines": [
+                  "Listens for heartbeats from Leader",
+                  "If heartbeat times out -> Becomes Candidate!"
+            ]
+      },
+      {
+            "title": "2. Candidate (Election)",
+            "lines": [
+                  "Requests votes from all nodes",
+                  "Wins majority (3/5)? Becomes Leader!"
+            ]
+      },
+      {
+            "title": "3. Leader (Authority)",
+            "lines": [
+                  "Accepts all client writes",
+                  "Replicates log entries across cluster quorum"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Consensus Algorithms: Paxos, Raft, and Distributed State Machines",
+      "def execute_flow():",
+      "    # Achieving agreement: the consensus problem, Replic...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Consensus Algorithms: Paxos, Raft, and Distributed State Machines"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Partition Split (5 nodes)"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The Raft consensus algorithm guarantees safe log replication across clusters by requiring agreement from a {1} majority ($N/2 + 1$) to prevent fatal {2} states."
+],
+    blanks: [
+      {
+            "a": [
+                  "quorum"
+            ],
+            "why": "Majority threshold of nodes"
+      },
+      {
+            "a": [
+                  "split-brain"
+            ],
+            "why": "Two competing leaders accepting conflicting writes"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the 'Split-Brain' problem in distributed database clusters?",
+      a: ["A network partition divides a cluster, causing two different nodes to believe they are the legitimate leader and accept conflicting writes simultaneously","A computer with two processors","A human developer being confused","A memory leak in Python"],
+      c: 0,
+      why: "Split-brain occurs when isolated sub-clusters elect competing leaders, corrupting data integrity."
+    },
+    {
+      q: "How many node failures can a 5-node Raft consensus cluster tolerate while continuing to operate normally?",
+      a: ["2 node failures (a quorum of 3 nodes remains active to make decisions)","1 node failure","4 node failures","Zero node failures"],
+      c: 0,
+      why: "A 5-node cluster needs 3 nodes for quorum ($5/2 + 1 = 3$), tolerating $5 - 3 = 2$ simultaneous failures."
+    },
+    {
+      q: "Why are production consensus clusters (like etcd in Kubernetes) deployed with an odd number of nodes (3, 5, 7)?",
+      a: ["An odd number prevents 50/50 vote ties during elections and provides optimal fault tolerance without wasted redundant nodes","Odd numbers are lucky in computer science","Even numbers crash Linux","It is required by Python syntax"],
+      c: 0,
+      why: "Odd node counts avoid split-vote deadlocks and maximize fault tolerance per node count."
+    },
+    {
+      q: "What critical distributed systems platform relies on the Raft algorithm to store cluster state in Kubernetes?",
+      a: ["etcd","MySQL","Redis","SQLite"],
+      c: 0,
+      why: "etcd uses Raft to provide consistent, highly available key-value storage for all Kubernetes cluster state."
+    }
+  ]);
+</script>
+</body>
+</html>

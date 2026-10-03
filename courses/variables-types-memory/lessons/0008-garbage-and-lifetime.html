@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 08 — Garbage and lifetime</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="variables-types-memory" data-lesson="8" data-lesson-id="garbage-and-lifetime">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 08</span> · Memory</span>
+
+  <h1 class="lesson-title">Garbage and lifetime</h1>
+  <p class="lesson-lede">
+    Heap objects do not live forever. When nothing refers to an object any more, it
+    becomes garbage and is reclaimed. Understanding this explains both why Python
+    feels effortless and how memory leaks still happen.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~11 min</span>
+    <span><b>Win</b> Predict when an object dies</span>
+    <span><b>Mission link</b> Why you never free memory</span>
+  </div>
+
+  <h2><span class="n">1</span>An object lives while it is reachable</h2>
+
+  <p>
+    An object on the heap stays alive as long as at least one reference points at
+    it. The moment the last reference goes away, the object is <b>unreachable</b> —
+    no name, no container, nothing can reach it. It is now garbage.
+  </p>
+
+  <pre><code>a = [1, 2, 3]   # one reference
+a = None        # the list is now unreachable
+                # nothing can reach it — it is garbage</code></pre>
+
+  <p>
+    Notice that the list was not "deleted". It simply became unreachable, and the
+    runtime is free to reclaim its memory.
+  </p>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Reference counting</h2>
+
+  <p>
+    Python's main strategy is <b>reference counting</b>. Every object keeps a count
+    of how many references point at it. When that count drops to zero, the object
+    is reclaimed immediately.
+  </p>
+
+  <pre><code>import sys
+a = [1, 2, 3]
+sys.getrefcount(a)   # more than 1 (the call itself adds one)
+b = a                # count goes up
+del b                # count goes down</code></pre>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    An object is alive while its <b>reference count</b> is above zero. When the last
+    reference disappears, the count hits zero and the memory is reclaimed.
+  </div>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Garbage collection for cycles</h2>
+
+  <p>
+    Reference counting has one blind spot: <b>cycles</b>. If two objects refer to
+    each other, each keeps the other's count above zero even when nothing outside
+    can reach them. Python handles this with a <b>garbage collector</b> that
+    periodically looks for unreachable cycles and reclaims them.
+  </p>
+
+  <pre><code>a = {}
+b = {}
+a["other"] = b
+b["other"] = a   # a cycle — counts never reach zero
+del a, b         # the cycle is unreachable, but counts stay high
+                 # the garbage collector finds and frees it</code></pre>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Memory leaks in a managed language</h2>
+
+  <p>
+    If Python frees everything automatically, how do leaks happen? A leak is not
+    lost memory — it is memory that is still <i>reachable</i> but no longer useful.
+    A global list that you keep appending to, or a cache that never expires, holds
+    references forever, so the objects can never be reclaimed.
+  </p>
+
+  <div class="note warn">
+    <span class="note-label">Common mistake</span>
+    Believing "Python has a garbage collector, so I cannot leak memory". You can —
+    by keeping references alive in globals, caches, or long-lived containers. The
+    collector only frees what is unreachable.
+  </div>
+
+  <div id="intro1"></div>
+
+  <div id="fill1"></div>
+
+  <h2><span class="n">5</span>Check yourself</h2>
+
+  <p>
+    Answer from memory — do not scroll back up. Each option has the same number of
+    words, so nothing gives the answer away.
+  </p>
+
+  <div id="quiz"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>
+      You can now predict when an object dies — when its last reference goes away —
+      explain reference counting and why cycles need a collector, and describe how
+      leaks happen even in a managed language. That completes the memory half of
+      the course.
+    </p>
+  </div>
+
+  <h2><span class="n">6</span>Do this next</h2>
+
+  <ol>
+    <li>
+      Create a list, bind a second name to it, then rebind both names. Explain at
+      which line the list becomes unreachable.
+    </li>
+    <li>
+      Build a two-object cycle as shown above, then delete both names. Explain why
+      reference counting alone cannot free it.
+    </li>
+    <li>
+      Write down one way you could accidentally keep an object alive forever in a
+      real program, and how you would avoid it.
+    </li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Read <a href="https://docs.python.org/3/library/gc.html">Python — "gc — Garbage Collector interface"</a>.
+    It documents reference counting, the cycle collector, and how to inspect and
+    control collection — the mechanisms this lesson describes.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher (me) anything — "what is a reference
+    cycle?", "when does the collector run?", "how do I find a leak?". There are no
+    bad questions here.
+  </div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  /* reference count dropping to zero */
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      { title: "a", lines: ["→ list", "count 1"] },
+      { title: "a = None", lines: ["count 0"] },
+      { title: "reclaimed", lines: ["memory freed"] }
+    ]
+  });
+
+  /* the three ideas */
+  TeachWidgets.introCards("#intro1", {
+    cards: [
+      { ico: "🔗", title: "Reachable", body: "An object lives while at least one reference can reach it." },
+      { ico: "🔢", title: "Ref count", body: "Each object counts its references; zero means reclaim now." },
+      { ico: "♻️", title: "Collector", body: "A cycle collector finds unreachable loops that counting misses." }
+    ]
+  });
+
+  /* predict-then-reveal */
+  TeachWidgets.predict("#predict1", {
+    q: "When does an object become garbage?",
+    a: ["When it is deleted", "When it is unreachable", "When the program ends"],
+    c: 1,
+    why: "An object is garbage when no reference can reach it. Deleting a name is just one way to remove the last reference."
+  });
+
+  /* step-through: a cycle */
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "a = {}",
+      "b = {}",
+      "a[\"other\"] = b",
+      "b[\"other\"] = a",
+      "del a, b"
+    ],
+    steps: [
+      { line: 0, vars: { a: "→ {}" } },
+      { line: 1, vars: { a: "→ {}", b: "→ {}" } },
+      { line: 2, vars: { "a→b": "count 2" } },
+      { line: 3, vars: { "b→a": "count 2", "cycle": "formed" } },
+      { line: 4, vars: { "outside refs": "none", "counts": "still 1 each" } }
+    ]
+  });
+
+  /* recall from memory */
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the blanks",
+    lines: [
+      "An object lives while it is <0>.",
+      "Reference counting frees an object when its count reaches <1>.",
+      "A <2> collector frees unreachable cycles."
+    ],
+    blanks: [
+      { a: ["reachable"], why: "An object stays alive as long as at least one reference can reach it." },
+      { a: ["zero", "0"], why: "When the reference count drops to zero, the object is reclaimed immediately." },
+      { a: ["garbage", "cycle"], why: "The garbage collector finds unreachable cycles that reference counting alone cannot free." }
+    ]
+  });
+
+  /* the quiz — every option is exactly three words */
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "When is an object garbage?",
+      a: ["When it is unreachable", "When it is immutable", "When it is copied", "When it is typed"],
+      c: 0,
+      why: "An object is garbage when no reference can reach it, so its memory can be reclaimed."
+    },
+    {
+      q: "What does reference counting do?",
+      a: ["Counts the objects", "Counts the references", "Counts the frames", "Counts the types"],
+      c: 1,
+      why: "Each object counts how many references point at it and is freed when that count reaches zero."
+    },
+    {
+      q: "Why are cycles a problem?",
+      a: ["They use up more memory", "Their counts never reach zero", "They break the whole stack", "They change the value types"],
+      c: 1,
+      why: "Objects in a cycle keep each other's counts above zero, so reference counting alone cannot free them."
+    },
+    {
+      q: "How can a leak happen?",
+      a: ["Memory is never freed", "References stay reachable forever", "The collector is disabled", "The heap stays small"],
+      c: 1,
+      why: "A leak is memory that is still reachable but no longer useful, so the collector cannot free it."
+    }
+  ]);
+</script>
+</body>
+</html>

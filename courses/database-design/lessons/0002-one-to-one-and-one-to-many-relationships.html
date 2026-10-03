@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 02 — One-to-one and one-to-many relationships</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="database-design" data-lesson="2" data-lesson-id="one-to-one-and-one-to-many-relationships">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 02</span> · Domain Modeling & Cardinality</span>
+
+  <h1 class="lesson-title">One-to-one and one-to-many relationships</h1>
+  <p class="lesson-lede">
+    Where does the foreign key go? Master the placement rules for one-to-one (1:1) and one-to-many (1:N) relationships without circular dependencies.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Implement one-to-one and one-to-many relationships with correct foreign key placement</span>
+    <span><b>Mission link</b> The architectural blueprint for linking 90% of relational tables</span>
+  </div>
+
+  <h2><span class="n">1</span>The foreign key placement rule</h2>
+  <p>In a <b>One-to-Many (1:N)</b> relationship (e.g. one Author has many Books), a simple rule governs schema design: <b>The foreign key ALWAYS lives on the 'many' side</b>. A book belongs to one author, so <code>books</code> holds the <code>author_id</code> column.</p><p>Putting foreign keys on the 'one' side (trying to store an array of book IDs on the author) breaks relational theory and creates unqueryable comma-separated strings.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    In a 1:N relationship, the foreign key column always belongs in the child (many) table.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>One-to-One (1:1) architecture</h2>
+  <p>For 1:1 relationships (e.g. User and UserProfile), make the foreign key also serve as the Primary Key.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing 1:N foreign key validation</h2>
+  <p>Trace how a single customer record links to multiple distinct order records.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of relationship placement.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can position foreign key columns correctly across one-to-one and one-to-many relational tables.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Create an authors and books schema with a foreign key constraint.</li>
+    <li>Implement a 1:1 user_preferences table where the primary key is a foreign key to users.</li>
+    <li>Query all children for a parent using a simple WHERE foreign_key = parent_id clause.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    C.J. Date, *An Introduction to Database Systems*, Chapter 4: 'Relational Integrity Constraints'.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "A customer has many orders. Which table must hold the foreign key column?",
+    a: ["The orders table holds the customer_id column","The customers table holds an array of order_id numbers","Both tables must hold foreign keys referencing each other","A separate third table is required"],
+    c: 0,
+    why: "In 1:N, the foreign key sits on the child 'many' side: each order references its parent customer."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Parent (users)",
+            "lines": [
+                  "id SERIAL PRIMARY KEY",
+                  "email, password_hash"
+            ]
+      },
+      {
+            "title": "Child (profiles)",
+            "lines": [
+                  "user_id INTEGER PRIMARY KEY",
+                  "FOREIGN KEY (user_id) REFERENCES users(id)",
+                  "enforces exactly 1:1 mapping!"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# users table: (id: 1, name: 'Ada')",
+      "# orders table: (id: 101, user_id: 1, total: 50)",
+      "# orders table: (id: 102, user_id: 1, total: 35)",
+      "# Result: Querying WHERE user_id = 1 retrieves both orders cleanly"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "parent": "Customer #1 exists in users table"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "child_1": "Order 101 links to user_id: 1"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "child_2": "Order 102 links to user_id: 1"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "relationship": "one-to-many established without modifying users table"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "In a one-to-many relationship, the foreign key belongs in the <0> table.",
+      "A relationship where one user has at most one profile is one-to-<1>.",
+      "Storing multiple IDs as a comma-separated string in a column violates <2>NF."
+],
+    blanks: [
+      {
+            "a": [
+                  "many",
+                  "child"
+            ],
+            "why": "Foreign keys live on the 'many' child side."
+      },
+      {
+            "a": [
+                  "one",
+                  "1"
+            ],
+            "why": "1:1 limits relationships to a single matching record."
+      },
+      {
+            "a": [
+                  "1",
+                  "first"
+            ],
+            "why": "1NF mandates atomic, indivisible column values."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why shouldn't you store multiple child IDs as a comma-separated string (e.g. '1,4,12') in a parent column?",
+      a: ["It breaks 1NF, prevents indexing, prevents foreign key constraints, and makes joins impossible","It makes the SQL file download too fast","Strings cannot contain commas in SQL","It causes database servers to catch on fire"],
+      c: 0,
+      why: "Comma-separated values destroy indexing, integrity constraints, and query performance."
+    },
+    {
+      q: "How do you enforce a strict 1:1 relationship between a 'users' table and a 'profiles' table in SQL?",
+      a: ["Make profiles.user_id the PRIMARY KEY of profiles while referencing users(id)","Add ten foreign key columns to both tables","Use a CHECK constraint checking user_id > 0","Set the table background color to blue"],
+      c: 0,
+      why: "Making the foreign key also be the unique primary key guarantees at most one profile per user."
+    },
+    {
+      q: "Can a child row in a 1:N relationship reference more than one parent row simultaneously in its foreign key column?",
+      a: ["No, a foreign key column holds a single scalar value referencing exactly one parent primary key","Yes, foreign keys can hold multiple parents at once","Only on Sundays","Yes, if the database is running on Linux"],
+      c: 0,
+      why: "A foreign key holds one scalar value, binding the child to exactly one parent record."
+    },
+    {
+      q: "When is it appropriate to split data into a 1:1 relationship rather than keeping it in a single table?",
+      a: ["When isolating rarely used large columns (like binary blobs), or separating sensitive security data","Whenever a table has more than two columns","Never; 1:1 relationships are completely forbidden in SQL","Only for tables that store numbers"],
+      c: 0,
+      why: "Vertical partitioning into 1:1 tables optimizes memory caching and security boundaries."
+    }
+  ]);
+</script>
+</body>
+</html>

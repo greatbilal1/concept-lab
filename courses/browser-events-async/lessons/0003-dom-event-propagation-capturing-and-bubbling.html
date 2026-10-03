@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 03 — DOM event propagation: capturing and bubbling</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="browser-events-async" data-lesson="3" data-lesson-id="dom-event-propagation-capturing-and-bubbling">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 03</span> · DOM Events & Delegation</span>
+
+  <h1 class="lesson-title">DOM event propagation: capturing and bubbling</h1>
+  <p class="lesson-lede">
+    When you click a button, the event does not start at the button. Explore the three phases of DOM event propagation: capturing down, target, and bubbling up.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Explain event propagation phases and control flow with stopPropagation</span>
+    <span><b>Mission link</b> The mechanism underlying all interactive browser UI event handling</span>
+  </div>
+
+  <h2><span class="n">1</span>The three phases of an event</h2>
+  <p>When an event occurs (e.g. clicking a nested <code>&lt;button&gt;</code>), the browser dispatches the event through three distinct phases: <b>1. Capturing Phase</b> (travels from <code>window</code> down through ancestors to the target), <b>2. Target Phase</b> (reaches the element clicked), and <b>3. Bubbling Phase</b> (ascends back up from target to <code>window</code>).</p><p>By default, <code>addEventListener</code> listens only during the <b>bubbling phase</b>. Calling <code>event.stopPropagation()</code> stops the event from ascending further up the tree.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Events travel down during capturing, reach the target, then bubble back up to window.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Event propagation path</h2>
+  <p>Visualise the U-shaped journey an event takes down and up the DOM hierarchy.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing stopPropagation()</h2>
+  <p>Trace how stopPropagation prevents an outer card click handler from firing when a child link is clicked.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of event propagation phases.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can control event propagation and prevent unwanted parent event collisions using stopPropagation.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Attach a click listener with { capture: true } and observe it firing before bubbling handlers.</li>
+    <li>Prevent a parent accordion from collapsing when an inner button is clicked using stopPropagation().</li>
+    <li>Inspect event.target versus event.currentTarget in a console log.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    W3C DOM Level 3 Events Specification, Section 3.1: 'Event dispatch and DOM tree flow'.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "A button is clicked inside a div. Both have click listeners. Which listener runs first by default?",
+    a: ["The button listener runs first, because bubbling is the default phase","The div listener runs first","Both listeners run simultaneously in parallel","Neither runs unless event.preventDefault() is called"],
+    c: 0,
+    why: "In the default bubbling phase, the innermost target fires before bubbling up to parent ancestors."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1. Capturing Phase",
+            "lines": [
+                  "window -> document -> body -> div",
+                  "descends down to target"
+            ]
+      },
+      {
+            "title": "2. Target Phase",
+            "lines": [
+                  "reaches <button>",
+                  "fires target listeners"
+            ]
+      },
+      {
+            "title": "3. Bubbling Phase",
+            "lines": [
+                  "button -> div -> body -> document",
+                  "ascends up (default listener phase)"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "button.addEventListener('click', (e) => {",
+      "    e.stopPropagation(); # halts bubbling phase right here",
+      "    console.log('Button clicked');",
+      "});",
+      "card.addEventListener('click', () => console.log('Card clicked'));"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "click": "button clicked"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "action": "bubbling halted at button"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "output": "'Button clicked'"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "parent": "card listener NEVER receives event"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The phase where an event descends down from the root is the <0> phase.",
+      "The phase where an event bubbles upward through ancestors is <1>.",
+      "The method that halts event propagation along the tree is stop<2>()."
+],
+    blanks: [
+      {
+            "a": [
+                  "capturing",
+                  "capture"
+            ],
+            "why": "Capturing descends from window to target."
+      },
+      {
+            "a": [
+                  "bubbling"
+            ],
+            "why": "Bubbling ascends from target back to window."
+      },
+      {
+            "a": [
+                  "Propagation"
+            ],
+            "why": "stopPropagation() stops bubbling and capturing."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the difference between event.target and event.currentTarget?",
+      a: ["event.target is the element that originated the event; event.currentTarget is the element whose listener is running","event.target only works on buttons; event.currentTarget works on divs","event.target is the mouse cursor; event.currentTarget is the monitor screen","There is no difference between them"],
+      c: 0,
+      why: "target is the deepest clicked node; currentTarget is the node handling the event."
+    },
+    {
+      q: "How do you configure an event listener to fire during the capturing phase?",
+      a: ["Pass { capture: true } or true as the third argument to addEventListener","Use the oncapture HTML attribute in markup","Set element.style.capture = 'active'","It is impossible; browsers only support bubbling"],
+      c: 0,
+      why: "The third parameter of addEventListener specifies whether to listen in capture mode."
+    },
+    {
+      q: "What does event.preventDefault() do?",
+      a: ["Cancels the default browser action (like following a link or submitting a form) without stopping bubbling","Stops the event from bubbling up the DOM tree","Deletes the element from the DOM tree","Closes the active browser tab"],
+      c: 0,
+      why: "preventDefault cancels default browser actions; stopPropagation cancels tree traversal."
+    },
+    {
+      q: "Do all DOM events bubble up the tree by default?",
+      a: ["No, some events like 'focus', 'blur', and 'mouseenter' do not bubble","Yes, every single DOM event bubbles to the window","Only mouse events bubble; keyboard events never bubble","Only events created with JavaScript bubble"],
+      c: 0,
+      why: "Events have an event.bubbles boolean; focus and blur do not bubble (focusin/focusout do)."
+    }
+  ]);
+</script>
+</body>
+</html>

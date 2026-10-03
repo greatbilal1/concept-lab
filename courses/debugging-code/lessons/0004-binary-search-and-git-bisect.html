@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 04 — Binary search and bisecting</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="debugging-code" data-lesson="4" data-lesson-id="binary-search-and-git-bisect">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 04</span> · Reproduction & Isolation</span>
+
+  <h1 class="lesson-title">Binary search and bisecting</h1>
+  <p class="lesson-lede">
+    A feature worked yesterday and is broken today. Use git bisect to automate binary search across commit history and find the culprit in seconds.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Use git bisect to isolate the exact commit that introduced a defect</span>
+    <span><b>Mission link</b> Applies algorithmic isolation across historical repository timelines</span>
+  </div>
+
+  <h2><span class="n">1</span>Automating history searches</h2>
+  <p>When software regresses, the bug was introduced by a specific commit between a known good release and the current broken HEAD. Instead of checking out commits at random, Git provides <code>git bisect</code> to automate binary search.</p><p>You tell Git the last known good commit and the first known bad one. Git checks out the midpoint commit, you test it, and Git repeats the process until the breaking commit is identified.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Git bisect turns months of commit history into a logarithmic search for the breaking change.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The bisect workflow</h2>
+  <p>The bisect lifecycle moves from initialisation, through marking good and bad endpoints, to automated or manual midpoint evaluation.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Automating with git bisect run</h2>
+  <p>Trace how a test script exiting with code 0 or 1 allows git bisect to run completely unattended.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Recall the key commands and exit code conventions for git bisect.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can run git bisect manually or with automated test scripts to discover regressions across hundreds of commits in seconds.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Create a test repo with 10 commits, introduce an error in commit 6, and find it with bisect.</li>
+    <li>Write a one-line test command suitable for git bisect run.</li>
+    <li>Practice running git bisect reset to return your working directory to normal.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Official Git Documentation: *git-bisect(1) Manual Page* (git-scm.com/docs/git-bisect).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Across a span of 128 commits, how many test runs does git bisect need to find the breaking commit?",
+    a: ["128 tests","64 tests","7 tests","1 test"],
+    c: 2,
+    why: "Two to the power of 7 equals 128, so binary search over 128 commits takes at most 7 steps."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Start",
+            "lines": [
+                  "git bisect start",
+                  "mark good and bad"
+            ]
+      },
+      {
+            "title": "Midpoint",
+            "lines": [
+                  "git checks out commit",
+                  "run test script"
+            ]
+      },
+      {
+            "title": "Verdict",
+            "lines": [
+                  "mark good or bad",
+                  "Git narrows interval"
+            ]
+      },
+      {
+            "title": "Culprit Found",
+            "lines": [
+                  "exact commit identified",
+                  "git bisect reset"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "git bisect start",
+      "git bisect bad HEAD",
+      "git bisect good v2.0.0",
+      "git bisect run pytest test_regression.py"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "bisect": "active"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "bad": "HEAD"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "good": "v2.0.0",
+                  "remaining": "128 commits"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "status": "running binary search automatically"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the missing terms",
+    lines: [
+      "To begin the search process, execute git bisect <0>.",
+      "An exit code of 0 informs git bisect that the commit is <1>.",
+      "An exit code between 1 and 127 marks the commit as <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "start"
+            ],
+            "why": "git bisect start initializes the bisect state machine."
+      },
+      {
+            "a": [
+                  "good"
+            ],
+            "why": "Exit code 0 indicates success, marking the commit as good."
+      },
+      {
+            "a": [
+                  "bad"
+            ],
+            "why": "Non-zero exit codes signal test failure, marking the commit as bad."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What does git bisect do when you run git bisect bad?",
+      a: ["Deletes all bad commits from repository history permanently","Eliminates the current commit and all newer commits from the search space","Marks the current commit as failing and checks out the next midpoint","Uploads the failed test output to GitHub issue tracker"],
+      c: 2,
+      why: "It flags the commit as failing and advances the binary search to the next candidate."
+    },
+    {
+      q: "What script exit code tells git bisect that a commit is clean?",
+      a: ["Exit code 0","Exit code 1","Exit code 128","Exit code 255"],
+      c: 0,
+      why: "Standard POSIX convention: exit code 0 indicates success (good commit)."
+    },
+    {
+      q: "Why is git bisect run so valuable in continuous integration?",
+      a: ["It runs the binary search fully automatically without human intervention","It automatically rewrites bad commits without developer review","It generates mock data for missing production database tables","It prevents developers from making commits on main branches"],
+      c: 0,
+      why: "Automating the test command allows git bisect to pinpoint regressions completely unattended."
+    },
+    {
+      q: "What command must you run when git bisect finishes its search?",
+      a: ["git bisect clean","git bisect reset","git commit --amend","git push origin main"],
+      c: 1,
+      why: "git bisect reset clears the bisect state and returns HEAD to your original branch."
+    }
+  ]);
+</script>
+</body>
+</html>

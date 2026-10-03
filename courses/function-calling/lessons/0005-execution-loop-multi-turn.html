@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 05 — The Execution Loop: Multi-Turn Tool Interactions</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="function-calling" data-lesson="5" data-lesson-id="execution-loop-multi-turn">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 05</span> · Agent Loops</span>
+
+  <h1 class="lesson-title">The Execution Loop: Multi-Turn Tool Interactions</h1>
+  <p class="lesson-lede">
+    Building the full agentic loop: while finish_reason == 'tool_calls', execute tools, feed results, and repeat until done.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to build autonomous, multi-turn tool execution loops.</span>
+    <span><b>Mission link</b> Mastering the execution loop: multi-turn tool interactions across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of The Execution Loop: Multi-Turn Tool Interactions</h2>
+  <p>A single tool call is useful, but real engineering tasks require <strong>multi-turn sequences</strong>: search for a customer by email $\rightarrow$ get their order ID $\rightarrow$ inspect order status $\rightarrow$ issue refund $\rightarrow$ send confirmation. This multi-step agency is driven by the <strong>Execution Loop</strong>.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Building the full agentic loop: while finish_reason == 'tool_calls', execute tools, feed results, and repeat until done.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Autonomous Agent Loop</h2>
+  <p>The Universal Agent Loop Algorithm:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Multi-Step Workflow Trace</h2>
+  <ul><li><strong>1. Call Model:</strong> Send conversation history and tool schemas.</li><li><strong>2. Check Finish Reason:</strong> If `finish_reason == 'stop'`, break the loop and return the final text to the user!</li><li><strong>3. Execute Tools:</strong> If `finish_reason == 'tool_calls'`, iterate through all requested tools, execute them, and append results.</li><li><strong>4. Repeat:</strong> Loop back to Step 1 with updated history!</li><li><strong>5. Circuit Breaker:</strong> Limit the loop to a maximum iteration count (e.g. `max_turns = 10`) to prevent runaway infinite loops!</li></ul><pre><code># The Autonomous Agent Loop in Python:
+def run_agent_loop(user_query, max_turns=10):
+    messages = [{"role": "user", "content": user_query}]
+    
+    for turn in range(max_turns):
+        response = client.chat.completions.create(model="gpt-4o", messages=messages, tools=tools)
+        msg = response.choices[0].message
+        messages.append(msg) # Record model turn
+        
+        if response.choices[0].finish_reason == "stop":
+            return msg.content # Goal accomplished! Return final answer!
+            
+        if response.choices[0].finish_reason == "tool_calls":
+            for call in msg.tool_calls:
+                result = dispatch_tool(call.function.name, json.loads(call.function.arguments))
+                messages.append({"role": "tool", "tool_call_id": call.id, "content": json.dumps(result)})
+    raise RuntimeError("Agent exceeded maximum turn limit!")</code></pre><div class="callout"><p><strong>The Circuit Breaker:</strong> Never write a `while True` loop without a hard turn ceiling. A runaway agent loop can burn thousands of dollars in minutes.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the agent loop sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to build autonomous, multi-turn tool execution loops.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where the execution loop: multi-turn tool interactions applies.</li>
+    <li>Author a unit test or verification script exercising the execution loop: multi-turn tool interactions.</li>
+    <li>Document team architectural conventions regarding the execution loop: multi-turn tool interactions.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for The Execution Loop: Multi-Turn Tool Interactions.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "How does an AI agent execute multi-step workflows (e.g. search for user, get their orders, process refund)?",
+    a: ["By running an automated while-loop that executes tools and feeds results back to the model until finish_reason is 'stop'","By predicting all steps in one single turn","By asking human permission for every keystroke","By running three models at once"],
+    c: 0,
+    why: "The agent loop iterates through tool calls and observations until the model determines the goal is satisfied."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1. Model Turn",
+            "lines": [
+                  "Evaluates state & prompt",
+                  "Emits tool request or final answer"
+            ]
+      },
+      {
+            "title": "2. Decision Gate",
+            "lines": [
+                  "If 'stop' -> Return answer to user!",
+                  "If 'tool_calls' -> Proceed to execution"
+            ]
+      },
+      {
+            "title": "3. Dispatch & Append",
+            "lines": [
+                  "Execute tool in backend",
+                  "Append tool result to history"
+            ]
+      },
+      {
+            "title": "4. Loop Back",
+            "lines": [
+                  "Repeat with updated context",
+                  "Bounded by max_turns circuit breaker"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing The Execution Loop: Multi-Turn Tool Interactions",
+      "def execute_flow():",
+      "    # Building the full agentic loop: while finish_reaso...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "The Execution Loop: Multi-Turn Tool Interactions"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Turn 1"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Turn 2"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "step": "Turn 3"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "step": "Turn 4 (Stop)"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The agent execution loop repeatedly dispatches tools and feeds results back to the model until finish_reason is {1}, bounded by a maximum {2} limit."
+],
+    blanks: [
+      {
+            "a": [
+                  "stop"
+            ],
+            "why": "Normal completion status"
+      },
+      {
+            "a": [
+                  "turn"
+            ],
+            "why": "Maximum iteration circuit breaker"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why is a hard turn ceiling (e.g. max_turns = 10) mandatory in autonomous agent loops?",
+      a: ["It prevents infinite loops and catastrophic token billing if the agent gets trapped in a cycle or encounters a persistent error","It is required by Python syntax","GPUs shut down after 10 turns","Tokens expire after 10 turns"],
+      c: 0,
+      why: "Circuit breakers protect against runaway loops and unbounded API financial costs."
+    },
+    {
+      q: "How does the model know when to stop calling tools and deliver the final answer?",
+      a: ["The model evaluates its prompt goal and determines that all required information has been gathered, emitting text with finish_reason='stop'","The user presses enter","The computer processor stops","The database closes"],
+      c: 0,
+      why: "The model's internal reasoning detects goal completion, shifting from tool calls to final answer generation."
+    },
+    {
+      q: "What happens to the conversation history array as the agent loop iterates?",
+      a: ["It grows with each turn, accumulating all tool calls and tool results as shared context for subsequent steps","It shrinks to zero","It deletes past messages","It encrypts older turns"],
+      c: 0,
+      why: "Accumulated tool calls and observations provide the working memory for multi-step reasoning."
+    },
+    {
+      q: "What should the agent loop do if a tool execution throws an uncaught Python exception?",
+      a: ["Catch the exception, format it as an informative error string, and feed it back in a tool result message for self-correction","Crash the entire application immediately","Delete the database","Ignore the exception"],
+      c: 0,
+      why: "Feeding errors back to the model allows it to adjust parameters or choose an alternative tool."
+    }
+  ]);
+</script>
+</body>
+</html>

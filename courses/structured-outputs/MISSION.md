@@ -1,0 +1,3 @@
+# Mission — Structured Outputs & JSON
+
+Bridge the chasm between probabilistic language generation and deterministic software integration. Understand why free-form text breaks pipelines, explore the evolution from prompt hints to grammar-constrained decoding, author bulletproof schemas in Pydantic v2 and Zod, leverage Field descriptions as micro-prompts, prevent forced hallucinations with defensive nullability, build self-healing JSON repair loops, compose hierarchical nested structures, and execute backward-compatible schema migrations.

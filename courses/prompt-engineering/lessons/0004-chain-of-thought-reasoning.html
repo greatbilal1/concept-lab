@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 04 — Chain-of-Thought (CoT): 'Think Step by Step'</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="prompt-engineering" data-lesson="4" data-lesson-id="chain-of-thought-reasoning">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 04</span> · Chain of Thought</span>
+
+  <h1 class="lesson-title">Chain-of-Thought (CoT): 'Think Step by Step'</h1>
+  <p class="lesson-lede">
+    Unlocking multi-step reasoning: Chain-of-Thought (CoT), Wei et al. (2022), and why intermediate tokens solve logic errors.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You understand the mathematics and cognitive mechanics of Chain-of-Thought prompting.</span>
+    <span><b>Mission link</b> Mastering chain-of-thought (cot): 'think step by step' across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Chain-of-Thought (CoT): 'Think Step by Step'</h2>
+  <p>In 2022, Jason Wei and researchers at Google Brain published a monumental paper: <strong>'Chain-of-Thought Prompting Elicits Reasoning in Large Language Models'</strong>. They revealed that asking a model for a direct answer to a complex problem causes it to fail, but asking it to <em>think step by step</em> unlocks stunning reasoning capability.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Unlocking multi-step reasoning: Chain-of-Thought (CoT), Wei et al. (2022), and why intermediate tokens solve logic errors.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Direct Answering vs Chain of Thought</h2>
+  <p>Why does Chain-of-Thought (CoT) work? Because of the physics of autoregressive transformers:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tokens as Computational Scratchpad</h2>
+  <ul><li><strong>No Computation Without Tokens:</strong> A transformer does not have a hidden pause button where it computes for 10 seconds before emitting token #1. Its 'thinking' happens <em>strictly as it generates tokens</em>!</li><li><strong>Autoregressive Conditioning:</strong> Every token emitted becomes part of the prompt for the next token. When a model writes out Step 1 and Step 2, Step 3 is conditioned on those established deductions!</li><li><strong>Eliminating Premature Guessing:</strong> If forced to output the final answer immediately in token 1, the model has only one forward pass to guess the solution to a complex 10-step math problem.</li></ul><pre><code># Standard Prompt (Fails on multi-step math):
+Q: Roger has 5 tennis balls. He buys 2 cans of tennis balls. Each can has 3 balls.
+   How many tennis balls does he have now?
+A: 10 (WRONG! Model guessed without computing intermediate steps!)
+
+# Chain-of-Thought Prompt (Succeeds!):
+Q: Roger has 5 tennis balls. He buys 2 cans of tennis balls. Each can has 3 balls.
+   How many tennis balls does he have now? Think step by step.
+A: 1. Roger starts with 5 balls.
+   2. 2 cans of 3 balls each = 2 * 3 = 6 balls.
+   3. 5 + 6 = 11 balls.
+   Final Answer: 11 (CORRECT!)</code></pre><div class="callout"><p><strong>The Golden Rule of Logic:</strong> If a task requires more than one step of deduction, never ask for the final answer directly. Always require the model to show its intermediate reasoning first!</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the Chain-of-Thought sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You understand the mathematics and cognitive mechanics of Chain-of-Thought prompting.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where chain-of-thought (cot): 'think step by step' applies.</li>
+    <li>Author a unit test or verification script exercising chain-of-thought (cot): 'think step by step'.</li>
+    <li>Document team architectural conventions regarding chain-of-thought (cot): 'think step by step'.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Chain-of-Thought (CoT): 'Think Step by Step'.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Why does adding the magic phrase 'Think step by step' dramatically improve an LLM's accuracy on math and logic problems?",
+    a: ["It forces the model to generate intermediate reasoning tokens, conditioning subsequent steps on previous verified deductions rather than guessing immediately","It casts a magical spell on the GPU","It slows down the computer processor","It tells the model to search Google"],
+    c: 0,
+    why: "Intermediate tokens provide working memory, allowing the model to condition final answers on prior logical steps."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Direct Answering (Single Pass)",
+            "lines": [
+                  "Prompt: 'Complex multi-step logic problem'",
+                  "Model must output answer in Token #1",
+                  "Prone to hasty statistical guessing"
+            ]
+      },
+      {
+            "title": "Chain of Thought (Multi-Step)",
+            "lines": [
+                  "Model outputs Step 1, Step 2, Step 3",
+                  "Each token conditions the next deduction",
+                  "Arrives at verified correct solution"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Chain-of-Thought (CoT): 'Think Step by Step'",
+      "def execute_flow():",
+      "    # Unlocking multi-step reasoning: Chain-of-Thought (...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Chain-of-Thought (CoT): 'Think Step by Step'"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "No Hidden Thought"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Self-Correction Window"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Chain-of-Thought prompting unlocks complex reasoning by generating intermediate {1} tokens that serve as a computational {2}."
+],
+    blanks: [
+      {
+            "a": [
+                  "reasoning"
+            ],
+            "why": "Step-by-step logical deductions"
+      },
+      {
+            "a": [
+                  "scratchpad"
+            ],
+            "why": "Working memory in context"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why is an LLM unable to 'think' about a problem without emitting tokens in standard architectures?",
+      a: ["Transformers execute a fixed amount of computation per emitted token; generating intermediate tokens allocates compute steps for reasoning","The model is lazy","The GPU stops running when not generating","Thinking without tokens is illegal"],
+      c: 0,
+      why: "In standard transformers, compute is strictly tied to token generation; intermediate tokens allocate reasoning compute."
+    },
+    {
+      q: "What phrase is famously known for triggering zero-shot Chain-of-Thought reasoning (Kojima et al., 2022)?",
+      a: ["'Let's think step by step.'","'Please be smart.'","'Do not make mistakes.'","'Output the answer now.'"],
+      c: 0,
+      why: "Kojima et al. proved adding 'Let's think step by step' triggers zero-shot CoT across reasoning benchmarks."
+    },
+    {
+      q: "How do reasoning models (like OpenAI o1 or DeepSeek R1) automate the Chain-of-Thought process?",
+      a: ["They automatically generate thousands of internal, hidden thinking tokens before emitting the user-facing response","They search Google","They use Python calculators","They ask human mathematicians"],
+      c: 0,
+      why: "Reasoning models spend dedicated test-time compute generating internal reasoning traces automatically."
+    },
+    {
+      q: "What should you do if an application requires structured JSON output AND Chain-of-Thought reasoning?",
+      a: ["Instruct the model to output a JSON object containing a 'reasoning' or 'steps' key before the final 'answer' key","Disable Chain of Thought","Ask for two separate API calls","Format the JSON with HTML"],
+      c: 0,
+      why: "Placing a reasoning key first allows the model to compute intermediate steps before generating the final field."
+    }
+  ]);
+</script>
+</body>
+</html>

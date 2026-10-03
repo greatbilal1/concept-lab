@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 04 — Quadratic Attention Cost vs FlashAttention and Sliding Windows</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="tokens-context" data-lesson="4" data-lesson-id="quadratic-attention-flashattention">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 04</span> · Attention Optimization</span>
+
+  <h1 class="lesson-title">Quadratic Attention Cost vs FlashAttention and Sliding Windows</h1>
+  <p class="lesson-lede">
+    The memory physics of attention: O(N^2) quadratic scaling, GPU High-Bandwidth Memory (HBM), and FlashAttention IO-awareness.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You understand the O(N^2) memory physics of attention and how FlashAttention unlocks long sequences.</span>
+    <span><b>Mission link</b> Mastering quadratic attention cost vs flashattention and sliding windows across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Quadratic Attention Cost vs FlashAttention and Sliding Windows</h2>
+  <p>The fundamental physical constraint of the Transformer architecture is its <strong>Quadratic Scaling ($O(N^2)$)</strong>. If a sequence has $N$ tokens, the attention score matrix has $N \times N$ elements:</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    The memory physics of attention: O(N^2) quadratic scaling, GPU High-Bandwidth Memory (HBM), and FlashAttention IO-awareness.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Quadratic Attention Matrix</h2>
+  <ul><li><strong>$1,000$ Tokens:</strong> $1,000 \times 1,000 = 1,000,000$ matrix cells (Easily fits in GPU memory).</li><li><strong>$32,000$ Tokens:</strong> $32,000 \times 32,000 = 1,024,000,000$ cells (1 Billion floating-point values!).</li><li><strong>$128,000$ Tokens:</strong> $128,000 \times 128,000 = 16,384,000,000$ cells (16 Billion values $\approx$ 32GB of VRAM just for one attention layer!).</li></ul>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>FlashAttention SRAM Tiling</h2>
+  <p>How did modern models scale past 8k tokens without running out of GPU memory? Through two breakthroughs:</p><ul><li><strong>1. FlashAttention (Dao et al., 2022):</strong> The real bottleneck was not compute; it was reading/writing the giant $N \times N$ matrix to slow GPU High-Bandwidth Memory (HBM). FlashAttention fuses operations into fast SRAM on-chip memory using tiling, computing exact attention without ever saving the $N \times N$ matrix to RAM!</li><li><strong>2. Sliding Window Attention (Mistral):</strong> Tokens only attend to the previous $W$ tokens (e.g. $W=4,096$), turning quadratic attention into linear $O(N \times W)$ compute.</li></ul><pre><code># The Quadratic Memory Reality:
+# Sequence N = 4k   -> Attention Matrix:  16 Million entries
+# Sequence N = 128k -> Attention Matrix: 16.3 BILLION entries (OOM Crash without FlashAttention!)
+# FlashAttention tiles computation in SRAM -> Exact math, ZERO OOM crash!</code></pre><div class="callout"><p><strong>Hardware Reality:</strong> FlashAttention made modern 128k+ long contexts physically possible by eliminating the memory-bandwidth bottleneck in GPU architectures.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the attention scaling sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You understand the O(N^2) memory physics of attention and how FlashAttention unlocks long sequences.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where quadratic attention cost vs flashattention and sliding windows applies.</li>
+    <li>Author a unit test or verification script exercising quadratic attention cost vs flashattention and sliding windows.</li>
+    <li>Document team architectural conventions regarding quadratic attention cost vs flashattention and sliding windows.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Quadratic Attention Cost vs FlashAttention and Sliding Windows.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Why does doubling the sequence length in a transformer quadruple the computational and memory cost of self-attention?",
+    a: ["Self-attention computes an N x N pairwise matrix: (2N)^2 = 4N^2 (quadratic scaling)","CPUs run at half speed on long text","Python multiplies memory by four","Transformers use square pixels"],
+    c: 0,
+    why: "Every token attends to every other token, producing an N x N matrix that scales quadratically."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Sequence: 2,048 tokens",
+            "lines": [
+                  "Matrix: 2k x 2k = 4M elements",
+                  "Memory: ~8 MB VRAM (Trivial)"
+            ]
+      },
+      {
+            "title": "Sequence: 32,768 tokens",
+            "lines": [
+                  "Matrix: 32k x 32k = 1B elements",
+                  "Memory: ~2 GB VRAM per layer"
+            ]
+      },
+      {
+            "title": "Sequence: 128,000 tokens",
+            "lines": [
+                  "Matrix: 128k x 128k = 16.3B elements",
+                  "Memory: ~32 GB VRAM (Crashing without FlashAttn)"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Quadratic Attention Cost vs FlashAttention and Sliding Windows",
+      "def execute_flow():",
+      "    # The memory physics of attention: O(N^2) quadratic ...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Quadratic Attention Cost vs FlashAttention and Sliding Windows"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Standard Attention"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "FlashAttention (Dao et al.)"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Standard self-attention scales {1} with sequence length, which FlashAttention optimizes by tiling computations inside GPU {2} memory."
+],
+    blanks: [
+      {
+            "a": [
+                  "quadratically"
+            ],
+            "why": "O(N^2) scaling factor"
+      },
+      {
+            "a": [
+                  "SRAM"
+            ],
+            "why": "Fast on-chip cache memory"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the primary GPU memory bottleneck that FlashAttention resolves?",
+      a: ["Memory bandwidth: repeatedly reading and writing the massive intermediate N x N attention matrix to slow High-Bandwidth Memory (HBM)","Running out of hard drive space","Slow internet connections","CPU fan failure"],
+      c: 0,
+      why: "FlashAttention fuses softmax and matrix multiplication directly in on-chip SRAM cache."
+    },
+    {
+      q: "How does Sliding Window Attention reduce computational complexity?",
+      a: ["By restricting each token's attention to a fixed local window (e.g. 4,096 tokens), converting complexity from O(N^2) to O(N * W)","By sliding the computer across a desk","By deleting half of the words","By using lower voltage"],
+      c: 0,
+      why: "Restricting attention to a fixed local window makes compute scale linearly with sequence length."
+    },
+    {
+      q: "Does FlashAttention produce approximate or exact mathematical results?",
+      a: ["Exact results: it computes the exact same mathematical attention formula without any lossy approximations","Approximate results with 50% accuracy loss","Random guesses","Zero results"],
+      c: 0,
+      why: "FlashAttention is an exact algorithmic reordering; it produces identical outputs to standard attention."
+    },
+    {
+      q: "What happens if you run standard un-tiled attention on a 128k token sequence on a standard GPU?",
+      a: ["CUDA Out-Of-Memory (OOM) error: the intermediate attention tensors exceed available GPU VRAM","The GPU catches fire","The text turns into numbers","The computer restarts"],
+      c: 0,
+      why: "Materializing the raw 16-billion-element matrix causes immediate VRAM exhaustion."
+    }
+  ]);
+</script>
+</body>
+</html>

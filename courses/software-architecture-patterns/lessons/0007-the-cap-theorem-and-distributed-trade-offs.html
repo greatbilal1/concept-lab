@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 07 — The CAP theorem and distributed trade-offs</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="software-architecture-patterns" data-lesson="7" data-lesson-id="the-cap-theorem-and-distributed-trade-offs">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 07</span> · Distributed Trade-offs & Conway's Law</span>
+
+  <h1 class="lesson-title">The CAP theorem and distributed trade-offs</h1>
+  <p class="lesson-lede">
+    You cannot beat the speed of light. Discover Eric Brewer's CAP Theorem, the PACELC extension, and why every distributed system must choose between Consistency and Availability.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Evaluate distributed storage systems against the CAP and PACELC theorems</span>
+    <span><b>Mission link</b> The fundamental physical theorem governing all distributed databases and cloud systems</span>
+  </div>
+
+  <h2><span class="n">1</span>Pick any two (except you can't)</h2>
+  <p>In 2000, Eric Brewer conjectured the <b>CAP Theorem</b>: a distributed data store can simultaneously provide at most two of three guarantees: <b>Consistency (C)</b> (every read receives the most recent write), <b>Availability (A)</b> (every non-failing node returns a response), and <b>Partition Tolerance (P)</b> (the system operates despite network dropped packets).</p><p>Here is the reality: <b>Network partitions are physically inevitable</b> across internet cables. Therefore, you do not choose CA! <b>When a partition happens (P), you MUST choose between Consistency (CP) or Availability (AP).</b></p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Network partitions are unavoidable; during a partition, systems must choose Consistency (CP) or Availability (AP).
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The CP versus AP trade-off</h2>
+  <p>Understand how systems behave when a network partition separates server replicas.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing a network partition split</h2>
+  <p>Trace how an AP system serves requests during an outage while a CP system blocks.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of the CAP theorem.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can evaluate distributed databases and cloud services using the CAP and PACELC theorems, selecting systems aligned with business risk.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Classify PostgreSQL, MongoDB, and Apache Cassandra as CP or AP systems.</li>
+    <li>Read Daniel Abadi's PACELC theorem paper explaining latency trade-offs during normal operation.</li>
+    <li>Explain why financial ledgers choose CP while social media feeds choose AP.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Eric Brewer: *CAP Twelve Years Later: How the 'Rules' Have Changed* (IEEE Computer, 2012).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "In an ATM network during a fiber-optic cable severance between New York and London, what does a CP system do?",
+    a: ["Rejects withdrawal requests or returns an error to guarantee that users cannot double-spend money (chooses Consistency over Availability)","Dispenses cash freely to all users without verification","Reboots the ATM computer","Transfers funds via satellite in 0ms"],
+    c: 0,
+    why: "A CP system refuses to serve requests if it cannot guarantee consistent consensus, sacrificing availability."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Network Partition (P)",
+            "lines": [
+                  "transatlantic fiber cable cut!",
+                  "Node A cannot talk to Node B"
+            ]
+      },
+      {
+            "title": "CP Choice (Consistency)",
+            "lines": [
+                  "refuses writes on isolated partition",
+                  "guarantees data correctness",
+                  "sacrifices Availability (returns error)"
+            ]
+      },
+      {
+            "title": "AP Choice (Availability)",
+            "lines": [
+                  "accepts writes on both sides",
+                  "sacrifices Consistency (data diverges)",
+                  "reconciles later with conflict resolution"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Replicas: Node 1 (US), Node 2 (EU). Network partition splits them!",
+      "# Client in US updates status = 'VIP' on Node 1",
+      "# Client in EU queries status from Node 2:",
+      "# CP System (MongoDB/Postgres): Node 2 returns ERROR (cannot reach consensus)",
+      "# AP System (Cassandra/Dynamo): Node 2 returns stale 'Standard' (stays available!)"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "partition": "nodes isolated by network failure"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "write": "Node 1 accepts write locally"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "cp_behavior": "CP halts to prevent serving inconsistent stale data"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "ap_behavior": "AP answers immediately, accepting temporary inconsistency"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The three properties in the CAP theorem are Consistency, Availability, and <0> Tolerance.",
+      "When network partitions happen, systems must choose between C and <1>.",
+      "The professor who formulated the CAP theorem is Eric <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "Partition"
+            ],
+            "why": "Partition Tolerance is the 'P' in CAP."
+      },
+      {
+            "a": [
+                  "A",
+                  "Availability"
+            ],
+            "why": "Under partitions, systems trade C for A or A for C."
+      },
+      {
+            "a": [
+                  "Brewer"
+            ],
+            "why": "Eric Brewer formulated the conjecture in 2000."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why is 'CA' (Consistency + Availability without Partition Tolerance) considered impossible in distributed systems?",
+      a: ["Because physical network cables and routers inevitably suffer latency spikes, hardware cuts, or drops; network partitions cannot be avoided","Because CA is forbidden by copyright law","Because computer operating systems do not support CA","Because CA requires quantum computing"],
+      c: 0,
+      why: "Networks are physically unreliable; an architecture that cannot handle partitions cannot be distributed."
+    },
+    {
+      q: "What is an AP (Availability + Partition Tolerance) system?",
+      a: ["A distributed system that remains fully available for reads and writes during network partitions, at the cost of returning potentially stale or divergent data","A system that never experiences bugs","A database that runs entirely on mobile phones","A system that encrypts all passwords with AES-256"],
+      c: 0,
+      why: "AP systems prioritize availability: every node returns an answer even if disconnected from peers."
+    },
+    {
+      q: "What does the PACELC theorem add to the CAP theorem?",
+      a: ["It accounts for normal operation: if Partition (P), trade A or C; Else (E), trade Latency (L) or Consistency (C)","It adds security and encryption to the triangle","It proves that all databases must use SQL","It calculates the physical temperature of hard drives"],
+      c: 0,
+      why: "PACELC acknowledges that even when no partition exists, databases must trade latency against consistency."
+    },
+    {
+      q: "Why is an e-commerce shopping cart typically modeled as an AP system?",
+      a: ["Because companies never want to block a customer from clicking 'Add to Cart' during temporary network hiccups; conflicts can be merged later","Because shopping carts cannot store numbers","Because shopping carts do not use databases","Because AP systems are free to host"],
+      c: 0,
+      why: "Preventing customers from buying is lost revenue; merging cart items upon reconnect is acceptable."
+    }
+  ]);
+</script>
+</body>
+</html>

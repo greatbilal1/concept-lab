@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 08 — Build artifacts and gitignore hygiene</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="software-project-structure" data-lesson="8" data-lesson-id="build-artifacts-and-git-ignore-hygiene">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 08</span> · Builds, Tests & Hygiene</span>
+
+  <h1 class="lesson-title">Build artifacts and gitignore hygiene</h1>
+  <p class="lesson-lede">
+    Never commit generated files. Learn how to craft bulletproof .gitignore files that keep compiled binaries, cache dirs, and secrets out of your repository forever.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Configure comprehensive .gitignore rules and audit repositories for accidental artifacts</span>
+    <span><b>Mission link</b> Maintains pristine repository history and eliminates merge pollution</span>
+  </div>
+
+  <h2><span class="n">1</span>Source code versus generated artifacts</h2>
+  <p>A git repository should contain <i>only the human-authored source files</i> needed to build the project. It should never contain generated artifacts: compiled binaries, transpiled JavaScript bundles, database dumps, OS thumbnails (<code>.DS_Store</code>), or virtual environments.</p><p>Committing generated files pollutes git history with massive diffs, creates endless merge conflicts, and risks committing machine-specific compiled code that breaks on other architectures.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    If a file can be generated from other files, it must never be committed to git.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Anatomy of a comprehensive .gitignore</h2>
+  <p>Categorize ignored files into three essential buckets: Build Artifacts, Dependency Caches, and Environment Secrets.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing untracked cleanup</h2>
+  <p>Trace how git status and git clean detect and remove generated clutter from working trees.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Confirm your understanding of gitignore rules.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can keep repositories lightweight, clean, and free of accidental build artifacts or leaked secrets.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your current git status with git status --ignored.</li>
+    <li>Verify that .env, build directories, and cache folders are in your .gitignore.</li>
+    <li>Use git check-ignore -v to test an ignored path.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    GitHub Documentation: *Ignoring Files* (docs.github.com/en/get-started/getting-started-with-git/ignoring-files).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What problem arises when node_modules or .venv is committed to git?",
+    a: ["Repo size explodes by hundreds of megabytes and binaries fail on different operating systems","The computer compiler will permanently refuse to run","The git repository will automatically convert into a mercurial repository","All files will be converted into read-only binary images"],
+    c: 0,
+    why: "Dependencies are huge and platform-specific; committing them bloats repos and breaks cross-platform use."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Build Output",
+            "lines": [
+                  "dist/, build/, *.pyc",
+                  "*.class, *.o, *.so"
+            ]
+      },
+      {
+            "title": "Dependency Caches",
+            "lines": [
+                  "node_modules/, .venv/",
+                  "__pycache__/, .pytest_cache/"
+            ]
+      },
+      {
+            "title": "Secrets & OS",
+            "lines": [
+                  ".env, secrets.json",
+                  ".DS_Store, Thumbs.db"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# .gitignore contains: dist/ and __pycache__/",
+      "git status --ignored     # lists ignored artifacts without cluttering main status",
+      "git check-ignore -v dist/bundle.js  # proves why file is ignored",
+      "git clean -fdX           # removes all gitignored generated files safely"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "rules": "dist/ and __pycache__/ ignored"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "status": "clean working tree; no accidental commits"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "audit": "matched rule on line 4 of .gitignore"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "cleanup": "all temporary build artifacts purged"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The configuration file listing untracked file patterns is .<0>.",
+      "The command to test which rule is ignoring a specific file is git check-<1>.",
+      "The directory holding compiled distribution wheels is often <2>/."
+],
+    blanks: [
+      {
+            "a": [
+                  "gitignore"
+            ],
+            "why": ".gitignore tells git which patterns to exclude."
+      },
+      {
+            "a": [
+                  "ignore"
+            ],
+            "why": "git check-ignore -v <path> shows which rule matched."
+      },
+      {
+            "a": [
+                  "dist",
+                  "build"
+            ],
+            "why": "dist/ holds generated distribution packages."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the primary rule for deciding whether a file belongs in .gitignore?",
+      a: ["If the file is generated by a compiler, build tool, or runtime, it must be ignored","If the file is larger than 10 lines of code, it should be ignored","If the file was written by a junior developer, it should be ignored","If the file has a .txt extension, it must be ignored"],
+      c: 0,
+      why: "Only human-authored source files belong in git; generated files belong in .gitignore."
+    },
+    {
+      q: "What does 'git check-ignore -v filename' do?",
+      a: ["Displays the exact line in .gitignore that is causing the file to be ignored","Forces git to track the file even if it is in .gitignore","Deletes the file from disk permanently","Encrypts the file before committing"],
+      c: 0,
+      why: "check-ignore -v is the primary diagnostic tool for debugging .gitignore rules."
+    },
+    {
+      q: "What happens if a file is already tracked in git before being added to .gitignore?",
+      a: ["Git continues tracking changes to the file until it is explicitly untracked with 'git rm --cached'","Git deletes the file from disk automatically","The repository corrupts and cannot be opened","Git hides the file from the filesystem"],
+      c: 0,
+      why: ".gitignore only prevents untracked files from being staged; existing tracked files must be removed from the index."
+    },
+    {
+      q: "Why are macOS .DS_Store files annoying in shared repositories?",
+      a: ["They are machine-specific desktop metadata files that cause unnecessary clutter and diffs","They install computer viruses on Windows machines","They corrupt Python bytecode compilers","They prevent git push commands from running"],
+      c: 0,
+      why: ".DS_Store files are OS-specific window display settings that have zero value in source code."
+    }
+  ]);
+</script>
+</body>
+</html>

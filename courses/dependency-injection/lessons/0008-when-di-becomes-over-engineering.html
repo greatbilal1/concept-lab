@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 08 — When DI becomes over-engineering</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="dependency-injection" data-lesson="8" data-lesson-id="when-di-becomes-over-engineering">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 08</span> · Testability & Test Doubles</span>
+
+  <h1 class="lesson-title">When DI becomes over-engineering</h1>
+  <p class="lesson-lede">
+    Should you inject the string library? Discover when dependency injection crosses the line into over-engineering, and the pragmatic boundaries of simplicity.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Identify when dependency injection is unnecessary and apply pragmatic YAGNI boundaries</span>
+    <span><b>Mission link</b> Prevents architectural bloat and preserves simplicity in software codebases</span>
+  </div>
+
+  <h2><span class="n">1</span>The abuse of abstraction</h2>
+  <p>Like any good design principle, Dependency Injection can be taken to absurd extremes. Some developers create an <code>IStringConcatenator</code> interface, an <code>IConsoleWriter</code>, and an <code>IMathAdder</code>, injecting basic language operations through a 500-line DI container!</p><p>This is architecture astronautics. The rule of thumb: <b>Stable, deterministic, pure mathematical operations should NOT be injected.</b> You inject volatile collaborators (databases, networks, time, randomness, external APIs). You do not inject basic data structures, math libraries, or pure utility functions.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Inject volatile dependencies that touch I/O or external systems; never inject pure deterministic utilities.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>What to inject versus What to call directly</h2>
+  <p>Categorize dependencies into volatile collaborators (inject) versus stable utilities (direct call).</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing over-engineered DI bloat</h2>
+  <p>Trace how removing an unnecessary interface simplifies code without losing any testability.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of pragmatic DI boundaries.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can apply dependency injection with pragmatic discipline, knowing exactly when to inject and when to keep code simple.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your DI container to see if any pure utility functions are being unnecessarily injected.</li>
+    <li>Remove an interface that has only one implementation and will never have another.</li>
+    <li>Explain the difference between a volatile collaborator and a stable dependency to a colleague.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Mark Seemann: *Volatile Dependencies* (blog.ploeh.dk/2012/08/31/ConcreteDependencies/).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Should a string trimming helper function or math rounding utility be injected via dependency injection?",
+    a: ["No, pure deterministic utility functions have zero side effects and should be called directly","Yes, every single function in the application must be injected through a container","Only in enterprise banking software","Only if the function is written in Java"],
+    c: 0,
+    why: "Pure functions have no I/O, state, or randomness; injecting them adds pure noise with zero benefit."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "INJECT (Volatile Collaborators)",
+            "lines": [
+                  "Databases & ORM sessions",
+                  "HTTP clients & Payment Gateways",
+                  "System Clock & Random generators",
+                  "File system I/O"
+            ]
+      },
+      {
+            "title": "CALL DIRECTLY (Stable Utilities)",
+            "lines": [
+                  "Math functions (Math.round)",
+                  "Data structures (Arrays, Sets, Maps)",
+                  "Pure string parsing helpers",
+                  "Pydantic / Zod schemas"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Over-engineered: class Order(IPriceCalculator, IDateProvider, ICurrencyFormatter)...",
+      "# 4 interfaces, 4 mock setups, 40 lines of boilerplate to test 2 lines of math!",
+      "# Pragmatic: Order takes plain data; calculates subtotal directly using standard Python math",
+      "# Result: 5 lines of code, tested in 0.0001s with zero mocks!"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "bloat": "excessive interfaces add cognitive overhead and wiring noise"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "pragmatic": "pure domain math requires zero mocks or interfaces"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "outcome": "simple, maintainable code adhering to YAGNI"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "You should inject dependencies that are volatile or perform <0>/O.",
+      "Deterministic math utilities should be called <1> without injection.",
+      "The principle 'You Aren't Gonna Need It' is abbreviated as <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "I",
+                  "I/O"
+            ],
+            "why": "I/O operations (network, disk) require injection."
+      },
+      {
+            "a": [
+                  "directly"
+            ],
+            "why": "Pure functions should be invoked directly."
+      },
+      {
+            "a": [
+                  "YAGNI"
+            ],
+            "why": "YAGNI guards against premature over-engineering."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What defines a 'Volatile Dependency' that SHOULD be injected via dependency injection?",
+      a: ["A dependency that requires external infrastructure (DB, network), contains non-deterministic behavior (time, random), or is in active parallel development","A dependency that changes every 5 seconds","A variable that is deleted after each function call","A file stored on a USB drive"],
+      c: 0,
+      why: "Volatile dependencies involve I/O, external state, or volatility that obstructs deterministic testing."
+    },
+    {
+      q: "Why is it considered bad practice to create an interface for every single class (e.g. IUserService for UserService) when only one implementation exists?",
+      a: ["It doubles the number of files with zero abstraction benefit (Header Interfaces smell); extract interfaces only when multiple implementations exist","Interfaces slow down database queries","Compilers reject interfaces with the letter I","Interfaces delete comments"],
+      c: 0,
+      why: "1:1 interfaces that mirror classes are speculative clutter; create abstractions when real variability exists."
+    },
+    {
+      q: "What does the YAGNI principle stand for in software architecture?",
+      a: ["You Aren't Gonna Need It","You Always Get New Interfaces","Your Architecture Generates No Income","Yield All Global Network Inputs"],
+      c: 0,
+      why: "YAGNI reminds developers not to add speculative complexity until actually needed."
+    },
+    {
+      q: "How should system time (e.g. datetime.now()) be handled in testable software?",
+      a: ["Inject a clock interface or pass the timestamp as a parameter, so tests can freeze or simulate time deterministically","Hardcode datetime.now() inside every function","Change the physical computer server clock during tests","Never use time in software applications"],
+      c: 0,
+      why: "System time is non-deterministic; parameterizing or injecting the clock makes temporal logic 100% testable."
+    }
+  ]);
+</script>
+</body>
+</html>

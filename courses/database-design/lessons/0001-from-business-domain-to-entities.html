@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 01 — From business domain to entities</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="database-design" data-lesson="1" data-lesson-id="from-business-domain-to-entities">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 01</span> · Domain Modeling & Cardinality</span>
+
+  <h1 class="lesson-title">From business domain to entities</h1>
+  <p class="lesson-lede">
+    How do you turn a messy real-world problem into clean relational tables? Learn how to identify entities, attributes, and business relationships.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Extract entities, attributes, and relationships from business requirements</span>
+    <span><b>Mission link</b> The initial conceptual phase of all software data modeling</span>
+  </div>
+
+  <h2><span class="n">1</span>Extracting nouns and verbs</h2>
+  <p>Database design begins with human language. When domain experts describe a business, their sentences hold the architecture: <b>nouns become Entities (Tables)</b>, <b>adjectives become Attributes (Columns)</b>, and <b>verbs become Relationships (Foreign Keys)</b>.</p><p>'A <i>customer</i> places multiple <i>orders</i>. Each order contains several <i>line items</i> of <i>products</i>.' That single sentence defines four distinct tables and three relationships.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Domain nouns map to tables; adjectives map to columns; verbs map to relationships.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Entity-Relationship blueprint</h2>
+  <p>Visualise how domain entities connect through cardinalities.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing entity decomposition</h2>
+  <p>Trace how a single unorganized spreadsheet row is broken down into separate normalized entities.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of domain modeling fundamentals.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can dissect complex business specifications into clean entity definitions and relationship diagrams.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Take an invoice receipt and extract all distinct entities and attributes.</li>
+    <li>Sketch an Entity-Relationship (ER) diagram for a music streaming platform.</li>
+    <li>Identify the primary key column for each extracted entity.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Michael J. Hernandez, *Database Design for Mere Mortals*, Chapter 3: 'Terminology and Relational Concepts'.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "In the sentence 'Students enroll in multiple courses', what are the entities versus the relationship?",
+    a: ["Students and Courses are entities (tables); 'enroll in' is the many-to-many relationship","Enroll is an entity; Students and Courses are columns","There is only one entity called School","Multiple is an attribute"],
+    c: 0,
+    why: "Students and Courses are independent domain nouns; enrollment is the relationship connecting them."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Customer (1)",
+            "lines": [
+                  "id, name, email",
+                  "places orders"
+            ]
+      },
+      {
+            "title": "Order (N)",
+            "lines": [
+                  "id, customer_id, total",
+                  "belongs to customer, contains items"
+            ]
+      },
+      {
+            "title": "Line Item (N)",
+            "lines": [
+                  "id, order_id, product_id",
+                  "quantities and prices"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Raw spreadsheet: 'Order #101, Ada Lovelace, ada@email.com, Book, $20'",
+      "# Entity 1: User (id: 1, name: 'Ada Lovelace', email: 'ada@email.com')",
+      "# Entity 2: Product (id: 42, title: 'Book', price: 20)",
+      "# Entity 3: Order (id: 101, user_id: 1, total: 20)"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "raw_row": "all domain concepts conflated in one row"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "entity_user": "user identity extracted"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "entity_product": "product catalog extracted"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "entity_order": "transaction links entities via foreign keys"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "A distinct real-world concept modeled as a table is an <0>.",
+      "A property or field describing an entity is an <1>.",
+      "A visual diagram depicting tables and connections is an <2> diagram."
+],
+    blanks: [
+      {
+            "a": [
+                  "entity"
+            ],
+            "why": "Entities represent core domain concepts."
+      },
+      {
+            "a": [
+                  "attribute"
+            ],
+            "why": "Attributes become table columns."
+      },
+      {
+            "a": [
+                  "ER",
+                  "Entity-Relationship"
+            ],
+            "why": "ER diagrams model entities and cardinalities."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is an 'Entity' in relational database design?",
+      a: ["A distinct person, place, item, event, or concept about which data is stored","A software license agreement for the database","A physical computer cable connecting the server","A mathematical function that multiplies numbers"],
+      c: 0,
+      why: "Entities represent distinct real-world concepts modeled as individual relational tables."
+    },
+    {
+      q: "Why shouldn't user contact details and product inventory data be stored in the same table?",
+      a: ["They represent distinct domain entities with different lifecycles; mixing them causes redundancy and update bugs","Relational databases cannot store words from different categories","It causes the computer screen to flicker","Tables can only have a maximum of four columns"],
+      c: 0,
+      why: "Conflating entities violates single responsibility and causes severe data duplication."
+    },
+    {
+      q: "What is 'cardinality' in database design?",
+      a: ["The numerical relationship between occurrences of one entity and occurrences of another (e.g. 1:1, 1:N, N:M)","The total number of CPU processors on the server","The font size of column names","The color of the database user interface"],
+      c: 0,
+      why: "Cardinality expresses how many instances of entity B relate to an instance of entity A."
+    },
+    {
+      q: "What part of speech in a business description typically indicates an attribute?",
+      a: ["Adjectives or descriptive nouns (e.g. status, color, price, creation_date)","Transitive action verbs","Prepositions like with and from","Conjunctions like and or but"],
+      c: 0,
+      why: "Adjectives and descriptive values qualify an entity and translate directly to column attributes."
+    }
+  ]);
+</script>
+</body>
+</html>

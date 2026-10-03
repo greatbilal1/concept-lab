@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Testing Fundamentals — Cheat Sheet</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+<style>
+  .ref-toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0 8px; }
+  .ref-toc a { font-size: .8rem; border: 1px solid var(--border); background: #111a30; padding: 5px 11px; border-radius: 999px; color: var(--muted); text-decoration: none; border-bottom: 1px solid var(--border); }
+  .ref-toc a:hover { color: #fff; border-color: #3d5488; }
+  .lesson-wrap h2 { scroll-margin-top: 20px; }
+  .snippet { margin: 14px 0 22px; }
+  .snippet .lbl { font-size: .72rem; font-weight: 800; letter-spacing: .7px; text-transform: uppercase; color: var(--accent2); margin-bottom: 6px; }
+  .see { font-size: .82rem; color: var(--muted); margin: -6px 0 12px; }
+  .see a { color: var(--accent2); border-bottom: 0; }
+  .see a:hover { color: #fff; }
+  .snippet pre { padding-top: 34px; }
+  @media print { .snippet pre { padding-top: 18px; } }
+</style>
+</head>
+<body class="lesson-body" data-course="testing-fundamentals">
+
+<div class="lesson-wrap">
+
+  <span class="lesson-kicker">Reference · Cheat sheet</span>
+  <h1 class="lesson-title">Testing Fundamentals — Cheat Sheet</h1>
+  <p class="lesson-lede">
+    The whole course on one page. Every snippet links back to the lesson that
+    teaches it.
+  </p>
+
+  <div class="ref-toc">
+    <a href="#sec-1">AAA Test Template (pytest)</a>
+    <a href="#sec-2">Exception Assertions</a>
+    <a href="#sec-3">Pytest Fixtures with Cleanup</a>
+    <a href="#sec-4">Freezing Time Deterministically</a>
+  </div>
+
+  <h2 id="sec-1"><span class="n">1</span>AAA Test Template (pytest)</h2>
+  <div class="snippet">
+    <div class="lbl">Universal test structure</div>
+    <pre><code>def test_transfer_funds():
+    # 1. Arrange
+    acc1, acc2 = Account(500), Account(100)
+    # 2. Act
+    transfer(acc1, acc2, 200)
+    # 3. Assert
+    assert acc1.balance == 300
+    assert acc2.balance == 300</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0002-arrange-act-assert.html">Lesson 02 — The Anatomy of a Test: Arrange, Act, Assert</a>.</p>
+
+  <h2 id="sec-2"><span class="n">2</span>Exception Assertions</h2>
+  <div class="snippet">
+    <div class="lbl">Verifying errors and messages</div>
+    <pre><code>import pytest
+
+with pytest.raises(ValueError, match="Insufficient balance"):
+    account.withdraw(99999)</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0003-assertions-and-failure-messages.html">Lesson 03 — Assertions and Informative Failure Messages</a>.</p>
+
+  <h2 id="sec-3"><span class="n">3</span>Pytest Fixtures with Cleanup</h2>
+  <div class="snippet">
+    <div class="lbl">Resource lifecycle management</div>
+    <pre><code>@pytest.fixture
+def db_session():
+    db = setup_in_memory_db()
+    yield db
+    db.close()</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0004-test-fixtures-and-setup.html">Lesson 04 — Test Fixtures and Setup/Teardown</a>.</p>
+
+  <h2 id="sec-4"><span class="n">4</span>Freezing Time Deterministically</h2>
+  <div class="snippet">
+    <div class="lbl">Eliminating clock-based flakiness</div>
+    <pre><code>from freezegun import freeze_time
+
+with freeze_time("2026-01-01 12:00:00") as frozen:
+    cache.set("k", "v", ttl=60)
+    frozen.tick(delta=timedelta(seconds=61))
+    assert cache.get("k") is None</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0007-flaky-tests-and-determinism.html">Lesson 07 — Flaky Tests and Non-Determinism</a>.</p>
+
+  <div class="lesson-foot">
+    <div class="links">
+      <a href="testing-fundamentals-glossary.html">📖 Glossary</a>
+      <a href="../course.html">← Course map</a>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

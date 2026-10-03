@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 07 — Handling Ambiguity and Asking Clarifying Questions</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="prompt-engineering" data-lesson="7" data-lesson-id="handling-ambiguity-clarifying-questions">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 07</span> · Clarifying Q&A</span>
+
+  <h1 class="lesson-title">Handling Ambiguity and Asking Clarifying Questions</h1>
+  <p class="lesson-lede">
+    Combating over-confident guessing: prompting models to detect underspecified requirements and ask clarifying questions.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to instruct models to detect ambiguity and ask high-value clarifying questions.</span>
+    <span><b>Mission link</b> Mastering handling ambiguity and asking clarifying questions across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Handling Ambiguity and Asking Clarifying Questions</h2>
+  <p>By default, language models are eager-to-please completion engines. If you give a model an ambiguous, underspecified instruction (e.g. <em>'Add export functionality to the table'</em>), the model will not pause to ask: <em>'Do you want CSV, Excel, or PDF?'</em> It will simply pick one at random, write 200 lines of code, and force you to rewrite it when you wanted CSV instead of PDF.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Combating over-confident guessing: prompting models to detect underspecified requirements and ask clarifying questions.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Guessing vs Proactive Clarification</h2>
+  <p>To prevent costly guessing, configure the <strong>Clarification Protocol</strong> in your system prompt:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>The Assumption Verification Gate</h2>
+  <ul><li><strong>The Ambiguity Threshold:</strong> Explicitly instruct the model: <em>'If a requirement is ambiguous, has multiple architectural paths, or lacks critical schema definitions, DO NOT GUESS. List your specific clarifying questions and pause.'</em></li><li><strong>Structured Options:</strong> Ask the model to present multiple choices with trade-offs: <em>'State Option A (CSV) vs Option B (PDF) and ask the user to select.'</em></li><li><strong>Verify Assumptions:</strong> Require the model to state its working assumptions before writing code: <em>'Before writing code, state the 3 core assumptions you are making.'</em></li></ul><pre><code># The Clarification Directive in System Prompt:
+"Before modifying code, evaluate whether any requirements are underspecified.
+If critical details (schemas, endpoints, third-party libraries) are missing:
+1. State the ambiguity clearly.
+2. Propose 2-3 reasonable options with brief trade-offs.
+3. Ask the user for confirmation before generating code."</code></pre><div class="callout"><p><strong>The Five-Second Question:</strong> A two-sentence clarifying question from an agent saves two hours of refactoring broken, misaligned code.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the clarification sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to instruct models to detect ambiguity and ask high-value clarifying questions.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where handling ambiguity and asking clarifying questions applies.</li>
+    <li>Author a unit test or verification script exercising handling ambiguity and asking clarifying questions.</li>
+    <li>Document team architectural conventions regarding handling ambiguity and asking clarifying questions.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Handling Ambiguity and Asking Clarifying Questions.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Why is instructing an AI agent to 'Ask clarifying questions if requirements are ambiguous' superior to letting it guess?",
+    a: ["Guessing forces the model to make arbitrary architectural assumptions that frequently conflict with existing code or user intent","Agents are required by law to ask questions","Questions make the model run faster","Asking questions uses zero API tokens"],
+    c: 0,
+    why: "Proactive clarification prevents models from building on false assumptions that require painful rework."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Default Agent (Eager Guessing)",
+            "lines": [
+                  "User: 'Add export feature'",
+                  "Agent builds PDF export without asking",
+                  "User wanted CSV -> 100% rework!"
+            ]
+      },
+      {
+            "title": "Clarifying Agent (Disciplined)",
+            "lines": [
+                  "User: 'Add export feature'",
+                  "Agent: 'Should this export CSV, JSON, or PDF?'",
+                  "User picks CSV -> Perfect result on first try!"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Handling Ambiguity and Asking Clarifying Questions",
+      "def execute_flow():",
+      "    # Combating over-confident guessing: prompting model...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Handling Ambiguity and Asking Clarifying Questions"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "1. User Prompt"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "2. Agent State Assumptions"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "step": "3. Human Green-Light"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Instructing models to ask clarifying questions prevents blind {1} and ensures alignment before {2} begins."
+],
+    blanks: [
+      {
+            "a": [
+                  "guessing"
+            ],
+            "why": "Making arbitrary unverified assumptions"
+      },
+      {
+            "a": [
+                  "implementation"
+            ],
+            "why": "Writing and modifying source code"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What prompt directive prevents an agent from blindly making up database column names when writing queries?",
+      a: ["'If the table schema is not provided in context, ask for the schema or inspect the database before writing the query'","Make the query fast","Write code in SQL","Do not use databases"],
+      c: 0,
+      why: "Explicitly instructing the agent to pause for schema clarity eliminates hallucinated column names."
+    },
+    {
+      q: "Why is presenting 2-3 structured options helpful when an agent asks a clarifying question?",
+      a: ["It allows the human user to quickly reply with 'Option B' rather than having to type out a lengthy architectural explanation","It makes the model run in parallel","It reduces GPU temperature","It encrypts the response"],
+      c: 0,
+      why: "Structured multiple-choice options make human steering fast and low-effort."
+    },
+    {
+      q: "What should an agent do when it discovers two conflicting conventions in an existing repository?",
+      a: ["Pause, point out the conflicting files, and ask the engineer which convention is the preferred canonical pattern","Randomly pick one and delete the other","Invent a third new convention","Stop running tests"],
+      c: 0,
+      why: "Surfacing codebase inconsistencies allows human maintainers to establish the canonical standard."
+    },
+    {
+      q: "How does requiring an agent to state its assumptions before generating code protect the developer?",
+      a: ["It exposes misunderstandings immediately in a few bullet points before the agent writes 500 lines of wrong code","It compiles Python code into C","It speeds up network latency","It turns off billing"],
+      c: 0,
+      why: "Reviewing a 3-bullet assumption list takes 5 seconds, preventing massive misaligned diffs."
+    }
+  ]);
+</script>
+</body>
+</html>

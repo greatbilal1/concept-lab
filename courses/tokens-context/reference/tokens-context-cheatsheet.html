@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tokens, Context Windows & Context Limits — Cheat Sheet</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+<style>
+  .ref-toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0 8px; }
+  .ref-toc a { font-size: .8rem; border: 1px solid var(--border); background: #111a30; padding: 5px 11px; border-radius: 999px; color: var(--muted); text-decoration: none; border-bottom: 1px solid var(--border); }
+  .ref-toc a:hover { color: #fff; border-color: #3d5488; }
+  .lesson-wrap h2 { scroll-margin-top: 20px; }
+  .snippet { margin: 14px 0 22px; }
+  .snippet .lbl { font-size: .72rem; font-weight: 800; letter-spacing: .7px; text-transform: uppercase; color: var(--accent2); margin-bottom: 6px; }
+  .see { font-size: .82rem; color: var(--muted); margin: -6px 0 12px; }
+  .see a { color: var(--accent2); border-bottom: 0; }
+  .see a:hover { color: #fff; }
+  .snippet pre { padding-top: 34px; }
+  @media print { .snippet pre { padding-top: 18px; } }
+</style>
+</head>
+<body class="lesson-body" data-course="tokens-context">
+
+<div class="lesson-wrap">
+
+  <span class="lesson-kicker">Reference · Cheat sheet</span>
+  <h1 class="lesson-title">Tokens, Context Windows & Context Limits — Cheat Sheet</h1>
+  <p class="lesson-lede">
+    The whole course on one page. Every snippet links back to the lesson that
+    teaches it.
+  </p>
+
+  <div class="ref-toc">
+    <a href="#sec-1">Client-Side Token Counting with Tiktoken</a>
+    <a href="#sec-2">Defensive Output Reserve Calculation</a>
+    <a href="#sec-3">Map-Reduce Parallel Summarizer</a>
+    <a href="#sec-4">Summarization Buffer Pattern</a>
+  </div>
+
+  <h2 id="sec-1"><span class="n">1</span>Client-Side Token Counting with Tiktoken</h2>
+  <div class="snippet">
+    <div class="lbl">Exact local token calculation</div>
+    <pre><code>import tiktoken
+enc = tiktoken.get_encoding("cl100k_base")
+def count_tokens(text: str) -&gt; int:
+    return len(enc.encode(text))</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0001-characters-words-tokens.html">Lesson 01 — Characters vs Words vs Tokens: How BPE Slices Text</a>.</p>
+
+  <h2 id="sec-2"><span class="n">2</span>Defensive Output Reserve Calculation</h2>
+  <div class="snippet">
+    <div class="lbl">Preventing length crash</div>
+    <pre><code>MAX_CONTEXT = 128_000
+OUTPUT_RESERVE = 4_000
+# Cap input prompt budget strictly:
+MAX_INPUT_BUDGET = MAX_CONTEXT - OUTPUT_RESERVE  # 124,000 max input tokens</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0007-handling-prompt-truncation-gracefully.html">Lesson 07 — Handling Prompt Truncation Gracefully</a>.</p>
+
+  <h2 id="sec-3"><span class="n">3</span>Map-Reduce Parallel Summarizer</h2>
+  <div class="snippet">
+    <div class="lbl">Scaling past context limits</div>
+    <pre><code>import asyncio
+# Map: Summarize 20 chunks concurrently
+summaries = await asyncio.gather(*[call_llm(f"Summarize: {c}") for c in chunks])
+# Reduce: Combine intermediate summaries into final report
+final_report = await call_llm(f"Synthesize these summaries:\n" + "\n".join(summaries))</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0008-designing-around-context-limits.html">Lesson 08 — Designing Architectures Around Context Limits</a>.</p>
+
+  <h2 id="sec-4"><span class="n">4</span>Summarization Buffer Pattern</h2>
+  <div class="snippet">
+    <div class="lbl">Rolling chat memory</div>
+    <pre><code># Prompt assembly:
+prompt = f"""System: {system_rules}
+Summary of previous conversation:
+{rolling_summary}
+Recent messages:
+{recent_turns_window}
+"""</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0006-context-eviction-rolling-windows.html">Lesson 06 — Context Eviction and Rolling Windows in Chat Apps</a>.</p>
+
+  <div class="lesson-foot">
+    <div class="links">
+      <a href="tokens-context-glossary.html">📖 Glossary</a>
+      <a href="../course.html">← Course map</a>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

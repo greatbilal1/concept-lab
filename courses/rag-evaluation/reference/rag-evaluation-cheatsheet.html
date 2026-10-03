@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RAG Evaluation — Cheat Sheet</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+<style>
+  .ref-toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0 8px; }
+  .ref-toc a { font-size: .8rem; border: 1px solid var(--border); background: #111a30; padding: 5px 11px; border-radius: 999px; color: var(--muted); text-decoration: none; border-bottom: 1px solid var(--border); }
+  .ref-toc a:hover { color: #fff; border-color: #3d5488; }
+  .lesson-wrap h2 { scroll-margin-top: 20px; }
+  .snippet { margin: 14px 0 22px; }
+  .snippet .lbl { font-size: .72rem; font-weight: 800; letter-spacing: .7px; text-transform: uppercase; color: var(--accent2); margin-bottom: 6px; }
+  .see { font-size: .82rem; color: var(--muted); margin: -6px 0 12px; }
+  .see a { color: var(--accent2); border-bottom: 0; }
+  .see a:hover { color: #fff; }
+  .snippet pre { padding-top: 34px; }
+  @media print { .snippet pre { padding-top: 18px; } }
+</style>
+</head>
+<body class="lesson-body" data-course="rag-evaluation">
+
+<div class="lesson-wrap">
+
+  <span class="lesson-kicker">Reference · Cheat sheet</span>
+  <h1 class="lesson-title">RAG Evaluation — Cheat Sheet</h1>
+  <p class="lesson-lede">
+    The whole course on one page. Every snippet links back to the lesson that
+    teaches it.
+  </p>
+
+  <div class="ref-toc">
+    <a href="#sec-1">Automated Ragas Evaluation Run</a>
+    <a href="#sec-2">Continuous RAG CI Verification Gate</a>
+    <a href="#sec-3">Synthetic Testset Generation Script</a>
+    <a href="#sec-4">RAG Failure Triage Decision Rule</a>
+  </div>
+
+  <h2 id="sec-1"><span class="n">1</span>Automated Ragas Evaluation Run</h2>
+  <div class="snippet">
+    <div class="lbl">Computing RAG Triad metrics</div>
+    <pre><code>from ragas import evaluate
+from ragas.metrics import faithfulness, answer_relevancy, context_recall
+from datasets import Dataset
+
+dataset = Dataset.from_dict(eval_records)
+results = evaluate(dataset, metrics=[faithfulness, answer_relevancy, context_recall])
+df = results.to_pandas()
+print(f"Faithfulness: {df['faithfulness'].mean():.2f}")</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0004-ragas-and-trulens-frameworks.html">Lesson 04 — The Ragas and TruLens Frameworks</a>.</p>
+
+  <h2 id="sec-2"><span class="n">2</span>Continuous RAG CI Verification Gate</h2>
+  <div class="snippet">
+    <div class="lbl">Gating deployments in GitHub Actions</div>
+    <pre><code>results = evaluate(golden_dataset, metrics=[context_recall, faithfulness])
+if results['context_recall'] &lt; 0.90 or results['faithfulness'] &lt; 0.95:
+    print('CI GATE FAILED: RAG quality threshold breached!')
+    sys.exit(1)
+sys.exit(0)</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0008-building-automated-rag-eval-pipeline.html">Lesson 08 — Building an Automated RAG Evaluation Pipeline</a>.</p>
+
+  <h2 id="sec-3"><span class="n">3</span>Synthetic Testset Generation Script</h2>
+  <div class="snippet">
+    <div class="lbl">Bootstrapping 50 test cases in 2 minutes</div>
+    <pre><code>from ragas.testset.generator import TestsetGenerator
+generator = TestsetGenerator.with_openai()
+testset = generator.generate_with_langchain_docs(documents, test_size=50)
+testset.to_pandas().to_json('evals/golden.jsonl', orient='records')</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0005-synthetic-test-generation-rag.html">Lesson 05 — Synthetic Test Generation for RAG</a>.</p>
+
+  <h2 id="sec-4"><span class="n">4</span>RAG Failure Triage Decision Rule</h2>
+  <div class="snippet">
+    <div class="lbl">Separating search from synthesis</div>
+    <pre><code># 1. Inspect retrieved chunks:
+if not any(ground_truth_fact in chunk for chunk in retrieved_chunks):
+    print('RETRIEVAL FAILURE: Tune chunking, add BM25, upgrade embeddings!')
+else:
+    print('GENERATION FAILURE: Set temp=0.0, use quotes-first prompt, reduce K!')</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0006-failure-mode-diagnosis-triaging.html">Lesson 06 — Failure Mode Diagnosis: Triaging Broken Answers</a>.</p>
+
+  <div class="lesson-foot">
+    <div class="links">
+      <a href="rag-evaluation-glossary.html">📖 Glossary</a>
+      <a href="../course.html">← Course map</a>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 06 — Type aliases and NewType</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="python-type-hints" data-lesson="6" data-lesson-id="type-aliases-and-newtype">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 06</span> · Generics</span>
+
+  <h1 class="lesson-title">Type aliases and NewType</h1>
+  <p class="lesson-lede">
+    Long type expressions get unreadable fast. Aliases name them, and
+    <code>NewType</code> goes further by making two identical shapes distinct.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~12 min</span>
+    <span><b>Win</b> Name and distinguish your types</span>
+    <span><b>Mission link</b> Types that read like domain words</span>
+  </div>
+
+  <h2><span class="n">1</span>Type aliases</h2>
+
+  <p>
+    An alias is just a name for a type expression:
+  </p>
+
+  <pre><code>UserId = int
+Scores = dict[str, list[float]]
+
+def top(scores: Scores) -> UserId:
+    ...</code></pre>
+
+  <p>
+    The alias is not a new type — it is a nickname. The checker treats
+    <code>UserId</code> and <code>int</code> as interchangeable, but your readers
+    get a word from the domain instead of a raw built-in.
+  </p>
+
+  <div id="intro1"></div>
+
+  <h2><span class="n">2</span>NewType</h2>
+
+  <p>
+    <code>NewType</code> creates a genuinely distinct type from an existing one:
+  </p>
+
+  <pre><code>UserId = NewType("UserId", int)
+OrderId = NewType("OrderId", int)
+
+def load(uid: UserId) -> None:
+    ...
+
+load(OrderId(7))   # checker error</code></pre>
+
+  <div id="predict1"></div>
+
+  <p>
+    At runtime <code>UserId(7)</code> is just <code>7</code> — no wrapper object,
+    no cost. But the checker now refuses to let you pass an order id where a user id
+    belongs. That is a whole class of bug eliminated for free.
+  </p>
+
+  <h2><span class="n">3</span>Literal and TypedDict</h2>
+
+  <p>
+    Two more shapes worth knowing. <code>Literal</code> restricts a value to an
+    exact set, and <code>TypedDict</code> gives a dictionary fixed keys:
+  </p>
+
+  <pre><code>Mode = Literal["read", "write"]
+
+class Row(TypedDict):
+    name: str
+    age: int</code></pre>
+
+  <div id="diagram1"></div>
+
+  <p>
+    <code>Literal</code> turns a stringly-typed parameter into a checked one.
+    <code>TypedDict</code> turns a loose dictionary into a record with known fields.
+  </p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Alias or NewType?</h2>
+
+  <p>
+    Use an <b>alias</b> when you want a shorter, clearer name for the same thing.
+    Use <b>NewType</b> when two things share a representation but must never be
+    confused — ids, currencies, units.
+  </p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    An alias is a nickname. <code>NewType</code> is a distinct type with zero
+    runtime cost. Choose based on whether confusion between the two would be a bug.
+  </div>
+
+  <h2><span class="n">5</span>Check yourself</h2>
+
+  <p>
+    Answer from memory — do not scroll back up. Each option has the same number of
+    words, so nothing gives the answer away.
+  </p>
+
+  <div id="fill1"></div>
+  <div id="quiz"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>
+      You can name a complex type with an alias, create a distinct type with
+      <code>NewType</code>, and reach for <code>Literal</code> or
+      <code>TypedDict</code> when the shape calls for it.
+    </p>
+  </div>
+
+  <h2><span class="n">6</span>Do this next</h2>
+
+  <ol>
+    <li>Find a long type expression in your code and give it an alias.</li>
+    <li>Find two ids that are both <code>int</code> and make them distinct types.</li>
+    <li>Replace one stringly-typed parameter with a <code>Literal</code>.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Read the
+    <a href="https://docs.python.org/3/library/typing.html">typing module docs</a>
+    on <code>NewType</code>, <code>Literal</code> and <code>TypedDict</code>.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher (me) anything — "does NewType cost
+    anything?", "can I alias a union?", "when is TypedDict better than a class?".
+    There are no bad questions here.
+  </div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  /* naming types */
+  TeachWidgets.introCards("#intro1", {
+    cards: [
+      { ico: "🏷️", title: "Alias", body: "A nickname for a type expression." },
+      { ico: "🆕", title: "NewType", body: "A distinct type, zero runtime cost." },
+      { ico: "📖", title: "Literal", body: "A fixed set of exact values." },
+      { ico: "🧾", title: "TypedDict", body: "A dict with known keys and types." }
+    ]
+  });
+
+  /* predict-then-reveal */
+  TeachWidgets.predict("#predict1", {
+    q: "What is UserId(7) at runtime?",
+    a: ["A wrapper object", "Just the integer 7", "A string of digits"],
+    c: 1,
+    why: "NewType adds no runtime wrapper; UserId(7) is literally the int 7, checked only statically."
+  });
+
+  /* alias vs NewType */
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      { title: "Alias", lines: ["same type", "shorter name"] },
+      { title: "NewType", lines: ["distinct type", "no runtime cost"] },
+      { title: "Literal", lines: ["exact values", "checked strings"] }
+    ]
+  });
+
+  /* step-through trace */
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "UserId = NewType(\"UserId\", int)",
+      "OrderId = NewType(\"OrderId\", int)",
+      "def load(uid: UserId) -> None: ...",
+      "load(UserId(7))",
+      "load(OrderId(7))"
+    ],
+    steps: [
+      { line: 0, vars: { UserId: "distinct int" } },
+      { line: 1, vars: { OrderId: "distinct int" } },
+      { line: 2, vars: { uid: "UserId" } },
+      { line: 3, vars: { call: "valid" } },
+      { line: 4, vars: { checker: "reports OrderId vs UserId" } }
+    ]
+  });
+
+  /* recall from memory */
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — naming types",
+    lines: [
+      "A nickname for a type is an <0>",
+      "A distinct type from an existing one is <1>",
+      "A fixed set of exact values is <2>"
+    ],
+    blanks: [
+      { a: ["alias", "type alias"], why: "An alias names a type expression without creating a new type." },
+      { a: ["NewType"], why: "NewType creates a distinct type from an existing one." },
+      { a: ["Literal"], why: "Literal restricts a value to an exact set of options." }
+    ]
+  });
+
+  /* the quiz — every option is exactly three words */
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is a type alias?",
+      a: ["A brand new type", "A nickname for types", "A runtime conversion tool", "A checker configuration"],
+      c: 1,
+      why: "An alias is a nickname; the checker treats it as the same type."
+    },
+    {
+      q: "What does NewType create?",
+      a: ["A wrapper object", "A distinct type", "A subclass instance", "A runtime validator"],
+      c: 1,
+      why: "NewType creates a distinct type that the checker will not confuse with its base."
+    },
+    {
+      q: "What does Literal restrict?",
+      a: ["The value's length", "The value's options", "The value's encoding", "The value's mutability"],
+      c: 1,
+      why: "Literal restricts a value to an exact set of allowed options."
+    },
+    {
+      q: "When use NewType instead?",
+      a: ["When you want speed", "When types must differ", "When values are strings", "When aliases are long"],
+      c: 1,
+      why: "NewType makes a distinct type so the checker will not confuse it with the underlying one."
+    }
+  ]);
+</script>
+</body>
+</html>

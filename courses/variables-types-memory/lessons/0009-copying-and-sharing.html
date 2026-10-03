@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 09 — Copying and sharing</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="variables-types-memory" data-lesson="9" data-lesson-id="copying-and-sharing">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 09</span> · Putting it together</span>
+
+  <h1 class="lesson-title">Copying and sharing</h1>
+  <p class="lesson-lede">
+    Now that you know names are references, you can decide deliberately: share a
+    value, or copy it. The choice is not always obvious, because a shallow copy
+    copies the container but not what is inside it.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~11 min</span>
+    <span><b>Win</b> Choose share or copy on purpose</span>
+    <span><b>Mission link</b> Why a copy still shares inner lists</span>
+  </div>
+
+  <h2><span class="n">1</span>Sharing is the default</h2>
+
+  <p>
+    Assignment shares. <code>b = a</code> gives you two names for one value. That is
+    often what you want — passing a large list to a function without copying it is
+    efficient. But when you need independence, you must copy explicitly.
+  </p>
+
+  <pre><code>a = [1, 2, 3]
+b = a            # shared — one list
+c = a.copy()     # copied — two lists
+c.append(4)
+print(a)         # [1, 2, 3] — a is untouched
+print(c)         # [1, 2, 3, 4]</code></pre>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Shallow copy: the container only</h2>
+
+  <p>
+    <code>a.copy()</code> is a <b>shallow copy</b>. It creates a new outer container,
+    but the items inside are still shared. If those items are themselves mutable,
+    changing one through the copy is visible through the original.
+  </p>
+
+  <pre><code>a = [[1, 2], [3, 4]]
+b = a.copy()      # new outer list, same inner lists
+b[0].append(99)
+print(a)          # [[1, 2, 99], [3, 4]] — a changed!</code></pre>
+
+  <p>
+    The outer list was copied, so <code>b[0] = something</code> would not affect
+    <code>a</code>. But <code>b[0]</code> and <code>a[0]</code> are the same inner
+    list, so mutating it is shared.
+  </p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Deep copy: everything</h2>
+
+  <p>
+    A <b>deep copy</b> copies the container <i>and</i> everything inside it,
+    recursively. The result shares nothing with the original, so changes never leak
+    across. It costs more, but it is fully independent.
+  </p>
+
+  <pre><code>import copy
+a = [[1, 2], [3, 4]]
+b = copy.deepcopy(a)
+b[0].append(99)
+print(a)          # [[1, 2], [3, 4]] — a is untouched</code></pre>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    A <b>shallow</b> copy duplicates the outer container but shares the items. A
+    <b>deep</b> copy duplicates everything, recursively, so nothing is shared.
+  </div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Choosing deliberately</h2>
+
+  <p>
+    The right choice depends on intent. Share when the other code should see your
+    changes, or when copying would be wasteful. Shallow-copy when you want a new
+    container but the items are immutable or safe to share. Deep-copy when you need
+    total independence and the structure is nested.
+  </p>
+
+  <div id="intro1"></div>
+
+  <div id="fill1"></div>
+
+  <h2><span class="n">5</span>Check yourself</h2>
+
+  <p>
+    Answer from memory — do not scroll back up. Each option has the same number of
+    words, so nothing gives the answer away.
+  </p>
+
+  <div id="quiz"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>
+      You can now choose between sharing, shallow copying, and deep copying on
+      purpose, and predict which changes will leak across. That is the practical
+      skill the whole memory half of the course was building toward.
+    </p>
+  </div>
+
+  <h2><span class="n">6</span>Do this next</h2>
+
+  <ol>
+    <li>
+      Make a shallow copy of a list of lists, mutate an inner list, and explain why
+      the original changed.
+    </li>
+    <li>
+      Repeat with <code>copy.deepcopy</code> and explain why the original did not
+      change this time.
+    </li>
+    <li>
+      Write one sentence for each of sharing, shallow copy, and deep copy, saying
+      when you would choose it.
+    </li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Read <a href="https://docs.python.org/3/library/copy.html">Python — "copy — Shallow and deep copy operations"</a>.
+    It defines shallow and deep copying precisely and explains exactly which parts
+    of a structure each one duplicates.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher (me) anything — "when is a shallow
+    copy enough?", "why is deepcopy slow?", "how do I copy a dict?". There are no
+    bad questions here.
+  </div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  /* shallow vs deep */
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      { title: "original", lines: ["outer", "→ inner list"] },
+      { title: "shallow copy", lines: ["new outer", "→ same inner"] },
+      { title: "deep copy", lines: ["new outer", "→ new inner"] }
+    ]
+  });
+
+  /* the three choices */
+  TeachWidgets.introCards("#intro1", {
+    cards: [
+      { ico: "🤝", title: "Share", body: "Two names, one value. Changes are visible to both." },
+      { ico: "🥞", title: "Shallow copy", body: "New outer container, but the items inside are shared." },
+      { ico: "🧬", title: "Deep copy", body: "New container and new items, recursively. Fully independent." }
+    ]
+  });
+
+  /* predict-then-reveal */
+  TeachWidgets.predict("#predict1", {
+    q: "What does a.copy() copy?",
+    a: ["The container and items", "The container only", "The items only"],
+    c: 1,
+    why: "a.copy() is a shallow copy: it creates a new outer container but the items inside are still shared with the original."
+  });
+
+  /* step-through: shallow copy surprise */
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "a = [[1, 2], [3, 4]]",
+      "b = a.copy()",
+      "b[0].append(99)",
+      "print(a)"
+    ],
+    steps: [
+      { line: 0, vars: { a: "→ [inner0, inner1]" } },
+      { line: 1, vars: { a: "→ outer", b: "→ new outer", "inner0": "shared" } },
+      { line: 2, vars: { "inner0": "[1, 2, 99]", "a and b": "both see it" } },
+      { line: 3, vars: { output: "[[1, 2, 99], [3, 4]]" } }
+    ]
+  });
+
+  /* recall from memory */
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the blanks",
+    lines: [
+      "Assignment <0> the value by default.",
+      "A shallow copy duplicates the <1> container only.",
+      "A deep copy duplicates everything, so nothing is <2>."
+    ],
+    blanks: [
+      { a: ["shares", "shares", "binds"], why: "Assignment binds a second name to the same value, so the value is shared." },
+      { a: ["outer", "outermost"], why: "A shallow copy creates a new outer container but shares the items inside it." },
+      { a: ["shared", "sharing"], why: "A deep copy recursively duplicates everything, so the result shares nothing with the original." }
+    ]
+  });
+
+  /* the quiz — every option is exactly three words */
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What does assignment do?",
+      a: ["Copies the value", "Shares the value", "Deep copies values", "Deletes the value"],
+      c: 1,
+      why: "Assignment binds a second name to the same value, so the value is shared by default."
+    },
+    {
+      q: "What does a shallow copy share?",
+      a: ["The outer container", "The items inside", "Nothing at all", "The type only"],
+      c: 1,
+      why: "A shallow copy makes a new outer container but the items inside are still shared."
+    },
+    {
+      q: "What does a deep copy do?",
+      a: ["Copies the container only", "Copies everything recursively down", "Shares the inner items", "Copies the names only"],
+      c: 1,
+      why: "A deep copy recursively duplicates the container and everything inside it, so nothing is shared."
+    },
+    {
+      q: "When is sharing the right choice?",
+      a: ["When changes should propagate down", "When values must stay independent", "When the structure is nested", "When memory is unlimited here"],
+      c: 0,
+      why: "Share when the other code should see your changes, or when copying would be wasteful."
+    }
+  ]);
+</script>
+</body>
+</html>

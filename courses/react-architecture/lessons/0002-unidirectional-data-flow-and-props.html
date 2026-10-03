@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 02 — Unidirectional data flow and props</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="react-architecture" data-lesson="2" data-lesson-id="unidirectional-data-flow-and-props">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 02</span> · Components & Unidirectional Flow</span>
+
+  <h1 class="lesson-title">Unidirectional data flow and props</h1>
+  <p class="lesson-lede">
+    Data flows down; events flow up. Master unidirectional data flow: how passing props down and callbacks up makes complex UI systems easy to debug.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Implement unidirectional data flow using props and event callbacks</span>
+    <span><b>Mission link</b> The architectural rule that prevents spaghetti state synchronization bugs</span>
+  </div>
+
+  <h2><span class="n">1</span>The one-way street of data</h2>
+  <p>In older frameworks (like AngularJS 1.x), two-way data binding meant child inputs could silently mutate parent state from anywhere. When a bug occurred, finding which component caused the change was nearly impossible.</p><p>React mandates <b>Unidirectional Data Flow</b>: data flows in strictly one direction: <b>Downwards via props</b>. When a child needs to communicate a change (e.g. user toggled a checkbox), it cannot mutate the parent. It calls an <b>event callback function</b> passed down from the parent: <code>onChange(newValue)</code>.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Data flows down as props; actions flow up as event callbacks.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Unidirectional loop diagram</h2>
+  <p>Observe the closed loop: state flows down as props, user action fires callback up, parent updates state.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing the event-callback cycle</h2>
+  <p>Trace how a toggle action flows up from a child switch to update parent state.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of unidirectional flow.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can design component hierarchies where data flows down as props and actions flow up through callbacks with zero state entanglement.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Build a custom Slider component that receives value as a prop and communicates edits via onChange(val).</li>
+    <li>Trace the path of a state variable as it flows down three levels of components.</li>
+    <li>Explain why two-way data binding causes unpredictable state bugs in large teams.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    React Official Documentation: *Responding to Events* (react.dev/learn/responding-to-events).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "How does a child button component tell its parent container that it was clicked in React?",
+    a: ["It invokes a callback function passed down to it via props (e.g. onClick())","It directly modifies the parent's state variable in memory","It triggers a full browser page reload","It sends an email to the server"],
+    c: 0,
+    why: "Children communicate upward by executing callback functions passed down from parents."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Parent: Container",
+            "lines": [
+                  "owns state: count = 0",
+                  "passes prop: count={count}",
+                  "passes callback: onIncrement={...}"
+            ]
+      },
+      {
+            "title": "Child: CounterButton",
+            "lines": [
+                  "reads: props.count (0)",
+                  "user clicks: calls props.onIncrement()"
+            ]
+      },
+      {
+            "title": "State Update",
+            "lines": [
+                  "parent updates count to 1",
+                  "new props flow down cleanly!"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Parent: <ToggleSwitch enabled={isDark} onToggle={handleToggle} />",
+      "1. User clicks ToggleSwitch child element",
+      "2. ToggleSwitch executes: props.onToggle(!props.enabled)",
+      "3. Parent handleToggle runs: setIsDark(true)",
+      "4. Parent re-renders: passes new prop enabled={true} down to child"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "user_event": "click received at leaf component"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "callback_up": "callback invoked up to parent with new value"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "parent_state": "parent modifies single source of truth"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "flow_down": "updated prop flows down to update UI"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "In React, data flows strictly <0> through the component tree via props.",
+      "Children notify parents of changes by invoking event <1> functions.",
+      "The architectural pattern where data flows in a single direction is <2> data flow."
+],
+    blanks: [
+      {
+            "a": [
+                  "down",
+                  "downward"
+            ],
+            "why": "Props flow down from parents to children."
+      },
+      {
+            "a": [
+                  "callback",
+                  "callbacks"
+            ],
+            "why": "Callbacks communicate events upward."
+      },
+      {
+            "a": [
+                  "unidirectional"
+            ],
+            "why": "Unidirectional data flow is React's core model."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the primary benefit of Unidirectional Data Flow in large applications?",
+      a: ["Predictability: data has a single source of truth and state changes can be traced directly to specific parent actions","It speeds up network data downloads","It turns off the need for CSS styling","It makes JavaScript execute on the GPU"],
+      c: 0,
+      why: "One-way data flow eliminates spooky action-at-a-distance bugs where child components secretly mutate parent data."
+    },
+    {
+      q: "Can a child component directly update its parent's state without a callback function?",
+      a: ["No, children can only update parent state if the parent explicitly provides a callback or setter function via props","Yes, children can mutate parent variables by default","Only in development mode","Only on Apple Mac computers"],
+      c: 0,
+      why: "Encapsulation prevents children from reaching into parent scopes directly."
+    },
+    {
+      q: "What should you pass as the 'key' prop when rendering a list of items in React?",
+      a: ["A stable, unique identifier from your data (like item.id), NEVER array index numbers","Math.random()","The array index number (0, 1, 2...)","The current time in milliseconds"],
+      c: 0,
+      why: "Stable IDs allow React's reconciler to match items across reorders and deletions without bugs."
+    },
+    {
+      q: "Why does using array indices (key={index}) cause subtle UI bugs when list items are reordered or deleted?",
+      a: ["React matches components by key index; reordering shifts indices, causing components to hold stale internal state from the wrong item","Array indices crash the browser compiler","Indices are forbidden by JavaScript syntax","It causes internet latency"],
+      c: 0,
+      why: "Index keys confuse the reconciler during inserts, reorders, and deletes, breaking form inputs."
+    }
+  ]);
+</script>
+</body>
+</html>

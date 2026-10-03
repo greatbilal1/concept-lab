@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 03 — Hexagonal architecture: ports and adapters</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="backend-architecture" data-lesson="3" data-lesson-id="hexagonal-architecture-ports-and-adapters">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 03</span> · Hexagonal Architecture & Ports</span>
+
+  <h1 class="lesson-title">Hexagonal architecture: ports and adapters</h1>
+  <p class="lesson-lede">
+    Treat your application as an isolated hexagon. Discover Alistair Cockburn's Ports and Adapters architecture: how to plug in databases, HTTP APIs, and CLI tools with zero coupling.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Implement Ports and Adapters to decouple core application logic from external technologies</span>
+    <span><b>Mission link</b> The practical implementation pattern for Hexagonal and Clean Architecture</span>
+  </div>
+
+  <h2><span class="n">1</span>The application in the center</h2>
+  <p>Alistair Cockburn created <b>Hexagonal Architecture (Ports and Adapters)</b> with a clear vision: an application should be equally driven by users, automated tests, or batch scripts, and developed and tested in isolation from its runtime devices and databases.</p><p>The application core sits inside a hexagon. To talk to the outside world, the core defines <b>Ports</b> (interfaces). External technologies connect through <b>Adapters</b> that translate between external drivers (HTTP, SQL, Stripe) and the core ports.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    The core defines Ports (interfaces); external technologies plug in via Adapters.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Driving versus Driven ports</h2>
+  <p>Understand the two sides of the hexagon: Primary (Driving) and Secondary (Driven).</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing port-and-adapter execution</h2>
+  <p>Trace how a notifications use case sends an SMS through an adapter without knowing Twilio exists.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of Hexagonal Architecture.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can implement Hexagonal Architecture to make databases, messaging queues, and external APIs completely swappable plugins.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Define an email sender Port (interface) in your core domain package.</li>
+    <li>Implement two Adapters: one using a real SMTP service and one printing to console for testing.</li>
+    <li>Inject the console adapter during local development.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Alistair Cockburn: *Hexagonal Architecture (Ports and Adapters)* (alistair.cockburn.us).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "In Hexagonal Architecture, what is a 'Port'?",
+    a: ["An interface or contract defined by the application core that specifies an interaction boundary","A physical USB port on the back of the server","A TCP network port number like 8080","A computer monitor connection cable"],
+    c: 0,
+    why: "A port is a protocol/interface defining what the application expects from the outside world."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Driving Adapters (Primary)",
+            "lines": [
+                  "HTTP Controller, CLI tool, Cron",
+                  "drives the application core inward"
+            ]
+      },
+      {
+            "title": "Application Core (Hexagon)",
+            "lines": [
+                  "Domain Models & Use Cases",
+                  "defines Ports (interfaces)"
+            ]
+      },
+      {
+            "title": "Driven Adapters (Secondary)",
+            "lines": [
+                  "PostgreSQL Adapter, Stripe Client",
+                  "driven by the core via outgoing ports"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# 1. Core defines Port: class NotificationSender(Protocol): def send(self, msg, to)\n# 2. Infrastructure implements Adapter: class TwilioSmsAdapter(NotificationSender)\n# 3. Core Use Case calls sender.send('Your order shipped', phone)\n# Result: Swapping Twilio for AWS SNS requires editing ZERO lines of core logic!"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "port": "NotificationSender interface defined in core"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "adapter": "TwilioSmsAdapter implements port using Twilio SDK"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "execution": "core invokes interface without importing Twilio"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "swappability": "external third-party provider is completely swappable"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Hexagonal Architecture is also known as Ports and <0>.",
+      "The interface defined by the core is a <1>.",
+      "The concrete class translating external tech to a port is an <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "Adapters"
+            ],
+            "why": "Ports and Adapters is the formal title."
+      },
+      {
+            "a": [
+                  "Port"
+            ],
+            "why": "Ports are internal interface specifications."
+      },
+      {
+            "a": [
+                  "Adapter"
+            ],
+            "why": "Adapters bridge external technologies to ports."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the difference between a Driving (Primary) Adapter and a Driven (Secondary) Adapter?",
+      a: ["Driving adapters initiate actions on the core (e.g. HTTP controller); Driven adapters are invoked by the core (e.g. database adapter)","Driving adapters are written in C; Driven adapters are written in Python","Driving adapters run on cars; Driven adapters run on servers","There is no difference between them"],
+      c: 0,
+      why: "Driving adapters trigger core use cases; driven adapters respond to core service calls."
+    },
+    {
+      q: "Who defines the 'Port' interface in Hexagonal Architecture?",
+      a: ["The application core defines the port, stating what contract it needs satisfied","The third-party external vendor (like Stripe or AWS)","The database software manufacturer","The web browser"],
+      c: 0,
+      why: "The core owns the port interface, forcing external adapters to conform to its domain rules."
+    },
+    {
+      q: "How does Hexagonal Architecture facilitate automated testing?",
+      a: ["You can plug in fake in-memory adapters for databases and external APIs, running tests in milliseconds without network I/O","It automatically generates test assertions using AI","It eliminates the need for unit testing","Tests run without using CPU cycles"],
+      c: 0,
+      why: "Swapping driven adapters with in-memory test doubles enables blazing-fast unit tests."
+    },
+    {
+      q: "Why is a hexagon used to represent this architecture?",
+      a: ["To visually emphasize that multiple ports and adapters can plug into the application across different sides","Because computer memory is stored in hexagonal shapes","Because Alistair Cockburn liked honeycombs","Because 6 is a lucky number in computer science"],
+      c: 0,
+      why: "The hexagon visually demonstrates multiple distinct interfaces (ports) connecting around a central core."
+    }
+  ]);
+</script>
+</body>
+</html>

@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 04 — Checkpoint-Driven Development: Save Points and Reverts</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="large-ai-coding-projects" data-lesson="4" data-lesson-id="checkpoint-driven-development">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 04</span> · Checkpoints</span>
+
+  <h1 class="lesson-title">Checkpoint-Driven Development: Save Points and Reverts</h1>
+  <p class="lesson-lede">
+    Using checkpoint-driven development: establishing clean savepoints before risky operations and knowing when to revert.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to practice checkpoint-driven development and leverage instant rollbacks.</span>
+    <span><b>Mission link</b> Mastering checkpoint-driven development: save points and reverts across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Checkpoint-Driven Development: Save Points and Reverts</h2>
+  <p>Software engineering is an empirical search through a possibility space. Sometimes an agent finds an elegant solution in 3 minutes; other times, it goes down an architectural rabbit hole, modifying 18 files and introducing circular import hell.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Using checkpoint-driven development: establishing clean savepoints before risky operations and knowing when to revert.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Checkpoint and Ripcord Loop</h2>
+  <p><strong>Checkpoint-Driven Development</strong> gives you complete psychological and technical freedom to let agents explore without fear:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>The Cost of Arguing vs Reverting</h2>
+  <ul><li><strong>1. Create the Checkpoint:</strong> Before giving the agent a task, ensure `git status` is clean. If needed, create an explicit WIP commit: `git commit -m "checkpoint: pre-auth-refactor"`.</li><li><strong>2. Unleash the Agent:</strong> Let the agent explore, edit files, and run tests autonomously.</li><li><strong>3. Evaluate the Trajectory:</strong> If after 5 minutes the agent is making clean, convergent progress, let it finish.</li><li><strong>4. Pull the Ripcord:</strong> If the agent is thrashing, breaking unrelated tests, or making erratic edits, do not argue with it! <strong>Pull the ripcord:</strong> `git reset --hard HEAD`.</li></ul><pre><code># The Ripcord Workflow:
+$ git commit -m "checkpoint: before payment gateway refactor"
+# ... Agent runs 8 turns, modifies 14 files, 6 tests failing ...
+# You realize the agent took the wrong design approach.
+$ git reset --hard HEAD
+# Result: Pristine working baseline restored in 100 milliseconds!
+# Now prompt with a refined constraint: "Do NOT alter PaymentGateway protocol..."</code></pre><div class="callout"><p><strong>The Revert Rule:</strong> Pulling the ripcord takes 1 second. Trying to fix an agent's confused, multi-file mess takes an hour. Revert early, refine the prompt, and restart clean.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the checkpoint development sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to practice checkpoint-driven development and leverage instant rollbacks.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where checkpoint-driven development: save points and reverts applies.</li>
+    <li>Author a unit test or verification script exercising checkpoint-driven development: save points and reverts.</li>
+    <li>Document team architectural conventions regarding checkpoint-driven development: save points and reverts.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Checkpoint-Driven Development: Save Points and Reverts.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is 'Checkpoint-Driven Development' when collaborating with AI agents?",
+    a: ["Committing a working baseline state before starting an agent task so you can instantly revert if the agent goes off track","Saving games on a video game console","Creating cloud database backups once a month","Writing down code on physical paper"],
+    c: 0,
+    why: "Checkpoints provide instant savepoints that eliminate the risk of exploratory agent tasks."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1. Save Checkpoint",
+            "lines": [
+                  "git commit -m 'checkpoint'",
+                  "Clean, working baseline locked"
+            ]
+      },
+      {
+            "title": "2. Agent Explores",
+            "lines": [
+                  "Agent attempts refactor",
+                  "Modifies 12 files autonomously"
+            ]
+      },
+      {
+            "title": "3. Decision Point",
+            "lines": [
+                  "Converging? -> Accept & polish",
+                  "Thrashing? -> Pull ripcord (git reset)"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Checkpoint-Driven Development: Save Points and Reverts",
+      "def execute_flow():",
+      "    # Using checkpoint-driven development: establishing ...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Checkpoint-Driven Development: Save Points and Reverts"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Arguing with Confused Agent"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Pulling the Ripcord"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Checkpoint-driven development establishes clean git {1} before delegating tasks, allowing developers to pull the {2} if the agent goes off track."
+],
+    blanks: [
+      {
+            "a": [
+                  "savepoints"
+            ],
+            "why": "Known good commits"
+      },
+      {
+            "a": [
+                  "ripcord"
+            ],
+            "why": "Instant git reset to clean baseline"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why is 'git reset --hard HEAD' considered a developer superpower when working with AI agents?",
+      a: ["It allows you to instantly discard an agent's confused exploration and return to a clean baseline in milliseconds","It makes Python run faster","It deletes the remote repository","It automatically fixes syntax errors"],
+      c: 0,
+      why: "Instant rollbacks eliminate the fear of letting agents explore complex, multi-file modifications."
+    },
+    {
+      q: "What is the primary indicator that you should pull the ripcord rather than continuing an agent session?",
+      a: ["The agent is thrashing, making contradictory edits back and forth, or breaking unrelated working tests","The agent finishes in 10 seconds","All unit tests pass","The agent asks a clarifying question"],
+      c: 0,
+      why: "Alternating test failures and circular edits indicate the agent has lost architectural coherence."
+    },
+    {
+      q: "Why is arguing with an agent in chat when it has made a 15-file mess usually counter-productive?",
+      a: ["The context window is saturated with error logs and confusion; restarting from a clean checkpoint with a refined prompt is vastly faster","Language models have emotional pride","The chat window will crash","It is considered impolite"],
+      c: 0,
+      why: "A saturated, confused context window degrades model reasoning; fresh prompts on clean baselines win."
+    },
+    {
+      q: "What should you do after pulling the ripcord before prompting the agent again?",
+      a: ["Analyze why the agent failed and add an explicit constraint or golden example to prevent the mistake on attempt #2","Run the exact same prompt again without changes","Delete your computer","Work through the night by hand"],
+      c: 0,
+      why: "Refining the prompt with the learned constraint guides the agent correctly on the second try."
+    }
+  ]);
+</script>
+</body>
+</html>

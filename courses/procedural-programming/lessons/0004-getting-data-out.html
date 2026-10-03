@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 04 — Getting data out</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="procedural-programming" data-lesson="4" data-lesson-id="getting-data-out">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 04</span> · Data</span>
+
+  <h1 class="lesson-title">Getting data out</h1>
+  <p class="lesson-lede">
+    A procedure that only prints is a dead end — its result cannot be used by the
+    next step. <code>return</code> is how a step hands a value back, so the sequence
+    can keep going.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Write a procedure that returns a value</span>
+    <span><b>Mission link</b> Get a result back from a procedure</span>
+  </div>
+
+  <h2><span class="n">1</span>return hands a value back</h2>
+
+  <p>
+    <code>return</code> does two things at once: it ends the procedure immediately,
+    and it sends a value back to whoever called it. That value can be stored, printed,
+    or passed to the next step.
+  </p>
+
+  <pre><code>def add(a, b):
+    return a + b
+
+total = add(2, 3)
+print(total)        # 5
+print(add(10, 20))  # 30</code></pre>
+
+  <p>
+    Compare this to a version that prints instead of returning. The printing version
+    can only show the answer; the returning version lets the rest of the program
+    <b>use</b> it. That difference is what makes a step composable.
+  </p>
+
+  <div id="diagram1"></div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>No return means None</h2>
+
+  <p>
+    If a procedure has no <code>return</code>, it still returns something:
+    <code>None</code>, Python's value for "nothing". This is why a procedure that
+    only prints cannot be used in an expression.
+  </p>
+
+  <pre><code>def show(a, b):
+    print(a + b)
+
+result = show(2, 3)   # prints 5
+print(result)         # None</code></pre>
+
+  <p>
+    <code>None</code> is not an error — it is the honest answer to "what did this
+    step produce?" when the step produced nothing. But if you meant to hand a value
+    back, a missing <code>return</code> is the bug.
+  </p>
+
+  <div class="note warn">
+    <span class="note-label">Watch out</span>
+    A procedure that prints and a procedure that returns look almost identical, but
+    only one of them can feed the next step. If your result is <code>None</code>,
+    check for a missing <code>return</code>.
+  </div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">3</span>Return ends the step</h2>
+
+  <p>
+    <code>return</code> is not just a value — it is an exit. Any statements after it
+    in the same block never run. This makes it the natural way to handle a failure
+    case early.
+  </p>
+
+  <pre><code>def safe_divide(a, b):
+    if b == 0:
+        return None      # leave early
+    return a / b
+
+print(safe_divide(10, 2))   # 5.0
+print(safe_divide(10, 0))   # None</code></pre>
+
+  <p>
+    The early <code>return</code> keeps the main path flat: the happy case is the
+    last line, not buried inside an <code>else</code>. This is the same early-exit
+    idea from Control Flow, now applied to a step.
+  </p>
+
+  <div id="intro1"></div>
+
+  <h2><span class="n">4</span>Return a result</h2>
+
+  <p>
+    Here is the win for today. The lab below returns a value and uses it in the next
+    step. Change the numbers, then delete the <code>return</code> and watch the
+    result become <code>None</code>.
+  </p>
+
+  <div id="lab1"></div>
+
+  <div id="fill1"></div>
+
+  <h2><span class="n">5</span>Check yourself</h2>
+
+  <p>
+    Answer from memory — do not scroll back up. Each option has the same number of
+    words, so nothing gives the answer away.
+  </p>
+
+  <div id="quiz"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>
+      You can now pass data into a step and get a result back out. That is the full
+      data contract of a procedure — in and out — and it is what lets steps be
+      chained into a program. The next lesson is about keeping each step to one job.
+    </p>
+  </div>
+
+  <h2><span class="n">6</span>Do this next</h2>
+
+  <ol>
+    <li>
+      Rewrite a printing procedure from your own code so it returns the value
+      instead, and print the result at the call site.
+    </li>
+    <li>
+      Write <code>safe_divide(a, b)</code> that returns <code>None</code> when
+      <code>b</code> is zero, and use it in a chain of steps.
+    </li>
+    <li>
+      Write a procedure with a statement after its <code>return</code> and confirm
+      that the statement never runs.
+    </li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Read <a href="https://docs.python.org/3/tutorial/controlflow.html#defining-functions">Python — Defining Functions</a>.
+    It states that a function without a <code>return</code> returns <code>None</code>,
+    which is the fact this lesson turns on.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher (me) anything — "can I return two
+    values?", "what is the difference between print and return?", "can I return a
+    list?". There are no bad questions here.
+  </div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  /* the data contract */
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      { title: "in", lines: ["parameters"] },
+      { title: "step", lines: ["the body"] },
+      { title: "out", lines: ["return value"] },
+      { title: "next", lines: ["the caller uses it"] }
+    ]
+  });
+
+  /* predict-then-reveal */
+  TeachWidgets.predict("#predict1", {
+    q: "What does a procedure return with no return statement?",
+    a: ["None", "Zero", "An empty string", "The last printed value"],
+    c: 0,
+    why: "A procedure with no return statement returns None, Python's value for nothing."
+  });
+
+  /* step through a return */
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "def add(a, b):",
+      "    return a + b",
+      "total = add(2, 3)",
+      "print(total)"
+    ],
+    steps: [
+      { line: 0, vars: { action: "define add" } },
+      { line: 2, vars: { action: "call add", a: "2", b: "3" } },
+      { line: 1, vars: { returned: "5" } },
+      { line: 2, vars: { total: "5" } },
+      { line: 3, vars: { printed: "5" } }
+    ]
+  });
+
+  /* three things return gives you */
+  TeachWidgets.introCards("#intro1", {
+    cards: [
+      { ico: "📤", title: "A value back", body: "The caller receives the result and can store or reuse it." },
+      { ico: "🛑", title: "An early exit", body: "return ends the step immediately, so later lines never run." },
+      { ico: "🔗", title: "Composability", body: "A returned value can feed the next step, chaining steps together." }
+    ]
+  });
+
+  /* the tiny interpreter */
+  TeachWidgets.lab("#lab1", {
+    label: "Run it — change the numbers, then delete the return",
+    starter: "def add(a, b):\n    return a + b\n\ntotal = add(2, 3)\nprint(total)\nprint(add(10, 20))"
+  });
+
+  /* recall from memory */
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the blanks",
+    lines: [
+      "A procedure with no return gives back <0>",
+      "return also ends the step <1>",
+      "A returned value can feed the <2> step"
+    ],
+    blanks: [
+      { a: ["None"], why: "Without a return statement, a procedure returns None." },
+      { a: ["immediately"], why: "return ends the procedure at once, so later statements never run." },
+      { a: ["next"], why: "A returned value can be passed to the next step, chaining steps together." }
+    ]
+  });
+
+  /* the quiz — every option is exactly three words */
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What does return do?",
+      a: ["Hands a value back", "Prints the value out", "Restarts the procedure here", "Deletes the parameter here"],
+      c: 0,
+      why: "return ends the procedure and sends a value back to the caller."
+    },
+    {
+      q: "What is returned with no return?",
+      a: ["None", "Zero", "Empty", "Last"],
+      c: 0,
+      why: "A procedure with no return statement returns None."
+    },
+    {
+      q: "What happens after return runs?",
+      a: ["The step ends immediately", "The step runs again", "The body repeats once", "The caller is skipped"],
+      c: 0,
+      why: "return exits the procedure at once, so any later statements never run."
+    },
+    {
+      q: "Why return instead of print?",
+      a: ["The value can be reused", "The output looks much nicer", "The code runs much faster", "The name gets much shorter"],
+      c: 0,
+      why: "A returned value can be stored and passed on; a printed value cannot."
+    }
+  ]);
+</script>
+</body>
+</html>

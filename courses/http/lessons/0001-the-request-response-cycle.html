@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 01 — The request-response cycle</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="http" data-lesson="1" data-lesson-id="the-request-response-cycle">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 01</span> · The Request-Response Cycle</span>
+
+  <h1 class="lesson-title">The request-response cycle</h1>
+  <p class="lesson-lede">
+    At the heart of the web is a simple, repeating conversation: the client asks a question, and the server gives an answer. Explore the stateless protocol loop.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Articulate the client-initiated, stateless request-response lifecycle</span>
+    <span><b>Mission link</b> The fundamental interaction pattern of all web architecture</span>
+  </div>
+
+  <h2><span class="n">1</span>A conversation over TCP</h2>
+  <p>Every time you load a website or call a REST API, your computer acts as an <b>HTTP client</b>. It opens a TCP connection to the server, sends an explicit HTTP request message, waits for the server to reply with an HTTP response message, and then closes or reuses the connection.</p><p>HTTP is fundamentally <b>stateless</b>: the server does not remember who you are from the previous request unless you explicitly attach an identification token or cookie to the message.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    HTTP is a stateless conversation: every request is evaluated independently as an isolated transaction.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The request-response lifecycle</h2>
+  <p>Observe the sequential phases of an HTTP transaction across the network.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing an HTTP exchange</h2>
+  <p>Trace a minimal HTTP/1.1 text transaction over an open network connection.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your recall of the HTTP lifecycle.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can explain the complete round-trip lifecycle of an HTTP transaction from client initiation to server response.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Send a raw HTTP request using curl -v https://httpbin.org/get.</li>
+    <li>Observe the request and response headers printed in the curl verbose output.</li>
+    <li>Notice the blank line separating headers from the response body.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    IETF RFC 9110: *HTTP Semantics*, Section 3: 'Protocol Parameters & Architecture'.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What does it mean that HTTP is a 'stateless' protocol?",
+    a: ["The server automatically forgets everything about prior requests once completed","The server cannot run in countries that have states or provinces","HTTP messages cannot be transmitted across state borders","Web servers cannot store data in relational databases"],
+    c: 0,
+    why: "Statelessness means the protocol preserves no conversational memory between individual request cycles."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1. Connect",
+            "lines": [
+                  "DNS lookup -> IP address",
+                  "TCP 3-way handshake on port 80/443"
+            ]
+      },
+      {
+            "title": "2. Request",
+            "lines": [
+                  "client sends headers & body",
+                  "GET /api/v1/items HTTP/1.1"
+            ]
+      },
+      {
+            "title": "3. Response",
+            "lines": [
+                  "server processes & replies",
+                  "HTTP/1.1 200 OK + payload"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Client sends plaintext command:",
+      "GET /hello.txt HTTP/1.1\\r\\nHost: example.com\\r\\n\\r\\n",
+      "# Server replies with formatted headers and body:",
+      "HTTP/1.1 200 OK\\r\\nContent-Length: 12\\r\\n\\r\\nHello World!"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "client": "connected on port 80"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "sent": "GET request with Host header"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "server": "parsed request and prepared 200 OK response"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "received": "12-byte payload 'Hello World!'"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The party that initiates an HTTP transaction is the <0>.",
+      "The party that listens and replies to requests is the <1>.",
+      "The protocol characteristic of retaining no session memory is <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "client"
+            ],
+            "why": "Clients initiate connections and send requests."
+      },
+      {
+            "a": [
+                  "server"
+            ],
+            "why": "Servers process requests and return responses."
+      },
+      {
+            "a": [
+                  "stateless",
+                  "statelessness"
+            ],
+            "why": "Stateless protocols treat each request independently."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Who initiates communication in a standard HTTP transaction?",
+      a: ["The client always initiates the request to the server","The server initiates contact whenever it has new data to share","The internet service provider initiates the transaction","The database server initiates the connection"],
+      c: 0,
+      why: "HTTP is client-driven: servers listen and respond only upon receiving a client request."
+    },
+    {
+      q: "What characters separate the HTTP headers from the message body in raw HTTP text?",
+      a: ["Two consecutive newline sequences (CRLF CRLF / \\r\\n\\r\\n)","A row of three equal signs (===)","A binary null byte (0x00)","A closing HTML tag (</html>)"],
+      c: 0,
+      why: "A blank line (CRLF CRLF) marks the end of the header section and the start of the body."
+    },
+    {
+      q: "Why is statelessness considered an architectural strength of HTTP?",
+      a: ["Servers do not need to hold connection state in memory, enabling easy horizontal scaling","It makes internet connections run faster through copper cables","It prevents web pages from containing visual images","It eliminates the need for computer encryption"],
+      c: 0,
+      why: "Statelessness lets any server in a load-balanced cluster handle any incoming request."
+    },
+    {
+      q: "What transport protocol does HTTP/1.1 and HTTP/2 rely upon beneath the application layer?",
+      a: ["TCP (Transmission Control Protocol)","UDP (User Datagram Protocol)","ICMP (Internet Control Message Protocol)","Bluetooth Radio Protocol"],
+      c: 0,
+      why: "HTTP/1.1 and HTTP/2 run over reliable in-order TCP streams."
+    }
+  ]);
+</script>
+</body>
+</html>

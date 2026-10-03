@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 07 — Decoding naming and conventions</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="reading-code" data-lesson="7" data-lesson-id="decoding-naming-and-conventions">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 07</span> · Conventions & Architecture</span>
+
+  <h1 class="lesson-title">Decoding naming and conventions</h1>
+  <p class="lesson-lede">
+    Codebases develop their own dialects. Learn to identify project idioms, naming patterns, and architectural metaphors to read code like a native.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Decode repository-specific naming idioms and ubiquitous language terms</span>
+    <span><b>Mission link</b> Bridges the gap between code syntax and business domain semantics</span>
+  </div>
+
+  <h2><span class="n">1</span>The ubiquitous language of a codebase</h2>
+  <p>Every mature software system is built around a domain vocabulary. Eric Evans called this the <b>Ubiquitous Language</b>. A financial app will have <code>Ledgers</code> and <code>Settlements</code>; a shipping app will have <code>Waybills</code> and <code>Manifests</code>.</p><p>If you do not understand these terms, the code will read like gibberish. Identifying the central domain nouns and verbs is the fastest way to translate code symbols into real-world meaning.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Mastering the domain nouns and verbs turns cryptic variable names into obvious business stories.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Structural naming prefixes and suffixes</h2>
+  <p>Teams use naming suffixes to signal architectural roles. Learn to recognize standard role archetypes.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Translating code to domain stories</h2>
+  <p>Observe how naming conventions make the business transaction clear even without documentation.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your understanding of architectural naming conventions.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can decode unfamiliar repository conventions and translate domain-specific symbols into clear business meaning.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Create a glossary of 5 domain-specific terms used throughout your codebase.</li>
+    <li>Identify three architectural suffixes (like *Service or *Repository) used in your project.</li>
+    <li>Explain the lifecycle of an entity using only domain terminology.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Eric Evans, *Domain-Driven Design* (Chapter 2: 'The Ubiquitous Language').
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "When reading an e-commerce codebase, what does an 'OrderFulfillmentHandler' likely do?",
+    a: ["Renders 3D graphics on mobile screens","Manages packaging, shipping, and delivery status after checkout","Compiles JavaScript into WebAssembly binaries","Calculates employee payroll tax deductions"],
+    c: 1,
+    why: "In e-commerce domain language, fulfillment represents the process of shipping items to customers."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "*Service / *Manager",
+            "lines": [
+                  "business operations",
+                  "orchestrates entities"
+            ]
+      },
+      {
+            "title": "*Repository / *DAO",
+            "lines": [
+                  "data storage access",
+                  "executes queries"
+            ]
+      },
+      {
+            "title": "*Adapter / *Client",
+            "lines": [
+                  "external API calls",
+                  "transforms payloads"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "customer = customer_repo.get_by_id(user_id)",
+      "invoice = billing_service.create_invoice(customer, cart)",
+      "payment_gateway.charge(invoice.amount, customer.card_token)",
+      "invoice.mark_settled()"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "repo": "fetches customer record"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "service": "generates invoice from cart items"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "gateway": "charges payment processor"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "state": "invoice status updated to settled"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The shared domain vocabulary used across a team is the <0> language.",
+      "A class suffix indicating data storage operations is <1>.",
+      "A class suffix indicating an external third-party API wrapper is <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "ubiquitous"
+            ],
+            "why": "Ubiquitous Language aligns domain models with business terminology."
+      },
+      {
+            "a": [
+                  "Repository",
+                  "DAO"
+            ],
+            "why": "Repositories mediate between the domain and data storage."
+      },
+      {
+            "a": [
+                  "Client",
+                  "Adapter"
+            ],
+            "why": "Clients and Adapters wrap external third-party communication."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is 'Ubiquitous Language' in software engineering?",
+      a: ["A shared vocabulary between developers and domain experts reflected in code","A programming language that can run on any device without changes","A translation tool that converts English into machine binary code","A standard SQL dialect supported by all relational databases"],
+      c: 0,
+      why: "Ubiquitous Language ensures code identifiers accurately mirror real business concepts."
+    },
+    {
+      q: "What architectural role does a 'UserRepository' class typically perform?",
+      a: ["Managing user interface layout themes and styles","Encapsulating user data storage, retrieval, and queries","Authenticating user passwords using cryptographic hashing","Sending marketing emails to registered email addresses"],
+      c: 1,
+      why: "Repositories abstract persistence mechanisms and collection-like data access."
+    },
+    {
+      q: "Why do engineering teams establish strict naming conventions?",
+      a: ["To allow readers to infer architectural roles without inspecting implementations","To make source code files smaller in kilobyte file size","To prevent the compiler from generating syntax warning errors","To prevent unauthorized users from viewing source code"],
+      c: 0,
+      why: "Consistent conventions let developers infer behavior and responsibilities at a glance."
+    },
+    {
+      q: "What should you do when you encounter an unfamiliar acronym in code?",
+      a: ["Look it up in project docs or ask teammates to define the domain meaning","Rename the variable across the entire repository immediately","Assume the acronym is meaningless and ignore it","Delete the file that contains the acronym"],
+      c: 0,
+      why: "Acronyms usually encode business domain concepts critical to understanding logic."
+    }
+  ]);
+</script>
+</body>
+</html>

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LLM Observability & Tracing — Cheat Sheet</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+<style>
+  .ref-toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0 8px; }
+  .ref-toc a { font-size: .8rem; border: 1px solid var(--border); background: #111a30; padding: 5px 11px; border-radius: 999px; color: var(--muted); text-decoration: none; border-bottom: 1px solid var(--border); }
+  .ref-toc a:hover { color: #fff; border-color: #3d5488; }
+  .lesson-wrap h2 { scroll-margin-top: 20px; }
+  .snippet { margin: 14px 0 22px; }
+  .snippet .lbl { font-size: .72rem; font-weight: 800; letter-spacing: .7px; text-transform: uppercase; color: var(--accent2); margin-bottom: 6px; }
+  .see { font-size: .82rem; color: var(--muted); margin: -6px 0 12px; }
+  .see a { color: var(--accent2); border-bottom: 0; }
+  .see a:hover { color: #fff; }
+  .snippet pre { padding-top: 34px; }
+  @media print { .snippet pre { padding-top: 18px; } }
+</style>
+</head>
+<body class="lesson-body" data-course="llm-observability">
+
+<div class="lesson-wrap">
+
+  <span class="lesson-kicker">Reference · Cheat sheet</span>
+  <h1 class="lesson-title">LLM Observability & Tracing — Cheat Sheet</h1>
+  <p class="lesson-lede">
+    The whole course on one page. Every snippet links back to the lesson that
+    teaches it.
+  </p>
+
+  <div class="ref-toc">
+    <a href="#sec-1">OpenInference Auto-Instrumentation</a>
+    <a href="#sec-2">Pre-Flight Budget Quota Check</a>
+    <a href="#sec-3">Presidio PII Redaction Pattern</a>
+    <a href="#sec-4">Langfuse Production Tracing</a>
+  </div>
+
+  <h2 id="sec-1"><span class="n">1</span>OpenInference Auto-Instrumentation</h2>
+  <div class="snippet">
+    <div class="lbl">Zero-code OpenAI tracing</div>
+    <pre><code>from openinference.instrumentation.openai import OpenAIInstrumentor
+# Automatically instrument all OpenAI calls in application:
+OpenAIInstrumentor().instrument()
+# Traces now export automatically to OpenTelemetry collector!</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0002-traces-spans-opentelemetry.html">Lesson 02 — Traces, Spans, and OpenTelemetry for AI (OpenInference)</a>.</p>
+
+  <h2 id="sec-2"><span class="n">2</span>Pre-Flight Budget Quota Check</h2>
+  <div class="snippet">
+    <div class="lbl">Redis spend enforcement</div>
+    <pre><code>async def check_quota(tenant_id, max_spend=100.0):
+    current = float(await redis.get(f'spend:{tenant_id}') or 0.0)
+    if current &gt;= max_spend:
+        raise HTTPException(429, 'Monthly AI budget limit reached!')</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0003-token-accounting-cost-tracking-quotas.html">Lesson 03 — Token Accounting, Cost Tracking, and Quotas</a>.</p>
+
+  <h2 id="sec-3"><span class="n">3</span>Presidio PII Redaction Pattern</h2>
+  <div class="snippet">
+    <div class="lbl">Sanitizing telemetry before export</div>
+    <pre><code>from presidio_analyzer import AnalyzerEngine
+from presidio_anonymizer import AnonymizerEngine
+analyzer, anonymizer = AnalyzerEngine(), AnonymizerEngine()
+def sanitize(text):
+    res = analyzer.analyze(text=text, language='en')
+    return anonymizer.anonymize(text=text, analyzer_results=res).text</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0005-prompt-logging-and-pii-scrubbing.html">Lesson 05 — Prompt and Response Logging with PII Scrubbing</a>.</p>
+
+  <h2 id="sec-4"><span class="n">4</span>Langfuse Production Tracing</h2>
+  <div class="snippet">
+    <div class="lbl">Manual span instrumentation</div>
+    <pre><code>from langfuse import Langfuse
+langfuse = Langfuse()
+trace = langfuse.trace(name="CheckoutWorkflow", user_id=user_id)
+with trace.span(name="ProcessPayment") as span:
+    result = execute_payment()
+    span.set_attribute("status", "success")</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0008-instrumenting-production-ai-service.html">Lesson 08 — Instrumenting a Production AI Service End-to-End</a>.</p>
+
+  <div class="lesson-foot">
+    <div class="links">
+      <a href="llm-observability-glossary.html">📖 Glossary</a>
+      <a href="../course.html">← Course map</a>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

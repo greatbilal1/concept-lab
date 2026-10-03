@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 02 — Creational patterns: Factory and Builder</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="design-patterns" data-lesson="2" data-lesson-id="creational-patterns-factory-and-builder">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 02</span> · Pattern Taxonomy & Creational</span>
+
+  <h1 class="lesson-title">Creational patterns: Factory and Builder</h1>
+  <p class="lesson-lede">
+    Stop writing constructors with 12 parameters. Master the Factory Method for decoupling instantiation, and the Builder pattern for constructing complex objects step-by-step.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Implement Factory Method and Builder patterns to streamline complex object creation</span>
+    <span><b>Mission link</b> Prevents constructor pollution and decouples callers from concrete implementation classes</span>
+  </div>
+
+  <h2><span class="n">1</span>Decoupling creation from business logic</h2>
+  <p>When a client class directly calls <code>new SmtpTransport()</code>, it is tightly coupled to that concrete class. If you want to switch to a <code>SendGridTransport</code> based on configuration, you must modify the client class.</p><p>The <b>Factory Method</b> pattern delegates instantiation to a factory: the client asks for a transport, and the factory returns an object implementing the <code>Transport</code> interface. The <b>Builder Pattern</b> tackles a different creational problem: constructing complex objects with dozens of optional configurations using fluent chained methods.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Factory decouples creation from usage; Builder constructs complex multi-step objects cleanly.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Factory versus Builder roles</h2>
+  <p>Contrast the polymorphic selection of Factory with the stepwise construction of Builder.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing a fluent Builder execution</h2>
+  <p>Trace how a fluent Builder constructs an immutable HTTP request object cleanly.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of creational patterns.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can implement Factory and Builder patterns to replace bloated constructors with elegant creational APIs.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Implement a NotificationFactory that creates Email, SMS, or Slack notification senders.</li>
+    <li>Build a fluent QueryBuilder class that constructs an SQL SELECT query string.</li>
+    <li>Refactor a constructor with 6 optional parameters into the Builder pattern.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Joshua Bloch, *Effective Java*, Item 2: 'Consider a builder when faced with many constructor parameters'.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What design pattern avoids the 'Telescoping Constructor' antipattern (constructors with 10 optional parameters)?",
+    a: ["The Builder pattern (constructing the object step-by-step with chained methods)","The Singleton pattern","The Adapter pattern","The Observer pattern"],
+    c: 0,
+    why: "Builder allows fluent, optional parameter configuration without huge confusing argument lists."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Factory Pattern",
+            "lines": [
+                  "Factory.create('pdf') -> returns PdfDocument",
+                  "Factory.create('html') -> returns HtmlDocument",
+                  "polymorphic type selection!"
+            ]
+      },
+      {
+            "title": "Builder Pattern",
+            "lines": [
+                  "QueryBuilder.select('*').from('users')",
+                  "  .where('active', true).limit(10).build();",
+                  "stepwise fluent assembly!"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "request = (HttpRequestBuilder()",
+      "    .set_url('https://api.com/users')",
+      "    .set_method('POST')",
+      "    .add_header('Authorization', 'Bearer token')",
+      "    .set_json_body({'name': 'Ada'})",
+      "    .build())"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "builder": "builder instance holds pending configuration"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "chaining": "fluent methods return self, enabling readable chaining"
+            }
+      },
+      {
+            "line": 5,
+            "vars": {
+                  "built": "build() validates parameters and constructs immutable HttpRequest"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The creational pattern delegating instance selection is the <0> pattern.",
+      "The creational pattern assembling complex objects step-by-step is the <1> pattern.",
+      "Method chaining where each method returns 'this' is a <2> interface."
+],
+    blanks: [
+      {
+            "a": [
+                  "Factory"
+            ],
+            "why": "Factory patterns encapsulate instantiation logic."
+      },
+      {
+            "a": [
+                  "Builder"
+            ],
+            "why": "Builder patterns construct complex objects incrementally."
+      },
+      {
+            "a": [
+                  "fluent"
+            ],
+            "why": "Fluent interfaces allow readable method chaining."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the primary problem solved by the Builder pattern?",
+      a: ["Constructing complex objects with many optional parameters without suffering from confusing 'telescoping constructors' (e.g. Foo(1, null, null, true, null))","Building physical computer servers","Encrypting data in relational database tables","Translating Python into C++ code"],
+      c: 0,
+      why: "Builder provides readable, step-by-step configuration of complex objects."
+    },
+    {
+      q: "What is the difference between a Simple Factory and the Abstract Factory pattern?",
+      a: ["A Simple Factory creates instances of a single class family; an Abstract Factory creates families of related or dependent objects (e.g. MacButton + MacWindow)","Simple Factory is for Python; Abstract Factory is for Java","Simple Factory runs in memory; Abstract Factory runs on disk","There is no difference between them"],
+      c: 0,
+      why: "Abstract Factory coordinates entire product families (like cross-platform UI suites)."
+    },
+    {
+      q: "Why does the Factory Method pattern support the Open-Closed Principle?",
+      a: ["You can add a new product type to your system by adding a new class and factory branch without modifying existing client code","It closes files after reading them","It turns off compiler warnings","It makes objects immutable"],
+      c: 0,
+      why: "Callers depend on the abstract product interface; adding new products leaves callers untouched."
+    },
+    {
+      q: "What does the .build() method typically do in a Builder pattern implementation?",
+      a: ["Validates that all required parameters are present and consistent, then constructs and returns the finalized object","Compiles the program into machine binary","Deletes the builder from memory","Prints the object to the screen"],
+      c: 0,
+      why: "build() validates invariants and returns the immutable finished product."
+    }
+  ]);
+</script>
+</body>
+</html>

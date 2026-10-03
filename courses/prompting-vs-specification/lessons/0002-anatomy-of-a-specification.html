@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 02 — Anatomy of a Software Specification</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="prompting-vs-specification" data-lesson="2" data-lesson-id="anatomy-of-a-specification">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 02</span> · Spec Anatomy</span>
+
+  <h1 class="lesson-title">Anatomy of a Software Specification</h1>
+  <p class="lesson-lede">
+    Structuring an engineering specification: Context, Functional Requirements, Invariants, and Verification Gates.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to author structured, unambiguous specifications for AI agents.</span>
+    <span><b>Mission link</b> Mastering anatomy of a software specification across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Anatomy of a Software Specification</h2>
+  <p>A technical specification for an AI agent is not an essay; it is a <strong>structured contract</strong>. When an agent receives a well-structured spec, it can parse requirements systematically and evaluate its own progress.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Structuring an engineering specification: Context, Functional Requirements, Invariants, and Verification Gates.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Four Pillars of an Agent Spec</h2>
+  <p>A comprehensive agent-ready specification contains four essential sections:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Constraint Boundary Wall</h2>
+  <ul><li><strong>1. Goal & Context:</strong> Why this change is needed and how it fits into the surrounding architecture.</li><li><strong>2. Functional Requirements:</strong> What the software must do, expressed as inputs, outputs, schemas, and state changes.</li><li><strong>3. Constraints & Non-Goals:</strong> What the agent must <em>not</em> do (e.g. <em>'Do NOT modify database migration 0014'</em>, <em>'Do NOT introduce third-party npm packages'</em>).</li><li><strong>4. Verification Criteria:</strong> The exact commands the agent must run to verify success (e.g. `pytest tests/test_orders.py`).</li></ul><pre><code># Specification: Add User Avatar Upload
+
+## 1. Goal
+Allow authenticated users to upload PNG/JPEG avatars up to 2MB.
+
+## 2. Requirements
+- Endpoint: POST /api/v1/users/me/avatar (multipart/form-data)
+- Storage: Save to local directory 'uploads/avatars/'
+- DB: Update User.avatar_url with the relative path
+
+## 3. Constraints & Non-Goals
+- Do NOT use AWS S3 (local filesystem storage only for this ticket).
+- Reject files > 2MB with HTTP 413 Payload Too Large.
+- Do NOT alter existing User authentication middleware.
+
+## 4. Verification
+- Run `pytest tests/test_avatar.py` (all tests must pass with 0 warnings).</code></pre><div class="callout"><p><strong>Power of Non-Goals:</strong> Stating what NOT to do is often more impactful than stating what to do. It prevents agent scope creep.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Fill in the spec anatomy sections</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to author structured, unambiguous specifications for AI agents.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where anatomy of a software specification applies.</li>
+    <li>Author a unit test or verification script exercising anatomy of a software specification.</li>
+    <li>Document team architectural conventions regarding anatomy of a software specification.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Anatomy of a Software Specification.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Which section of a specification tells the agent what parts of the system it is NOT allowed to modify?",
+    a: ["Non-Goals and Constraints","The Title","The Introduction","The Credits"],
+    c: 0,
+    why: "Constraints and Non-Goals prevent agents from expanding scope or touching unrelated files."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1. Goal & Context",
+            "lines": [
+                  "Business purpose",
+                  "Surrounding architecture seams"
+            ]
+      },
+      {
+            "title": "2. Requirements",
+            "lines": [
+                  "Inputs, outputs, schemas",
+                  "State transitions & behaviors"
+            ]
+      },
+      {
+            "title": "3. Constraints",
+            "lines": [
+                  "Non-goals & boundaries",
+                  "Prohibited edits & libraries"
+            ]
+      },
+      {
+            "title": "4. Verification",
+            "lines": [
+                  "Exact test commands",
+                  "Zero-error pass criteria"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Anatomy of a Software Specification",
+      "def execute_flow():",
+      "    # Structuring an engineering specification: Context,...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Anatomy of a Software Specification"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Inside Scope"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "The Boundary Wall"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "step": "Agent Result"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "An agent spec defines functional requirements, establishes {1} to stop scope creep, and sets {2} criteria to prove success."
+],
+    blanks: [
+      {
+            "a": [
+                  "constraints"
+            ],
+            "why": "Boundaries of what not to do"
+      },
+      {
+            "a": [
+                  "verification"
+            ],
+            "why": "Commands to validate behavior"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why are 'Non-Goals' especially valuable when directing AI agents?",
+      a: ["Agents naturally tend to over-engineer or touch adjacent code; non-goals establish firm boundaries","Non-goals make the specification shorter","Non-goals speed up internet connections","Non-goals prevent git commits"],
+      c: 0,
+      why: "Explicit boundaries prevent agents from speculatively refactoring unrelated code."
+    },
+    {
+      q: "What should the Verification section of a specification contain?",
+      a: ["Concrete, executable commands like test suite invocations or lint checks that the agent can run","A list of developers to contact","A link to the company wiki","A promise of future payment"],
+      c: 0,
+      why: "Executable verification criteria give the agent an objective definition of done."
+    },
+    {
+      q: "How does defining exact input and output schemas help an agent?",
+      a: ["It prevents the agent from guessing field names and datatypes, ensuring seamless integration with existing code","It translates Python into Java","It reduces file sizes by 50%","It eliminates the need for databases"],
+      c: 0,
+      why: "Strict schemas remove ambiguity around field names, types, and JSON formats."
+    },
+    {
+      q: "What happens if a specification lacks context about surrounding architecture?",
+      a: ["The agent may implement the feature in an isolated, incompatible style that clashes with project conventions","The editor crashes","The compiler issues an architecture warning","Git refuses to stage files"],
+      c: 0,
+      why: "Context grounds the agent in the project's existing architectural patterns and idioms."
+    }
+  ]);
+</script>
+</body>
+</html>

@@ -1,0 +1,3 @@
+# Mission — Model Selection & Trade-offs
+
+Master the strategic, financial, and operational art of model selection. Navigate the three-tier landscape (Frontier, Mid-Tier, Small), critically evaluate benchmarks like SWE-bench against real-world engineering, balance latency deadlines with intelligence, construct quantitative unit cost models, evaluate open-weights vs proprietary APIs, navigate commercial license terms, and design an enterprise Model Matrix.

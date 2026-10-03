@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Git & Version Control — Cheat Sheet</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+<style>
+  .ref-toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0 8px; }
+  .ref-toc a { font-size: .8rem; border: 1px solid var(--border); background: #111a30; padding: 5px 11px; border-radius: 999px; color: var(--muted); text-decoration: none; border-bottom: 1px solid var(--border); }
+  .ref-toc a:hover { color: #fff; border-color: #3d5488; }
+  .lesson-wrap h2 { scroll-margin-top: 20px; }
+  .snippet { margin: 14px 0 22px; }
+  .snippet .lbl { font-size: .72rem; font-weight: 800; letter-spacing: .7px; text-transform: uppercase; color: var(--accent2); margin-bottom: 6px; }
+  .see { font-size: .82rem; color: var(--muted); margin: -6px 0 12px; }
+  .see a { color: var(--accent2); border-bottom: 0; }
+  .see a:hover { color: #fff; }
+  .snippet pre { padding-top: 34px; }
+  @media print { .snippet pre { padding-top: 18px; } }
+</style>
+</head>
+<body class="lesson-body" data-course="git-version-control">
+
+<div class="lesson-wrap">
+
+  <span class="lesson-kicker">Reference · Cheat sheet</span>
+  <h1 class="lesson-title">Git & Version Control — Cheat Sheet</h1>
+  <p class="lesson-lede">
+    The whole course on one page. Every snippet links back to the lesson that
+    teaches it.
+  </p>
+
+  <div class="ref-toc">
+    <a href="#basics">Basics</a>
+    <a href="#trees">Three trees</a>
+    <a href="#history">History</a>
+    <a href="#branches">Branches</a>
+    <a href="#merge">Merging</a>
+    <a href="#undo">Undo</a>
+    <a href="#workflow">Workflow</a>
+  </div>
+
+  <h2 id="basics"><span class="n">1</span>Repository basics</h2>
+
+  <div class="snippet">
+    <div class="lbl">Start a repository and record a snapshot</div>
+    <pre><code>git init
+git status
+git add README.md
+git commit -m "Add project overview"
+
+# A commit records a project snapshot and metadata.
+# It is not just a saved diff.</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0001-what-version-control-is-for.html">Lesson 01 — What version control is for</a> and <a href="../lessons/0002-your-first-commit.html">Lesson 02 — Your first commit</a>.</p>
+
+  <h2 id="trees"><span class="n">2</span>The three trees</h2>
+  <p class="see">See <a href="../lessons/0003-the-three-trees.html">Lesson 03 — The three trees</a>.</p>
+  <div class="snippet">
+    <div class="lbl">Working tree, index, repository</div>
+    <pre><code>git status
+git diff              # working tree compared with index
+git diff --staged     # index compared with HEAD
+git add file.py       # working tree -> index
+git commit            # index -> repository</code></pre>
+  </div>
+
+  <h2 id="history"><span class="n">3</span>Read history</h2>
+  <p class="see">See <a href="../lessons/0004-reading-history.html">Lesson 04 — Reading history</a>.</p>
+  <div class="snippet">
+    <div class="lbl">Inspect commits and changes</div>
+    <pre><code>git log --oneline --decorate
+git show HEAD
+git show &lt;commit&gt;
+git diff HEAD~1..HEAD
+
+# HEAD names the commit currently checked out.
+# Use status and log to re-orient before acting.</code></pre>
+  </div>
+
+  <h2 id="branches"><span class="n">4</span>Branch and switch</h2>
+  <p class="see">See <a href="../lessons/0005-branching.html">Lesson 05 — Branching</a>.</p>
+  <div class="snippet">
+    <div class="lbl">A branch is a movable name for a commit</div>
+    <pre><code>git branch
+git switch -c add-search
+# make and commit focused changes
+git switch main
+git branch -d add-search
+
+# -d refuses to delete an unmerged branch.</code></pre>
+  </div>
+  <h2 id="merge"><span class="n">5</span>Merge and resolve conflicts</h2>
+  <p class="see">See <a href="../lessons/0006-merging-and-conflicts.html">Lesson 06 — Merging and conflicts</a>.</p>
+  <div class="snippet">
+    <div class="lbl">Bring a branch into the current branch</div>
+    <pre><code>git switch main
+git merge add-search
+
+# If Git reports conflicts:
+# 1. Open each conflicted file and choose the intended result.
+# 2. Remove conflict markers and save.
+# 3. Run tests, then stage the resolved files.
+git add path/to/resolved-file
+git commit</code></pre>
+  </div>
+
+  <h2 id="undo"><span class="n">6</span>Undo with the right tool</h2>
+  <p class="see">See <a href="../lessons/0007-undoing-things.html">Lesson 07 — Undoing things</a>.</p>
+  <div class="snippet">
+    <div class="lbl">Choose by where the change lives</div>
+    <pre><code>git restore file.py             # discard unstaged working-tree edits
+git restore --staged file.py    # unstage; keep working-tree edits
+git revert &lt;commit&gt;             # new commit that reverses an old commit
+git reflog                      # find recent local HEAD positions
+
+# git reset moves a branch/HEAD; inspect its mode and target first.
+# Avoid destructive reset commands until you understand the state.</code></pre>
+  </div>
+
+  <h2 id="workflow"><span class="n">7</span>Feature-branch workflow</h2>
+  <p class="see">See <a href="../lessons/0008-a-workflow-that-works.html">Lesson 08 — A workflow that works</a>.</p>
+  <div class="snippet">
+    <div class="lbl">Small commits, shared branch, review</div>
+    <pre><code>git switch -c fix-empty-search
+# edit, inspect, and test
+git status
+git diff
+git add src/search.py
+git commit -m "Handle empty search query"
+git push -u origin fix-empty-search
+
+# Open a pull request for review, then merge by team policy.</code></pre>
+  </div>
+
+  <div class="lesson-foot">
+    <div class="links">
+      <a href="git-version-control-glossary.html">📖 Glossary</a>
+      <a href="../course.html">← Course map</a>
+    </div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script>
+  TeachLesson.init({ course: "git-version-control", lessons: window.TeachLessons || [] });
+</script>
+</body>
+</html>

@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 04 — HTTP methods: GET, POST, PUT, DELETE</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="http" data-lesson="4" data-lesson-id="http-methods-get-post-put-delete">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 04</span> · Methods & Status Codes</span>
+
+  <h1 class="lesson-title">HTTP methods: GET, POST, PUT, DELETE</h1>
+  <p class="lesson-lede">
+    HTTP methods are not suggestions; they have precise mathematical properties of safety and idempotency. Learn how to choose the right method for every operation.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Select appropriate HTTP verbs based on safety and idempotency semantics</span>
+    <span><b>Mission link</b> Guides clean, predictable REST API design and client communication</span>
+  </div>
+
+  <h2><span class="n">1</span>Safety and idempotency</h2>
+  <p>HTTP methods are defined by two critical semantic properties: <b>Safety</b> and <b>Idempotency</b>.</p><p>A method is <b>safe</b> if it does not alter server resource state (it is read-only, like <code>GET</code> or <code>HEAD</code>). A method is <b>idempotent</b> if executing it ten times produces the exact same server state as executing it once (like <code>PUT</code> or <code>DELETE</code>). <code>POST</code> is neither safe nor idempotent.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Idempotent methods can be retried automatically over flaky networks without accidental duplication.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The method semantics matrix</h2>
+  <p>Memorise the safety, idempotency, and CRUD mappings of the standard HTTP verbs.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing PUT vs PATCH state modification</h2>
+  <p>Trace how PUT replaces an entire object, whereas PATCH applies a partial delta update.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your recall of method properties.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can choose the semantically correct HTTP method for any API endpoint according to safety and idempotency rules.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit an existing API route table to verify GET methods perform no database mutations.</li>
+    <li>Ensure update endpoints distinguish between PUT (full replace) and PATCH (partial update).</li>
+    <li>Explain why payment gateways use idempotency keys with POST requests.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    IETF RFC 9110: *HTTP Semantics*, Section 9: 'Method Definitions'.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "A network drops right after a client sends a request. Is it safe to automatically retry a POST request?",
+    a: ["No, retrying POST risks creating duplicate resources like double-charging a credit card","Yes, POST requests never modify server database records","Yes, all HTTP requests can be retried an infinite number of times safely","Only if the request was sent on a Friday"],
+    c: 0,
+    why: "POST is non-idempotent; re-executing it may repeat destructive side effects."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "GET (Read)",
+            "lines": [
+                  "Safe: YES",
+                  "Idempotent: YES",
+                  "never mutates state"
+            ]
+      },
+      {
+            "title": "POST (Create)",
+            "lines": [
+                  "Safe: NO",
+                  "Idempotent: NO",
+                  "creates new resources"
+            ]
+      },
+      {
+            "title": "PUT (Replace)",
+            "lines": [
+                  "Safe: NO",
+                  "Idempotent: YES",
+                  "replaces resource entirely"
+            ]
+      },
+      {
+            "title": "DELETE (Remove)",
+            "lines": [
+                  "Safe: NO",
+                  "Idempotent: YES",
+                  "removes resource"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Initial state: {'name': 'Ada', 'role': 'Admin', 'score': 100}",
+      "# PATCH /users/1 with {'score': 105} -> updates only score",
+      "# PUT /users/1 with {'score': 105} -> replaces entire object (name and role lost!)",
+      "# Conclusion: Use PATCH for partial updates; PUT for complete replacement"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "initial": "3 attributes defined"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "patch": "{'name': 'Ada', 'role': 'Admin', 'score': 105}"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "put": "{'score': 105} (fields omitted in PUT are erased)"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "A method that does not modify server state is called <0>.",
+      "A method that produces the same state regardless of repetition is <1>.",
+      "The method designed for partial updates of existing resources is <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "safe"
+            ],
+            "why": "Safe methods are strictly read-only."
+      },
+      {
+            "a": [
+                  "idempotent"
+            ],
+            "why": "Idempotent operations can be executed multiple times safely."
+      },
+      {
+            "a": [
+                  "PATCH"
+            ],
+            "why": "PATCH applies partial delta modifications to a resource."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What does it mean for an HTTP method to be idempotent?",
+      a: ["Making multiple identical requests leaves the server in the exact same state as making one request","The method executes in zero milliseconds without network latency","The method can only be executed by authenticated administrators","The method compresses data before transmission"],
+      c: 0,
+      why: "Mathematical definition of idempotence: f(f(x)) = f(x)."
+    },
+    {
+      q: "Why is DELETE considered an idempotent method even if the second call returns 404?",
+      a: ["Because the end state of the server is identical: the resource remains deleted","Because DELETE never deletes data from the database","Because DELETE can only be run once per year","DELETE is actually not idempotent in modern HTTP"],
+      c: 0,
+      why: "Idempotency applies to side effects on server resource state, not response status codes."
+    },
+    {
+      q: "What is the difference between PUT and PATCH?",
+      a: ["PUT replaces the target resource entirely; PATCH applies partial modifications to it","PUT is safe; PATCH is unsafe","PUT only works with XML; PATCH only works with JSON","There is no difference between PUT and PATCH"],
+      c: 0,
+      why: "PUT sets the complete state; PATCH mutates only the specified subset of fields."
+    },
+    {
+      q: "Which of the following methods is classified as 'safe' by HTTP specifications?",
+      a: ["GET","POST","PUT","DELETE"],
+      c: 0,
+      why: "GET is safe because it is purely observational and does not alter server state."
+    }
+  ]);
+</script>
+</body>
+</html>

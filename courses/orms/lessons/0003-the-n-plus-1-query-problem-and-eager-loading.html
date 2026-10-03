@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 03 — The N+1 query problem and eager loading</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="orms" data-lesson="3" data-lesson-id="the-n-plus-1-query-problem-and-eager-loading">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 03</span> · The N+1 Problem & Loading</span>
+
+  <h1 class="lesson-title">The N+1 query problem and eager loading</h1>
+  <p class="lesson-lede">
+    The #1 performance killer in modern web applications. Discover why lazy loading turns a single page render into 500 individual database queries, and how to fix it with eager loading.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Diagnose and eliminate N+1 query storms using eager loading and joined loads</span>
+    <span><b>Mission link</b> The single most common database performance bug in web application development</span>
+  </div>
+
+  <h2><span class="n">1</span>The accidental query storm</h2>
+  <p>Consider rendering a list of 100 blog posts with their author names. You query all posts: <code>posts = Post.all()</code> (<b>1 query</b>). Then in your template loop, you write: <code>for p in posts: print(p.author.name)</code>.</p><p>Because <code>author</code> is lazy-loaded, the ORM fires a separate query <b>for every single post</b>: <code>SELECT * FROM authors WHERE id = ?</code>. 1 initial query + 100 author queries = <b>101 queries (N+1)</b>! A page that should take 5ms now takes 2 seconds.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    The N+1 problem occurs when lazy-loading related entities inside a loop, firing N extra queries.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Lazy loading versus Eager loading</h2>
+  <p>Contrast lazy query storms with high-performance eager loading strategies.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing the N+1 fix with joinedload</h2>
+  <p>Trace how instructing the ORM to eager load collapses 101 queries down to a single JOIN.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of the N+1 query problem.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can detect N+1 query storms in application logs and eliminate them using eager loading joins or prefetching.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Enable SQL logging in your ORM to observe the queries emitted during a page render.</li>
+    <li>Identify an N+1 query loop and fix it using eager loading (joinedload, select_related, or include).</li>
+    <li>Install an automated N+1 detection tool (like django-debug-toolbar or bullet gem).</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Martin Fowler, *Patterns of Enterprise Application Architecture*, Chapter 11: 'Lazy Load'.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "If an endpoint fetches 250 orders and accesses 'order.customer.email' in a loop with lazy loading, how many total queries are sent to the database?",
+    a: ["251 queries (1 query for orders + 250 individual queries for customers)","1 query","2 queries","250 queries"],
+    c: 0,
+    why: "1 query to fetch the 250 orders, plus 250 individual queries to fetch each customer = 251 queries."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Lazy Loading (N+1 Storm)",
+            "lines": [
+                  "SELECT * FROM posts;",
+                  "100 iterations -> 100 x SELECT FROM authors",
+                  "101 network round-trips!"
+            ]
+      },
+      {
+            "title": "Eager Joined (1 Query)",
+            "lines": [
+                  "SELECT * FROM posts LEFT JOIN authors ON...",
+                  "fetches posts and authors in ONE query!",
+                  "1 network round-trip!"
+            ]
+      },
+      {
+            "title": "Eager Subquery (2 Queries)",
+            "lines": [
+                  "SELECT * FROM posts;",
+                  "SELECT * FROM authors WHERE id IN (1, 2, 3...)",
+                  "2 network round-trips total!"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Bad: Post.query.all() -> 101 queries in template loop",
+      "# Fixed with Eager Loading (SQLAlchemy):",
+      "query = select(Post).options(joinedload(Post.author))",
+      "posts = session.scalars(query).all()",
+      "# Emits strictly 1 query: SELECT posts.*, authors.* FROM posts JOIN authors..."
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "problem": "101 queries saturates connection pool"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "fix": "joinedload option instructs ORM to fetch relation upfront"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "executed": "single optimized JOIN query executed in 4ms"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Fetching child entities on-demand inside a loop causes the N+<0> problem.",
+      "Loading related data upfront in a single query is <1> loading.",
+      "Deferring data loading until property access is <2> loading."
+],
+    blanks: [
+      {
+            "a": [
+                  "1",
+                  "one"
+            ],
+            "why": "N+1 query problem is the universal terminology."
+      },
+      {
+            "a": [
+                  "eager"
+            ],
+            "why": "Eager loading loads related records upfront."
+      },
+      {
+            "a": [
+                  "lazy"
+            ],
+            "why": "Lazy loading waits until property access."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the root cause of the N+1 query problem?",
+      a: ["Looping over N parent entities and accessing a lazy-loaded relationship property on each item, triggering N individual queries","Writing an SQL query that contains the number 1","A database server running out of disk space","Using PostgreSQL instead of MySQL"],
+      c: 0,
+      why: "Lazy loading triggers a separate network query for each element in the loop."
+    },
+    {
+      q: "How does 'joined loading' solve the N+1 problem?",
+      a: ["It generates a single SQL query using an INNER or LEFT JOIN to retrieve parent and child records together in one round-trip","It cancels all child queries and returns empty objects","It speeds up the computer processor clock speed","It caches queries in the client web browser"],
+      c: 0,
+      why: "Joined eager loading fetches parents and children in a single SQL statement."
+    },
+    {
+      q: "What is 'subquery / prefetch loading' in ORMs (e.g. select_related vs prefetch_related)?",
+      a: ["It executes 2 queries total: one query for parents, and one query fetching all related children using 'WHERE id IN (...)', then stitches them in memory","It runs fifty queries in parallel","It converts SQL into JSON format","It deletes duplicate records"],
+      c: 0,
+      why: "Prefetch loading runs 2 queries total, avoiding massive duplicate column data on 1:N joins."
+    },
+    {
+      q: "Why can the N+1 query problem slip past developers unnoticed in local testing?",
+      a: ["Local databases run on localhost with 0ms network latency and small datasets; in production, 100 network round-trips cause massive lag","Local databases do not execute SQL queries","Local databases automatically disable lazy loading","N+1 only happens on mobile phones"],
+      c: 0,
+      why: "Zero latency on localhost hides hundreds of sequential round-trips until deployed across real networks."
+    }
+  ]);
+</script>
+</body>
+</html>

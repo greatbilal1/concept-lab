@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vector Databases & Semantic Search — Cheat Sheet</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+<style>
+  .ref-toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0 8px; }
+  .ref-toc a { font-size: .8rem; border: 1px solid var(--border); background: #111a30; padding: 5px 11px; border-radius: 999px; color: var(--muted); text-decoration: none; border-bottom: 1px solid var(--border); }
+  .ref-toc a:hover { color: #fff; border-color: #3d5488; }
+  .lesson-wrap h2 { scroll-margin-top: 20px; }
+  .snippet { margin: 14px 0 22px; }
+  .snippet .lbl { font-size: .72rem; font-weight: 800; letter-spacing: .7px; text-transform: uppercase; color: var(--accent2); margin-bottom: 6px; }
+  .see { font-size: .82rem; color: var(--muted); margin: -6px 0 12px; }
+  .see a { color: var(--accent2); border-bottom: 0; }
+  .see a:hover { color: #fff; }
+  .snippet pre { padding-top: 34px; }
+  @media print { .snippet pre { padding-top: 18px; } }
+</style>
+</head>
+<body class="lesson-body" data-course="vector-databases">
+
+<div class="lesson-wrap">
+
+  <span class="lesson-kicker">Reference · Cheat sheet</span>
+  <h1 class="lesson-title">Vector Databases & Semantic Search — Cheat Sheet</h1>
+  <p class="lesson-lede">
+    The whole course on one page. Every snippet links back to the lesson that
+    teaches it.
+  </p>
+
+  <div class="ref-toc">
+    <a href="#sec-1">PostgreSQL HNSW Index Creation (pgvector)</a>
+    <a href="#sec-2">Reciprocal Rank Fusion (RRF) Formula</a>
+    <a href="#sec-3">ChromaDB Local Embedded Query</a>
+    <a href="#sec-4">Single-Stage Filtered SQL Query</a>
+  </div>
+
+  <h2 id="sec-1"><span class="n">1</span>PostgreSQL HNSW Index Creation (pgvector)</h2>
+  <div class="snippet">
+    <div class="lbl">Production vector index setup</div>
+    <pre><code>-- Increase maintenance memory for fast build:
+SET maintenance_work_mem = '8GB';
+-- Create HNSW index with cosine distance (&lt;=&gt;):
+CREATE INDEX CONCURRENTLY ON document_chunks
+USING hnsw (embedding vector_cosine_ops)
+WITH (m = 16, ef_construction = 64);</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0003-vector-database-distance-metrics.html">Lesson 03 — Distance Metrics: Cosine, L2 (Euclidean), and Inner Product</a>.</p>
+
+  <h2 id="sec-2"><span class="n">2</span>Reciprocal Rank Fusion (RRF) Formula</h2>
+  <div class="snippet">
+    <div class="lbl">Merging hybrid search rankings</div>
+    <pre><code>def rrf_score(ranks_dict, k=60):
+    # ranks_dict = {doc_id: [rank_in_bm25, rank_in_vector]}
+    return sum(1.0 / (k + rank) for rank in ranks_dict.values())</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0006-rrf-and-reranking-models.html">Lesson 06 — Reciprocal Rank Fusion (RRF) and Re-ranking Models</a>.</p>
+
+  <h2 id="sec-3"><span class="n">3</span>ChromaDB Local Embedded Query</h2>
+  <div class="snippet">
+    <div class="lbl">Zero-infrastructure local store</div>
+    <pre><code>import chromadb
+client = chromadb.PersistentClient(path="./chroma_db")
+collection = client.get_or_create_collection("documents")
+results = collection.query(query_texts=["my query"], n_results=5)</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0007-popular-vector-stores-comparison.html">Lesson 07 — Popular Vector Stores: pgvector, Chroma, Qdrant, Pinecone</a>.</p>
+
+  <h2 id="sec-4"><span class="n">4</span>Single-Stage Filtered SQL Query</h2>
+  <div class="snippet">
+    <div class="lbl">Metadata filter + HNSW search</div>
+    <pre><code>SELECT id, content, 1 - (embedding &lt;=&gt; :query_vec) AS sim
+FROM documents
+WHERE tenant_id = 'org_42' AND status = 'active'
+ORDER BY embedding &lt;=&gt; :query_vec
+LIMIT 5;</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0004-metadata-filtering-pre-vs-post.html">Lesson 04 — Metadata Filtering: Pre-Filtering vs Post-Filtering</a>.</p>
+
+  <div class="lesson-foot">
+    <div class="links">
+      <a href="vector-databases-glossary.html">📖 Glossary</a>
+      <a href="../course.html">← Course map</a>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

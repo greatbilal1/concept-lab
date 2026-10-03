@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 02 — Reading and writing text</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="python-files-json-data" data-lesson="2" data-lesson-id="reading-and-writing-text">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 02</span> · Files</span>
+
+  <h1 class="lesson-title">Reading and writing text</h1>
+  <p class="lesson-lede">
+    The mode you pass to <code>open()</code> decides whether you are reading,
+    overwriting, or appending — and getting it wrong destroys data. This lesson is
+    about choosing the mode deliberately.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Choose the right mode every time</span>
+    <span><b>Mission link</b> Never lose data by accident</span>
+  </div>
+
+  <h2><span class="n">1</span>The four modes</h2>
+
+  <p>
+    The second argument to <code>open()</code> is a short string. Each letter means
+    something specific, and one of them is dangerous.
+  </p>
+
+  <div id="intro1"></div>
+
+  <p>
+    <code>"w"</code> is the one to respect. It does not add to the file — it
+    <b>truncates</b> it to zero bytes the moment you open it, before you write
+    anything. If your program crashes after opening, the old contents are already
+    gone.
+  </p>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Reading line by line</h2>
+
+  <p>
+    <code>read()</code> gives you the whole file as one string. Often you want it
+    line by line, and a file handle is iterable:
+  </p>
+
+  <pre><code>with open("log.txt") as f:
+    for line in f:
+        print(line.rstrip())   # strip the trailing newline</code></pre>
+
+  <p>
+    Each line keeps its <code>\n</code>. That is why <code>rstrip()</code> appears
+    so often — without it, printing adds a second blank line.
+  </p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">3</span>Writing and appending</h2>
+
+  <p>
+    Writing is the mirror image. <code>"w"</code> replaces the file;
+    <code>"a"</code> adds to the end. Neither adds a newline for you.
+  </p>
+
+  <pre><code>with open("out.txt", "w") as f:
+    f.write("first\n")
+    f.write("second\n")
+
+with open("out.txt", "a") as f:
+    f.write("third\n")   # appended, not replaced</code></pre>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    <code>write()</code> writes exactly the characters you give it. Newlines are
+    your responsibility, not Python's.
+  </div>
+
+  <h2><span class="n">4</span>Encoding is not optional</h2>
+
+  <p>
+    Text mode decodes bytes using an encoding. If you do not name one, Python uses
+    the platform default, which differs between machines. That is how a file that
+    works on your laptop breaks on a server.
+  </p>
+
+  <div id="diagram1"></div>
+
+  <p>
+    Naming <code>encoding="utf-8"</code> explicitly makes the behaviour identical
+    everywhere. It is one extra argument and it removes a whole class of bug.
+  </p>
+
+  <div class="note good">
+    <span class="note-label">Why this matters later</span>
+    Every JSON and CSV file you read in this course is text underneath. Choosing
+    the mode and the encoding deliberately is what makes those formats reliable
+    rather than lucky.
+  </div>
+
+  <h2><span class="n">5</span>Check yourself</h2>
+
+  <p>
+    Answer from memory — do not scroll back up. Each option has the same number of
+    words, so nothing gives the answer away.
+  </p>
+
+  <div id="fill1"></div>
+  <div id="quiz"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>
+      You can now pick a mode on purpose, read a file line by line, and write text
+      with an explicit encoding. No more accidental truncation, no more
+      platform-dependent decoding.
+    </p>
+  </div>
+
+  <h2><span class="n">6</span>Do this next</h2>
+
+  <ol>
+    <li>
+      Write three lines to a file with <code>"w"</code>, then open it again with
+      <code>"w"</code> and write one line. Confirm the first three are gone.
+    </li>
+    <li>
+      Repeat with <code>"a"</code> and confirm nothing is lost.
+    </li>
+    <li>
+      Read a file line by line and print each line with and without
+      <code>rstrip()</code>. See the difference.
+    </li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Read the Python docs on
+    <a href="https://docs.python.org/3/library/functions.html#open">open()</a>,
+    which lists every mode character and the encoding argument.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher (me) anything — "what is a BOM?",
+    "why does Windows use \r\n?", "what is buffering?". There are no bad questions
+    here.
+  </div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  /* the modes */
+  TeachWidgets.introCards("#intro1", {
+    cards: [
+      { ico: "📖", title: "\"r\" read", body: "Opens for reading. The file must already exist." },
+      { ico: "⚠️", title: "\"w\" write", body: "Truncates the file to zero bytes, then writes." },
+      { ico: "➕", title: "\"a\" append", body: "Adds to the end without touching existing content." }
+    ]
+  });
+
+  /* predict-then-reveal */
+  TeachWidgets.predict("#predict1", {
+    q: "You open an existing file with mode `\"w\"` and write nothing. What is left?",
+    a: ["The original contents", "An empty file", "The file is deleted"],
+    c: 1,
+    why: "Mode w truncates the file the moment it opens, before any write happens."
+  });
+
+  /* step-through trace of line iteration */
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "with open(\"log.txt\") as f:",
+      "  for line in f:",
+      "    print(line.rstrip())",
+      "  -> \"first\"",
+      "  -> \"second\""
+    ],
+    steps: [
+      { line: 0, vars: { handle: "open" } },
+      { line: 1, vars: { iterating: "line by line" } },
+      { line: 2, vars: { stripping: "newline" } },
+      { line: 3, vars: { printed: "first" } },
+      { line: 4, vars: { printed: "second" } }
+    ]
+  });
+
+  /* encoding */
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      { title: "Bytes on disk", lines: ["c3 a9", "raw data"] },
+      { title: "encoding=utf-8", lines: ["decode rule", "same everywhere"] },
+      { title: "Platform default", lines: ["varies by machine", "source of bugs"] }
+    ]
+  });
+
+  /* recall from memory */
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — modes and encoding",
+    lines: [
+      "Mode that truncates the file is <code>\"<0>\"</code>",
+      "Mode that adds to the end is <code>\"<1>\"</code>",
+      "Name the encoding explicitly as <code>encoding=\"<2>\"</code>"
+    ],
+    blanks: [
+      { a: ["w"], why: "Mode w truncates the file to zero bytes before writing." },
+      { a: ["a"], why: "Mode a appends to the end without touching existing content." },
+      { a: ["utf-8", "utf8"], why: "Naming utf-8 makes decoding identical on every platform." }
+    ]
+  });
+
+  /* the quiz — every option is exactly three words */
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What does mode w do?",
+      a: ["Appends to the file", "Truncates then writes", "Reads the whole file", "Creates a backup copy"],
+      c: 1,
+      why: "Mode w empties the file the moment it opens, then writes from the start."
+    },
+    {
+      q: "What does mode a do?",
+      a: ["Overwrites the whole file", "Adds to the end", "Reads from the start", "Deletes the file"],
+      c: 1,
+      why: "Mode a appends new content after whatever is already there."
+    },
+    {
+      q: "Why name an encoding?",
+      a: ["To make writes faster", "To behave the same everywhere", "To compress the file", "To lock the file"],
+      c: 1,
+      why: "The platform default differs between machines; naming utf-8 removes that variation."
+    }
+    {
+      q: "Who adds newlines when writing?",
+      a: ["Python adds them", "You add them", "The operating system", "The encoding adds them"],
+      c: 1,
+      why: "write() writes exactly the characters you give it, so newlines are your responsibility."
+    }
+  ]);
+</script>
+</body>
+</html>

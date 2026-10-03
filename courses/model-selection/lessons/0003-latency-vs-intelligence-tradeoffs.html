@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 03 — Latency vs Intelligence: Time-to-First-Token and Throughput</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="model-selection" data-lesson="3" data-lesson-id="latency-vs-intelligence-tradeoffs">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 03</span> · Latency Trade-offs</span>
+
+  <h1 class="lesson-title">Latency vs Intelligence: Time-to-First-Token and Throughput</h1>
+  <p class="lesson-lede">
+    Balancing intelligence and latency: Time-to-First-Token (TTFT), inter-token latency, and user experience psychology.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to navigate the latency-intelligence trade-off across application tiers.</span>
+    <span><b>Mission link</b> Mastering latency vs intelligence: time-to-first-token and throughput across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Latency vs Intelligence: Time-to-First-Token and Throughput</h2>
+  <p>In product development, <strong>speed is a feature</strong>. A response that takes 12 seconds to arrive—even if brilliant—destroys user flow. In user interface psychology, any delay over 1 second breaks a user's conversational flow state; any delay over 10 seconds causes users to switch tabs or abandon the task.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Balancing intelligence and latency: Time-to-First-Token (TTFT), inter-token latency, and user experience psychology.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Latency vs Intelligence Spectrum</h2>
+  <p>Every engineering architectural decision balances <strong>Intelligence vs Latency</strong>:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>The Power of Token Streaming</h2>
+  <ul><li><strong>Interactive Typing (Autocomplete):</strong> Latency target: $&lt; 100\text{ms}$. Only small local models (1B - 8B) or specialized completion engines can achieve this. A frontier model is 20x too slow!</li><li><strong>Interactive Chat & Search:</strong> Latency target: TTFT $&lt; 800\text{ms}$, throughput $&gt; 50\text{ tokens/sec}$. Mid-tier models (Haiku, 4o-mini) excel here.</li><li><strong>Deep Asynchronous Tasks (Refactoring, Audits, PR Reviews):</strong> Latency target: 30 seconds to 5 minutes. Use the largest frontier or reasoning models (o1, Sonnet) without latency anxiety, because the user is not actively waiting on an interactive cursor.</li></ul><pre><code># Latency-Intelligence Mapping Matrix:
+# Task Archetype         | Latency Target | Recommended Model Tier
+# -----------------------------------------------------------------
+# Inline Autocomplete    | < 150ms        | Small / Speculative (8B)
+# Interactive Search     | < 1.0s         | Mid-Tier (Haiku / 4o-mini)
+# Coding Agent Loop      | 3s - 15s       | Frontier (Claude 3.5 Sonnet / 4o)
+# Complex Math / Debug   | 30s - 2 min    | Reasoning (o1 / DeepSeek R1)</code></pre><div class="callout"><p><strong>Perceived Latency:</strong> Always <strong>stream tokens</strong> via Server-Sent Events (SSE). Streaming text starting in 500ms feels instantaneous, whereas waiting 6 seconds for a full block feels agonizingly slow.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the latency trade-off sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to navigate the latency-intelligence trade-off across application tiers.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where latency vs intelligence: time-to-first-token and throughput applies.</li>
+    <li>Author a unit test or verification script exercising latency vs intelligence: time-to-first-token and throughput.</li>
+    <li>Document team architectural conventions regarding latency vs intelligence: time-to-first-token and throughput.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Latency vs Intelligence: Time-to-First-Token and Throughput.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "How does model size (parameter count) impact generation throughput and latency?",
+    a: ["Larger models require significantly more GPU memory bandwidth and computation per token, resulting in slower throughput and higher latency","Larger models run faster because they are smarter","Parameter count has zero effect on latency","Smaller models take more memory"],
+    c: 0,
+    why: "Inference latency scales with parameter size and memory bandwidth; larger models are inherently slower."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Inline Autocomplete (< 150ms)",
+            "lines": [
+                  "Small edge models (1B - 8B)",
+                  "Sub-millisecond token streaming"
+            ]
+      },
+      {
+            "title": "Interactive Chat (< 1s TTFT)",
+            "lines": [
+                  "Mid-tier workhorses (Haiku / 4o-mini)",
+                  "Smooth streaming, highly responsive"
+            ]
+      },
+      {
+            "title": "Deep Asynchronous (1 - 5 min)",
+            "lines": [
+                  "Frontier reasoning models (o1 / Sonnet)",
+                  "Background processing, maximum intellect"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Latency vs Intelligence: Time-to-First-Token and Throughput",
+      "def execute_flow():",
+      "    # Balancing intelligence and latency: Time-to-First-...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Latency vs Intelligence: Time-to-First-Token and Throughput"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Buffered Full Response (Slow)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Streaming Tokens (SSE) (Fast)"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Inline autocomplete demands low-latency {1} models under 150ms, while deep architectural planning justifies high-latency {2} models."
+],
+    blanks: [
+      {
+            "a": [
+                  "small"
+            ],
+            "why": "Compact models with fast throughput"
+      },
+      {
+            "a": [
+                  "reasoning"
+            ],
+            "why": "Deep deliberation models like o1 or Sonnet"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is 'Speculative Decoding' in modern inference optimization?",
+      a: ["Using a tiny, ultra-fast model to draft candidate tokens, which a larger model verifies in parallel in a single forward pass","Speculating on cryptocurrency with AI","Guessing user passwords","Running models on speculative stock markets"],
+      c: 0,
+      why: "Speculative decoding accelerates generation by 2x-3x using small draft models verified by large models."
+    },
+    {
+      q: "Why does streaming responses via Server-Sent Events (SSE) improve perceived user latency?",
+      a: ["The user begins reading immediately upon Time-to-First-Token, masking the total duration of generation","Streaming makes the internet connection faster","Streaming uses fewer tokens","Streaming compresses text"],
+      c: 0,
+      why: "Immediate visual feedback keeps users engaged while generation proceeds."
+    },
+    {
+      q: "What hardware metric primarily bounds tokens-per-second throughput during LLM decoding?",
+      a: ["GPU High-Bandwidth Memory (HBM) bandwidth (GB/sec)","The size of the computer monitor","The hard drive spindle speed","The room temperature"],
+      c: 0,
+      why: "Autoregressive decoding is memory-bandwidth bound: weights must be read from VRAM for every token."
+    },
+    {
+      q: "What should an engineer do if a customer-facing chatbot is taking 8 seconds to respond?",
+      a: ["Switch the routing to a faster mid-tier model (like 4o-mini or Haiku) and enable token streaming","Ask users to wait patiently","Increase prompt length","Add more if-statements"],
+      c: 0,
+      why: "Mid-tier models and streaming restore sub-second interactive responsiveness."
+    }
+  ]);
+</script>
+</body>
+</html>

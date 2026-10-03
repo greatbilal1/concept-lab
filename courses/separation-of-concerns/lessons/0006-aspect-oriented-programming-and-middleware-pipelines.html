@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 06 — Aspect-Oriented Programming and middleware pipelines</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="separation-of-concerns" data-lesson="6" data-lesson-id="aspect-oriented-programming-and-middleware-pipelines">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 06</span> · Cross-Cutting Concerns & Layers</span>
+
+  <h1 class="lesson-title">Aspect-Oriented Programming and middleware pipelines</h1>
+  <p class="lesson-lede">
+    How do you apply cross-cutting concerns across 500 endpoints at once? Discover Aspect-Oriented Programming (AOP) concepts and HTTP middleware pipelines.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Design middleware pipelines that enforce cross-cutting policies across entire service applications</span>
+    <span><b>Mission link</b> Scales cross-cutting concern management from individual functions to entire server fleets</span>
+  </div>
+
+  <h2><span class="n">1</span>Aspects and the pipeline pattern</h2>
+  <p>Decorating 500 individual functions by hand is tedious. For application-wide cross-cutting concerns, software architectures use <b>Aspect-Oriented Programming (AOP)</b> or <b>Middleware Pipelines</b>.</p><p>In a middleware pipeline, every incoming HTTP request passes through a chain of composable filters: <b>1. RateLimiter &rarr; 2. RequestIdInjector &rarr; 3. Authenticator &rarr; 4. Logger &rarr; Route Handler</b>. Each middleware executes its cross-cutting concern centrally, keeping individual route functions 100% clean.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Middleware pipelines centralize cross-cutting concerns across all routes without manual decoration.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The pipeline filter chain</h2>
+  <p>Observe how requests flow through sequential middleware layers to the application handler and back.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing pipeline short-circuiting</h2>
+  <p>Trace how unauthenticated requests are stopped at the perimeter before consuming backend resources.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of middleware pipelines.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can design and configure middleware pipelines that handle authentication, rate limiting, and observability centrally.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Implement a middleware that injects a unique correlation ID into every request context.</li>
+    <li>Add a rate-limiting middleware that short-circuits with 429 Too Many Requests.</li>
+    <li>Verify that order matters in your middleware pipeline (e.g. error handlers must wrap outer layers).</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Gregor Kiczales et al., *Aspect-Oriented Programming* (ECOOP, 1997).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What happens if the RateLimiting middleware in a pipeline determines a client has exceeded its quota?",
+    a: ["It short-circuits the pipeline immediately, returning HTTP 429 without invoking any downstream route handlers","It forwards the request to the database anyway","It crashes the server","It sends an alert email to all users"],
+    c: 0,
+    why: "Middleware can short-circuit early, rejecting unauthorized or throttled calls before hitting business logic."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1. Rate Limiting",
+            "lines": [
+                  "checks client IP tokens",
+                  "short-circuits with 429 if exceeded"
+            ]
+      },
+      {
+            "title": "2. Auth Middleware",
+            "lines": [
+                  "validates Bearer token",
+                  "attaches request.user context"
+            ]
+      },
+      {
+            "title": "3. Timing & Logger",
+            "lines": [
+                  "times full round-trip",
+                  "logs structured JSON event"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "Request -> Pipeline:",
+      "  [1. CorrelationId]: Injects 'a8f9-42'",
+      "  [2. AuthMiddleware]: Missing Authorization header! -> Short-circuit!",
+      "  [Returns HTTP 401 Unauthorized immediately]",
+      "  [Downstream Business Services and Database NEVER EXECUTED!]"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "correlation": "request ID tagged"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "auth_check": "security gate detects missing token"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "short_circuit": "401 returned at perimeter"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "resource_protection": "database queries and business services spared from processing"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "A chain of request filters is a middleware <0>.",
+      "When a middleware returns early without calling downstream handlers, it <1>-circuits.",
+      "Aspect-<2> Programming formalizes separating cross-cutting aspects."
+],
+    blanks: [
+      {
+            "a": [
+                  "pipeline"
+            ],
+            "why": "Pipelines chain middleware filters sequentially."
+      },
+      {
+            "a": [
+                  "short"
+            ],
+            "why": "Short-circuiting terminates requests early."
+      },
+      {
+            "a": [
+                  "Oriented"
+            ],
+            "why": "Aspect-Oriented Programming (AOP) addresses cross-cutting aspects."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What does 'short-circuiting' mean in a middleware pipeline?",
+      a: ["A middleware halts execution and returns an HTTP response directly, bypassing all subsequent downstream middleware and route handlers","An electrical fuse blowing in the server room","An error that deletes database records","A technique that increases CPU clock speed"],
+      c: 0,
+      why: "Short-circuiting stops the pipeline early on failures (like unauthenticated requests or throttles)."
+    },
+    {
+      q: "Why is the order of middleware registration critical in web frameworks?",
+      a: ["Middleware executes in the order registered on entry, and in reverse order on exit; an error handler must wrap around all inner layers","Alphabetical order is required by compilers","Order does not matter at all","Fastest middleware must always be registered last"],
+      c: 0,
+      why: "Order determines execution hierarchy: outer middleware wraps inner middleware like onion layers."
+    },
+    {
+      q: "What is an AOP 'Join Point' in Aspect-Oriented Programming theory?",
+      a: ["A point in program execution (such as a method call or exception throw) where an aspect advice can be applied","An SQL INNER JOIN condition","A network cable splitter","A database primary key"],
+      c: 0,
+      why: "Join points are target execution moments where cross-cutting aspect interceptors hook in."
+    },
+    {
+      q: "What is the primary architectural benefit of centralizing authentication in middleware rather than in each route handler?",
+      a: ["Zero routes can accidentally forget to perform authentication; security is enforced uniformly by default at the application perimeter","It turns off the need for passwords","It speeds up internet connection bandwidth","It allows databases to run without an operating system"],
+      c: 0,
+      why: "Perimeter enforcement prevents human oversight where developers forget auth checks on new endpoints."
+    }
+  ]);
+</script>
+</body>
+</html>

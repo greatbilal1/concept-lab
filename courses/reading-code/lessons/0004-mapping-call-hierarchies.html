@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 04 — Mapping call hierarchies</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="reading-code" data-lesson="4" data-lesson-id="mapping-call-hierarchies">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 04</span> · Tracing Data & Call Paths</span>
+
+  <h1 class="lesson-title">Mapping call hierarchies</h1>
+  <p class="lesson-lede">
+    Code is a web of calls. Use your editor's language server and grep to navigate caller-callee relationships without losing your place.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Map incoming and outgoing call hierarchies using LSP tools and ripgrep</span>
+    <span><b>Mission link</b> Prevents disorientation while traversing multi-file function chains</span>
+  </div>
+
+  <h2><span class="n">1</span>Callers and callees</h2>
+  <p>When looking at a function, two questions matter: <i>'Who calls this?'</i> (incoming calls) and <i>'What does this call?'</i> (outgoing calls).</p><p>Language Server Protocol (LSP) tools provide 'Find All References' and 'Show Call Hierarchy'. When LSP is unavailable, fast text search tools like <code>ripgrep</code> (<code>rg</code>) let you search for function names and import statements across thousands of files in milliseconds.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Incoming calls show where behavior is used; outgoing calls show how behavior is implemented.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Navigating with bookmarks</h2>
+  <p>When descending deeply into call chains, use editor navigation marks or jump stacks (e.g. Ctrl-O / Ctrl-I) so you can return to your origin without getting lost.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Call stack traversal</h2>
+  <p>Trace how a developer steps through nested call sites while keeping track of the root caller.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Review call hierarchy navigation habits.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can navigate up and down call trees across dozens of files while always knowing your way back.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Use 'Find All References' on a central utility function in your codebase.</li>
+    <li>Practice using editor jump keys (Ctrl-O / Ctrl-I or equivalent) to navigate back and forth.</li>
+    <li>Map a 3-level call tree on a sheet of paper for an important business transaction.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    VS Code Documentation: *Call Hierarchy and Symbol Search* (code.visualstudio.com/docs/editor/editingevolved).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "You need to change a function signature. Which view is most critical before making the edit?",
+    a: ["The file creation timestamp in the filesystem","The incoming call hierarchy showing all current call sites","The total number of comments written in the file","The CPU temperature of the development computer"],
+    c: 1,
+    why: "Changing a signature breaks every existing caller; finding all incoming references prevents regressions."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Origin Function",
+            "lines": [
+                  "process_payment()",
+                  "mark jump position"
+            ]
+      },
+      {
+            "title": "Callee 1",
+            "lines": [
+                  "validate_card()",
+                  "inspect implementation"
+            ]
+      },
+      {
+            "title": "Callee 2",
+            "lines": [
+                  "charge_stripe()",
+                  "return back up stack"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "def checkout(): charge_user()",
+      "def charge_user(): send_stripe_req()",
+      "def send_stripe_req(): http_post('/v1/charges')",
+      "# Call hierarchy: checkout -> charge_user -> send_stripe_req"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "root": "checkout()"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "depth_1": "charge_user()"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "depth_2": "send_stripe_req()"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "network": "http_post()"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "A tool that indexes code symbols and provides references is an <0> server.",
+      "Functions that invoke a given function are its <1> callers.",
+      "The history stack of code locations you have visited is the <2> stack."
+],
+    blanks: [
+      {
+            "a": [
+                  "LSP",
+                  "language"
+            ],
+            "why": "Language Server Protocol powers reference search and autocompletion."
+      },
+      {
+            "a": [
+                  "incoming"
+            ],
+            "why": "Incoming calls represent all callers of a function."
+      },
+      {
+            "a": [
+                  "jump"
+            ],
+            "why": "Jump stacks record visited locations so you can navigate backwards."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What does 'Find All References' reveal about a function?",
+      a: ["Every location across the workspace where that function is invoked or imported","The memory address where the function binary is stored in RAM","The total number of times the function was run in production yesterday","The author's personal phone number and contact details"],
+      c: 0,
+      why: "Find All References locates every usage site across the entire project."
+    },
+    {
+      q: "Why are jump stacks essential when exploring call hierarchies?",
+      a: ["They automatically optimize recursive loops into tail-calls","They allow you to retrace your steps backward after descending into callees","They prevent the computer from running out of disk storage space","They encrypt source code files while you are reading them"],
+      c: 1,
+      why: "Without jump stacks, deep exploration leads to disorientation and lost working context."
+    },
+    {
+      q: "What is the difference between incoming and outgoing call hierarchies?",
+      a: ["Incoming shows who calls the function; outgoing shows what the function calls","Incoming is written in C; outgoing is written in JavaScript","Incoming only applies to web APIs; outgoing only applies to mobile apps","There is no difference between incoming and outgoing calls"],
+      c: 0,
+      why: "Incoming maps upstream dependents; outgoing maps downstream dependencies."
+    },
+    {
+      q: "When is ripgrep (rg) preferred over Language Server references?",
+      a: ["When working in dynamic languages or codebases without configured language servers","When you want the computer to compile faster","When the repository contains only plain markdown text files","When you are disconnected from power adapters"],
+      c: 0,
+      why: "Fast text search works universally even when indexers or language servers fail to parse."
+    }
+  ]);
+</script>
+</body>
+</html>

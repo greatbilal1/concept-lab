@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 07 — Aggregations: COUNT, SUM, and GROUP BY</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="sql-relational-databases" data-lesson="7" data-lesson-id="aggregations-count-sum-and-group-by">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 07</span> · Aggregations & Analytics</span>
+
+  <h1 class="lesson-title">Aggregations: COUNT, SUM, and GROUP BY</h1>
+  <p class="lesson-lede">
+    Turn millions of rows into actionable business metrics. Master aggregate functions (COUNT, SUM, AVG, MIN, MAX) and the power of GROUP BY.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Summarize relational datasets using aggregate functions and GROUP BY clauses</span>
+    <span><b>Mission link</b> The foundation of all business intelligence, metrics, and reporting queries</span>
+  </div>
+
+  <h2><span class="n">1</span>Collapsing rows into summaries</h2>
+  <p>Relational databases do more than store individual records: they are high-performance analytical engines. <b>Aggregate functions</b> collapse multiple rows into a single summary scalar: <code>COUNT(*)</code>, <code>SUM()</code>, <code>AVG()</code>, <code>MIN()</code>, and <code>MAX()</code>.</p><p>When combined with <code>GROUP BY</code>, the database partitions rows into distinct buckets based on matching values (e.g. group orders by <code>user_id</code> or <code>country</code>) and calculates the aggregate separately for each bucket.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    GROUP BY partitions rows into category buckets; aggregate functions compute metrics per bucket.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The aggregation pipeline</h2>
+  <p>Visualise how GROUP BY partitions rows into buckets before calculating summary functions.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing GROUP BY execution</h2>
+  <p>Trace how a sales query groups 10,000 orders into total revenue per country.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of SQL aggregate functions.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can write analytical SQL queries that calculate summary statistics, totals, and averages across categories.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Calculate the total number of orders and total spend per customer.</li>
+    <li>Find the minimum and maximum prices in a product catalog using MIN() and MAX().</li>
+    <li>Count unique active users using COUNT(DISTINCT user_id).</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Alan Beaulieu, *Learning SQL*, Chapter 8: 'Grouping and Aggregates'.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "In 'SELECT department, AVG(salary) FROM employees GROUP BY department', what does each output row represent?",
+    a: ["One department and the average salary calculated across all employees in that department","Every individual employee row with their salary doubled","The highest paid employee across the entire company","The total number of departments"],
+    c: 0,
+    why: "GROUP BY collapses all employees in each department into a single aggregated summary row."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Raw Rows",
+            "lines": [
+                  "Dept A: $50k, $70k",
+                  "Dept B: $60k, $80k, $100k"
+            ]
+      },
+      {
+            "title": "GROUP BY department",
+            "lines": [
+                  "Bucket 1: Dept A",
+                  "Bucket 2: Dept B"
+            ]
+      },
+      {
+            "title": "Aggregate Outputs",
+            "lines": [
+                  "Dept A: AVG = $60k, COUNT = 2",
+                  "Dept B: AVG = $80k, COUNT = 3"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "SELECT country, COUNT(*) AS orders_count, SUM(amount) AS total_revenue",
+      "FROM sales",
+      "GROUP BY country",
+      "ORDER BY total_revenue DESC;"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "source": "accesses sales relation (10,000 rows)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "partition": "partitions rows into distinct country buckets (US, UK, DE...)"
+            }
+      },
+      {
+            "line": 0,
+            "vars": {
+                  "calculation": "computes COUNT and SUM for each country bucket"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "sort": "orders countries from highest total revenue to lowest"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The clause that partitions rows into category buckets is <0> BY.",
+      "The aggregate function that calculates arithmetic mean is <1>().",
+      "To count only unique non-duplicate values, write COUNT(<2> column)."
+],
+    blanks: [
+      {
+            "a": [
+                  "GROUP"
+            ],
+            "why": "GROUP BY partitions rows into summary buckets."
+      },
+      {
+            "a": [
+                  "AVG"
+            ],
+            "why": "AVG() calculates the average value."
+      },
+      {
+            "a": [
+                  "DISTINCT"
+            ],
+            "why": "COUNT(DISTINCT col) counts unique values."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What rule governs which non-aggregated columns can appear in a SELECT clause with GROUP BY?",
+      a: ["Any column in the SELECT list that is not wrapped in an aggregate function MUST be included in the GROUP BY clause","You can select any random column without including it in GROUP BY","Non-aggregated columns are strictly forbidden in all SQL queries","Columns can only be selected if they contain numbers"],
+      c: 0,
+      why: "If a column isn't aggregated, the engine must know which value to represent the collapsed bucket."
+    },
+    {
+      q: "What does COUNT(DISTINCT country) calculate?",
+      a: ["The count of unique, non-duplicate country values, ignoring repetitions","The total number of rows in the table","The alphabetized list of country names","The total population of all countries"],
+      c: 0,
+      why: "DISTINCT filters out repeated values before the aggregate function counts."
+    },
+    {
+      q: "How does the AVG() function handle NULL values in its calculation?",
+      a: ["It ignores NULL rows completely, calculating the average based only on rows that contain numbers","It treats NULL as zero, dragging down the average","It returns NULL if any single row contains a NULL","It throws an unhandled mathematical exception"],
+      c: 0,
+      why: "Standard SQL aggregate functions (except COUNT(*)) silently skip NULL values."
+    },
+    {
+      q: "What is the difference between MAX(date) and MIN(date)?",
+      a: ["MAX returns the most recent (latest) date; MIN returns the earliest (oldest) date","MAX only works on numbers; MIN only works on dates","MAX deletes old dates from the table","There is no difference between them"],
+      c: 0,
+      why: "Chronologically, later dates are greater than earlier dates."
+    }
+  ]);
+</script>
+</body>
+</html>

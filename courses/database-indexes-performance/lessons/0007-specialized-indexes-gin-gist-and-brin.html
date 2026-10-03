@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 07 — Specialized indexes: GIN, GiST, and BRIN</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="database-indexes-performance" data-lesson="7" data-lesson-id="specialized-indexes-gin-gist-and-brin">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 07</span> · Specialized Indexes & Maintenance</span>
+
+  <h1 class="lesson-title">Specialized indexes: GIN, GiST, and BRIN</h1>
+  <p class="lesson-lede">
+    B-trees cannot index JSON arrays, full-text words, or geographic coordinates. Discover specialized index types: GIN for JSONB and search, GiST for GIS, and BRIN for terabytes of time-series data.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Select between B-tree, GIN, GiST, and BRIN index types based on data structures</span>
+    <span><b>Mission link</b> Expands indexing capabilities beyond scalar numbers and strings</span>
+  </div>
+
+  <h2><span class="n">1</span>When B-trees fall short</h2>
+  <p>A B-tree index maps one scalar value per row. But what if a column holds an <b>array of tags</b>, a <b>JSONB document</b>, a <b>full-text document</b>, or a <b>geographic polygon</b>?</p><p>PostgreSQL provides specialized index access methods: <b>GIN (Generalized Inverted Index)</b> decomposes arrays and JSONB documents into individual components, indexing each element separately. <b>BRIN (Block Range Index)</b> indexes massive time-series tables (terabytes in size) in just a few kilobytes of index space.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Use GIN for JSONB and multi-value arrays; use BRIN for massive time-ordered datasets.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The index access methods spectrum</h2>
+  <p>Match your data type and query requirements to the appropriate index method.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing a GIN inverted index lookup</h2>
+  <p>Trace how a GIN index finds all users who have the tag 'python' in their JSONB profile.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of specialized index types.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can select and configure specialized GIN, GiST, and BRIN indexes for JSONB, geographic, and large-scale time-series data.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Create a GIN index on a JSONB column in PostgreSQL using USING GIN.</li>
+    <li>Query the JSONB column with the contains operator (@>).</li>
+    <li>Compare the storage footprint of a BRIN index versus a B-tree on a time-ordered log table.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    PostgreSQL Documentation: *GIN Indexes* & *BRIN Indexes* (postgresql.org/docs/current/indexes-types.html).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Which index type is optimal for searching inside a PostgreSQL JSONB column with the '@>' operator?",
+    a: ["GIN index","Standard B-tree","Hash index","Linear scan"],
+    c: 0,
+    why: "GIN (Generalized Inverted Index) indexes keys and values inside JSONB documents."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "B-Tree (Default)",
+            "lines": [
+                  "scalars: numbers, strings, dates",
+                  "equality (=), range (<, >, BETWEEN), ORDER BY"
+            ]
+      },
+      {
+            "title": "GIN (Inverted)",
+            "lines": [
+                  "multi-value: JSONB, arrays, text search",
+                  "contains (@>), key exists (?)"
+            ]
+      },
+      {
+            "title": "BRIN (Block Range)",
+            "lines": [
+                  "huge time-series append-only tables",
+                  "stores min/max per 128 disk pages",
+                  "tiny footprint!"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "CREATE INDEX idx_users_skills ON users USING GIN (skills);",
+      "SELECT name FROM users WHERE skills @> '[\"python\"]';",
+      "# GIN lookup: jumps directly to the entry for 'python'",
+      "# Delivers list of matching row pointers in 0.1ms!"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "gin_created": "GIN inverted index created on skills array"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "json_query": "contains operator @> searches for 'python'"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "inverted_lookup": "GIN maps 'python' to exact matching tuple IDs"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The inverted index type used for JSONB and arrays in PostgreSQL is <0>.",
+      "The ultra-compact index storing min/max values for block ranges is <1>.",
+      "The index type used for geometric points and GIS spatial queries is <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "GIN"
+            ],
+            "why": "GIN stands for Generalized Inverted Index."
+      },
+      {
+            "a": [
+                  "BRIN"
+            ],
+            "why": "BRIN stands for Block Range Index."
+      },
+      {
+            "a": [
+                  "GiST"
+            ],
+            "why": "GiST handles multi-dimensional spatial data (PostGIS)."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is a GIN (Generalized Inverted Index) index?",
+      a: ["An index that breaks complex items (arrays, JSON documents, text) into individual elements and maps each element to rows","An index that can only be used on gin distillery inventory databases","A temporary index stored on a USB flash drive","An index that runs once per year"],
+      c: 0,
+      why: "Inverted indexes map sub-elements (like words or JSON keys) to rows containing them."
+    },
+    {
+      q: "Why is a BRIN (Block Range Index) remarkably effective on massive append-only log tables?",
+      a: ["It only stores the minimum and maximum values for physical blocks of 128 disk pages, using a fraction of the RAM of a B-tree","It compresses text files into zip format","It prevents the server from needing internet connectivity","It runs on the client web browser"],
+      c: 0,
+      why: "On naturally ordered data, storing min/max per block range provides huge speedups with 99% less index space."
+    },
+    {
+      q: "What is the trade-off of GIN indexes compared to standard B-tree indexes?",
+      a: ["GIN indexes are significantly slower to update on writes because inserting one row requires updating multiple inverted index entries","GIN indexes cannot be saved to disk","GIN indexes only work on integers","GIN indexes are illegal in public cloud servers"],
+      c: 0,
+      why: "An array of 20 items requires updating 20 separate GIN postings lists on every insert."
+    },
+    {
+      q: "Which index type is standard for PostGIS spatial geographic calculations (e.g. ST_DWithin)?",
+      a: ["GiST (Generalized Search Tree)","BRIN","Hash index","Sequential Scan"],
+      c: 0,
+      why: "GiST handles bounding boxes and multi-dimensional spatial geometric hierarchies."
+    }
+  ]);
+</script>
+</body>
+</html>

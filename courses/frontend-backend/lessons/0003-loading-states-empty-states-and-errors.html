@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 03 — Loading states, empty states, and errors</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="frontend-backend" data-lesson="3" data-lesson-id="loading-states-empty-states-and-errors">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 03</span> · UI State & Optimistic Updates</span>
+
+  <h1 class="lesson-title">Loading states, empty states, and errors</h1>
+  <p class="lesson-lede">
+    An API call is not just data: it is a journey through time. Master the 4-state asynchronous UI state machine: idle, loading, success, and error.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Design comprehensive asynchronous UI states that handle loading, errors, and empty results</span>
+    <span><b>Mission link</b> Prevents UI flickering and broken component states during network operations</span>
+  </div>
+
+  <h2><span class="n">1</span>The four essential UI states</h2>
+  <p>Many junior developers model asynchronous UI with multiple independent booleans: <code>const [loading, setLoading] = useState(false); const [error, setError] = useState(null);</code>. This leads to impossible states: what if both <code>loading</code> and <code>error</code> are true at the same time?</p><p>A resilient frontend models asynchronous communication as a strict <b>State Machine</b> with four mutually exclusive states: <b>1. Idle</b> (not started), <b>2. Loading</b> (awaiting network), <b>3. Success</b> (data received), and <b>4. Error</b> (network or server failure).</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Model asynchronous UI as mutually exclusive states: idle, loading, success, or error.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The async state machine lifecycle</h2>
+  <p>Visualise the deterministic transitions between asynchronous component states.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing state machine transitions</h2>
+  <p>Trace how a state machine transitions cleanly from loading to error without conflicting booleans.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of asynchronous UI states.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can build resilient frontend components that handle every phase of asynchronous data fetching without visual bugs.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Replace multiple boolean flags (isLoading, isError) with a single status state string.</li>
+    <li>Implement a skeleton loading placeholder instead of an abrupt generic spinner.</li>
+    <li>Design an engaging empty state with an action button when a search returns zero results.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Kent C. Dodds: *Stop using isLoading booleans* (kentcdodds.com/blog/stop-using-isloading-booleans).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is an 'empty state' in UI engineering?",
+    a: ["The visual state displayed when an API query succeeds with 200 OK, but returns an empty list ([])","A crash that happens when the computer monitor is turned off","An error code representing a missing server database","A web page that contains no CSS styling"],
+    c: 0,
+    why: "Empty states guide users when valid searches return zero items, rather than showing a blank screen."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "IDLE",
+            "lines": [
+                  "initial mount",
+                  "user has not submitted"
+            ]
+      },
+      {
+            "title": "LOADING",
+            "lines": [
+                  "fetch initiated",
+                  "render skeleton / spinner"
+            ]
+      },
+      {
+            "title": "SUCCESS",
+            "lines": [
+                  "data arrived (status 200)",
+                  "render list OR empty state"
+            ]
+      },
+      {
+            "title": "ERROR",
+            "lines": [
+                  "network failure / 500 error",
+                  "render user-friendly error banner"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "state = { status: 'loading' } # render skeleton screen",
+      "try {",
+      "    const data = await api.fetchUsers();",
+      "    state = { status: 'success', data }; # render user list",
+      "} catch (err) {",
+      "    state = { status: 'error', message: err.message }; # render retry button",
+      "}"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "status": "'loading' (spinner active)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "network": "fetch failed with 500"
+            }
+      },
+      {
+            "line": 5,
+            "vars": {
+                  "status": "'error' (loading state cleared automatically; no state collision)"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The placeholder screen shown while data loads is a <0> screen.",
+      "The state representing successful fetch with zero items is the <1> state.",
+      "Modeling mutually exclusive states prevents impossible <2> collisions."
+],
+    blanks: [
+      {
+            "a": [
+                  "skeleton"
+            ],
+            "why": "Skeleton screens maintain layout geometry during load."
+      },
+      {
+            "a": [
+                  "empty"
+            ],
+            "why": "Empty states provide helpful onboarding when lists have 0 items."
+      },
+      {
+            "a": [
+                  "state",
+                  "boolean"
+            ],
+            "why": "State machines eliminate impossible boolean flag combinations."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why is a single 'status' state preferred over separate 'isLoading' and 'isError' booleans?",
+      a: ["It mathematically prevents impossible states where both isLoading and isError are true simultaneously","It saves fifty megabytes of browser RAM memory","Modern JavaScript compilers forbid more than one boolean per file","It speeds up internet connection bandwidth"],
+      c: 0,
+      why: "A single status union ('idle' | 'loading' | 'success' | 'error') ensures states are mutually exclusive."
+    },
+    {
+      q: "What should a user-friendly error state always provide to the user?",
+      a: ["A clear, non-technical explanation of the problem and an actionable 'Retry' button","A full database stack trace with internal file paths","A link to the developer's personal Twitter account","An automatic reload loop that refreshes twenty times per second"],
+      c: 0,
+      why: "Users need to understand what happened and have a clear recovery path (like a retry action)."
+    },
+    {
+      q: "What is the benefit of a skeleton loading screen over a generic centered spinner?",
+      a: ["It previews the layout geometry of the incoming content, reducing perceived latency and layout shift (CLS)","It downloads the data fifty percent faster from the server","It eliminates the need for CSS flexbox","It works when the user monitor is unplugged"],
+      c: 0,
+      why: "Skeletons stabilize visual layout and reduce Cumulative Layout Shift (CLS) as content loads."
+    },
+    {
+      q: "When should an empty state be rendered?",
+      a: ["When an asynchronous fetch succeeds, but the returned data array contains zero items","Whenever an unhandled server error occurs","While the network request is still in flight","Only when the user's internet is disconnected"],
+      c: 0,
+      why: "Empty states handle valid, zero-item responses (e.g. empty inbox, no search matches)."
+    }
+  ]);
+</script>
+</body>
+</html>

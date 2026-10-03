@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 06 — Ports and sockets</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="how-the-internet-works" data-lesson="6" data-lesson-id="ports-and-sockets">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 06</span> · Transport Layer & Protocols</span>
+
+  <h1 class="lesson-title">Ports and sockets</h1>
+  <p class="lesson-lede">
+    An IP address gets a packet to the computer; a port gets it to the right program. Learn how operating systems multiplex thousands of network connections using sockets.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Map network traffic to running processes using ports, sockets, and netstat</span>
+    <span><b>Mission link</b> Prevents 'port already in use' errors and reveals local network listening state</span>
+  </div>
+
+  <h2><span class="n">1</span>Multiplexing with ports</h2>
+  <p>A single computer server has only one IP address, but it might run a web server, an SSH daemon, a database, and a mail server all at the same time. How does the operating system know which program should receive an incoming packet?</p><p>The answer is <b>ports</b>. A port is a 16-bit number (from 0 to 65,535). Standard well-known ports identify common services: port 80 for HTTP, 443 for HTTPS, 22 for SSH, and 5432 for PostgreSQL.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    An IP address identifies the machine; a port number identifies the specific application process inside it.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Standard port ranges</h2>
+  <p>The 65,536 available ports are divided into three standard regulatory bands.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing active connection sockets</h2>
+  <p>Trace how an incoming HTTP request is paired with an ephemeral client port for bidirectional communication.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of common networking ports.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can identify, audit, and debug network sockets and listening processes on any host machine.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>List all active listening ports on your machine with lsof -i -P -n or netstat -an.</li>
+    <li>Diagnose which process is holding a port using lsof -i :8080.</li>
+    <li>Verify why running a server on port 80 requires elevated privileges on Linux.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    IANA: *Service Name and Transport Protocol Port Number Registry* (iana.org).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What defines a network socket endpoint in modern operating systems?",
+    a: ["The combination of an IP address and a port number (e.g. 192.168.1.5:8080)","The serial number of the computer motherboard","The username of the logged-in computer user","The brand name of the computer network interface card"],
+    c: 0,
+    why: "A socket is the operating system abstraction representing the tuple (IP address, Port number)."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Well-Known (0 - 1023)",
+            "lines": [
+                  "system services, requires root/admin",
+                  "22 (SSH), 80 (HTTP), 443 (HTTPS)"
+            ]
+      },
+      {
+            "title": "Registered (1024 - 49151)",
+            "lines": [
+                  "user applications and databases",
+                  "3000 (React), 5432 (Postgres), 8080 (dev)"
+            ]
+      },
+      {
+            "title": "Ephemeral (49152 - 65535)",
+            "lines": [
+                  "temporary outbound client ports",
+                  "allocated dynamically by OS kernel"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Web server listening on 0.0.0.0:443",
+      "# Browser connects from client IP 203.0.113.8 using ephemeral port 54120",
+      "# Established socket tuple:",
+      "# (203.0.113.8:54120 <-> 198.51.100.2:443)",
+      "# Operating system routes all replies directly to port 54120"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "server_socket": "0.0.0.0:443 (listening)"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "client_socket": "203.0.113.8:54120 (ephemeral)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "connection_tuple": "unique 4-part conversation identifier"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "state": "ESTABLISHED connection"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The standard default port for encrypted HTTPS is <0>.",
+      "The standard default port for unencrypted HTTP is <1>.",
+      "The standard default port for Secure Shell (SSH) is <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "443"
+            ],
+            "why": "HTTPS standard traffic runs on port 443."
+      },
+      {
+            "a": [
+                  "80"
+            ],
+            "why": "HTTP plaintext traffic runs on port 80."
+      },
+      {
+            "a": [
+                  "22"
+            ],
+            "why": "SSH remote management runs on port 22."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What causes the common error 'Address already in use: bind' when launching a server?",
+      a: ["Another running process on your computer is already bound and listening to that exact port","The hard drive has run out of space to store internet packets","Your home Wi-Fi password has expired","The computer cannot connect to DNS servers"],
+      c: 0,
+      why: "Only one process can bind to a specific IP and port combination at a time."
+    },
+    {
+      q: "Why are ports below 1024 restricted to root or administrator privileges on UNIX systems?",
+      a: ["Historical security standard to prevent untrusted users from impersonating core system services","Because CPU processors cannot calculate numbers below 1024 in user mode","To prevent internet service providers from charging higher fees","Because older computer memory was limited to 1 kilobyte"],
+      c: 0,
+      why: "Privileged ports ensure only system administrators can run services like SSH or mail."
+    },
+    {
+      q: "What is an ephemeral port?",
+      a: ["A temporary short-lived port automatically allocated by the OS for outbound client connections","A port that permanently deletes incoming data packets","A port used exclusively by Wi-Fi wireless routers","A cryptographic port used by bitcoin miners"],
+      c: 0,
+      why: "Clients allocate temporary ephemeral ports to receive replies from listening servers."
+    },
+    {
+      q: "What command on Linux displays active listening TCP and UDP sockets with their Process IDs?",
+      a: ["ss -tulpn","cat /etc/ports","ping --all-ports","ls -la /dev/sockets"],
+      c: 0,
+      why: "ss -tulpn inspects TCP/UDP listening sockets and outputs numerical ports and PIDs."
+    }
+  ]);
+</script>
+</body>
+</html>

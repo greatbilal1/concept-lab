@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 06 — Permissions and ownership</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="command-line-shell" data-lesson="6" data-lesson-id="permissions-and-ownership">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 06</span> · Processes & Permissions</span>
+
+  <h1 class="lesson-title">Permissions and ownership</h1>
+  <p class="lesson-lede">
+    UNIX security starts at the file mode. Learn how read, write, and execute bits protect files, and how to configure them using octal masks.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Calculate and set file permissions using chmod and octal notation</span>
+    <span><b>Mission link</b> Prevents permission denied errors and security vulnerabilities</span>
+  </div>
+
+  <h2><span class="n">1</span>The rwx permission triad</h2>
+  <p>Every file and directory in a UNIX filesystem belongs to an owner user and a group, and maintains a 9-bit permission mask. The mask is divided into three triads: <b>user</b> (owner), <b>group</b>, and <b>others</b> (world).</p><p>Each triad has three bits: <b>r</b> (read, value 4), <b>w</b> (write, value 2), and <b>x</b> (execute, value 1). Adding the values produces the octal permission code (e.g. 7 = 4+2+1 for read/write/execute).</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Permissions define who can read, modify, or execute a file across user, group, and others.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Octal values reference</h2>
+  <p>Memorise the additive binary values that compose every permission number.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing chmod changes</h2>
+  <p>Trace how chmod changes a text script from a passive document into an executable program.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your ability to calculate octal permissions.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can audit and set exact UNIX file permissions without guessing or using dangerous 777 masks.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Check permissions on your SSH keys in ~/.ssh using ls -la.</li>
+    <li>Make a shell script executable using chmod +x.</li>
+    <li>Calculate the octal representation of -rw-rw-r--.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Shotts, *The Linux Command Line*, Chapter 9: 'Permissions'.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What does an octal permission of 755 represent?",
+    a: ["Owner: rwx (7), Group: r-x (5), Others: r-x (5)","Owner: r-- (4), Group: rw- (6), Others: rwx (7)","Full access for all users on the computer","Read-only access for the file owner"],
+    c: 0,
+    why: "7 = 4+2+1 (rwx); 5 = 4+0+1 (r-x) for both group and others."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Read (r = 4)",
+            "lines": [
+                  "view file contents",
+                  "list directory entries"
+            ]
+      },
+      {
+            "title": "Write (w = 2)",
+            "lines": [
+                  "modify file contents",
+                  "add/delete dir entries"
+            ]
+      },
+      {
+            "title": "Execute (x = 1)",
+            "lines": [
+                  "run file as binary/script",
+                  "enter/traverse directory"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "ls -l deploy.sh     # -rw-r--r-- (644)",
+      "./deploy.sh         # bash: permission denied",
+      "chmod +x deploy.sh  # add execute bit",
+      "ls -l deploy.sh     # -rwxr-xr-x (755)"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "mode": "644 (read/write only)"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "error": "Permission Denied: missing execute bit"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "action": "chmod adds execute flag"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "mode": "755 (executable)"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The numeric value for read permission is <0>.",
+      "The numeric value for write permission is <1>.",
+      "The numeric value for execute permission is <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "4"
+            ],
+            "why": "Read has a binary weight of 4."
+      },
+      {
+            "a": [
+                  "2"
+            ],
+            "why": "Write has a binary weight of 2."
+      },
+      {
+            "a": [
+                  "1"
+            ],
+            "why": "Execute has a binary weight of 1."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What does chmod 600 do to a sensitive configuration file?",
+      a: ["Grants read and write to owner only; all other access is denied","Makes the file readable by everyone on the local network","Allows the file to be executed by any user","Deletes the file automatically after 600 seconds"],
+      c: 0,
+      why: "6 = 4+2 (read+write for owner); 0 denies all permissions to group and others."
+    },
+    {
+      q: "Why is 'chmod 777' considered a dangerous security antipattern?",
+      a: ["It gives every user on the system permission to read, write, and execute the file","It corrupts SSD drive flash controller memory cells","It automatically disables computer antivirus scanners","It converts text files into compiled binary libraries"],
+      c: 0,
+      why: "777 grants full destructive and executable power to any local process or user."
+    },
+    {
+      q: "What does execute permission mean on a directory (as opposed to a file)?",
+      a: ["It allows the user to traverse, enter, and access files inside that directory","It runs all executable files inside the directory simultaneously","It encrypts the filenames inside the directory","It converts the directory into a network file share"],
+      c: 0,
+      why: "Directory execute permission allows passing through (cd) and resolving path contents."
+    },
+    {
+      q: "Which command changes the owner of a file?",
+      a: ["chown user:group file.txt","chmod 755 file.txt","touch --owner=user file.txt","mv --user=user file.txt"],
+      c: 0,
+      why: "chown (change owner) modifies user and group ownership of filesystem paths."
+    }
+  ]);
+</script>
+</body>
+</html>

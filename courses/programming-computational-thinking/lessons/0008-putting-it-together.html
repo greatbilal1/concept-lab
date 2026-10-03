@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 08 — Putting it together</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="programming-computational-thinking" data-lesson="8" data-lesson-id="putting-it-together">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 08</span> · The loop</span>
+  <h1 class="lesson-title">Putting it together</h1>
+  <p class="lesson-lede">
+    Six moves, one problem. This lesson takes a single task and runs it through
+    the whole loop — decompose, find the pattern, abstract it, write the steps,
+    evaluate the result, then generalise it.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~14 min</span>
+    <span><b>Win</b> You can design a solution to a problem you have never seen</span>
+    <span><b>Mission link</b> This is the whole course in one worked example</span>
+  </div>
+
+  <h2><span class="n">1</span>The problem</h2>
+  <p>
+    Here is a problem you have probably met. It is deliberately ordinary, because
+    the point is the method, not the problem.
+  </p>
+  <pre><code>Given:  a shelf of 60 books, in no particular order
+Produce: the same books, arranged so that you can
+         find any one of them quickly
+Rule:   every book is on the shelf exactly once,
+         and books are grouped by subject</code></pre>
+  <p>
+    Notice we started with a problem statement, exactly as Lesson 1 said. We know
+    what we are given, what we must produce, and how we will check it. Now the
+    loop begins.
+  </p>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Move 1 — decompose</h2>
+  <p>
+    "Organise the shelf" is a fog. Cut it into parts that cover everything and
+    overlap nothing:
+  </p>
+  <pre><code>a. decide the subject groups
+b. assign every book to a group
+c. choose an order within each group
+d. place the groups on the shelf
+e. label the shelf so it can be found again</code></pre>
+  <p>
+    Five parts, no overlap, and together they cover the whole job. Now the
+    dependencies: <b>b</b> needs <b>a</b>, <b>c</b> needs <b>b</b>, <b>d</b>
+    needs <b>c</b>. Part <b>e</b> is independent — it can happen at any time.
+  </p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Move 2 — find the pattern</h2>
+  <p>
+    Look down the list for sameness. Parts <b>b</b> and <b>c</b> are the same
+    shape: both take a pile of books and sort them into an order, differing only
+    in <em>what they sort by</em> — subject in one case, title in the other.
+  </p>
+  <pre><code>sort(books, by):
+    for each book:
+        work out its key using "by"
+        place it in the right position
+    return the sorted books</code></pre>
+  <p>
+    One rule now covers two parts. And it covers a third case we did not plan
+    for: sorting by author, or by height, or by how recently you read it. That is
+    the payoff from Lesson 3 — the rule is bigger than the problem.
+  </p>
+
+  <h2><span class="n">4</span>Move 3 — abstract</h2>
+  <p>
+    The rule needs an interface. What does a caller need to know? Only that you
+    hand it books and a way of choosing a key, and you get back the same books in
+    order. Everything else — how the key is computed, how positions are found —
+    is hidden.
+  </p>
+  <pre><code>Interface:      sort(books, by) → sorted books
+Implementation: key computation, position finding,
+                comparison, placement</code></pre>
+  <p>
+    Now the shelf organiser can use <code>sort</code> without knowing anything
+    about how it works. And if we later make <code>sort</code> faster, nothing
+    that uses it has to change. That is the deal from Lesson 4, kept.
+  </p>
+
+  <h2><span class="n">5</span>Move 4 — write the steps</h2>
+  <p>
+    Finally, the algorithm. Sequence, selection and iteration, in order:
+  </p>
+  <pre><code>1. groups = decide the subject groups
+2. for each book on the shelf:
+3.     find the group whose subject matches
+4.     add the book to that group
+5. for each group:
+6.     sort(group, by title)
+7. place the groups on the shelf in order
+8. label the shelf</code></pre>
+  <p>
+    Line 2 is iteration. Line 3 is selection — the book goes to whichever group
+    matches. Line 6 is the abstracted rule from move 2, used twice over. Every
+    step is something an executor could do without asking a question.
+  </p>
+
+  <div id="fill1"></div>
+
+  <h2><span class="n">6</span>Move 5 — evaluate it</h2>
+  <p>
+    Now trace it. Pick an edge case: a book whose subject is not in your groups.
+    Walk the steps and watch what happens at line 3 — nothing matches, and the
+    book is silently dropped. The rule says every book appears exactly once, so
+    the algorithm is <b>wrong</b>.
+  </p>
+  <p>
+    That is correctness failing, and it is the first thing evaluation catches.
+    But suppose you fix it and the algorithm now works. Evaluation still has a
+    question left: is this solution <em>good</em>? Count the work. For 60 books
+    you make 60 comparisons to place them, then sort each group — a few hundred
+    steps in total. A solution that compared every book against every other book
+    would need nearly two thousand. Same result, six times the work.
+  </p>
+  <p>
+    This is the loop closing. You do not throw the work away; you go round again
+    with better information. Add a default group, or a step that reports the
+    unmatched book. Then trace again.
+  </p>
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Finding a bug by tracing is not a failure of the method — it <em>is</em> the
+    method. The loop is designed to catch exactly this, cheaply, before anything
+    is built.
+  </div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">7</span>Move 6 — generalise it</h2>
+  <p>
+    The shelf is organised. Now the move that makes the work pay off twice: what
+    <b>family</b> of problems did you just solve?
+  </p>
+  <p>
+    Look at what varied. The books were the input; the subject groups were the
+    rule. Everything else — split into groups, sort within each group, place the
+    groups in order — stayed the same. Lift out the parts that vary and you have
+    <code>organise(items, group_by, sort_by)</code>, which organises a shelf of
+    books, a folder of files, a list of contacts, or a warehouse of parts.
+  </p>
+  <p>
+    And the boundary is clear too: this works for anything that can be grouped
+    and sorted. It does not work for items with no group at all — that is where
+    the family ends and a different solution begins.
+  </p>
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    You solved one problem and walked away with a solution to a whole class of
+    them. That is the difference between doing the work and doing the work once.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>
+      You took a problem you had never solved, ran it through all six moves,
+      wrote a real algorithm, found a genuine bug by tracing it, judged the fix
+      against a criterion, and generalised the result to a whole family of
+      problems. That is the entire course, working end to end.
+    </p>
+  </div>
+
+  <h2><span class="n">8</span>Do this next</h2>
+  <ol>
+    <li>Pick a problem from your own week and write its problem statement.</li>
+    <li>Run it through all six moves, writing down each one.</li>
+    <li>Trace your algorithm with one edge case and fix what you find.</li>
+    <li>Name one other problem your solution would also solve.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    David J. Malan, <em>CS50 Lecture 0</em> (Harvard, free online) — the first
+    40 minutes turn "find a name in a phone book" into a precise, repeatable
+    procedure, live.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Bring your own problem to the chat and ask for the
+    decomposition. Working through a real one is the fastest way to make the six
+    moves automatic.
+  </div>
+
+  <div id="lessonNav"></div>
+  <div class="course-map"><h3>Course map</h3><div id="courseMap"></div></div>
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is the very first thing to do with this problem?",
+    a: [
+      "Start moving books into rough piles",
+      "Write a statement of input and output",
+      "Decide which sorting method to use",
+      "Count how many books are on the shelf"
+    ],
+    c: 1,
+    why: "Without a problem statement you cannot tell whether you are finished, and you cannot test anything. Every other move is judged against that sentence."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      { title: "a · groups", lines: ["decide subjects", "no dependency"] },
+      { title: "b · assign", lines: ["needs a", "every book once"] },
+      { title: "c · order", lines: ["needs b", "sort within group"] },
+      { title: "d · place", lines: ["needs c", "groups on shelf"] },
+      { title: "e · label", lines: ["independent", "any time"] }
+    ]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "Complete the algorithm",
+    lines: [
+      "1. groups = decide the subject groups",
+      "2. for each book on the shelf:",
+      "3.     find the group whose subject <0>",
+      "4.     add the book to that group",
+      "5. for each group:",
+      "6.     sort(group, by <1>)",
+      "7. place the groups on the shelf in order",
+      "8. label the shelf"
+    ],
+    blanks: [
+      { a: ["matches", "fits", "agrees"], why: "Line 3 is the selection step: the book is routed to whichever group its subject matches." },
+      { a: ["title", "name"], why: "The second sort uses the same abstracted rule with a different key — that is the pattern from move 2 being reused." }
+    ]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    label: "Trace: a book whose subject is not in the groups",
+    code: [
+      "groups = [science, history, cooking]",
+      "for each book on the shelf:",
+      "    find the group whose subject matches",
+      "    add the book to that group",
+      "for each group:",
+      "    sort(group, by title)"
+    ],
+    steps: [
+      { line: 0, vars: { groups: "science, history, cooking" } },
+      { line: 2, vars: { book: "Atlas of Maps", match: "none" } },
+      { line: 3, vars: { book: "Atlas of Maps", placed: "nowhere" } },
+      { line: 2, vars: { book: "Soup", match: "cooking" } },
+      { line: 3, vars: { book: "Soup", placed: "cooking" } },
+      { line: 5, vars: { result: "Atlas of Maps is missing" } }
+    ]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Which move produced the reusable sort rule?",
+      a: ["Decomposition, by cutting the job apart", "Pattern recognition, by spotting the sameness", "Abstraction, by hiding the whole implementation", "Algorithm writing, by ordering the steps"],
+      c: 1,
+      why: "Parts b and c were the same shape, differing only in the key. Spotting that sameness is what let one rule replace two parts."
+    },
+    {
+      q: "What did tracing the algorithm actually reveal?",
+      a: ["That the sort rule was slow", "That unmatched books were being dropped", "That the groups were chosen incorrectly", "That the shelf label was wrong"],
+      c: 1,
+      why: "The edge case — a book with no matching subject — fell through line 3 and vanished. Tracing caught it before anything was built."
+    },
+    {
+      q: "What should you do after finding a bug by tracing?",
+      a: ["Abandon the design and start over", "Fix it and trace the steps", "Ignore it until the code written", "Add a note and continue on"],
+      c: 1,
+      why: "The loop is designed to be gone round again. Fix the step, then re-trace with the same edge case to confirm the fix holds."
+    },
+    {
+      q: "What made the shelf solution generalisable?",
+      a: ["It was written in a programming language", "The books and the grouping rule varied", "It sorted every group by same key", "It placed the groups on the shelf"],
+      c: 1,
+      why: "The books and the grouping rule were the parts that varied. Lifting them out gave organise(items, group_by, sort_by) — a solution to a whole family of problems."
+    }
+  ]);
+</script>
+</body>
+</html>

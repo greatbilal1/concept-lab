@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 07 — Testability: mocks, stubs, and fakes</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="dependency-injection" data-lesson="7" data-lesson-id="testability-mocks-stubs-and-fakes">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 07</span> · Testability & Test Doubles</span>
+
+  <h1 class="lesson-title">Testability: mocks, stubs, and fakes</h1>
+  <p class="lesson-lede">
+    Stop making unit tests talk to Stripe and PostgreSQL. Master Gerard Meszaros's Test Double taxonomy: Fakes, Stubs, Mocks, Dummies, and Spies.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Select and implement appropriate test doubles (fakes, stubs, mocks) to achieve fast, isolated unit tests</span>
+    <span><b>Mission link</b> The ultimate payoff of dependency injection: fearless, sub-millisecond testing</span>
+  </div>
+
+  <h2><span class="n">1</span>The test double taxonomy</h2>
+  <p>Why do we inject dependencies? The greatest practical payoff is <b>Testability</b>. If a class receives its collaborators as arguments, we can substitute them during automated tests with <b>Test Doubles</b>.</p><p>Gerard Meszaros categorized test doubles into five distinct roles: <b>Dummy</b> (filler object), <b>Stub</b> (provides canned responses), <b>Spy</b> (records calls), <b>Mock</b> (verifies expected interactions), and <b>Fake</b> (working in-memory implementation, like an in-memory SQLite database or dictionary store).</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Test doubles substitute real external dependencies in tests; DI makes substitution effortless.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Test Double spectrum</h2>
+  <p>Understand the specific capabilities of each test double archetype.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing test double substitution</h2>
+  <p>Trace how a Fake Payment Gateway allows testing checkout failure logic in 1 millisecond.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of test double types.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can author fast, reliable unit test suites using the right test double archetype for each scenario.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Build a FakeUserRepository backed by an in-memory Python dictionary for testing.</li>
+    <li>Write a test that uses a Mock to verify an alert email was sent on security failure.</li>
+    <li>Refactor an integration test that hits a real database to use an in-memory fake.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Gerard Meszaros, *xUnit Test Patterns: Refactoring Test Code*, Chapter 23: 'Test Double Patterns'.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is the difference between a Stub and a Mock in test double terminology?",
+    a: ["A Stub provides canned data to the code under test; a Mock asserts that specific methods were called with expected arguments","Stubs are written in Python; Mocks are written in Java","Mocks run on real databases; Stubs run in memory","There is no difference between them"],
+    c: 0,
+    why: "Stubs verify state (returning canned answers); Mocks verify behavior (asserting call counts and arguments)."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Stub (Canned Data)",
+            "lines": [
+                  "returns fixed answers",
+                  "e.g. stub_user_repo.find() -> User(name='Ada')",
+                  "verifies STATE"
+            ]
+      },
+      {
+            "title": "Mock (Behavior Check)",
+            "lines": [
+                  "pre-programmed with expectations",
+                  "e.g. mock_mailer.assert_called_with('ada@co.com')",
+                  "verifies BEHAVIOR"
+            ]
+      },
+      {
+            "title": "Fake (Working Alternative)",
+            "lines": [
+                  "real working lightweight implementation",
+                  "e.g. InMemoryDatabase with Python dict",
+                  "ideal for complex integration tests"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "class FakePaymentGateway:",
+      "    def __init__(self, should_fail=False): self.should_fail = should_fail",
+      "    def charge(self, amount):",
+      "        if self.should_fail: raise PaymentDeclinedException('Card declined')",
+      "        return 'charge_token_123'",
+      "# Test: checkout with failing gateway -> assert order marked failed in 0.001s!"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "fake_defined": "FakePaymentGateway implements real interface without Stripe SDK"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "failure_mode": "simulates credit card decline deterministically"
+            }
+      },
+      {
+            "line": 5,
+            "vars": {
+                  "test_run": "order rollback and error handling verified without touching internet"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The generic term for any surrogate object used in testing is a test <0>.",
+      "A test double returning canned answers without verifying calls is a <1>.",
+      "A lightweight, fully-working in-memory implementation is a <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "double"
+            ],
+            "why": "Test double is the universal umbrella term."
+      },
+      {
+            "a": [
+                  "stub"
+            ],
+            "why": "Stubs provide canned data inputs."
+      },
+      {
+            "a": [
+                  "fake"
+            ],
+            "why": "Fakes have working business shortcuts (like dict stores)."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is a 'Fake' in the Gerard Meszaros test double taxonomy?",
+      a: ["A test double that has a working implementation, but takes shortcuts that make it unsuitable for production (like an in-memory dictionary database)","A fake screenshot of a website","A bug in the test runner","A stolen password"],
+      c: 0,
+      why: "Fakes have real working logic (like an in-memory repository) that is much faster and simpler than production."
+    },
+    {
+      q: "What is the danger of overusing Mocks (Mockist testing) in unit tests?",
+      a: ["Tests become tightly coupled to internal implementation details (asserting exact method calls), making refactoring difficult even when behavior is unchanged","Mocks use too much internet bandwidth","Mocks can only be used in C++ code","Mocks delete database tables"],
+      c: 0,
+      why: "Excessive mocking couples tests to exact private method calls, causing tests to break during harmless refactorings."
+    },
+    {
+      q: "What is a 'Dummy' object in test double terminology?",
+      a: ["An object passed to satisfy a required parameter list that is never actually accessed or called during the test","A developer who doesn't write unit tests","A computer that has no monitor","A broken test that fails"],
+      c: 0,
+      why: "Dummies are placeholders used strictly to fill mandatory function arguments."
+    },
+    {
+      q: "Why is Dependency Injection essential for utilizing test doubles?",
+      a: ["Because if a class hardcodes 'new RealMailer()', there is no way for the test to substitute a FakeMailer without rewriting the code","DI makes the test files smaller in size","DI is required by compiler regulations","DI automatically runs tests in parallel"],
+      c: 0,
+      why: "Constructor injection provides the seam that lets test runners inject test doubles cleanly."
+    }
+  ]);
+</script>
+</body>
+</html>

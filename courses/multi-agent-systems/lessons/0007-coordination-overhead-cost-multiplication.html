@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 07 — Coordination Overhead and Cost Multiplication</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="multi-agent-systems" data-lesson="7" data-lesson-id="coordination-overhead-cost-multiplication">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 07</span> · Coordination Costs</span>
+
+  <h1 class="lesson-title">Coordination Overhead and Cost Multiplication</h1>
+  <p class="lesson-lede">
+    The hidden taxes of multi-agent systems: token multiplication, latency compounding, and Brooks's Law for AI.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You understand the financial and latency trade-offs of multi-agent coordination.</span>
+    <span><b>Mission link</b> Mastering coordination overhead and cost multiplication across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Coordination Overhead and Cost Multiplication</h2>
+  <p>In 1975, Fred Brooks coined <strong>Brooks's Law</strong>: <em>'Adding manpower to a late software project makes it later.'</em> In the era of AI, we face the exact same reality: <strong>The Multi-Agent Coordination Tax</strong>.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    The hidden taxes of multi-agent systems: token multiplication, latency compounding, and Brooks's Law for AI.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Multi-Agent Cost Multiplier</h2>
+  <p>Every time you add an agent to a workflow, you introduce significant operational costs:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>When Multi-Agent Is Justified vs Wasteful</h2>
+  <ul><li><strong>1. Cost Multiplication:</strong> If a task requires 4 agents who each take 3 turns with 8,000 tokens of context, total token consumption leaps from 8,000 tokens to <strong>over 100,000 tokens</strong>! What was a $\$0.02$ task becomes a $\$0.50$ task.</li><li><strong>2. Latency Compounding:</strong> Sequential agent handoffs compound Time-to-First-Token. If Agent 1 takes 5s, Agent 2 takes 7s, and Agent 3 takes 6s, the user waits 18 seconds for an answer!</li><li><strong>3. Coordination Overhead:</strong> Agents spending tokens talking to each other (<em>'Thank you, I will begin now.'</em>, <em>'Great, here is my update.'</em>) instead of doing useful work.</li></ul><pre><code># The Coordination Tax Math:
+# Single Agent Workflow:     1 agent  x 3 turns =  3 API calls (12k tokens, 4s latency)
+# 4-Agent Monolithic Swarm:  4 agents x 5 turns = 20 API calls (160k tokens, 35s latency!)
+# Cost multiplier: 13x more expensive! Latency multiplier: 9x slower!</code></pre><div class="callout"><p><strong>The Architectural Rule:</strong> Never use a multi-agent system where a single focused agent with good prompt engineering suffices. Multi-agent complexity is justified ONLY when tasks require strict division of labor or independent verification.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the coordination overhead sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You understand the financial and latency trade-offs of multi-agent coordination.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where coordination overhead and cost multiplication applies.</li>
+    <li>Author a unit test or verification script exercising coordination overhead and cost multiplication.</li>
+    <li>Document team architectural conventions regarding coordination overhead and cost multiplication.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Coordination Overhead and Cost Multiplication.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is 'Brooks's Law for AI Multi-Agent Systems'?",
+    a: ["Adding more agents to a task increases communication and coordination overhead, which can slow down execution and multiply costs","Adding more RAM makes computers colder","AI agents can only communicate in English","Adding more agents reduces token costs to zero"],
+    c: 0,
+    why: "Like Fred Brooks's mythical man-month, adding more agents multiplies communication overhead and token consumption."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Single Agent Task",
+            "lines": [
+                  "1 model, 3 turns",
+                  "12k tokens total ($0.03)",
+                  "4s latency, direct execution"
+            ]
+      },
+      {
+            "title": "4-Agent Swarm Overhead",
+            "lines": [
+                  "4 models, 5 turns each",
+                  "160k tokens total ($0.45)",
+                  "35s latency, heavy communication chatter"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Coordination Overhead and Cost Multiplication",
+      "def execute_flow():",
+      "    # The hidden taxes of multi-agent systems: token mul...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Coordination Overhead and Cost Multiplication"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Wasteful (Over-Engineered)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Justified (High ROI)"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Multi-agent architectures multiply token costs and {1} latency, requiring engineers to justify multi-agent complexity only for tasks requiring strict division of {2}."
+],
+    blanks: [
+      {
+            "a": [
+                  "compounding"
+            ],
+            "why": "Accumulating sequential delays"
+      },
+      {
+            "a": [
+                  "labor"
+            ],
+            "why": "Independent roles and verification"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why is deploying a 5-agent swarm to answer basic customer support FAQs usually an anti-pattern?",
+      a: ["It introduces massive latency and multiplies token costs by 10x for a task that a single fast model with RAG solves instantly","Customer support is illegal for AI","Swarm agents cannot read FAQs","It uses too much electricity"],
+      c: 0,
+      why: "Simple factual Q&A does not require multi-agent debate or handoff overhead."
+    },
+    {
+      q: "How can you minimize 'conversational chatter' overhead between cooperating agents?",
+      a: ["Enforce strict structured JSON handoff schemas and prohibit conversational pleasantries between agents in their system prompts","Turn off the internet","Delete the agents' memory","Make the agents write in lowercase"],
+      c: 0,
+      why: "Prohibiting conversational fluff ensures agent-to-agent exchanges consist purely of dense data payloads."
+    },
+    {
+      q: "What latency metric suffers the most in sequential multi-agent chains?",
+      a: ["Total end-to-end task completion duration, because each agent must wait for the preceding agent to finish its turns","Screen refresh rate","Keyboard typing speed","Download bandwidth"],
+      c: 0,
+      why: "Sequential dependencies compound latency across each agent's execution turns."
+    },
+    {
+      q: "When is the cost of multi-agent debate and verification well worth the financial expense?",
+      a: ["In high-consequence domains (like security auditing, medical reasoning, or financial compliance) where preventing a single error is worth thousands of dollars","When writing a poem","When testing a 1-line script","When checking spelling"],
+      c: 0,
+      why: "High-stakes failure consequences easily justify spending extra compute on redundant verification."
+    }
+  ]);
+</script>
+</body>
+</html>

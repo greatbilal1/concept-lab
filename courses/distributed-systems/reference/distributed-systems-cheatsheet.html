@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Distributed Systems & Scalability — Cheat Sheet</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+<style>
+  .ref-toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0 8px; }
+  .ref-toc a { font-size: .8rem; border: 1px solid var(--border); background: #111a30; padding: 5px 11px; border-radius: 999px; color: var(--muted); text-decoration: none; border-bottom: 1px solid var(--border); }
+  .ref-toc a:hover { color: #fff; border-color: #3d5488; }
+  .lesson-wrap h2 { scroll-margin-top: 20px; }
+  .snippet { margin: 14px 0 22px; }
+  .snippet .lbl { font-size: .72rem; font-weight: 800; letter-spacing: .7px; text-transform: uppercase; color: var(--accent2); margin-bottom: 6px; }
+  .see { font-size: .82rem; color: var(--muted); margin: -6px 0 12px; }
+  .see a { color: var(--accent2); border-bottom: 0; }
+  .see a:hover { color: #fff; }
+  .snippet pre { padding-top: 34px; }
+  @media print { .snippet pre { padding-top: 18px; } }
+</style>
+</head>
+<body class="lesson-body" data-course="distributed-systems">
+
+<div class="lesson-wrap">
+
+  <span class="lesson-kicker">Reference · Cheat sheet</span>
+  <h1 class="lesson-title">Distributed Systems & Scalability — Cheat Sheet</h1>
+  <p class="lesson-lede">
+    The whole course on one page. Every snippet links back to the lesson that
+    teaches it.
+  </p>
+
+  <div class="ref-toc">
+    <a href="#sec-1">G-Counter CRDT Implementation</a>
+    <a href="#sec-2">Consistent Hashing Ring Lookup</a>
+    <a href="#sec-3">Leaderless Quorum Assertion</a>
+    <a href="#sec-4">Raft Cluster Quorum Majority Rule</a>
+  </div>
+
+  <h2 id="sec-1"><span class="n">1</span>G-Counter CRDT Implementation</h2>
+  <div class="snippet">
+    <div class="lbl">Conflict-free distributed counter merge</div>
+    <pre><code>class GCounter:
+    def __init__(self, node_id, n=3):
+        self.node_id = node_id
+        self.counts = [0] * n
+    def inc(self): self.counts[self.node_id] += 1
+    def value(self): return sum(self.counts)
+    def merge(self, other):
+        # Commutative, associative, idempotent maximum:
+        self.counts = [max(a, b) for a, b in zip(self.counts, other.counts)]</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0007-eventual-consistency-vector-clocks-crdts.html">Lesson 07 — Eventual Consistency, Vector Clocks, and CRDTs</a>.</p>
+
+  <h2 id="sec-2"><span class="n">2</span>Consistent Hashing Ring Lookup</h2>
+  <div class="snippet">
+    <div class="lbl">Clockwise binary search on ring</div>
+    <pre><code>import bisect, hashlib
+def get_node(key, ring_keys, ring_map):
+    h = int(hashlib.sha256(key.encode()).hexdigest(), 16)
+    idx = bisect.bisect_right(ring_keys, h)
+    if idx == len(ring_keys): idx = 0 # Wrap around ring!
+    return ring_map[ring_keys[idx]]</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0004-data-partitioning-consistent-hashing.html">Lesson 04 — Data Partitioning and Consistent Hashing</a>.</p>
+
+  <h2 id="sec-3"><span class="n">3</span>Leaderless Quorum Assertion</h2>
+  <div class="snippet">
+    <div class="lbl">Dynamo-style strong consistency condition</div>
+    <pre><code># To guarantee linearizable reads in Dynamo/Cassandra:
+N = 3 # Total replica nodes
+W = 2 # Write acknowledged by 2 nodes
+R = 2 # Read queries 2 nodes
+assert (W + R) &gt; N, 'Quorum condition violated! Stale reads possible!'</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0005-replication-single-multi-leaderless.html">Lesson 05 — Replication Strategies: Single-Leader, Multi-Leader, and Leaderless</a>.</p>
+
+  <h2 id="sec-4"><span class="n">4</span>Raft Cluster Quorum Majority Rule</h2>
+  <div class="snippet">
+    <div class="lbl">Fault tolerance formula</div>
+    <pre><code># N nodes requires (N // 2 + 1) for quorum:
+# Survives F = (N - 1) // 2 node failures:
+# 3 nodes -&gt; Quorum: 2 -&gt; Survives 1 failure
+# 5 nodes -&gt; Quorum: 3 -&gt; Survives 2 failures</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0003-consensus-algorithms-raft-paxos.html">Lesson 03 — Consensus Algorithms: Paxos, Raft, and Distributed State Machines</a>.</p>
+
+  <div class="lesson-foot">
+    <div class="links">
+      <a href="distributed-systems-glossary.html">📖 Glossary</a>
+      <a href="../course.html">← Course map</a>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 06 — Space and trade-offs</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="big-o-complexity" data-lesson="6" data-lesson-id="space-and-trade-offs">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 06</span> · Space & trade-offs</span>
+
+  <h1 class="lesson-title">Space and trade-offs</h1>
+  <p class="lesson-lede">
+    Every lesson so far has counted time. But algorithms also consume memory, and
+    the two costs are often linked: you can spend space to buy time, or spend time
+    to save space. This lesson is about that bargain.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~12 min</span>
+    <span><b>Win</b> Spot a time-for-space trade-off</span>
+    <span><b>Mission link</b> Cost has two axes, not one</span>
+  </div>
+
+  <h2><span class="n">1</span>The cost you forgot to count</h2>
+
+  <p>
+    Big O applies to memory exactly as it applies to time. If an algorithm stores
+    one extra value per input item, its <b>space</b> is $O(n)$. If it stores a
+    fixed number of variables no matter how big the input is, its space is $O(1)$.
+  </p>
+
+  <p>
+    Here is the subtle part: a loop that scans a list uses $O(1)$ extra space,
+    because it only needs a cursor and a running total. But a function that builds
+    a new list of the same size uses $O(n)$ extra space. Same time class, very
+    different space class.
+  </p>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Buying time with space</h2>
+
+  <p>
+    The most common trade-off in all of computing: <b>remember an answer instead
+    of recomputing it</b>. Storing results in a table so you can look them up
+    later is called <b>memoisation</b>, and it is the classic space-for-time
+    bargain.
+  </p>
+
+  <div id="diagram1"></div>
+
+  <p>
+    The naive way to compute Fibonacci numbers recurses on both $n-1$ and $n-2$,
+    which is exponential — $O(2^n)$. But the same computation repeats the same
+    subproblems over and over. Store each answer once and the time collapses to
+    $O(n)$, at the cost of an $O(n)$ table.
+  </p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Space and time are two axes of the same cost. Memoisation trades memory for
+    speed; streaming trades speed for memory. Neither is free.
+  </div>
+
+  <h2><span class="n">3</span>Watch the trade happen</h2>
+
+  <p>
+    Step through the two versions of Fibonacci below. The naive version recomputes
+    the same values again and again; the memoised version computes each value once
+    and reads it back. Watch the <code>calls</code> counter.
+  </p>
+
+  <div id="trace1"></div>
+
+  <p>
+    For $n = 5$, the naive version makes 15 calls and the memoised version makes
+    5. The gap widens fast: at $n = 30$ the naive version makes over a million
+    calls while the memoised version makes 30. That is the exponential-to-linear
+    collapse, bought with a table.
+  </p>
+
+  <h2><span class="n">4</span>Recall the trade-off rules</h2>
+
+  <p>Fill these in from memory before the quiz.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>
+      You can look at an algorithm and state both its time and its space
+      complexity, and you can name the trade-off when one is bought with the
+      other. Cost is a pair, not a single number.
+    </p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+
+  <ol>
+    <li>
+      Take a function that reverses a list. Write one version that builds a new
+      list and one that swaps in place. State the space class of each.
+    </li>
+    <li>
+      Explain in one sentence why a lookup table can turn an $O(n)$ search into
+      an $O(1)$ lookup — and what it costs you.
+    </li>
+    <li>
+      Think of a case where saving memory matters more than saving time (a huge
+      file, a small device). This sets up Lesson 08.
+    </li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Read <a href="https://mitpress.mit.edu/9780262046305/introduction-to-algorithms/">_Introduction to Algorithms_</a>,
+    Chapter 15 ("Dynamic Programming"). It introduces memoisation and shows the
+    space-for-time trade-off on exactly the Fibonacci example used here.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher (me) anything — "does the input
+    itself count as space?", "when is $O(n)$ space too much?", "what is
+    streaming?". There are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  /* predict-then-reveal: space is a separate axis from time */
+  TeachWidgets.predict("#predict1", {
+    q: "A loop scans a list and keeps one running total. What is its extra space?",
+    a: ["It is O(n) extra space", "It is O(1) extra space", "It is O(n squared) space"],
+    c: 1,
+    why: "The loop needs only a cursor and a total, no matter how long the list is. Its time is O(n) but its extra space is O(1) — the two axes are independent."
+  });
+
+  /* the space-for-time bargain */
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      { title: "Naive", lines: ["recompute each time", "O(2ⁿ) time", "O(1) space"] },
+      { title: "Memoised", lines: ["store each answer", "O(n) time", "O(n) space"] },
+      { title: "The trade", lines: ["spend space", "buy time"] }
+    ]
+  });
+
+  /* step-through: naive vs memoised Fibonacci */
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "fib(5) naive → 15 calls",
+      "fib(5) memo  → 5 calls",
+      "fib(30) naive → 1,664,079 calls",
+      "fib(30) memo  → 30 calls",
+      "cost: an O(n) table"
+    ],
+    steps: [
+      { line: 0, vars: { n: "5", calls: "15", mode: "naive" } },
+      { line: 1, vars: { n: "5", calls: "5", mode: "memo" } },
+      { line: 2, vars: { n: "30", calls: "1,664,079", mode: "naive" } },
+      { line: 3, vars: { n: "30", calls: "30", mode: "memo" } },
+      { line: 4, vars: { space: "O(n)", time: "O(n)" } }
+    ]
+  });
+
+  /* recall from memory */
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — space and trade-offs",
+    lines: [
+      "An algorithm that stores one value per item uses O(<0>) space.",
+      "Storing answers to avoid recomputing them is called <1>.",
+      "Memoisation trades space for <2>."
+    ],
+    blanks: [
+      { a: ["n"], why: "One stored value per input item means the extra memory grows in proportion to n." },
+      { a: ["memoisation"], why: "Memoisation caches each subproblem's answer so it is computed only once." },
+      { a: ["time"], why: "The table costs memory but removes repeated work, so the running time drops sharply." }
+    ]
+  });
+
+  /* the quiz — every option is exactly six words */
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the extra space of a simple scanning loop?",
+      a: ["It uses constant extra space O(1)", "It uses linear extra space O(n)", "It uses quadratic extra space O(n²)", "It uses logarithmic extra space O(logn)"],
+      c: 0,
+      why: "A cursor and a running total are a fixed number of variables, so the extra space does not grow with the input."
+    },
+    {
+      q: "What does memoisation trade away to gain speed?",
+      a: ["It trades memory space for faster time", "It trades correctness away for faster time", "It trades time for much more memory", "It trades readability away for faster time"],
+      c: 0,
+      why: "Memoisation stores computed answers in a table, spending memory to avoid recomputing the same subproblems."
+    },
+    {
+      q: "Why is naive Fibonacci exponential in time?",
+      a: ["Because it recomputes the same subproblems", "Because it uses a large table", "Because it loops over every item", "Because it sorts the input first"],
+      c: 0,
+      why: "Each call branches into two more calls that repeat work already done, so the number of calls doubles per level."
+    },
+    {
+      q: "What is the space cost of the memoised version?",
+      a: ["It needs a table of size O(n)", "It needs a table of size O(1)", "It needs a table of size O(n²)", "It needs no extra memory at all"],
+      c: 0,
+      why: "One stored answer per value from 1 to n means the table grows linearly with n — the price of the speed-up."
+    }
+  ]);
+</script>
+</body>
+</html>

@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 08 — Building a Production AI Guardrail Gateway</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="ai-guardrails" data-lesson="8" data-lesson-id="building-production-guardrail-gateway">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 08</span> · Guardrail Gateway</span>
+
+  <h1 class="lesson-title">Building a Production AI Guardrail Gateway</h1>
+  <p class="lesson-lede">
+    Synthesizing guardrails: architecting an enterprise API gateway proxy with input screening, model dispatch, and output verification.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You have completed the AI Guardrails & Validation course.</span>
+    <span><b>Mission link</b> Mastering building a production ai guardrail gateway across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Building a Production AI Guardrail Gateway</h2>
+  <p>We have explored the full spectrum of AI Guardrails: bounded systems, input topicality and jailbreak filtering, PII redaction, output schema verification, secret scanning, open-source frameworks (NeMo, Guardrails AI), allow-lists, and human escalation.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Synthesizing guardrails: architecting an enterprise API gateway proxy with input screening, model dispatch, and output verification.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Production Guardrail Gateway Stack</h2>
+  <p>Now, we synthesize these into a <strong>Centralized Production AI Guardrail Gateway</strong>:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Centralized Enterprise Compliance</h2>
+  <ul><li><strong>1. Ingress Screening Layer:</strong> Runs fast regex PII scrubbing and Llama Guard safety classification in parallel (&lt; 50ms).</li><li><strong>2. Topicality & Scope Gate:</strong> Verifies domain vector distance. Out-of-scope queries short-circuit immediately.</li><li><strong>3. Model Dispatch:</strong> Dispatches clean prompt to the optimal model provider via circuit breaker.</li><li><strong>4. Egress Verification Layer:</strong> Audits output for Pydantic schema adherence, checks NLI factual grounding, and scans for secret leakage.</li><li><strong>5. Audit & Metric Telemetry:</strong> Emits OTel traces, token costs, and safety metrics to Prometheus and SIEM.</li></ul><pre><code># The Complete Production Guardrail Gateway (FastAPI Proxy):
+@app.post("/v1/chat/completions")
+async def secure_chat_gateway(request: ChatRequest, user: User = Depends(auth)):
+    # 1. Input Guardrail: PII + Safety + Topicality
+    scrubbed_prompt = scrub_pii(request.prompt)
+    if not await check_safety_and_topic(scrubbed_prompt):
+        return SafeRejectionResponse("Request violates safety or scope policies.")
+        
+    # 2. Model Execution via Resilient Proxy
+    raw_response = await model_router.dispatch(request.model, scrubbed_prompt)
+    
+    # 3. Output Guardrail: Secrets + Schema + Grounding
+    if contains_secrets(raw_response.text):
+        alert_soc_and_escalate(user.id, "Credential Leak Attempt")
+        return SafeRejectionResponse("Response blocked by security policy.")
+        
+    validated_data = validate_schema(raw_response.text, request.response_format)
+    return validated_data</code></pre><div class="callout"><p><strong>The Enterprise Standard:</strong> Centralizing guardrails in a gateway proxy ensures that every team across your company complies with corporate security and privacy policies automatically.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the guardrail gateway sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You have completed the AI Guardrails & Validation course.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where building a production ai guardrail gateway applies.</li>
+    <li>Author a unit test or verification script exercising building a production ai guardrail gateway.</li>
+    <li>Document team architectural conventions regarding building a production ai guardrail gateway.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Building a Production AI Guardrail Gateway.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is an 'AI Guardrail Gateway' in production enterprise architecture?",
+    a: ["A centralized proxy service sitting between all client applications and model providers that enforces uniform security, compliance, and guardrails","A physical metal gate outside the server room","A website with login buttons","A database index"],
+    c: 0,
+    why: "A guardrail gateway centralizes security, compliance, and validation policy across all company AI applications."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1. Ingress Screening (50ms)",
+            "lines": [
+                  "PII Scrubbing + Llama Guard",
+                  "Embedding Topicality Gate",
+                  "Blocks threats at the perimeter"
+            ]
+      },
+      {
+            "title": "2. Resilient Model Dispatch",
+            "lines": [
+                  "Routes to OpenAI / Anthropic / Local",
+                  "Enforces rate limits & circuit breakers"
+            ]
+      },
+      {
+            "title": "3. Egress Verification (20ms)",
+            "lines": [
+                  "Secret leak regex scanning",
+                  "Pydantic JSON Schema enforcement",
+                  "NLI Grounding Verification"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Building a Production AI Guardrail Gateway",
+      "def execute_flow():",
+      "    # Synthesizing guardrails: architecting an enterpris...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Building a Production AI Guardrail Gateway"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Internal App 1: HR Bot"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Internal App 2: Support"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "A production guardrail gateway centralizes security by screening prompts at ingress, routing to resilient models, and verifying {1} schemas and {2} grounding at egress."
+],
+    blanks: [
+      {
+            "a": [
+                  "output"
+            ],
+            "why": "Generated response structure"
+      },
+      {
+            "a": [
+                  "factual"
+            ],
+            "why": "Substantiated and truth-verified"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why is deploying guardrails as a centralized gateway proxy superior to having each app developer write their own filters?",
+      a: ["A centralized gateway ensures uniform corporate security, audit logging, and compliance policies across all internal teams without duplicate effort","Gateways eliminate server costs","Individual developers are not allowed to write code","Gateways run on quantum hardware"],
+      c: 0,
+      why: "Centralization guarantees consistent policy enforcement, unified logging, and single-point updates."
+    },
+    {
+      q: "What should the maximum latency overhead added by the guardrail gateway be for typical chat applications?",
+      a: ["Under 50 to 100 milliseconds across input and output checks","At least 10 seconds","1 minute","Latency does not matter in chat"],
+      c: 0,
+      why: "Fast, optimized guardrails add imperceptible overhead, preserving responsive user experience."
+    },
+    {
+      q: "How does the gateway handle an upstream model provider outage?",
+      a: ["It automatically triggers circuit breakers and reroutes traffic to a secondary fallback provider transparently","It crashes the client application","It deletes user data","It reboots the internet"],
+      c: 0,
+      why: "Enterprise gateways integrate fallback routing to maintain high availability during outages."
+    },
+    {
+      q: "What is the ultimate mark of an enterprise-grade AI architecture?",
+      a: ["Centralized guardrail gateways, rigorous input/output boundaries, automated quality evaluations, and immutable audit logs","Using the largest model available regardless of safety","Allowing arbitrary shell tool execution","Never testing code"],
+      c: 0,
+      why: "Defensive boundaries, centralized governance, and verifiable testing define mature AI architecture."
+    }
+  ]);
+</script>
+</body>
+</html>

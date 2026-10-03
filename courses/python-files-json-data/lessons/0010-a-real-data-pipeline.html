@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 10 — A real data pipeline</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="python-files-json-data" data-lesson="10" data-lesson-id="a-real-data-pipeline">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 10</span> · Together</span>
+
+  <h1 class="lesson-title">A real data pipeline</h1>
+  <p class="lesson-lede">
+    Everything in this course now fits together into one shape: read, transform,
+    write. This lesson builds that pipeline properly, with validation at the edges
+    and a guarantee you can run it twice.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~15 min</span>
+    <span><b>Win</b> Build a pipeline you can trust</span>
+    <span><b>Mission link</b> The whole course, working</span>
+  </div>
+
+  <h2><span class="n">1</span>The three stages</h2>
+
+  <p>
+    Almost every data program is the same three stages. Naming them makes the code
+    easier to reason about, test, and change:
+  </p>
+
+  <div id="intro1"></div>
+
+  <p>
+    Keeping them separate matters. If reading and transforming are tangled
+    together, you cannot test the transform without a file on disk — and you cannot
+    swap CSV for JSON without rewriting the logic.
+  </p>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Read, transform, write</h2>
+
+  <p>
+    Here is the whole pipeline, using every tool from this course:
+  </p>
+
+  <pre><code>import csv, json
+from pathlib import Path
+
+def read_rows(path):
+    with open(path, newline="") as f:
+        return list(csv.DictReader(f))
+
+def transform(rows):
+    out = []
+    for r in rows:
+        score = float(r["score"])          # CSV gives strings
+        out.append({"name": r["name"], "score": score})
+    return out
+
+def write_json(rows, path):
+    Path(path).parent.mkdir(parents=True, exist_ok=True)
+    with open(path, "w") as f:
+        json.dump(rows, f, indent=2, sort_keys=True)
+
+rows = read_rows("in.csv")
+write_json(transform(rows), "out/rows.json")</code></pre>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">3</span>Idempotency</h2>
+
+  <p>
+    A pipeline is <b>idempotent</b> when running it twice gives the same result as
+    running it once. That sounds obvious and is easy to break: appending instead of
+    overwriting, or accumulating into a global list, both destroy it.
+  </p>
+
+  <div id="diagram1"></div>
+
+  <p>
+    The version above is idempotent because it reads fresh, builds a new list, and
+    overwrites the output. Run it a hundred times and the file is identical.
+  </p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Idempotency is what makes a pipeline safe to re-run after a failure. Without
+    it, every retry makes the damage worse.
+  </div>
+
+  <h2><span class="n">4</span>Validate at the edges</h2>
+
+  <p>
+    Add validation where data enters and where it leaves. Inside, trust it:
+  </p>
+
+  <pre><code>def read_rows(path):
+    p = Path(path)
+    if not p.exists():
+        raise FileNotFoundError(f"missing input: {p}")
+    with open(p, newline="") as f:
+        rows = list(csv.DictReader(f))
+    if not rows:
+        raise ValueError("input has no data rows")
+    return rows</code></pre>
+
+  <div class="note good">
+    <span class="note-label">Why this matters later</span>
+    This is the shape of every data tool you will write: a thin read, a pure
+    transform, a thin write, and validation at both ends. Once you can build this,
+    you can build the rest.
+  </div>
+
+  <h2><span class="n">5</span>Check yourself</h2>
+
+  <p>
+    Answer from memory — do not scroll back up. Each option has the same number of
+    words, so nothing gives the answer away.
+  </p>
+
+  <div id="fill1"></div>
+  <div id="quiz"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>
+      You have built a complete, idempotent, validated data pipeline using files,
+      paths, JSON, CSV, conversion and error handling. That is the entire course,
+      working as one program.
+    </p>
+  </div>
+
+  <h2><span class="n">6</span>Do this next</h2>
+
+  <ol>
+    <li>
+      Build the pipeline above and run it twice. Confirm the output is identical.
+    </li>
+    <li>
+      Delete the input file and confirm you get a clear error, not a crash deep
+      inside the transform.
+    </li>
+    <li>
+      Swap the input for a JSON file and change only <code>read_rows</code>. Notice
+      that nothing else had to change.
+    </li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Read the Python docs on
+    <a href="https://docs.python.org/3/library/pathlib.html">pathlib</a> and the
+    <a href="https://docs.python.org/3/library/csv.html">csv module</a> — the two
+    libraries this pipeline leans on most.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher (me) anything — "how do I test
+    this?", "what about huge files?", "should I use pandas?". There are no bad
+    questions here.
+  </div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  /* the three stages */
+  TeachWidgets.introCards("#intro1", {
+    cards: [
+      { ico: "📥", title: "Read", body: "Get data in from a file, as raw as possible." },
+      { ico: "🔧", title: "Transform", body: "Pure logic: no files, no side effects, testable." },
+      { ico: "📤", title: "Write", body: "Put the result somewhere, overwriting cleanly." }
+    ]
+  });
+
+  /* predict-then-reveal */
+  TeachWidgets.predict("#predict1", {
+    q: "Why keep transform separate from read?",
+    a: ["It runs much faster", "It can be tested alone", "It uses less memory"],
+    c: 1,
+    why: "A pure transform can be tested with plain data, no files on disk required."
+  });
+
+  /* step-through trace of the pipeline */
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "rows = read_rows(\"in.csv\")",
+      "  -> [{'name': 'Ada', 'score': '42'}]",
+      "clean = transform(rows)",
+      "  -> [{'name': 'Ada', 'score': 42.0}]",
+      "write_json(clean, \"out/rows.json\")"
+    ],
+    steps: [
+      { line: 0, vars: { stage: "read" } },
+      { line: 1, vars: { note: "strings from CSV" } },
+      { line: 2, vars: { stage: "transform" } },
+      { line: 3, vars: { note: "score is a float" } },
+      { line: 4, vars: { stage: "write" } }
+    ]
+  });
+
+  /* idempotency */
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      { title: "Run once", lines: ["read fresh", "overwrite output"] },
+      { title: "Run again", lines: ["same input", "same output"] },
+      { title: "Breaks if", lines: ["you append", "or accumulate"] }
+    ]
+  });
+
+  /* recall from memory */
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — the pipeline",
+    lines: [
+      "The three stages are read, transform and <0>",
+      "A pipeline that gives the same result twice is <1>",
+      "Validation belongs at the <2> of the pipeline"
+    ],
+    blanks: [
+      { a: ["write"], why: "Read, transform, write is the shape of nearly every data program." },
+      { a: ["idempotent"], why: "Idempotent means running it twice equals running it once." },
+      { a: ["edges", "boundary"], why: "Validating at the edges lets the interior trust its data." }
+    ]
+  });
+
+  /* the quiz — every option is exactly three words */
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What are the three stages?",
+      a: ["Open, parse, close", "Read, transform, write", "Load, check, save", "Fetch, clean, print"],
+      c: 1,
+      why: "Nearly every data program reads input, transforms it, and writes output."
+    },
+    {
+      q: "What does idempotent mean?",
+      a: ["It runs very fast", "Twice equals once", "It never raises errors", "It uses less memory"],
+      c: 1,
+      why: "An idempotent pipeline produces the same result no matter how often it runs."
+    },
+    {
+      q: "Why keep transform pure?",
+      a: ["It runs much faster", "It is easy to test", "It uses less memory", "It avoids exceptions"],
+      c: 1,
+      why: "A pure transform takes data and returns data, so it can be tested without files."
+    }
+    {
+      q: "What breaks idempotency?",
+      a: ["Reading fresh input", "Appending to output", "Overwriting the output", "Sorting the keys"],
+      c: 1,
+      why: "Appending accumulates results across runs, so the second run differs from the first."
+    }
+  ]);
+</script>
+</body>
+</html>

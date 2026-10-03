@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 06 — Alignment: RLHF and Direct Preference Optimization (DPO)</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="llms" data-lesson="6" data-lesson-id="alignment-rlhf-and-dpo">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 06</span> · Alignment</span>
+
+  <h1 class="lesson-title">Alignment: RLHF and Direct Preference Optimization (DPO)</h1>
+  <p class="lesson-lede">
+    Human preference alignment: RLHF (PPO), Reward Modeling, and modern Direct Preference Optimization (DPO).
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You understand the principles and mechanics of RLHF and Direct Preference Optimization.</span>
+    <span><b>Mission link</b> Mastering alignment: rlhf and direct preference optimization (dpo) across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Alignment: RLHF and Direct Preference Optimization (DPO)</h2>
+  <p>Supervised Fine-Tuning is powerful, but it has a limitation: it only teaches the model to imitate a specific target text. However, for complex creative or reasoning prompts, there is no single 'correct' text. It is much easier for humans to look at two candidate answers ($A$ and $B$) and say: <strong>'Option A is significantly better than Option B.'</strong></p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Human preference alignment: RLHF (PPO), Reward Modeling, and modern Direct Preference Optimization (DPO).
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Classical RLHF vs Modern DPO</h2>
+  <p>This insight powers <strong>Human Preference Alignment</strong>:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>The Three Alignment Criteria</h2>
+  <ul><li><strong>1. Classical RLHF (with PPO):</strong> Train a separate <strong>Reward Model</strong> on human preference rankings ($y_{win} \succ y_{lose}$). Then use reinforcement learning (PPO) to train the LLM to maximize this reward score, with a KL-divergence penalty to stop it from drifting too far from the base model.</li><li><strong>2. Direct Preference Optimization (DPO) (Rafailov et al., 2023):</strong> The modern breakthrough! DPO mathematically proves that the language model itself can implicitly represent the reward model! DPO trains directly on $(x, y_{win}, y_{lose})$ pairs using a simple binary cross-entropy loss, completely eliminating the need for a separate reward model or complex PPO training!</li></ul><pre><code># The DPO Data Tuple:
+Prompt (x): "How do I bypass an admin password?"
+Chosen (y_win):  "I cannot provide instructions for bypassing authentication..."
+Rejected (y_lose): "Here is how to exploit the admin login route..."
+
+# DPO mathematically increases the likelihood of y_win while decreasing y_lose!</code></pre><div class="callout"><p><strong>The DPO Revolution:</strong> DPO made post-training alignment accessible to every engineering team. It runs with standard training loops, stable gradients, and zero reinforcement learning instability.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the alignment sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You understand the principles and mechanics of RLHF and Direct Preference Optimization.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where alignment: rlhf and direct preference optimization (dpo) applies.</li>
+    <li>Author a unit test or verification script exercising alignment: rlhf and direct preference optimization (dpo).</li>
+    <li>Document team architectural conventions regarding alignment: rlhf and direct preference optimization (dpo).</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Alignment: RLHF and Direct Preference Optimization (DPO).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Why is Reinforcement Learning from Human Feedback (RLHF) necessary after Supervised Fine-Tuning?",
+    a: ["SFT models can still generate dangerous, sycophantic, or unhelpful answers; RLHF optimizes directly for human preference judgments","SFT models forget English","RLHF is required by cloud servers","SFT models cannot output numbers"],
+    c: 0,
+    why: "RLHF aligns model behavior with nuanced human preferences across safety, honesty, and helpfulness."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Classical RLHF (PPO)",
+            "lines": [
+                  "Train separate Reward Model",
+                  "Run complex PPO reinforcement loop",
+                  "High training instability, 4 models in RAM"
+            ]
+      },
+      {
+            "title": "Direct Preference Optimization (DPO)",
+            "lines": [
+                  "Implicit reward within the model",
+                  "Simple closed-form loss on (win, loss) pairs",
+                  "Rock-solid stability, 2x faster"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Alignment: RLHF and Direct Preference Optimization (DPO)",
+      "def execute_flow():",
+      "    # Human preference alignment: RLHF (PPO), Reward Mod...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Alignment: RLHF and Direct Preference Optimization (DPO)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Helpful"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Honest"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "step": "Harmless"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Direct Preference Optimization aligns language models with human preferences by increasing the likelihood of {1} answers over {2} answers."
+],
+    blanks: [
+      {
+            "a": [
+                  "chosen"
+            ],
+            "why": "The preferred target response y_win"
+      },
+      {
+            "a": [
+                  "rejected"
+            ],
+            "why": "The inferior or harmful response y_lose"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What are the 'Three Hs' of AI alignment defined by Anthropic?",
+      a: ["Helpful, Honest, and Harmless","Hardware, Hosting, and Hyperparameters","HTML, HTTP, and HTTPS","Headers, Hashes, and Handshakes"],
+      c: 0,
+      why: "Helpful, Honest, and Harmless represent the foundational triumvirate of safe AI alignment."
+    },
+    {
+      q: "Why was classical PPO-based RLHF notoriously difficult to train?",
+      a: ["It required keeping four large neural networks simultaneously in GPU memory and suffered from extreme hyperparameter instability","PPO is written in assembly","PPO requires paper punch cards","PPO cannot run on Linux"],
+      c: 0,
+      why: "PPO requires the policy model, reference model, reward model, and value network in VRAM simultaneously."
+    },
+    {
+      q: "How does DPO eliminate the need for a separate reward model?",
+      a: ["It derives an exact mathematical equivalence between the optimal policy and the reward function, training the model directly on preference pairs","It deletes the rewards","It uses an SQL database instead","It turns off alignment"],
+      c: 0,
+      why: "DPO re-parameterizes the reward function in terms of the language model policy itself."
+    },
+    {
+      q: "What is 'Reward Hacking' (or Specification Gaming) in RLHF?",
+      a: ["When a model discovers weird loopholes (like excessive flattery or verbosity) that score high with the reward model without actually being helpful","A hacker stealing the reward model","A database corruption bug","A compiler error"],
+      c: 0,
+      why: "Models exploit flaws in reward functions to maximize score through unintended shortcuts."
+    }
+  ]);
+</script>
+</body>
+</html>

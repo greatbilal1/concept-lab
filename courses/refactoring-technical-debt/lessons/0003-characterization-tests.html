@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 03 — Characterization Tests: Safety Nets for Legacy Code</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="refactoring-technical-debt" data-lesson="3" data-lesson-id="characterization-tests">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 03</span> · Legacy Code</span>
+
+  <h1 class="lesson-title">Characterization Tests: Safety Nets for Legacy Code</h1>
+  <p class="lesson-lede">
+    Writing characterization tests (Golden Master tests) to create a safety net for legacy code with zero existing tests.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to establish safety nets around legacy code with characterization tests.</span>
+    <span><b>Mission link</b> Mastering characterization tests: safety nets for legacy code across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Characterization Tests: Safety Nets for Legacy Code</h2>
+  <p>Michael Feathers, in his seminal book <em>Working Effectively with Legacy Code</em>, offers a brutal but accurate definition: <strong>Legacy code is simply code without tests.</strong></p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Writing characterization tests (Golden Master tests) to create a safety net for legacy code with zero existing tests.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Characterization Workflow</h2>
+  <p>When you inherit a 1,500-line legacy function with zero tests, you cannot refactor it safely. But how do you write tests when you don't even understand all the strange edge cases and historical quirks the code handles?</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Locking in Current Behavior</h2>
+  <p>The answer is <strong>Characterization Testing</strong> (also called <em>Snapshot Testing</em> or <em>Golden Master Testing</em>). You do not ask: <em>'What should this code do?'</em> Instead, you ask: <em>'What does this code actually do right now?'</em></p><pre><code># Writing a Characterization Test:
+def test_legacy_pricing_engine_characterization():
+    # 1. Arrange a representative real-world input payload
+    payload = {"user_type": "standard", "items": [{"id": 1, "qty": 2}]}
+
+    # 2. Call the legacy beast
+    result = legacy_calculate_bill(payload)
+
+    # 3. Assert on the ACTUAL current output (bugs included!)
+    assert result == {"total": 45.50, "tax": 3.50, "status": "PROCESSED"}</code></pre><p>Once you have 20 characterization tests covering various inputs, you have constructed a <strong>safety net</strong>. Now you can refactor, extract classes, and clean up the implementation. If your characterization tests stay green, you have preserved existing behavior 100%.</p><div class="callout"><p><strong>Warning:</strong> If you spot an obvious bug while writing characterization tests, resist fixing it immediately! Lock down the existing behavior first, complete your refactoring, and only then write a new test to fix the bug.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the characterization testing sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to establish safety nets around legacy code with characterization tests.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where characterization tests: safety nets for legacy code applies.</li>
+    <li>Author a unit test or verification script exercising characterization tests: safety nets for legacy code.</li>
+    <li>Document team architectural conventions regarding characterization tests: safety nets for legacy code.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Characterization Tests: Safety Nets for Legacy Code.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is a 'characterization test' (also known as a golden master test)?",
+    a: ["A test that records and asserts the current actual behavior of a legacy system, bugs and quirks included, as a baseline","A test that checks variable names for proper character encoding","A test that verifies actor dialogue in video games","A benchmark test measuring typing speed"],
+    c: 0,
+    why: "Characterization tests lock down existing behavior so you can refactor safely without accidental changes."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1. Untested Legacy Beast",
+            "lines": [
+                  "2,000 lines of spaghetti",
+                  "Zero automated tests (Terrifying)"
+            ]
+      },
+      {
+            "title": "2. Write Characterization Tests",
+            "lines": [
+                  "Run real inputs through beast",
+                  "Capture and assert actual outputs"
+            ]
+      },
+      {
+            "title": "3. Refactor with Safety",
+            "lines": [
+                  "Extract classes & clean methods",
+                  "Tests guarantee zero regressions"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Characterization Tests: Safety Nets for Legacy Code",
+      "def execute_flow():",
+      "    # Writing characterization tests (Golden Master test...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Characterization Tests: Safety Nets for Legacy Code"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Observe Actual Output"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Safe Refactor Sandbox"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "step": "Subsequent Bug Fix"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "A characterization test locks down the {1} behavior of legacy code to provide a {2} net for future refactoring."
+],
+    blanks: [
+      {
+            "a": [
+                  "existing"
+            ],
+            "why": "Current actual output of the code today"
+      },
+      {
+            "a": [
+                  "safety"
+            ],
+            "why": "Protection against unintended regressions"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is Michael Feathers' definition of legacy code?",
+      a: ["Code without automated tests","Code written in COBOL or Fortran","Code older than 5 years","Code written by developers who left the company"],
+      c: 0,
+      why: "Without tests, modifying code is risky and fraught with regression danger."
+    },
+    {
+      q: "Why should you NOT fix bugs while writing characterization tests for legacy code?",
+      a: ["Fixing bugs changes behavior before you have a safety net, making it impossible to separate intended fixes from accidental breakage","Bugs in legacy code are protected by copyright","Legacy bugs do not affect users","Characterization tests cannot pass if bugs are fixed"],
+      c: 0,
+      why: "First lock down current behavior; then refactor safely; then fix bugs in dedicated commits."
+    },
+    {
+      q: "How do you know what inputs to feed into a characterization test?",
+      a: ["Use production logs, recorded database inputs, and boundary edge cases","Use only random characters","Call functions with empty arguments","Use inputs generated by a CSS compiler"],
+      c: 0,
+      why: "Representative production inputs provide the most realistic baseline coverage."
+    },
+    {
+      q: "What is another common name for characterization testing?",
+      a: ["Golden Master testing or Snapshot testing","Mutation fuzzing","Chaos engineering","Static analysis"],
+      c: 0,
+      why: "Golden Master testing compares current outputs against an established baseline golden snapshot."
+    }
+  ]);
+</script>
+</body>
+</html>

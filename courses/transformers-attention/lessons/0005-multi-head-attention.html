@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 05 — Multi-Head Attention: Attending to Multiple Relationships</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="transformers-attention" data-lesson="5" data-lesson-id="multi-head-attention">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 05</span> · Multi-Head</span>
+
+  <h1 class="lesson-title">Multi-Head Attention: Attending to Multiple Relationships</h1>
+  <p class="lesson-lede">
+    Why one attention head is not enough: Multi-Head Attention allows models to focus on multiple relationships simultaneously.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You understand why multi-head attention is essential for capturing rich linguistic relationships.</span>
+    <span><b>Mission link</b> Mastering multi-head attention: attending to multiple relationships across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Multi-Head Attention: Attending to Multiple Relationships</h2>
+  <p>A single attention mechanism can only focus on one thing at a time. If the word 'bank' attends strongly to 'river' to resolve its geographic meaning, it cannot simultaneously attend to 'overflowed' to resolve its subject-verb grammar.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Why one attention head is not enough: Multi-Head Attention allows models to focus on multiple relationships simultaneously.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Multi-Head Attention Splitting</h2>
+  <p>The solution is <strong>Multi-Head Attention</strong> (typically 8, 16, or 32 heads):</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Concatenation and Output Projection</h2>
+  <ul><li><strong>Subspace Splitting:</strong> The 768-dimensional embedding space is split into 12 distinct 64-dimensional subspaces ($d_k = 768 / 12 = 64$).</li><li><strong>Parallel Heads:</strong> Each head runs its own independent scaled dot-product attention in its own subspace.</li><li><strong>Specialization:</strong> Head 1 tracks syntactic subject-verb agreement; Head 2 tracks pronoun coreference; Head 3 tracks positional proximity; Head 4 tracks semantic synonyms.</li><li><strong>Concatenation & Projection:</strong> The outputs of all 12 heads are concatenated back into a 768-dimensional vector and multiplied by an output projection matrix $W_O$.</li></ul><pre><code># Multi-Head Attention Architecture:
+# MultiHead(Q, K, V) = Concat(head_1, head_2, ... head_h) @ W_O
+# where each head_i = Attention(Q @ W_Q_i, K @ W_K_i, V @ W_V_i)
+
+# Total compute cost is IDENTICAL to single-head attention because
+# each head operates on a fraction of the total dimension (d_model / h)!</code></pre><div class="callout"><p><strong>Free Richness:</strong> Multi-head attention does not increase computational cost; it simply reshapes the matrix multiplication into parallel subspace slices!</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the multi-head attention sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You understand why multi-head attention is essential for capturing rich linguistic relationships.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where multi-head attention: attending to multiple relationships applies.</li>
+    <li>Author a unit test or verification script exercising multi-head attention: attending to multiple relationships.</li>
+    <li>Document team architectural conventions regarding multi-head attention: attending to multiple relationships.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Multi-Head Attention: Attending to Multiple Relationships.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Why is Multi-Head Attention superior to a single large attention mechanism?",
+    a: ["Different heads can specialize in tracking different relationships simultaneously (e.g. grammar, coreference, rhyming, factual links)","Multi-head attention uses fewer parameters","Multi-head attention eliminates the need for GPUs","Single-head attention is illegal in PyTorch"],
+    c: 0,
+    why: "Multiple heads allow the model to jointly attend to information from different representation subspaces."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Head 1 (Grammar Lens)",
+            "lines": [
+                  "Attends: 'dog' -> 'barks'",
+                  "Tracks syntactic subject-verb agreement"
+            ]
+      },
+      {
+            "title": "Head 2 (Coreference Lens)",
+            "lines": [
+                  "Attends: 'it' -> 'dog'",
+                  "Tracks pronoun antecedent resolution"
+            ]
+      },
+      {
+            "title": "Head 3 (Semantic Lens)",
+            "lines": [
+                  "Attends: 'dog' -> 'veterinarian'",
+                  "Tracks domain topical association"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Multi-Head Attention: Attending to Multiple Relationships",
+      "def execute_flow():",
+      "    # Why one attention head is not enough: Multi-Head A...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Multi-Head Attention: Attending to Multiple Relationships"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Head Outputs (12 x 64D)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Output Projection (W_O)"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Multi-Head Attention splits the embedding dimension into parallel {1}, allowing the model to track multiple semantic {2} simultaneously."
+],
+    blanks: [
+      {
+            "a": [
+                  "heads"
+            ],
+            "why": "Parallel attention mechanisms"
+      },
+      {
+            "a": [
+                  "relationships"
+            ],
+            "why": "Linguistic, grammatical, and topical associations"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "How does the computational cost of 12 heads of dimension 64 compare to a single head of dimension 768?",
+      a: ["The total computational operations are nearly identical because 12 * 64 equals 768","12 heads take 12x more compute","Single head takes 12x more compute","12 heads cannot run on GPUs"],
+      c: 0,
+      why: "Subspace projection keeps total floating-point operations equal to a single full-width head."
+    },
+    {
+      q: "What happens after all attention heads have computed their individual outputs?",
+      a: ["Their output vectors are concatenated horizontally and projected through an output weight matrix W_O","They are averaged into a single number","They are saved to a text file","They are deleted"],
+      c: 0,
+      why: "Concatenation followed by linear projection blends the insights of all heads into a single vector."
+    },
+    {
+      q: "How many attention heads does a standard modern transformer layer typically have?",
+      a: ["Between 8 and 128 heads depending on model width and parameter scale","Exactly 1 head","1 million heads","0 heads"],
+      c: 0,
+      why: "Frontier models typically configure between 32 and 128 heads per layer."
+    },
+    {
+      q: "What empirical observation did researchers make when visualizing trained attention heads?",
+      a: ["Individual heads spontaneously specialize into distinct linguistic functions (e.g. tracking direct objects, punctuation, or names)","All heads learn the exact same thing","Heads only pay attention to spaces","Heads stop working after 10 tokens"],
+      c: 0,
+      why: "Trained heads exhibit clear specialization for syntax, coreference, and domain relationships."
+    }
+  ]);
+</script>
+</body>
+</html>

@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 02 — Inversion of Control: the Hollywood Principle</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="dependency-injection" data-lesson="2" data-lesson-id="inversion-of-control-the-hollywood-principle">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 02</span> · Dependency Injection & IoC</span>
+
+  <h1 class="lesson-title">Inversion of Control: the Hollywood Principle</h1>
+  <p class="lesson-lede">
+    Don't call us, we'll call you. Discover Inversion of Control (IoC): how frameworks and dependency containers reverse the flow of control in software systems.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Explain Inversion of Control and the distinction between libraries and frameworks</span>
+    <span><b>Mission link</b> The architectural shift distinguishing modern extensible systems from traditional scripts</span>
+  </div>
+
+  <h2><span class="n">1</span>The Hollywood Principle</h2>
+  <p>In traditional procedural programming, your code is in charge: it creates objects, calls library functions, and controls the program execution from start to finish. You call the library.</p><p><b>Inversion of Control (IoC)</b> flips this dynamic upside down. Coined as the <b>Hollywood Principle</b> (<i>'Don't call us, we'll call you'</i>), an IoC container or framework is in charge of the main control loop. You plug your components into the framework, and <b>the framework calls your code</b> when appropriate.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    With a library, your code is in control; with Inversion of Control, the framework is in control.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Library versus Framework control flow</h2>
+  <p>Visualise how Inversion of Control reverses the direction of the execution driver.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing Inversion of Control in a web framework</h2>
+  <p>Trace how a web framework listens for network requests and invokes your registered handler.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of Inversion of Control.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can articulate how Inversion of Control shifts architectural orchestration from user scripts to framework containers.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Explain to a peer the difference between calling a library function and registering a framework route.</li>
+    <li>Observe how an HTTP framework manages the server event loop while your code remains passive.</li>
+    <li>Read Martin Fowler's classic essay *Inversion of Control Containers and the Dependency Injection Pattern*.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Martin Fowler: *Inversion of Control Containers and the Dependency Injection Pattern* (martinfowler.com, 2004).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is the primary difference between a library and a framework in terms of control flow?",
+    a: ["You call a library; a framework calls you (Inversion of Control)","Libraries are written in C; frameworks are written in Python","Frameworks do not use computer memory","There is no difference between them"],
+    c: 0,
+    why: "The defining characteristic of a framework is Inversion of Control: it owns the control loop and invokes your code."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Traditional Library",
+            "lines": [
+                  "Your Code is in Control",
+                  "calls math.sqrt()",
+                  "calls json.loads()"
+            ]
+      },
+      {
+            "title": "Inversion of Control (Framework)",
+            "lines": [
+                  "Framework owns Main Loop (FastAPI / React)",
+                  "framework invokes your route: @app.get()",
+                  "framework injects dependencies!"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# You register your handler with the framework:",
+      "@app.get('/users/{id}')",
+      "def get_user(id: int): return {'id': id}",
+      "# Framework executes the infinite event loop: accepts socket -> parses HTTP -> CALLS YOUR FUNCTION!"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "registration": "user code registered as plugin callback"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "ioc_execution": "framework receives TCP packet, parses params, and calls get_user(42)"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The design principle where frameworks call your code is Inversion of <0>.",
+      "The Hollywood Principle says: 'Don't call us, we'll <1> you.'",
+      "The acronym IoC stands for Inversion of <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "Control"
+            ],
+            "why": "Inversion of Control reverses program flow."
+      },
+      {
+            "a": [
+                  "call"
+            ],
+            "why": "The Hollywood Principle describes framework callbacks."
+      },
+      {
+            "a": [
+                  "Control"
+            ],
+            "why": "IoC is the standard abbreviation."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the 'Hollywood Principle' in software architecture?",
+      a: ["'Don't call us, we'll call you': high-level frameworks control the execution loop and invoke low-level user code plugins when needed","All software should be documented with movie analogies","Every variable must have an audition before being declared","Code must be written in Los Angeles, California"],
+      c: 0,
+      why: "The Hollywood Principle encapsulates Inversion of Control: framework calls user code."
+    },
+    {
+      q: "Is Dependency Injection the only way to achieve Inversion of Control?",
+      a: ["No, DI is one specific implementation of IoC; other forms include Template Method, Strategy, and Event Callbacks","Yes, DI and IoC are completely identical terms","Only in object-oriented programming","Yes, unless using C++"],
+      c: 0,
+      why: "IoC is a broad architectural concept; DI is the specific practice of inverting dependency creation."
+    },
+    {
+      q: "How does a web server framework (like FastAPI or Express) embody Inversion of Control?",
+      a: ["The framework owns the main network socket loop and calls your route functions when matching HTTP requests arrive","It turns off the database server","It makes your Python code compile to binary","It eliminates the need for HTTP headers"],
+      c: 0,
+      why: "You don't call the server; the server loop listens and invokes your route callbacks."
+    },
+    {
+      q: "What is the primary advantage of Inversion of Control in software frameworks?",
+      a: ["Extensibility: common plumbing (networking, lifecycle, thread management) is handled centrally, letting developers focus strictly on business logic plugins","It makes computers use fifty percent less electrical power","It allows the computer to run without a CPU","It makes code impossible to reverse engineer"],
+      c: 0,
+      why: "Frameworks manage complex boilerplate lifecycles, calling custom user plugins as needed."
+    }
+  ]);
+</script>
+</body>
+</html>

@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 11 — Dunder methods</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="oop" data-lesson="11" data-lesson-id="dunder-methods">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 11</span> · Python power tools</span>
+
+  <h1 class="lesson-title">Dunder methods</h1>
+  <p class="lesson-lede">
+    Dunder methods (double underscore, like <code>__init__</code>) let your objects
+    plug into Python's own syntax. Define <code>__len__</code> and
+    <code>len(obj)</code> works. Define <code>__eq__</code> and <code>==</code>
+    works. Your objects stop feeling foreign.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Make your objects behave like built-ins</span>
+    <span><b>Mission link</b> Objects that fit the language</span>
+  </div>
+
+  <h2><span class="n">1</span>Your object feels foreign</h2>
+
+  <p>
+    Print a plain object and you get something unhelpful.
+  </p>
+
+  <pre><code>book = Book("Dune", 3)
+print(book)          # &lt;__main__.Book object at 0x104f2c190&gt;
+print(book == book)  # True — but only because it is the same object</code></pre>
+
+  <p>
+    Two books with the same title are not equal, and printing one tells you nothing.
+    Dunder methods fix both.
+  </p>
+
+  <div class="note bad">
+    <span class="note-label">The failure</span>
+    Without dunders, your objects do not participate in the language. You cannot
+    print them, compare them, or use them in loops the way you expect.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Plug into the syntax</h2>
+
+  <p>
+    Each dunder maps to a piece of syntax. Define the method, and the syntax starts
+    working.
+  </p>
+
+  <table>
+    <tr><th>You write</th><th>Python calls</th></tr>
+    <tr><td><code>print(book)</code></td><td><code>__str__</code></td></tr>
+    <tr><td><code>book == other</code></td><td><code>__eq__</code></td></tr>
+    <tr><td><code>len(shelf)</code></td><td><code>__len__</code></td></tr>
+    <tr><td><code>for x in shelf</code></td><td><code>__iter__</code></td></tr>
+  </table>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Dunders are the hooks between your class and Python's syntax. You are not
+    inventing new syntax — you are teaching Python how your object behaves in the
+    syntax it already has.
+  </div>
+
+  <h2><span class="n">3</span>__str__ and __eq__</h2>
+
+  <p>
+    These two are the ones you will write most often. <code>__str__</code> controls
+    printing; <code>__eq__</code> controls equality.
+  </p>
+
+  <pre><code>class Book:
+    def __init__(self, title, copies):
+        self.title = title
+        self.copies = copies
+
+    def __str__(self):
+        return f"Book({self.title!r}, copies={self.copies})"
+
+    def __eq__(self, other):
+        if not isinstance(other, Book):
+            return NotImplemented
+        return self.title == other.title
+
+print(Book("Dune", 3))                       # Book('Dune', copies=3)
+print(Book("Dune", 3) == Book("Dune", 9))    # True</code></pre>
+
+  <div class="note warn">
+    <span class="note-label">Two rules</span>
+    Return <code>NotImplemented</code> (not <code>False</code>) when the other object
+    is a different type. And if you define <code>__eq__</code>, define
+    <code>__hash__</code> too if the object should be usable in sets or as dict keys.
+  </div>
+
+  <div id="fill1"></div>
+
+  <h2><span class="n">4</span>Check yourself</h2>
+
+  <p>
+    Answer from memory. Every option has the same number of words.
+  </p>
+
+  <div id="quiz"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>
+      You can now make your objects print nicely, compare sensibly, and work with
+      <code>len()</code> and loops. Your classes now feel like they belong in Python
+      rather than sitting beside it.
+    </p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+
+  <ol>
+    <li>
+      Add <code>__str__</code> to your <code>Book</code> class and print an object.
+    </li>
+    <li>
+      Add <code>__eq__</code> so two books with the same title are equal.
+    </li>
+    <li>
+      Add <code>__len__</code> to a <code>Shelf</code> class so
+      <code>len(shelf)</code> returns the number of books.
+    </li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Read <a href="https://docs.python.org/3/reference/datamodel.html#special-method-names">The
+    Python Data Model → Special method names</a>. It is the full list — skim it and
+    note the ones you recognise.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask me anything — "why NotImplemented and not False?",
+    "what is __repr__ for?", "when do I need __hash__?". I will shape the next lesson
+    around your questions.
+  </div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What does print(book) show by default?",
+    a: ["The book's title", "A memory address", "The class source"],
+    c: 1,
+    why: "Without __str__, Python prints the object's type and memory address — which tells you nothing useful."
+  });
+
+  TeachWidgets.fill("#fill1", {
+    lines: [
+      "class Book:",
+      "    def <0>(self):",
+      "        return f\"Book({self.title!r})\"",
+      "",
+      "    def <1>(self, other):",
+      "        if not isinstance(other, Book):",
+      "            return NotImplemented",
+      "        return self.title == other.title"
+    ],
+    blanks: [
+      { a: ["__str__"], why: "__str__ controls what print() shows for the object." },
+      { a: ["__eq__"], why: "__eq__ controls what the == operator does between two objects." }
+    ]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is a dunder method?",
+      a: ["A private helper method here", "A hook into Python syntax", "A method with no body", "A method that runs first"],
+      c: 1,
+      why: "Dunder methods connect your class to Python's built-in syntax like print, ==, and len."
+    },
+    {
+      q: "Which dunder controls printing?",
+      a: ["The __print__ method", "The __str__ method", "The __init__ method", "The __repr__ method"],
+      c: 1,
+      why: "__str__ returns the string that print() shows for the object."
+    },
+    {
+      q: "Which dunder controls equality?",
+      a: ["__eq__", "__cmp__", "__same__", "__equal__"],
+      c: 0,
+      why: "__eq__ is called when you use == between two objects."
+    },
+    {
+      q: "What should __eq__ return?",
+      a: ["Always True or False", "NotImplemented for other types", "The other object itself", "A string describing it"],
+      c: 1,
+      why: "Returning NotImplemented lets Python try the other object's __eq__ instead of assuming they differ."
+    }
+  ]);
+</script>
+</body>
+</html>

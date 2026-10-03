@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 06 — Context Eviction and Rolling Windows in Chat Apps</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="tokens-context" data-lesson="6" data-lesson-id="context-eviction-rolling-windows">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 06</span> · Eviction Strategies</span>
+
+  <h1 class="lesson-title">Context Eviction and Rolling Windows in Chat Apps</h1>
+  <p class="lesson-lede">
+    Managing conversation memory in production: sliding rolling windows, FIFO eviction, and summarization buffers.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to manage rolling windows and summarization buffers for production chat applications.</span>
+    <span><b>Mission link</b> Mastering context eviction and rolling windows in chat apps across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Context Eviction and Rolling Windows in Chat Apps</h2>
+  <p>In production chat applications, users can talk for days, generating hundreds of messages. Because LLM APIs are stateless, your backend must send the conversation history on every turn. If you append messages indefinitely, your app will inevitably crash with an HTTP 400 <code>context_length_exceeded</code> error.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Managing conversation memory in production: sliding rolling windows, FIFO eviction, and summarization buffers.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Eviction Strategies Compared</h2>
+  <p>To manage multi-turn history within a fixed budget, architectures use <strong>Context Eviction Strategies</strong>:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>The Summarization Buffer Flow</h2>
+  <ul><li><strong>1. FIFO Sliding Window (Message Truncation):</strong> Keep only the most recent $K$ messages (e.g. last 10 turns). Simple and fast, but loses all early context and decisions made at the start of the chat.</li><li><strong>2. Token-Bounded Sliding Window:</strong> Keep as many recent messages as fit within a strict token budget (e.g. 8,000 tokens), dropping the oldest user/assistant pairs when budget is exceeded.</li><li><strong>3. Summarization Buffer (Summary + Recent):</strong> When older messages are evicted, an asynchronous background task summarizes them into a concise 3-line memory block that stays pinned to the top of the prompt!</li></ul><pre><code># The Summarization Buffer Architecture in Python:
+[SYSTEM PROMPT]        -> Fixed system rules
+[PINNED SUMMARY]       -> "User is building an e-commerce app with FastAPI.
+                          Decided on PostgreSQL with Pydantic v2 schemas."
+[ROLLING WINDOW]       -> Last 6 recent turns (Full detailed messages)
+# Older turns 1-20 were evicted and condensed into the PINNED SUMMARY!</code></pre><div class="callout"><p><strong>Production Best Practice:</strong> Never drop the System Prompt! Evict only intermediate dialog turns, preserving the core system identity and active summary.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the eviction strategy sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to manage rolling windows and summarization buffers for production chat applications.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where context eviction and rolling windows in chat apps applies.</li>
+    <li>Author a unit test or verification script exercising context eviction and rolling windows in chat apps.</li>
+    <li>Document team architectural conventions regarding context eviction and rolling windows in chat apps.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Context Eviction and Rolling Windows in Chat Apps.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What happens if a chat application continuously appends messages without implementing an eviction or truncation strategy?",
+    a: ["The conversation will eventually crash with a 'context length exceeded' API error when token count exceeds the model limit","The chat window turns green","The user's account is charged double","The messages are automatically translated"],
+    c: 0,
+    why: "Unbounded chat history accumulation leads to hard context length crashes."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "FIFO Message Drop",
+            "lines": [
+                  "Keep last 10 messages",
+                  "Drops turn 1 completely (Amnesia)"
+            ]
+      },
+      {
+            "title": "Token-Bounded Buffer",
+            "lines": [
+                  "Keep up to 8k tokens of recent turns",
+                  "Predictable cost, but loses history"
+            ]
+      },
+      {
+            "title": "Summary + Rolling Window",
+            "lines": [
+                  "Old turns condensed to 3-line summary",
+                  "Preserves decisions + recent context"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Context Eviction and Rolling Windows in Chat Apps",
+      "def execute_flow():",
+      "    # Managing conversation memory in production: slidin...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Context Eviction and Rolling Windows in Chat Apps"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Active Turns (1-30)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Distilled Checkpoint"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "step": "Updated Prompt"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "A summarization buffer preserves conversation continuity by condensing older evicted turns into a {1} summary pinned below the {2} prompt."
+],
+    blanks: [
+      {
+            "a": [
+                  "distilled"
+            ],
+            "why": "Condensed high-signal overview"
+      },
+      {
+            "a": [
+                  "system"
+            ],
+            "why": "Foundational instruction tier"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why is simple FIFO (First-In, First-Out) message eviction problematic in complex chat workflows?",
+      a: ["It discards early messages where the user originally defined the primary goal, constraints, and project rules","FIFO takes too much memory","FIFO causes syntax errors in JSON","FIFO is forbidden in Python"],
+      c: 0,
+      why: "Dropping early turns erases the foundational project setup and initial constraints."
+    },
+    {
+      q: "What component of the prompt should NEVER be evicted during context window management?",
+      a: ["The system prompt (instructions and behavioral constraints)","The third user message","The latest assistant response","The tool output"],
+      c: 0,
+      why: "The system prompt defines model behavior and must remain permanently pinned."
+    },
+    {
+      q: "How does an asynchronous summarizer background task avoid slowing down chat responses?",
+      a: ["It summarizes older history in a background worker while the main server continues serving immediate turns without delay","It runs on the user's phone","It deletes old messages without reading them","It turns off logging"],
+      c: 0,
+      why: "Background workers update the rolling summary asynchronously without blocking user response latency."
+    },
+    {
+      q: "What happens if a sliding window evicts half of a tool-calling exchange (keeping the result but dropping the call)?",
+      a: ["Many model APIs (like Anthropic/OpenAI) will throw an error because tool calls and tool results must remain paired in history","The model fixes the pair automatically","The computer restarts","The API bill is waived"],
+      c: 0,
+      why: "Tool-use schemas require atomic call-and-response pairing in conversation history."
+    }
+  ]);
+</script>
+</body>
+</html>

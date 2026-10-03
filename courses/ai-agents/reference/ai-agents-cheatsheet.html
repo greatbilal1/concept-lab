@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Agents & Agent Loops — Cheat Sheet</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+<style>
+  .ref-toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0 8px; }
+  .ref-toc a { font-size: .8rem; border: 1px solid var(--border); background: #111a30; padding: 5px 11px; border-radius: 999px; color: var(--muted); text-decoration: none; border-bottom: 1px solid var(--border); }
+  .ref-toc a:hover { color: #fff; border-color: #3d5488; }
+  .lesson-wrap h2 { scroll-margin-top: 20px; }
+  .snippet { margin: 14px 0 22px; }
+  .snippet .lbl { font-size: .72rem; font-weight: 800; letter-spacing: .7px; text-transform: uppercase; color: var(--accent2); margin-bottom: 6px; }
+  .see { font-size: .82rem; color: var(--muted); margin: -6px 0 12px; }
+  .see a { color: var(--accent2); border-bottom: 0; }
+  .see a:hover { color: #fff; }
+  .snippet pre { padding-top: 34px; }
+  @media print { .snippet pre { padding-top: 18px; } }
+</style>
+</head>
+<body class="lesson-body" data-course="ai-agents">
+
+<div class="lesson-wrap">
+
+  <span class="lesson-kicker">Reference · Cheat sheet</span>
+  <h1 class="lesson-title">AI Agents & Agent Loops — Cheat Sheet</h1>
+  <p class="lesson-lede">
+    The whole course on one page. Every snippet links back to the lesson that
+    teaches it.
+  </p>
+
+  <div class="ref-toc">
+    <a href="#sec-1">Universal Agent Execution Loop</a>
+    <a href="#sec-2">Circuit Breaker Guardrails</a>
+    <a href="#sec-3">Human-in-the-Loop Interrupt Pattern</a>
+    <a href="#sec-4">Tool Registry Dispatcher</a>
+  </div>
+
+  <h2 id="sec-1"><span class="n">1</span>Universal Agent Execution Loop</h2>
+  <div class="snippet">
+    <div class="lbl">Goal-Plan-Act-Observe pattern</div>
+    <pre><code>while not goal_satisfied:
+    thought = agent.plan(history, state)
+    action = agent.decide_action(thought)
+    if action.is_done: break
+    obs = tools.dispatch(action.name, action.args)
+    history.append({'action': action, 'observation': obs})
+    state.update(obs)</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0002-core-agent-loop-goal-plan-act-observe.html">Lesson 02 — The Core Agent Loop: Goal, Plan, Act, Observe</a>.</p>
+
+  <h2 id="sec-2"><span class="n">2</span>Circuit Breaker Guardrails</h2>
+  <div class="snippet">
+    <div class="lbl">Bounding execution safety</div>
+    <pre><code>class CircuitBreaker:
+    def __init__(self, max_turns=15, max_cost=2.0):
+        self.max_turns = max_turns
+        self.max_cost = max_cost
+    def check(self, turns, cost):
+        if turns &gt;= self.max_turns: raise LimitExceeded('Turn ceiling reached!')
+        if cost &gt;= self.max_cost: raise LimitExceeded('Cost ceiling reached!')</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0006-self-correction-circuit-breakers.html">Lesson 06 — Self-Correction, Error Recovery, and Circuit Breakers</a>.</p>
+
+  <h2 id="sec-3"><span class="n">3</span>Human-in-the-Loop Interrupt Pattern</h2>
+  <div class="snippet">
+    <div class="lbl">Pausing before sensitive write tools</div>
+    <pre><code>if tool.is_sensitive:
+    # Pause workflow and checkpoint state to database:
+    save_checkpoint(session_id, state)
+    return {'status': 'PAUSED', 'message': 'Requires human approval'}
+# Resumes only after human clicks 'Approve'!</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0007-human-in-the-loop-approval-gates.html">Lesson 07 — Human-in-the-Loop Approval and Steering Gates</a>.</p>
+
+  <h2 id="sec-4"><span class="n">4</span>Tool Registry Dispatcher</h2>
+  <div class="snippet">
+    <div class="lbl">Async execution with timeout</div>
+    <pre><code>async def dispatch_tool(registry, name, args):
+    func = registry[name]
+    # Enforce strict 30-second timeout guard:
+    return await asyncio.wait_for(func(**args), timeout=30.0)</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0004-tool-orchestration-environment-execution.html">Lesson 04 — Tool Orchestration and Environment Execution</a>.</p>
+
+  <div class="lesson-foot">
+    <div class="links">
+      <a href="ai-agents-glossary.html">📖 Glossary</a>
+      <a href="../course.html">← Course map</a>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

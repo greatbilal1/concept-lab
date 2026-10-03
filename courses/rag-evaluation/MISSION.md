@@ -1,0 +1,3 @@
+# Mission — RAG Evaluation
+
+Master the science of quantitative evaluation for Retrieval-Augmented Generation systems. Bifurcate retrieval evaluation from generation evaluation, compute Context Recall and Context Precision, evaluate Faithfulness and Answer Relevance, automate metrics using Ragas and TruLens, scale test coverage with synthetic generation, triage broken pipelines systematically, run configuration matrix benchmarks, and enforce continuous CI quality gates.

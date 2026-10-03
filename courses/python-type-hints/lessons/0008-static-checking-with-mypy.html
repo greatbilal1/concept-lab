@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 08 — Static checking with mypy</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="python-type-hints" data-lesson="8" data-lesson-id="static-checking-with-mypy">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 08</span> · Checking</span>
+
+  <h1 class="lesson-title">Static checking with mypy</h1>
+  <p class="lesson-lede">
+    Annotations do nothing on their own. A checker is what turns them into
+    feedback — and <code>mypy</code> is the one you will meet most often.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~12 min</span>
+    <span><b>Win</b> Run a checker and read its output</span>
+    <span><b>Mission link</b> Feedback you can act on</span>
+  </div>
+
+  <h2><span class="n">1</span>Running a checker</h2>
+
+  <p>
+    Install it, then point it at your code:
+  </p>
+
+  <pre><code>pip install mypy
+mypy src/</code></pre>
+
+  <p>
+    It reads your annotations, follows your imports, and prints one line per
+    problem. Nothing runs — the analysis is entirely static.
+  </p>
+
+  <div id="intro1"></div>
+
+  <h2><span class="n">2</span>Reading the output</h2>
+
+  <p>
+    A typical error names the file, the line, the expected type and the actual one:
+  </p>
+
+  <pre><code>src/app.py:12: error: Argument 1 to "greet" has
+incompatible type "int"; expected "str"  [arg-type]</code></pre>
+
+  <div id="predict1"></div>
+
+  <p>
+    The bracketed code at the end is the error category. You can silence a specific
+    category with a comment, but silencing should be rare and deliberate.
+  </p>
+
+  <h2><span class="n">3</span>Strictness</h2>
+
+  <p>
+    By default mypy is lenient: unannotated functions are treated as
+    <code>Any</code>, so mistakes inside them go unnoticed. Strict mode refuses that
+    bargain.
+  </p>
+
+  <div id="diagram1"></div>
+
+  <p>
+    A common path is to start lenient, get the codebase annotated, then turn on
+    strict flags one at a time. Turning everything on at once on a large codebase
+    produces a wall of errors nobody fixes.
+  </p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Stubs</h2>
+
+  <p>
+    When a library has no annotations, a <b>stub</b> file (<code>.pyi</code>)
+    supplies them without touching the library. Many popular packages ship stubs, and
+    <code>types-*</code> packages exist for the rest.
+  </p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    A checker turns annotations into feedback. Start lenient, annotate, then tighten.
+    Stubs let you type code you do not own.
+  </div>
+
+  <h2><span class="n">5</span>Check yourself</h2>
+
+  <p>
+    Answer from memory — do not scroll back up. Each option has the same number of
+    words, so nothing gives the answer away.
+  </p>
+
+  <div id="fill1"></div>
+  <div id="quiz"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>
+      You can run <code>mypy</code>, read an error line, explain what strict mode
+      changes, and say what a stub file is for.
+    </p>
+  </div>
+
+  <h2><span class="n">6</span>Do this next</h2>
+
+  <ol>
+    <li>Run <code>mypy</code> on a small project and count the errors.</li>
+    <li>Fix one error and re-run to confirm it disappeared.</li>
+    <li>Turn on one strict flag and see what new errors appear.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Read the
+    <a href="https://mypy.readthedocs.io/en/stable/">mypy documentation</a>,
+    especially the section on strictness flags.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher (me) anything — "mypy or pyright?",
+    "how do I ignore one line?", "what is a plugin?". There are no bad questions
+    here.
+  </div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  /* checking vocabulary */
+  TeachWidgets.introCards("#intro1", {
+    cards: [
+      { ico: "🔍", title: "mypy", body: "The most common Python checker." },
+      { ico: "📄", title: "Stub", body: "A .pyi file declaring types." },
+      { ico: "🔒", title: "Strict", body: "Refuses to ignore unannotated code." }
+    ]
+  });
+
+  /* predict-then-reveal */
+  TeachWidgets.predict("#predict1", {
+    q: "Does mypy run your code?",
+    a: ["Yes, it executes it", "No, it only analyses", "Only in strict mode"],
+    c: 1,
+    why: "mypy is a static checker: it analyses the source without executing anything."
+  });
+
+  /* strictness */
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      { title: "Default", lines: ["unannotated is Any", "fewer errors"] },
+      { title: "Strict", lines: ["no silent Any", "more errors"] },
+      { title: "Adoption", lines: ["annotate first", "tighten gradually"] }
+    ]
+  });
+
+  /* step-through trace */
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "def greet(name: str) -> str:",
+      "  return \"Hi \" + name",
+      "greet(42)",
+      "mypy src/app.py",
+      "src/app.py:3: error: arg-type"
+    ],
+    steps: [
+      { line: 0, vars: { name: "str", returns: "str" } },
+      { line: 1, vars: { body: "concatenation" } },
+      { line: 2, vars: { arg: "int" } },
+      { line: 3, vars: { action: "static analysis" } },
+      { line: 4, vars: { report: "incompatible type" } }
+    ]
+  });
+
+  /* recall from memory */
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — checking",
+    lines: [
+      "The most common checker is <0>",
+      "A file declaring types is a <1>",
+      "A configuration ignoring nothing is <2> mode"
+    ],
+    blanks: [
+      { a: ["mypy"], why: "mypy is the most widely used static type checker for Python." },
+      { a: ["stub", ".pyi"], why: "A stub file declares types for code you do not own." },
+      { a: ["strict"], why: "Strict mode refuses to silently treat unannotated code as Any." }
+    ]
+  });
+
+  /* the quiz — every option is exactly three words */
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What does mypy do?",
+      a: ["Runs your program", "Analyses without running", "Formats your source", "Compiles to bytecode"],
+      c: 1,
+      why: "mypy performs static analysis; it never executes your code."
+    },
+    {
+      q: "What is a stub file?",
+      a: ["A test fixture file", "A file declaring types", "A compiled binary file", "A configuration file"],
+      c: 1,
+      why: "A .pyi stub declares types for code without modifying it."
+    },
+    {
+      q: "What does strict mode do?",
+      a: ["Runs code faster", "Refuses silent Any", "Formats the output", "Skips all imports"],
+      c: 1,
+      why: "Strict mode refuses to silently treat unannotated code as Any."
+    },
+    {
+      q: "What is the bracket code?",
+      a: ["A line number", "An error rule name", "A severity level", "A module path"],
+      c: 1,
+      why: "The bracketed code such as [arg-type] names the rule that produced the error."
+    }
+  ]);
+</script>
+</body>
+</html>

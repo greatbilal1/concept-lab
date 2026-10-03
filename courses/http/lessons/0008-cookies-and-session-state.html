@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 08 — Cookies and session state</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="http" data-lesson="8" data-lesson-id="cookies-and-session-state">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 08</span> · State, Cookies & Caching</span>
+
+  <h1 class="lesson-title">Cookies and session state</h1>
+  <p class="lesson-lede">
+    How does a stateless protocol support login sessions and shopping carts? Learn how Set-Cookie, HttpOnly, and SameSite manage state and defend against attacks.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Configure secure session cookies with HttpOnly, Secure, and SameSite attributes</span>
+    <span><b>Mission link</b> Prevents critical web vulnerabilities like XSS credential theft and CSRF attacks</span>
+  </div>
+
+  <h2><span class="n">1</span>Simulating state over a stateless protocol</h2>
+  <p>Because HTTP preserves no memory between requests, the web simulates continuity using <b>Cookies</b>. When you log in, the server generates a random session token and returns it in a <code>Set-Cookie</code> response header.</p><p>The browser automatically stores this cookie and attaches it as a <code>Cookie</code> header to <i>every subsequent request</i> sent to that domain. The server inspects the incoming token to identify the authenticated user.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Cookies are client-stored tokens sent automatically on every request to simulate continuous sessions.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The cookie security triad</h2>
+  <p>Every production session cookie must be guarded by three essential defensive attributes.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing the session lifecycle</h2>
+  <p>Trace how a user logs in, receives a session cookie, and makes authenticated requests.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of cookie security attributes.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can architect resilient, secure session management systems using industry-standard cookie configurations.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Inspect cookies stored by your favorite websites in DevTools Application tab.</li>
+    <li>Verify that your session cookies carry HttpOnly and Secure flags.</li>
+    <li>Configure SameSite=Lax on authentication endpoints to guard against CSRF.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    IETF RFC 6265: *HTTP State Management Mechanism* (Cookie Specification).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What security vulnerability occurs if authentication cookies lack the 'HttpOnly' flag?",
+    a: ["Malicious JavaScript injected via Cross-Site Scripting (XSS) can read and steal the session cookie","The computer CPU will overheat during browser rendering","The cookie cannot be transmitted over HTTPS connections","The website database will automatically delete all customer records"],
+    c: 0,
+    why: "HttpOnly instructs the browser to block document.cookie access from JavaScript."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Secure",
+            "lines": [
+                  "transmitted only over HTTPS",
+                  "blocks plaintext Wi-Fi sniffing"
+            ]
+      },
+      {
+            "title": "HttpOnly",
+            "lines": [
+                  "inaccessible to document.cookie",
+                  "defeats XSS session theft"
+            ]
+      },
+      {
+            "title": "SameSite=Lax/Strict",
+            "lines": [
+                  "restricts cross-site sending",
+                  "defeats Cross-Site Request Forgery (CSRF)"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "Client -> POST /login (credentials)",
+      "Server -> 200 OK + Set-Cookie: sid=a8f9c2; HttpOnly; Secure; SameSite=Strict",
+      "Browser stores sid in secure cookie jar",
+      "Client -> GET /dashboard + Cookie: sid=a8f9c2",
+      "Server verifies sid -> renders user dashboard"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "auth": "valid username and password"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "cookie_set": "session ID issued with 3 security flags"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "storage": "browser isolates cookie to domain"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "session": "authenticated request processed seamlessly"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The header sent by the server to set a cookie is <0>-Cookie.",
+      "The flag blocking JavaScript access to cookies is <1>.",
+      "The flag ensuring cookies only travel over HTTPS is <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "Set"
+            ],
+            "why": "Set-Cookie instructs the client to store the cookie."
+      },
+      {
+            "a": [
+                  "HttpOnly"
+            ],
+            "why": "HttpOnly mitigates XSS token theft."
+      },
+      {
+            "a": [
+                  "Secure"
+            ],
+            "why": "Secure restricts transmission to TLS connections."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What does the 'SameSite=Strict' cookie attribute achieve?",
+      a: ["Prevents the browser from sending the cookie in cross-site requests, mitigating CSRF attacks","Encrypts the cookie with military grade AES-256 encryption","Forces the cookie to expire exactly after 60 seconds","Blocks users from opening more than one browser tab"],
+      c: 0,
+      why: "SameSite=Strict ensures cookies are only included when navigating directly within the origin site."
+    },
+    {
+      q: "Why should session tokens never be stored in browser localStorage for sensitive authentication?",
+      a: ["Any JavaScript running on the page (including third-party analytics or XSS payloads) can read localStorage","localStorage is limited to only 5 bytes of data","localStorage is erased every time the user refreshes the page","localStorage only works on Internet Explorer"],
+      c: 0,
+      why: "localStorage has no HttpOnly defense; any XSS vulnerability exposes stored tokens directly."
+    },
+    {
+      q: "What header does the browser use to transmit stored cookies back to the server?",
+      a: ["Cookie: name=value; name2=value2","Set-Cookie: name=value","Authorization-Cookie: bearer","Session-Store: active"],
+      c: 0,
+      why: "The client sends the 'Cookie' header containing semicolon-delimited key-value pairs."
+    },
+    {
+      q: "What happens when a cookie reaches its 'Expires' or 'Max-Age' timestamp?",
+      a: ["The browser deletes the cookie from its storage jar and stops sending it in requests","The web server shuts down and reboots automatically","The user computer locks and requires password entry","The website source code is deleted"],
+      c: 0,
+      why: "Expired cookies are discarded by the browser's internal cookie jar management."
+    }
+  ]);
+</script>
+</body>
+</html>

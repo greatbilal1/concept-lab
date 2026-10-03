@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 01 — How AI Agents Introduce Architectural Drift</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="ai-generated-architecture" data-lesson="1" data-lesson-id="how-ai-introduces-drift">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 01</span> · Architectural Drift</span>
+
+  <h1 class="lesson-title">How AI Agents Introduce Architectural Drift</h1>
+  <p class="lesson-lede">
+    Why AI agents introduce subtle architectural drift: copy-pasting patterns, creating sprawling helpers, and bypassing domain models.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You understand the causes and risks of AI-induced architectural drift.</span>
+    <span><b>Mission link</b> Mastering how ai agents introduce architectural drift across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of How AI Agents Introduce Architectural Drift</h2>
+  <p>When an engineer asks an agent to add a feature, the agent's objective function is narrow: <em>make this specific feature work right now</em>. The agent does not inherently care about your 5-year maintainability vision, module boundaries, or domain purity.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Why AI agents introduce subtle architectural drift: copy-pasting patterns, creating sprawling helpers, and bypassing domain models.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>How Drift Accumulates</h2>
+  <p>This narrow focus leads to <strong>Architectural Drift</strong>:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Enforcing Boundary Disciplines</h2>
+  <ul><li><strong>Sprawling Utility Files:</strong> Creating `utils.py`, `helpers.py`, or `common.py` that become dumping grounds for random unrelated functions.</li><li><strong>Bypassing Domain Entities:</strong> Writing direct SQL queries or database updates inside route handlers rather than invoking domain services.</li><li><strong>Inconsistent Patterns:</strong> Using functional composition in one file and deep OOP inheritance in an adjacent file.</li></ul><pre><code># The Anatomy of Drift:
+# Prompt: "Allow users to tag products"
+# AGENT'S EXPEDIENT SHORTCUT (Drift):
+# Inside src/api/routes.py:
+@router.post("/products/{id}/tags")
+def add_tag(id: int, tag: str, db: Session = Depends(get_db)):
+    # Directly executing SQL inside an API route handler! Bypasses product domain model!
+    db.execute("INSERT INTO product_tags (product_id, tag) VALUES (:id, :tag)", ...)
+
+# ARCHITECTURAL STANDARD (Clean):
+# The route handler delegates to the ProductDomainService, preserving layer purity.</code></pre><div class="callout"><p><strong>The Law of Drift:</strong> Left unchecked, an AI agent will always choose local expedience over global architectural consistency. The human architect must provide the boundaries.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the architectural drift sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You understand the causes and risks of AI-induced architectural drift.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where how ai agents introduce architectural drift applies.</li>
+    <li>Author a unit test or verification script exercising how ai agents introduce architectural drift.</li>
+    <li>Document team architectural conventions regarding how ai agents introduce architectural drift.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for How AI Agents Introduce Architectural Drift.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Why do AI coding agents tend to cause architectural drift over time if left unconstrained?",
+    a: ["Agents optimize for solving the immediate prompt locally without global architectural awareness, taking expedient shortcuts","Language models forget how to code after 3 turns","Compilers randomly shuffle directories","Git branches merge on their own"],
+    c: 0,
+    why: "Agents solve the local problem by taking the shortest path, which often bypasses global design invariants."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Day 1: Direct SQL in Route",
+            "lines": [
+                  "Saves 5 lines of code",
+                  "Bypasses domain service"
+            ]
+      },
+      {
+            "title": "Day 30: 15 Route SQLs",
+            "lines": [
+                  "Domain model is bypassed",
+                  "Business rules duplicated in API layer"
+            ]
+      },
+      {
+            "title": "Day 90: Architectural Rot",
+            "lines": [
+                  "Tightly coupled spaghetti",
+                  "Refactoring becomes terrifying"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing How AI Agents Introduce Architectural Drift",
+      "def execute_flow():",
+      "    # Why AI agents introduce subtle architectural drift...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "How AI Agents Introduce Architectural Drift"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Expedient AI Choice"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Architectural Guardrail"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "AI agents introduce architectural drift by prioritizing {1} expedience over global {2} consistency."
+],
+    blanks: [
+      {
+            "a": [
+                  "local"
+            ],
+            "why": "Immediate file or prompt scope"
+      },
+      {
+            "a": [
+                  "system"
+            ],
+            "why": "Whole-codebase architecture"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is 'Architectural Drift' in an AI-assisted codebase?",
+      a: ["The gradual divergence of the system from its intended clean design due to accumulated shortcuts and inconsistent patterns","The movement of cloud servers across data centers","The depreciation of computer hardware over time","A feature in git version control"],
+      c: 0,
+      why: "Drift is the erosion of clean system architecture caused by uncoordinated local shortcuts."
+    },
+    {
+      q: "Why is dumping shared code into a generic 'utils.py' file an architectural smell?",
+      a: ["It becomes an uncohesive dumping ground that hides dependencies and encourages chaotic coupling","Python forbids files named utils","It prevents code from being tested","It uses too much memory"],
+      c: 0,
+      why: "Generic utility files obscure domain cohesion and become tangled dependency hubs."
+    },
+    {
+      q: "How can an engineering team prevent agents from introducing architectural drift?",
+      a: ["Provide explicit architectural boundary rules, enforce ADRs, and use automated layer linters","Tell the agent to be smart","Stop writing software","Only use one programming language"],
+      c: 0,
+      why: "Firm boundary constraints and automated architectural linters keep agents aligned with system design."
+    },
+    {
+      q: "What layer should encapsulate core business logic in a clean architecture?",
+      a: ["The domain layer, completely decoupled from HTTP frameworks and database drivers","The API route handlers","The CSS stylesheets","The Dockerfile"],
+      c: 0,
+      why: "Pure domain models keep business rules isolated from delivery mechanisms and infrastructure."
+    }
+  ]);
+</script>
+</body>
+</html>

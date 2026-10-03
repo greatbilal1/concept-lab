@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 01 — Authentication versus authorization</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="authentication-sessions" data-lesson="1" data-lesson-id="authentication-versus-authorization">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 01</span> · Identity & Password Security</span>
+
+  <h1 class="lesson-title">Authentication versus authorization</h1>
+  <p class="lesson-lede">
+    Who are you versus what can you do? Learn the vital architectural boundary between Authentication (AuthN) and Authorization (AuthZ).
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Differentiate between authentication identity checks and authorization permission models</span>
+    <span><b>Mission link</b> The primary conceptual distinction for all security architectures</span>
+  </div>
+
+  <h2><span class="n">1</span>AuthN versus AuthZ</h2>
+  <p>Security architecture is divided into two distinct gates: <b>Authentication (AuthN)</b> answers <i>'Who are you?'</i>. It verifies proof of identity via passwords, biometric passkeys, or multi-factor codes.</p><p><b>Authorization (AuthZ)</b> answers <i>'What are you allowed to do?'</i>. Once identity is proven, authorization checks whether that user possesses permission to view a document, delete an order, or access an admin panel.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Authentication proves who you are; authorization decides what you are allowed to do.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The two-gate security model</h2>
+  <p>Observe how requests pass through authentication before being evaluated by authorization policies.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing status code dispatch</h2>
+  <p>Trace how a server distinguishes between missing credentials and insufficient role permissions.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of AuthN versus AuthZ.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can clearly separate authentication mechanics from authorization business rules in system designs.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your API handlers to verify they return 401 for unauthenticated and 403 for unauthorized.</li>
+    <li>Implement a role-based access control (RBAC) check on an admin endpoint.</li>
+    <li>Explain the difference between 401 and 403 to a colleague.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    OWASP: *Authentication Cheat Sheet* (cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "A user logs into an app with valid credentials, but receives '403 Forbidden' when clicking /admin. Is this AuthN or AuthZ?",
+    a: ["Authorization (AuthZ) failed: identity is proven, but permission to access /admin was denied","Authentication (AuthN) failed: the password was rejected","Neither, it is a database hardware error","Both failed simultaneously"],
+    c: 0,
+    why: "403 Forbidden means identity is authenticated, but permissions are insufficient for the action."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Incoming Request",
+            "lines": [
+                  "POST /billing/refund",
+                  "contains credentials / token"
+            ]
+      },
+      {
+            "title": "Gate 1: AuthN",
+            "lines": [
+                  "verifies credentials -> user_id: 42",
+                  "401 Unauthorized if invalid"
+            ]
+      },
+      {
+            "title": "Gate 2: AuthZ",
+            "lines": [
+                  "checks: does user 42 have 'refund' role?",
+                  "403 Forbidden if not permitted"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "if not request.user:",
+      "    return Response(status=401, 'Please log in')",
+      "if 'admin' not in request.user.roles:",
+      "    return Response(status=403, 'Admin privileges required')"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "check_1": "checking identity (AuthN)"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "result_1": "401 Unauthorized returned if unauthenticated"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "check_2": "checking permissions (AuthZ)"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "result_2": "403 Forbidden returned if role is missing"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The process of proving identity ('Who are you?') is <0>.",
+      "The process of checking permissions ('What can you do?') is <1>.",
+      "The HTTP status code for missing or invalid identity is <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "authentication",
+                  "AuthN"
+            ],
+            "why": "Authentication validates credentials."
+      },
+      {
+            "a": [
+                  "authorization",
+                  "AuthZ"
+            ],
+            "why": "Authorization verifies permissions."
+      },
+      {
+            "a": [
+                  "401"
+            ],
+            "why": "401 Unauthorized signals missing or invalid authentication."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the primary difference between Authentication and Authorization?",
+      a: ["Authentication validates user identity; Authorization verifies user permissions","Authentication is written in Python; Authorization is written in SQL","Authentication only works on mobile phones; Authorization is for desktop","There is no difference between them"],
+      c: 0,
+      why: "AuthN establishes identity ('Who?'); AuthZ checks permissions ('Allowed?')."
+    },
+    {
+      q: "What HTTP status code represents an Authorization failure for an authenticated user?",
+      a: ["403 Forbidden","401 Unauthorized","404 Not Found","500 Internal Server Error"],
+      c: 0,
+      why: "403 signals that the server understands the user's identity but refuses authorization."
+    },
+    {
+      q: "Which of the following is an example of an Authentication mechanism?",
+      a: ["Verifying a password hash and checking a TOTP two-factor code","Checking if user.role === 'admin' before deleting an account","Restricting a user to only viewing orders associated with their account ID","Setting a database query limit to 10 rows"],
+      c: 0,
+      why: "Passwords and TOTP codes prove identity (AuthN); role checks enforce permissions (AuthZ)."
+    },
+    {
+      q: "What is Role-Based Access Control (RBAC)?",
+      a: ["An authorization model where permissions are assigned to roles (like editor, admin) and roles to users","A hardware device used to cool server processors","A protocol for encrypting fiber optic cables","A password hashing algorithm"],
+      c: 0,
+      why: "RBAC groups permissions under roles to simplify access management across users."
+    }
+  ]);
+</script>
+</body>
+</html>

@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 06 — Request Batching and High-Throughput Serving (vLLM)</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="ai-cost-latency" data-lesson="6" data-lesson-id="request-batching-vllm-serving">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 06</span> · High-Throughput Serving</span>
+
+  <h1 class="lesson-title">Request Batching and High-Throughput Serving (vLLM)</h1>
+  <p class="lesson-lede">
+    Serving self-hosted models: continuous iteration batching, PagedAttention, vLLM architecture, and maximizing requests-per-second.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to achieve massive serving throughput with vLLM, PagedAttention, and continuous batching.</span>
+    <span><b>Mission link</b> Mastering request batching and high-throughput serving (vllm) across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Request Batching and High-Throughput Serving (vLLM)</h2>
+  <p>When hosting models on private GPU servers (AWS EC2, RunPod), serving one request at a time wastes 90% of GPU compute. To achieve enterprise profitability, you must serve <strong>dozens of concurrent requests simultaneously on a single GPU</strong>.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Serving self-hosted models: continuous iteration batching, PagedAttention, vLLM architecture, and maximizing requests-per-second.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Naive Batching vs Continuous Batching</h2>
+  <p>Traditional serving failed because requests have different lengths, causing severe GPU memory fragmentation. The modern solution is <strong>vLLM and PagedAttention (Kwon et al., UC Berkeley)</strong>:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>PagedAttention Memory Efficiency</h2>
+  <ul><li><strong>1. PagedAttention:</strong> Inspired by virtual memory in operating systems. It stores KV-cache tokens in non-contiguous memory blocks (pages). Zero memory fragmentation! Reduces wasted VRAM from 60-80% down to under 4%!</li><li><strong>2. Continuous Iteration-Level Batching:</strong> Old serving engines waited for all batched requests to finish before starting new ones. vLLM dynamically injects incoming requests into the active iteration loop the moment any single request finishes!</li><li><strong>3. OpenAI-Compatible API:</strong> vLLM exposes a drop-in `/v1/chat/completions` server. You can swap OpenAI for your self-hosted vLLM cluster with zero application code changes!</li></ul><pre><code># Launching a Production vLLM Cluster with 4x Throughput:
+python -m vllm.entrypoints.openai.api_server \
+    --model meta-llama/Llama-3.1-8B-Instruct \
+    --tensor-parallel-size 1 \
+    --max-model-len 8192 \
+    --gpu-memory-utilization 0.95 \
+    --port 8000
+# Access full OpenAI-compatible API at http://localhost:8000/v1!</code></pre><div class="callout"><p><strong>The Scale Economics:</strong> A single $1.50/hour A10G GPU running vLLM can process <strong>250,000 requests per day</strong> at a fraction of commercial API costs.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the serving sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to achieve massive serving throughput with vLLM, PagedAttention, and continuous batching.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where request batching and high-throughput serving (vllm) applies.</li>
+    <li>Author a unit test or verification script exercising request batching and high-throughput serving (vllm).</li>
+    <li>Document team architectural conventions regarding request batching and high-throughput serving (vllm).</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Request Batching and High-Throughput Serving (vLLM).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What revolutionary memory management innovation allows vLLM to serve LLMs with 2x to 4x higher throughput than naive serving?",
+    a: ["PagedAttention: managing KV-cache memory using virtual memory paging principles, eliminating memory fragmentation and wasted VRAM","Using CPU memory instead of GPU VRAM","Deleting past conversation history","Running models in low-power battery mode"],
+    c: 0,
+    why: "PagedAttention allocates non-contiguous KV-cache memory in pages, eliminating memory waste and enabling massive batching."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Naive Static Batching (Slow)",
+            "lines": [
+                  "Request A (10 tokens), Request B (500 tokens)",
+                  "GPU idles waiting for B to finish before accepting new jobs",
+                  "Wastes 70% of GPU capacity"
+            ]
+      },
+      {
+            "title": "Continuous Batching (vLLM)",
+            "lines": [
+                  "As soon as Request A finishes at token 10,",
+                  "New Request C injected into the next iteration!",
+                  "100% GPU utilization at all times"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Request Batching and High-Throughput Serving (vLLM)",
+      "def execute_flow():",
+      "    # Serving self-hosted models: continuous iteration b...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Request Batching and High-Throughput Serving (vLLM)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Pre-vLLM Waste"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "PagedAttention"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "vLLM achieves high-throughput serving through {1}, which eliminates VRAM fragmentation, and continuous iteration-level {2}."
+],
+    blanks: [
+      {
+            "a": [
+                  "PagedAttention"
+            ],
+            "why": "Paged memory management for KV-caches"
+      },
+      {
+            "a": [
+                  "batching"
+            ],
+            "why": "Grouping concurrent requests dynamically"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What problem does PagedAttention solve in GPU memory management?",
+      a: ["Memory fragmentation and over-allocation in the KV-cache, allowing near 100% utilization of GPU VRAM","It prevents GPUs from getting hot","It speeds up network cards","It eliminates the need for power supplies"],
+      c: 0,
+      why: "PagedAttention allocates memory dynamically in pages, eliminating fragmented reserve buffers."
+    },
+    {
+      q: "What is 'Continuous Batching' (or iteration-level scheduling)?",
+      a: ["An execution engine that dynamically injects new requests into the forward pass as soon as any existing request finishes generating","Batching all requests at midnight","Running requests one by one","Sending requests via email"],
+      c: 0,
+      why: "Continuous batching schedules at the iteration level rather than waiting for an entire batch to finish."
+    },
+    {
+      q: "Why is vLLM's OpenAI-compatible API interface advantageous for software engineering teams?",
+      a: ["Teams can switch between OpenAI cloud models and private self-hosted vLLM models simply by changing the base_url in standard SDK clients","It translates Python to JavaScript","It deletes third-party libraries","It makes open models run in browsers"],
+      c: 0,
+      why: "API compatibility enables seamless routing between proprietary cloud APIs and self-hosted models."
+    },
+    {
+      q: "What does the '--tensor-parallel-size' argument configure when launching vLLM?",
+      a: ["The number of GPUs across which a single large model's weights are sharded and executed in parallel","The number of users allowed to connect","The size of the hard drive","The number of CPU threads"],
+      c: 0,
+      why: "Tensor parallelism splits model layers across multiple GPUs to fit large models in memory."
+    }
+  ]);
+</script>
+</body>
+</html>

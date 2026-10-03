@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 07 — Designing failure</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="python-errors-exceptions" data-lesson="7" data-lesson-id="designing-failure">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 07</span> · Designing failure</span>
+
+  <h1 class="lesson-title">Designing failure</h1>
+  <p class="lesson-lede">
+    An exception is useful only if the program responds well to it. Choose
+    between checking first and handling a failed operation, write messages that
+    help someone act, and preserve diagnostics instead of silently discarding
+    them.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Design a failure path that helps recovery</span>
+    <span><b>Mission link</b> Make failures diagnosable, not invisible</span>
+  </div>
+
+  <h2><span class="n">1</span>Give the person a next step</h2>
+
+  <p>
+    Compare <code>"Invalid input"</code> with
+    <code>"Age must be a whole number from 0 to 130; you entered 'old'."</code>.
+    The second message identifies the expectation and the value that failed it.
+    Do not include secrets, and avoid showing a traceback as if it were a
+    user-facing explanation.
+  </p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    A useful error tells the reader what failed, what was expected, and what
+    they can do next, without exposing sensitive data.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Second idea</h2>
+  <h2><span class="n">2</span>Check first or try the operation?</h2>
+
+  <p>
+    LBYL ("look before you leap") checks a condition first, such as testing
+    whether a key exists. EAFP ("easier to ask forgiveness than permission")
+    tries the operation and handles the specific exception if it fails. Choose
+    the clearer expression of the rule. EAFP is especially useful when the
+    operation itself is the reliable test; a separate check can become stale
+    before the operation happens.
+  </p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Third idea</h2>
+  <h2><span class="n">3</span>Keep diagnostics, not silence</h2>
+
+  <p>
+    If you can recover, handle the known failure. If you cannot, let it
+    propagate or log it with its traceback at a boundary. An empty
+    <code>except</code> block or <code>pass</code> turns a visible problem into
+    wrong output that is much harder to find. Use <code>assert</code> for
+    programmer assumptions during development, not for validating user input:
+    Python may remove assertions when optimization is enabled.
+  </p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+
+  <p>Recall the key facts from memory before the quiz.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <b>✓ Your win for today</b>
+    You can choose an explicit recovery style, write actionable messages, and
+    preserve unexpected failures for diagnosis instead of hiding them.
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Rewrite one vague error message to include the failed value and the expected form.</li>
+    <li>Implement a dictionary lookup once with LBYL and once with EAFP; choose the clearer version for the situation.</li>
+    <li>Replace a silent <code>except: pass</code> with a specific handler or a logged re-raise.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Read the Python <a href="https://docs.python.org/3/howto/logging.html">Logging HOWTO</a> for recording diagnostic context. See RESOURCES.md.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "An except block catches a failure and does nothing. What is the main risk?",
+    a: ["The failure disappears and later code may use bad state", "Python automatically retries the failed operation", "The traceback is shown twice", "The exception becomes a syntax error"],
+    c: 0,
+    why: "Silently swallowing an exception hides the cause while allowing the program to continue as if the operation succeeded."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      { title: "Known, recoverable", lines: ["handle narrowly", "tell the user"] },
+      { title: "Unexpected", lines: ["keep traceback", "propagate or log"] },
+      { title: "Never", lines: ["silently discard", "or expose secrets"] }
+    ]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "try:",
+      "    save_record(record)",
+      "except OSError:",
+      "    logger.exception(\"Could not save record\")",
+      "    raise",
+    ],
+    steps: [
+      { line: 1, vars: { call: "save_record(record)", result: "write fails" } },
+      { line: 2, vars: { raised: "OSError", handler: "matched" } },
+      { line: 3, vars: { log: "message and traceback recorded" } },
+      { line: 4, vars: { action: "bare raise", traceback: "preserved" } }
+    ]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the blanks",
+    lines: [
+      "Check first or handle the failed operation: <0> vs <1>.",
+      "Use <2> for internal invariants, not user input."
+    ],
+    blanks: [
+      { a: ["LBYL", "look before you leap"], why: "LBYL checks the condition before attempting the operation; EAFP tries and handles failure." },
+      { a: ["EAFP", "easier to ask forgiveness than permission"], why: "EAFP attempts the operation and handles a specific failure." },
+      { a: ["assert"], why: "Assertions document internal assumptions and can be disabled; they are not input validation." }
+    ]
+  });
+
+  /* the quiz — four questions with plausible options */
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What makes an error message actionable?",
+      a: ["It states the expectation and the failed value", "It includes the entire program source", "It hides which operation failed", "It uses the longest technical term available"],
+      c: 0,
+      why: "An actionable message gives enough context to understand and correct the failure without exposing sensitive information."
+    },
+    {
+      q: "What is the difference between LBYL and EAFP?",
+      a: ["LBYL checks first; EAFP tries and handles failure", "LBYL always raises; EAFP always returns None", "LBYL is for files; EAFP is for numbers", "LBYL retries; EAFP never uses exceptions"],
+      c: 1,
+      why: "LBYL checks a precondition before acting; EAFP attempts the operation and handles the specific exception if it fails."
+    },
+    {
+      q: "Why is `except: pass` dangerous?",
+      a: ["It hides failure and lets the program continue", "It prints every local variable", "It makes all exceptions recoverable", "It automatically retries the operation"],
+      c: 0,
+      why: "The code discards the exception without recovery, logging, or re-raising, so later behavior may be silently wrong."
+    },
+    {
+      q: "What should assert be used for?",
+      a: ["Internal invariants controlled by the programmer", "Validating every value from a user", "Catching expected file errors", "Replacing all input checks"],
+      c: 0,
+      why: "Assertions express internal assumptions and may be removed under optimization, so external input must be validated explicitly."
+    }
+  ]);
+</script>
+</body>
+</html>

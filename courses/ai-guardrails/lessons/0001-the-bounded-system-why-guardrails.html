@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 01 — The Bounded System: Why Models Need Guardrails</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="ai-guardrails" data-lesson="1" data-lesson-id="the-bounded-system-why-guardrails">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 01</span> · Bounded Systems</span>
+
+  <h1 class="lesson-title">The Bounded System: Why Models Need Guardrails</h1>
+  <p class="lesson-lede">
+    Why raw LLMs cannot be exposed directly to users: brand risk, prompt injection, liability, and the necessity of guardrails.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You understand the need for bounded systems and the guardrail sandwich architecture.</span>
+    <span><b>Mission link</b> Mastering the bounded system: why models need guardrails across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of The Bounded System: Why Models Need Guardrails</h2>
+  <p>A raw Large Language Model is an unconstrained probabilistic text generator. If an insurance company connects an unconstrained model directly to customer chat, an adversarial user can trick it into offering insurance for $1/year, explaining how to make weapons, or leaking proprietary pricing algorithms.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Why raw LLMs cannot be exposed directly to users: brand risk, prompt injection, liability, and the necessity of guardrails.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Guardrail Sandwich Architecture</h2>
+  <p>An <strong>AI Guardrail</strong> wraps the model in a deterministic control layer:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Short-Circuit Savings</h2>
+  <ul><li><strong>Pre-Inference Guardrails (Input Defense):</strong> Filters jailbreaks, prompt injections, off-topic requests, and Personally Identifiable Information (PII) <em>before</em> the model ever sees the prompt.</li><li><strong>Post-Inference Guardrails (Output Defense):</strong> Validates schema compliance, checks factual grounding (hallucination), filters toxic language, and redacts leaked API keys <em>before</em> returning text to the user.</li><li><strong>Bypass & Fallback Paths:</strong> If an input violates policy, the guardrail short-circuits immediately with a canned response, saving token costs and eliminating risk.</li></ul><pre><code># The Guardrail Sandwich Architecture:
+[User Input] 
+  -> [Input Guardrails: Jailbreak Detection, PII Redaction, Topic Gate]
+       ├── VIOLATION -> Return Safe Canned Rejection (Cost: $0.00, Time: 5ms)
+       └── PASS -> [Target LLM Generation]
+  -> [Output Guardrails: JSON Schema Adherence, Hallucination Check, Toxicity]
+       ├── VIOLATION -> Repair Output or Fallback Response
+       └── PASS -> [Deliver to User with Mathematical Safety]</code></pre><div class="callout"><p><strong>The Core Law of Guardrails:</strong> Never let untrusted user input directly touch an unconstrained model. Bounded systems transform probabilistic engines into enterprise-ready software.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the guardrails sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You understand the need for bounded systems and the guardrail sandwich architecture.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where the bounded system: why models need guardrails applies.</li>
+    <li>Author a unit test or verification script exercising the bounded system: why models need guardrails.</li>
+    <li>Document team architectural conventions regarding the bounded system: why models need guardrails.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for The Bounded System: Why Models Need Guardrails.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is an 'AI Guardrail' in software architecture?",
+    a: ["A programmable programmable safety boundary that intercepts, inspects, and modifies inputs and outputs before they reach the model or user","A metal fence around a data center","A physical lock on a keyboard","A firewall that blocks all internet traffic"],
+    c: 0,
+    why: "AI guardrails enforce programmatic boundaries on inputs and outputs to prevent security, compliance, and brand failures."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1. Input Guardrails",
+            "lines": [
+                  "Filters prompt injections & PII",
+                  "Enforces approved topic scope",
+                  "Blocks attacks before model call"
+            ]
+      },
+      {
+            "title": "2. Model Generation",
+            "lines": [
+                  "Processes sanitized prompt",
+                  "Generates candidate response"
+            ]
+      },
+      {
+            "title": "3. Output Guardrails",
+            "lines": [
+                  "Validates JSON schemas",
+                  "Checks factual grounding & toxicity",
+                  "Guarantees safe delivery to user"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing The Bounded System: Why Models Need Guardrails",
+      "def execute_flow():",
+      "    # Why raw LLMs cannot be exposed directly to users: ...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "The Bounded System: Why Models Need Guardrails"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Adversarial Injection Detected"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "AI guardrails enforce safety boundaries by screening {1} for prompt injections and validating {2} for schema adherence and toxicity."
+],
+    blanks: [
+      {
+            "a": [
+                  "inputs"
+            ],
+            "why": "User prompts before model execution"
+      },
+      {
+            "a": [
+                  "outputs"
+            ],
+            "why": "Model responses before user delivery"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the primary architectural purpose of a pre-inference input guardrail?",
+      a: ["To detect and neutralize prompt injections, off-topic queries, and PII before invoking expensive and vulnerable LLM calls","To make the text load faster","To change the font color","To compress the hard drive"],
+      c: 0,
+      why: "Input guardrails screen and sanitize untrusted inputs at the perimeter."
+    },
+    {
+      q: "How does an input guardrail save money during an adversarial denial-of-service or jailbreak attack?",
+      a: ["It rejects malicious prompts in milliseconds with canned responses without calling the billing-metered frontier model","It makes API calls free","It reduces GPU temperature","It deletes the database"],
+      c: 0,
+      why: "Short-circuiting attacks at the edge bypasses expensive token generation entirely."
+    },
+    {
+      q: "What does a post-inference output guardrail check for?",
+      a: ["Factual hallucination, JSON schema validity, toxic language, and accidental leakage of system secrets or PII","The speed of the network cable","The user's credit score","The version of Windows"],
+      c: 0,
+      why: "Output guardrails audit the model's generated text before it reaches the end user."
+    },
+    {
+      q: "Why is relying solely on a prompt instruction like 'Please behave ethically' an inadequate security control?",
+      a: ["Prompt instructions can be overridden or bypassed by adversarial prompt injection techniques; deterministic guardrails cannot","Prompts use too many characters","Models cannot read English","Prompts expire after 1 hour"],
+      c: 0,
+      why: "Probabilistic prompt instructions lack the hard enforcement guarantees of programmatic guardrails."
+    }
+  ]);
+</script>
+</body>
+</html>

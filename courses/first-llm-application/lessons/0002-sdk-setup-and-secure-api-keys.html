@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 02 — Setting Up the SDK and API Keys Securely</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="first-llm-application" data-lesson="2" data-lesson-id="sdk-setup-and-secure-api-keys">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 02</span> · Security & Config</span>
+
+  <h1 class="lesson-title">Setting Up the SDK and API Keys Securely</h1>
+  <p class="lesson-lede">
+    Configuring LLM SDKs: managing API secrets with environment variables, preventing key leaks, and client initialization.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to securely configure API credentials and initialize model SDKs.</span>
+    <span><b>Mission link</b> Mastering setting up the sdk and api keys securely across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Setting Up the SDK and API Keys Securely</h2>
+  <p>AI API keys (such as `OPENAI_API_KEY` or `ANTHROPIC_API_KEY`) are equivalent to root access to your company's credit card. Automated bot scrapers continuously monitor public GitHub commits. If you accidentally commit an API key, bots will scrape it within <strong>3 seconds</strong>, racking up thousands of dollars in unauthorized inference charges.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Configuring LLM SDKs: managing API secrets with environment variables, preventing key leaks, and client initialization.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Credential Security Architecture</h2>
+  <p>To secure your application credentials:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>SDK Client Singleton</h2>
+  <ul><li><strong>1. Environment Variables:</strong> Store secrets in `.env` files or system environment variables. Never put raw key strings in code.</li><li><strong>2. Strict `.gitignore`:</strong> Immediately add `.env` and `*.key` to your `.gitignore` file before initializing git!</li><li><strong>3. Dedicated Client Singleton:</strong> Initialize the SDK client once using environment variables, rather than re-instantiating it inside every function.</li><li><strong>4. Secret Scanning & Pre-Commit Hooks:</strong> Use tools like `git-secrets` or GitHub Secret Scanning to block commits containing key patterns.</li></ul><pre><code># The Secure SDK Initialization Pattern (Python):
+import os
+from openai import OpenAI
+from dotenv import load_dotenv
+
+# Load variables from .env file into os.environ
+load_dotenv()
+
+# Automatically reads OPENAI_API_KEY from environment:
+client = OpenAI()
+# NEVER DO THIS: client = OpenAI(api_key="sk-proj-12345...") <- DANGEROUS!</code></pre><div class="callout"><p><strong>The Emergency Protocol:</strong> If an API key is ever committed or exposed, revoke it immediately in your provider dashboard. Do not merely delete the commit—git history preserves committed files!</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the security setup sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to securely configure API credentials and initialize model SDKs.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where setting up the sdk and api keys securely applies.</li>
+    <li>Author a unit test or verification script exercising setting up the sdk and api keys securely.</li>
+    <li>Document team architectural conventions regarding setting up the sdk and api keys securely.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Setting Up the SDK and API Keys Securely.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is the single most common and catastrophic security mistake when building LLM applications?",
+    a: ["Hardcoding secret API keys directly into source code and accidentally pushing them to public GitHub repositories","Using Python instead of C","Running code on a laptop","Installing pip packages"],
+    c: 0,
+    why: "Hardcoding API secrets leads to automated bot scrapers stealing keys within seconds of pushing to GitHub."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Insecure (Hardcoded)",
+            "lines": [
+                  "api_key = 'sk-proj-...'",
+                  "Committed to git -> Scraped in 3 seconds",
+                  "Thousands in fraudulent bills!"
+            ]
+      },
+      {
+            "title": "Secure (.env & gitignore)",
+            "lines": [
+                  "export OPENAI_API_KEY=...",
+                  "SDK reads environment automatically",
+                  "100% immune to repository leaks"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Setting Up the SDK and API Keys Securely",
+      "def execute_flow():",
+      "    # Configuring LLM SDKs: managing API secrets with en...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Setting Up the SDK and API Keys Securely"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Naive Re-creation"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Singleton Client"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "API keys must be stored in {1} variables and excluded from version control using {2} to prevent automated credential leaks."
+],
+    blanks: [
+      {
+            "a": [
+                  "environment"
+            ],
+            "why": "System configuration values like os.environ"
+      },
+      {
+            "a": [
+                  ".gitignore"
+            ],
+            "why": "Git file exclusion list"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What happens if you accidentally commit an active OpenAI API key to a public GitHub repo?",
+      a: ["Automated bot scrapers will detect and abuse the key within seconds, generating massive unauthorized cloud bills","GitHub deletes your computer","The code runs 10x faster","Python displays an error message"],
+      c: 0,
+      why: "Bot armies monitor public git commits 24/7 to steal exposed API credentials."
+    },
+    {
+      q: "How does the official OpenAI Python SDK locate your API key by default?",
+      a: ["It automatically inspects the OPENAI_API_KEY environment variable if no explicit key argument is passed","It asks the user to type it in terminal","It reads a file on your desktop","It generates a key randomly"],
+      c: 0,
+      why: "The SDK checks os.environ['OPENAI_API_KEY'] automatically upon initialization."
+    },
+    {
+      q: "What should you do immediately if you discover an API key was committed to git history?",
+      a: ["Revoke and delete the key immediately in the provider dashboard, and generate a new key","Delete the commit from your local git repo","Change your laptop password","Wait until the end of the month"],
+      c: 0,
+      why: "Revoking the key immediately cuts off unauthorized access, rendering the leaked string useless."
+    },
+    {
+      q: "Why is reusing an existing SDK client instance better than creating client = OpenAI() inside every request handler?",
+      a: ["The client reuses an internal HTTP connection pool (keep-alive), reducing TCP and TLS handshake latency across requests","It makes Python run in C","Creating multiple clients is illegal","It uses no RAM"],
+      c: 0,
+      why: "Connection pooling eliminates the latency overhead of re-establishing TCP/TLS connections."
+    }
+  ]);
+</script>
+</body>
+</html>

@@ -1,0 +1,3 @@
+# Mission — Web Application Security
+
+Master the science of engineering secure web applications. Navigate the OWASP Top 10 risk landscape, eliminate SQL and command injection with parameterized queries, neutralize Stored and Reflected XSS using context-aware escaping and DOMPurify, defend against CSRF using the cookie Holy Trinity (HttpOnly, Secure, SameSite=Lax), prevent IDOR and broken access control with ownership verification, configure browser security headers (CSP, HSTS, CORS), secure APIs with Pydantic and JWT validation, and conduct automated penetration testing with OWASP ZAP.

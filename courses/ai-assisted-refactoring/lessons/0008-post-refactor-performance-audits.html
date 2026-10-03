@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 08 — Post-Refactor Performance and Regression Audits</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="ai-assisted-refactoring" data-lesson="8" data-lesson-id="post-refactor-performance-audits">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 08</span> · Performance Audits</span>
+
+  <h1 class="lesson-title">Post-Refactor Performance and Regression Audits</h1>
+  <p class="lesson-lede">
+    Auditing refactored code for unintended performance regressions: N+1 queries, memory bloat, and algorithmic complexity.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You have completed the AI-Assisted Refactoring course.</span>
+    <span><b>Mission link</b> Mastering post-refactor performance and regression audits across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Post-Refactor Performance and Regression Audits</h2>
+  <p>A refactoring can pass 100% of unit tests and still destroy production performance. When an agent refactors raw SQL queries into clean domain models or ORM classes, it frequently introduces subtle <strong>performance regressions</strong>.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Auditing refactored code for unintended performance regressions: N+1 queries, memory bloat, and algorithmic complexity.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The N+1 Performance Regression</h2>
+  <p>Common post-refactor performance regressions include:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Post-Refactor Verification Gates</h2>
+  <ul><li><strong>N+1 Database Queries:</strong> Moving property access into a helper method called inside a loop, causing 100 SQL queries instead of 1 `JOIN` query.</li><li><strong>Memory Bloat from Full Materialization:</strong> Replacing a memory-efficient generator or streaming query with a massive `list()` allocation in RAM.</li><li><strong>Algorithmic Complexity Degradation:</strong> Replacing an $O(1)$ dictionary lookup with an $O(N)$ list search inside a nested loop ($O(N^2)$ overall).</li></ul><pre><code># The Post-Refactor Audit Checklist:
+1. QUERY COUNT AUDIT: Verify that query count did not jump from 1 to N+1.
+   (In pytest: use `django_assert_num_queries` or SQLAlchemy event listeners).
+2. BENCHMARK LATENCY: Run `pytest-benchmark` against core calculation loops.
+3. MEMORY PROFILING: Verify that batch processing still streams without RAM spikes.</code></pre><p>Refactoring is only truly complete when the code is cleaner, tests are green, <strong>and performance is equal to or better than the original baseline</strong>.</p><div class="callout"><p><strong>The Final Metric:</strong> Clean code that takes 10 seconds to respond is not an improvement. Always verify that structural elegance did not sacrifice operational performance.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the performance audit sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You have completed the AI-Assisted Refactoring course.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where post-refactor performance and regression audits applies.</li>
+    <li>Author a unit test or verification script exercising post-refactor performance and regression audits.</li>
+    <li>Document team architectural conventions regarding post-refactor performance and regression audits.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Post-Refactor Performance and Regression Audits.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What common performance regression is frequently introduced during AI-assisted database refactorings?",
+    a: ["The N+1 query problem, where accessing extracted properties inside a loop triggers dozens of individual SQL queries","The CPU fan stopping","The hard drive becoming read-only","The database automatically deleting indexes"],
+    c: 0,
+    why: "Extracted object models often introduce lazy-loading N+1 query loops that severely degrade database throughput."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Original Raw SQL",
+            "lines": [
+                  "1 query with JOIN",
+                  "Fetches 100 users + orders in 12ms"
+            ]
+      },
+      {
+            "title": "Refactored Clean Model",
+            "lines": [
+                  "Clean user.orders property",
+                  "Fires 1 query per user (101 queries!)",
+                  "Latency explodes to 850ms (Regression!)"
+            ]
+      },
+      {
+            "title": "Audited Fix",
+            "lines": [
+                  "Add eager loading (joinedload)",
+                  "Restores 1 query, keeps clean model"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Post-Refactor Performance and Regression Audits",
+      "def execute_flow():",
+      "    # Auditing refactored code for unintended performanc...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Post-Refactor Performance and Regression Audits"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "1. Tests Pass 100%"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "2. Types & Linters Pass"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "step": "3. Performance Audited"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Post-refactor audits verify that structural improvements did not introduce unintended performance regressions like {1} queries or {2} bloat."
+],
+    blanks: [
+      {
+            "a": [
+                  "N+1"
+            ],
+            "why": "Looping query anti-pattern"
+      },
+      {
+            "a": [
+                  "memory"
+            ],
+            "why": "RAM consumption and allocation"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the N+1 query problem?",
+      a: ["Executing one initial query to fetch parent records, followed by N separate queries inside a loop to fetch related child records","A math equation in quantum mechanics","A test that takes N+1 seconds to run","A git branch naming convention"],
+      c: 0,
+      why: "N+1 queries flood the database with network round-trips, severely degrading latency."
+    },
+    {
+      q: "How can you prevent N+1 query regressions during automated testing?",
+      a: ["Use query count assertion fixtures (e.g. assert_num_queries) in integration tests to enforce query caps","Disable the database","Run tests only on production","Turn off SQL logging"],
+      c: 0,
+      why: "Query count assertions fail CI immediately if a refactoring introduces unexpected queries."
+    },
+    {
+      q: "Why is replacing a streaming generator with a full list comprehension dangerous for large datasets?",
+      a: ["It forces the entire dataset into RAM at once, potentially causing Out-Of-Memory (OOM) crashes on large inputs","List comprehensions are syntax errors in Python","Generators run slower on the CPU","Lists cannot be iterated over"],
+      c: 0,
+      why: "Materializing large datasets in memory risks server crashes under high data volume."
+    },
+    {
+      q: "What is the final milestone in a successful AI-assisted refactoring workflow?",
+      a: ["Passing all tests, satisfying static analysis, verifying performance metrics, and creating clean atomic commits","Deleting the git repository","Pushing to production without review","Closing all issue tickets without testing"],
+      c: 0,
+      why: "Comprehensive verification across behavior, types, and performance proves true refactoring success."
+    }
+  ]);
+</script>
+</body>
+</html>

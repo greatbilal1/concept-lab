@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 07 — API versioning strategies</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="rest-apis-json" data-lesson="7" data-lesson-id="api-versioning-strategies">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 07</span> · Evolution & Documentation</span>
+
+  <h1 class="lesson-title">API versioning strategies</h1>
+  <p class="lesson-lede">
+    APIs evolve, but you cannot break existing mobile apps and integrations. Compare URI path versioning, header versioning, and content negotiation.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Design and implement API versioning strategies to manage breaking contract changes</span>
+    <span><b>Mission link</b> Ensures APIs can evolve features without breaking existing production clients</span>
+  </div>
+
+  <h2><span class="n">1</span>The inevitability of breaking changes</h2>
+  <p>A public API is a promise: once third-party clients write code against your endpoints, renaming a field or deleting an endpoint breaks their business. Adding a new optional field is safe (backward-compatible), but changing data types or removing fields is a <b>breaking change</b>.</p><p>When breaking changes are unavoidable, you must version your API. The three major strategies are <b>URI Path Versioning</b> (<code>/v1/users</code>), <b>Custom Header Versioning</b> (<code>X-API-Version</code>), and <b>Content Negotiation</b> (<code>Accept: application/vnd.app.v1+json</code>).</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Add optional fields backward-compatibly; version the API only when breaking contracts.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Versioning strategies compared</h2>
+  <p>Evaluate the trade-offs of the three primary API versioning models.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing version routing in an API gateway</h2>
+  <p>Trace how a reverse proxy routes v1 and v2 requests to different backend service instances.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of API versioning practices.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can evaluate and implement API versioning architectures that allow systems to evolve while preserving backward compatibility.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Inspect the versioning strategy used by Stripe (date-based headers) and GitHub (Accept header).</li>
+    <li>Design a backward-compatible addition to an existing JSON response.</li>
+    <li>Document a deprecation policy giving clients 6 months before retiring an old version.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Stripe API Documentation: *API Versioning and Upgrades* (stripe.com/docs/api/versioning).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Which API versioning strategy is the most visible and widely adopted across the tech industry?",
+    a: ["URI path versioning (e.g. https://api.example.com/v1/...)","Accept header content negotiation","Custom request cookies","Sending an email to developers before each request"],
+    c: 0,
+    why: "URI path versioning (/v1/) is clear, easy to test in browsers, and straightforward to route."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "URI Path (/v1/)",
+            "lines": [
+                  "highly visible & cache-friendly",
+                  "easy to test with curl/browser",
+                  "slight violation of URI purism"
+            ]
+      },
+      {
+            "title": "Custom Header",
+            "lines": [
+                  "Stripe style (Stripe-Version: 2026-05)",
+                  "clean persistent URIs",
+                  "harder to test directly in browser"
+            ]
+      },
+      {
+            "title": "Accept Header",
+            "lines": [
+                  "application/vnd.myapi.v2+json",
+                  "strict REST purism",
+                  "requires complex client header setup"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "Client 1: GET /api/v1/orders -> Gateway routes to legacy orders-service:v1",
+      "Client 2: GET /api/v2/orders -> Gateway routes to modern orders-service:v2",
+      "# Both clients run simultaneously without mutual interference"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "client_1": "v1 request routed to legacy container"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "client_2": "v2 request routed to new container"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "coexistence": "zero downtime transition across API generations"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Modifying an API in a way that breaks existing consumers is a <0> change.",
+      "Embedding version numbers directly into the path is <1> versioning.",
+      "Versioning via the Accept header uses content <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "breaking"
+            ],
+            "why": "Breaking changes invalidate existing client code."
+      },
+      {
+            "a": [
+                  "URI",
+                  "path"
+            ],
+            "why": "URI path versioning places /v1/ directly in the path."
+      },
+      {
+            "a": [
+                  "negotiation"
+            ],
+            "why": "Content negotiation negotiates representations via Accept headers."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Which of the following modifications constitutes a breaking change in an API?",
+      a: ["Renaming an existing response field from 'user_name' to 'username'","Adding a brand new optional field to a response JSON object","Adding a new endpoint that didn't exist before","Improving database query performance on the server"],
+      c: 0,
+      why: "Renaming fields breaks existing client code that expects the original key name."
+    },
+    {
+      q: "What is the primary advantage of URI path versioning (/v1/users) over header versioning?",
+      a: ["It is explicit, easy to explore in browsers, and straightforward to route at CDN and proxy layers","It speeds up CPU clock frequencies on the server","It prevents database crashes","It eliminates the need for unit tests"],
+      c: 0,
+      why: "URI versioning is transparent and requires no special header configuration in clients."
+    },
+    {
+      q: "What header is used to signal to clients that an API endpoint is deprecated and will be removed?",
+      a: ["Sunset: Wed, 11 Nov 2026 00:00:00 GMT","Delete-After: 30","Warning: Stop-Using","Deprecated: True"],
+      c: 0,
+      why: "RFC 8594 standardizes the 'Sunset' HTTP response header for service retirement dates."
+    },
+    {
+      q: "Why is date-based versioning (e.g. Stripe-Version: 2026-05-01) popular in enterprise developer platforms?",
+      a: ["It allows frequent, granular upgrades pinned to specific documentation release dates","It automatically translates text into calendar appointments","It works without internet connectivity","It makes APIs free to use"],
+      c: 0,
+      why: "Date-based versioning provides fine-grained immutability tied to documentation snapshots."
+    }
+  ]);
+</script>
+</body>
+</html>

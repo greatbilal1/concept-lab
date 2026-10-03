@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Algorithms & Problem Solving — Cheat Sheet</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+<style>
+  .ref-toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0 8px; }
+  .ref-toc a { font-size: .8rem; border: 1px solid var(--border); background: #111a30; padding: 5px 11px; border-radius: 999px; color: var(--muted); text-decoration: none; border-bottom: 1px solid var(--border); }
+  .ref-toc a:hover { color: #fff; border-color: #3d5488; }
+  .lesson-wrap h2 { scroll-margin-top: 20px; }
+  .snippet { margin: 14px 0 22px; }
+  .snippet .lbl { font-size: .72rem; font-weight: 800; letter-spacing: .7px; text-transform: uppercase; color: var(--accent2); margin-bottom: 6px; }
+  .see { font-size: .82rem; color: var(--muted); margin: -6px 0 12px; }
+  .see a { color: var(--accent2); border-bottom: 0; }
+  .see a:hover { color: #fff; }
+  .snippet pre { padding-top: 34px; }
+  @media print { .snippet pre { padding-top: 18px; } }
+</style>
+</head>
+<body class="lesson-body" data-course="algorithms-problem-solving">
+
+<div class="lesson-wrap">
+
+  <span class="lesson-kicker">Reference · Cheat sheet</span>
+  <h1 class="lesson-title">Algorithms & Problem Solving — Cheat Sheet</h1>
+  <p class="lesson-lede">
+    The whole course on one page. Every snippet links back to the lesson that
+    teaches it.
+  </p>
+
+  <div class="ref-toc">
+    <a href="#habits">Habits</a>
+    <a href="#searching">Searching</a>
+    <a href="#sorting">Sorting</a>
+    <a href="#recursion">Recursion</a>
+    <a href="#together">Putting it together</a>
+  </div>
+
+  <h2 id="habits"><span class="n">1</span>Habits</h2>
+
+  <div class="snippet">
+    <div class="lbl">What an algorithm is</div>
+    <pre><code>An algorithm is a finite, unambiguous sequence of steps
+that turns an input into an output.
+
+Good algorithms are:
+  - correct on every valid input
+  - finite (they always stop)
+  - precise enough for a machine to follow
+
+Pseudocode: plain-language steps, no syntax rules.
+Decomposition: break a problem into smaller problems.
+Invariant: a fact that stays true at every step.
+Trace: run the steps by hand on a small input.
+Edge case: the smallest, largest, or empty input.</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0001-what-an-algorithm-really-is.html">Lesson 01 — What an algorithm really is</a>.</p>
+
+  <h2 id="searching"><span class="n">2</span>Searching</h2>
+
+  <div class="snippet">
+    <div class="lbl">Linear search — O(n)</div>
+    <pre><code>for each item in the list:
+    if item == target: return its index
+return not found
+
+Works on any list, sorted or not.
+Worst case: scan every item.
+A sentinel is a value placed at the end so the
+loop needs no separate bounds check.</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0002-linear-search.html">Lesson 02 — Linear search</a>.</p>
+
+  <div class="snippet">
+    <div class="lbl">Binary search — O(log n)</div>
+    <pre><code>low = 0, high = n - 1
+while low &lt;= high:
+    mid = (low + high) / 2
+    if list[mid] == target: return mid
+    if list[mid] &lt; target: low = mid + 1
+    else:                  high = mid - 1
+return not found
+
+Precondition: the list MUST be sorted.
+Each step halves the search space.
+1,000,000 items -> about 20 steps.
+On an unsorted list it returns a wrong answer.</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0003-binary-search.html">Lesson 03 — Binary search</a>.</p>
+
+  <h2 id="sorting"><span class="n">3</span>Sorting</h2>
+
+  <div class="snippet">
+    <div class="lbl">Selection sort — O(n²)</div>
+    <pre><code>for i from 0 to n - 1:
+    find the smallest item in list[i..n-1]
+    swap it into position i
+
+Always scans the whole unsorted region.
+Cost is the same even if the list is sorted.
+In-place, but NOT stable.</code></pre>
+  </div>
+
+  <div class="snippet">
+    <div class="lbl">Insertion sort — O(n²), fast when nearly sorted</div>
+    <pre><code>for i from 1 to n - 1:
+    take list[i]
+    slide it left past every larger item
+    drop it where it fits
+
+Adaptive: nearly sorted input is almost free.
+In-place AND stable.</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0004-selection-and-insertion-sort.html">Lesson 04 — Selection and insertion sort</a>.</p>
+
+  <div class="snippet">
+    <div class="lbl">Merge sort — O(n log n)</div>
+    <pre><code>mergeSort(list):
+    if list has 0 or 1 item: return list   # base case
+    split list into left and right halves
+    left  = mergeSort(left)
+    right = mergeSort(right)
+    return merge(left, right)
+
+merge(a, b):
+    while both lists have items:
+        take the smaller front item
+    append whatever remains
+
+Divide and conquer: divide, conquer, combine.
+Merging is linear, so each level costs n.
+log n levels x n work = n log n.
+Needs extra memory, so NOT in-place.
+Stable if ties take from the left list first.</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0005-divide-and-conquer-merge-sort.html">Lesson 05 — Divide and conquer: merge sort</a>.</p>
+
+  <h2 id="recursion"><span class="n">4</span>Recursion</h2>
+
+  <div class="snippet">
+    <div class="lbl">The two required parts</div>
+    <pre><code>def factorial(n):
+    if n &lt;= 1: return 1        # base case
+    return n * factorial(n-1)  # recursive case
+
+Base case: smallest input, answered directly.
+Recursive case: call on a smaller input.
+The recursive case must move toward the base case.
+No base case -> infinite calls -> crash.</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0006-recursion-a-function-that-calls-itself.html">Lesson 06 — Recursion: a function that calls itself</a>.</p>
+
+  <div class="snippet">
+    <div class="lbl">The call stack</div>
+    <pre><code>Each active call pushes a stack frame holding:
+  - its arguments
+  - its local variables
+  - where to resume on return
+
+Returning pops the top frame.
+Order is last-in, first-out.
+Too many nested frames -> stack overflow.
+Tail recursion: the call is the last action,
+so the frame can be replaced, not pushed.</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0007-recursion-in-disguise-the-call-stack.html">Lesson 07 — Recursion in disguise: the call stack</a>.</p>
+
+  <h2 id="together"><span class="n">5</span>Putting it together</h2>
+
+  <div class="snippet">
+    <div class="lbl">Complexity and trade-offs</div>
+    <pre><code>Complexity: how work grows as input grows.
+Big-O: the growth rate, ignoring constants.
+
+  linear search   O(n)
+  binary search   O(log n)
+  selection sort  O(n²)
+  insertion sort  O(n²), fast when nearly sorted
+  merge sort      O(n log n)
+
+Trade-off: sort once (n log n), then every
+search costs log n instead of n.
+Precomputation: pay up front to save later.
+
+Recipe for a hard problem:
+  1. decompose it into known pieces
+  2. match each piece to a tool
+  3. name the trade-off before coding</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0008-putting-it-together-solving-a-hard-problem.html">Lesson 08 — Putting it together: solving a hard problem</a>.</p>
+
+  <div class="lesson-foot">
+    <div class="links">
+      <a href="algorithms-problem-solving-glossary.html">📖 Glossary</a>
+      <a href="../course.html">← Course map</a>
+    </div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script>
+  TeachLesson.init({ course: "algorithms-problem-solving", lessons: window.TeachLessons || [] });
+</script>
+</body>
+</html>

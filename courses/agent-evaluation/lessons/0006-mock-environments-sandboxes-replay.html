@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 06 — Mock Environments, Sandboxes, and Deterministic Replay</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="agent-evaluation" data-lesson="6" data-lesson-id="mock-environments-sandboxes-replay">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 06</span> · Hermetic Sandboxes</span>
+
+  <h1 class="lesson-title">Mock Environments, Sandboxes, and Deterministic Replay</h1>
+  <p class="lesson-lede">
+    Hermetic evaluation environments: Docker sandboxes, mock APIs, deterministic filesystem states, and session replay.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to build hermetic Docker sandboxes and deterministic replay harnesses for agent evaluations.</span>
+    <span><b>Mission link</b> Mastering mock environments, sandboxes, and deterministic replay across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Mock Environments, Sandboxes, and Deterministic Replay</h2>
+  <p>If an agent evaluation runs on your local machine, test #1 might create a file named `temp.txt`. When test #2 runs, it finds `temp.txt` already there, altering its behavior! Worse, if an agent runs `git clean -fd`, it might delete your local personal files.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Hermetic evaluation environments: Docker sandboxes, mock APIs, deterministic filesystem states, and session replay.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Hermetic Container Sandbox</h2>
+  <p>Professional agent evaluation requires <strong>Hermetic Sandboxing</strong>:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Mocking External Services</h2>
+  <ul><li><strong>1. Disposable Docker Sandboxes:</strong> Every benchmark task spins up a pristine, disposable container with a fixed filesystem state. When the evaluation finishes, the container is destroyed!</li><li><strong>2. Mock External APIs:</strong> Never let benchmark evaluation agents make real HTTP calls to Stripe, GitHub, or AWS! Mock external APIs using tools like WireMock, responses, or local mock servers.</li><li><strong>3. Deterministic State Reset:</strong> Guarantee that git HEAD, database fixtures, and file contents are bit-for-bit identical on every run.</li><li><strong>4. Session Replay:</strong> Record all tool calls and observations so engineers can replay the agent's exact decision tree in a visual debugger!</li></ul><pre><code># The Hermetic Benchmark Runner Workflow:
+1. Docker container spins up: `python:3.12-slim`
+2. Git clone repository at commit `a849f2` (Known baseline)
+3. Inject task prompt: "Fix KeyError in billing.py"
+4. Agent executes tools inside container (Host machine 100% protected!)
+5. Evaluator runs `pytest` inside container to check exit code.
+6. Container destroyed! Zero residual state!</code></pre><div class="callout"><p><strong>The Hermetic Rule:</strong> If an evaluation run cannot be replayed from scratch with identical inputs producing the identical environment state, your benchmark is not scientific.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the hermetic sandbox sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to build hermetic Docker sandboxes and deterministic replay harnesses for agent evaluations.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where mock environments, sandboxes, and deterministic replay applies.</li>
+    <li>Author a unit test or verification script exercising mock environments, sandboxes, and deterministic replay.</li>
+    <li>Document team architectural conventions regarding mock environments, sandboxes, and deterministic replay.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Mock Environments, Sandboxes, and Deterministic Replay.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Why must agent evaluation benchmarks run inside isolated, disposable Docker containers?",
+    a: ["To ensure tests are 100% reproducible, prevent agents from damaging host machines, and reset state cleanly between runs","Because Docker makes models smarter","Containers are required by Python","Containers run without electricity"],
+    c: 0,
+    why: "Disposable containers provide hermetic isolation, preventing cross-test pollution and host damage."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Pristine Container (Task 1)",
+            "lines": [
+                  "Spun up from clean Docker image",
+                  "Fixed git commit baseline",
+                  "Agent executes tools safely"
+            ]
+      },
+      {
+            "title": "Evaluation & Teardown",
+            "lines": [
+                  "Test suite asserts exit code 0",
+                  "Container destroyed completely",
+                  "Zero residual state pollution!"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Mock Environments, Sandboxes, and Deterministic Replay",
+      "def execute_flow():",
+      "    # Hermetic evaluation environments: Docker sandboxes...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Mock Environments, Sandboxes, and Deterministic Replay"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Real Internet (Flaky)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Mock API (Deterministic)"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Hermetic evaluation runs agents inside disposable {1} containers with mock APIs to guarantee reproducible results and prevent state {2}."
+],
+    blanks: [
+      {
+            "a": [
+                  "Docker"
+            ],
+            "why": "Containerization platform"
+      },
+      {
+            "a": [
+                  "pollution"
+            ],
+            "why": "Contamination between consecutive runs"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is a 'Hermetic' test environment in software engineering?",
+      a: ["An isolated, self-contained environment that has zero unmanaged external dependencies and always starts from a known, fixed state","A test environment that is open to the public","An environment with no operating system","A computer on an airplane"],
+      c: 0,
+      why: "Hermetic environments eliminate external variables to ensure pure, reproducible testing."
+    },
+    {
+      q: "Why should evaluation agents be disconnected from the live internet during benchmarks?",
+      a: ["To prevent rate limits, network latency variations, and ensure the agent cannot cheat by searching Google for solutions","Because the internet is illegal in testing","To save electricity","Internet makes Python run slower"],
+      c: 0,
+      why: "Offline evaluation ensures tests evaluate model reasoning rather than live internet search."
+    },
+    {
+      q: "What is 'Session Replay' in agent debugging?",
+      a: ["The capability to step through an agent's recorded thoughts, tool calls, and observations turn-by-turn after execution completes","Playing a video game recording","Restarting the computer","Re-running a YouTube video"],
+      c: 0,
+      why: "Session replay allows engineers to inspect the exact cognitive steps leading to a failure."
+    },
+    {
+      q: "How does running benchmarks in Docker containers protect developer laptops?",
+      a: ["Any destructive shell commands or accidental file deletions are confined entirely inside the disposable container","It cools the laptop battery","It prevents screens from cracking","It speeds up the keyboard"],
+      c: 0,
+      why: "Containerization isolates the host filesystem from unintended agent actions."
+    }
+  ]);
+</script>
+</body>
+</html>

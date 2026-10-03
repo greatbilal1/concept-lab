@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 09 — Data integrity and errors</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="python-files-json-data" data-lesson="9" data-lesson-id="data-integrity-and-errors">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 09</span> · Together</span>
+
+  <h1 class="lesson-title">Data integrity and errors</h1>
+  <p class="lesson-lede">
+    Real files are malformed, truncated, or simply not what you expected. This
+    lesson is about failing loudly and early instead of silently producing wrong
+    answers.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~12 min</span>
+    <span><b>Win</b> Fail loudly, never silently</span>
+    <span><b>Mission link</b> Trustworthy data handling</span>
+  </div>
+
+  <h2><span class="n">1</span>The three failure modes</h2>
+
+  <p>
+    Data problems come in three flavours, and they need different responses:
+    the file is <b>missing</b>, the file is <b>malformed</b>, or the file is
+    <b>valid but wrong</b> — the right shape with the wrong values.
+  </p>
+
+  <div id="intro1"></div>
+
+  <p>
+    The first two raise exceptions you can catch. The third does not raise at all,
+    which is why it is the most dangerous: your program runs happily and produces
+    nonsense.
+  </p>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Catching parse errors</h2>
+
+  <p>
+    <code>json.loads</code> raises <code>json.JSONDecodeError</code> on bad input.
+    Catch it specifically — a bare <code>except</code> would also swallow your own
+    bugs:
+  </p>
+
+  <pre><code>import json
+
+try:
+    data = json.loads(text)
+except json.JSONDecodeError as e:
+    raise ValueError(f"bad JSON at line {e.lineno}: {e.msg}") from e</code></pre>
+
+  <p>
+    Note the <code>from e</code>. It keeps the original error attached, so the
+    traceback shows both what went wrong and where.
+  </p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">3</span>Validating what you got</h2>
+
+  <p>
+    Parsing successfully only means the syntax was fine. You still have to check
+    the content — required keys present, values the right type, numbers in range.
+  </p>
+
+  <pre><code>required = {"name", "score"}
+missing = required - data.keys()
+if missing:
+    raise ValueError(f"missing fields: {missing}")
+
+if not isinstance(data["score"], (int, float)):
+    raise TypeError("score must be a number")</code></pre>
+
+  <div id="diagram1"></div>
+
+  <p>
+    This is called <b>validation</b>, and it belongs at the boundary — the moment
+    data enters your program. Validate once, then trust it everywhere inside.
+  </p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Parsing checks <b>syntax</b>; validation checks <b>meaning</b>. A file can
+    parse perfectly and still be useless.
+  </div>
+
+  <h2><span class="n">4</span>Fail loudly, fail early</h2>
+
+  <p>
+    The worst outcome is not a crash — it is a wrong answer that looks right. A
+    crash tells you exactly where to look; a silent corruption can travel all the
+    way into a report before anyone notices.
+  </p>
+
+  <div class="note good">
+    <span class="note-label">Why this matters later</span>
+    Every pipeline you build should validate at its edges. That single habit is
+    what makes the difference between a script you run once and a tool you trust
+    with real data.
+  </div>
+
+  <h2><span class="n">5</span>Check yourself</h2>
+
+  <p>
+    Answer from memory — do not scroll back up. Each option has the same number of
+    words, so nothing gives the answer away.
+  </p>
+
+  <div id="fill1"></div>
+  <div id="quiz"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>
+      You can now catch parse errors precisely, validate content at the boundary,
+      and explain why a silent wrong answer is worse than a loud crash.
+    </p>
+  </div>
+
+  <h2><span class="n">6</span>Do this next</h2>
+
+  <ol>
+    <li>
+      Feed <code>json.loads</code> a deliberately broken string and read the error
+      message carefully.
+    </li>
+    <li>
+      Write a validation function that checks for required keys and raises a clear
+      error.
+    </li>
+    <li>
+      Pass it a record with a missing field and confirm the message names the field.
+    </li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Read the Python docs on
+    <a href="https://docs.python.org/3/library/json.html#json.JSONDecodeError">JSONDecodeError</a>
+    and the tutorial section on
+    <a href="https://docs.python.org/3/tutorial/errors.html">handling exceptions</a>.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher (me) anything — "what is a schema?",
+    "should I use pydantic?", "when do I retry?". There are no bad questions here.
+  </div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  /* the three failure modes */
+  TeachWidgets.introCards("#intro1", {
+    cards: [
+      { ico: "🚫", title: "Missing", body: "The file is not there — raises FileNotFoundError." },
+      { ico: "💥", title: "Malformed", body: "The syntax is broken — raises JSONDecodeError." },
+      { ico: "🎭", title: "Valid but wrong", body: "Parses fine, values are nonsense — raises nothing." }
+    ]
+  });
+
+  /* predict-then-reveal */
+  TeachWidgets.predict("#predict1", {
+    q: "Which failure mode is most dangerous?",
+    a: ["A missing file", "A malformed file", "A valid but wrong file"],
+    c: 2,
+    why: "It raises no error, so the program runs happily and produces wrong results."
+  });
+
+  /* step-through trace of a caught error */
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "try:",
+      "  data = json.loads(text)",
+      "except json.JSONDecodeError as e:",
+      "  raise ValueError(f\"bad JSON: {e.msg}\") from e",
+      "-> traceback shows both errors"
+    ],
+    steps: [
+      { line: 0, vars: { entering: "try block" } },
+      { line: 1, vars: { parsing: "text" } },
+      { line: 2, vars: { caught: "JSONDecodeError" } },
+      { line: 3, vars: { chained: "from e" } },
+      { line: 4, vars: { result: "clear traceback" } }
+    ]
+  });
+
+  /* parse vs validate */
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      { title: "Parse", lines: ["checks syntax", "raises on bad JSON"] },
+      { title: "Validate", lines: ["checks meaning", "keys, types, ranges"] },
+      { title: "Boundary", lines: ["validate once", "trust inside"] }
+    ]
+  });
+
+  /* recall from memory */
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — integrity",
+    lines: [
+      "Bad JSON raises <code>json.<0></code>",
+      "Checking keys and types is called <1>",
+      "Keep the original error attached with <code>raise ... <2> e</code>"
+    ],
+    blanks: [
+      { a: ["JSONDecodeError"], why: "json.loads raises JSONDecodeError when the text is not valid JSON." },
+      { a: ["validation"], why: "Validation checks that parsed data has the keys and types you require." },
+      { a: ["from"], why: "raise ... from e chains the original exception into the traceback." }
+    ]
+  });
+
+  /* the quiz — every option is exactly three words */
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What does parsing check?",
+      a: ["The data meaning", "The text syntax", "The file permissions", "The value ranges"],
+      c: 1,
+      why: "Parsing only verifies that the text is syntactically valid JSON."
+    },
+    {
+      q: "What does validation check?",
+      a: ["The text syntax", "The data meaning", "The file encoding", "The line endings"],
+      c: 1,
+      why: "Validation checks that the parsed content has the keys, types and ranges you need."
+    },
+    {
+      q: "Why catch JSONDecodeError specifically?",
+      a: ["It runs much faster", "A bare except hides bugs", "It needs extra imports", "It skips the parsing"],
+      c: 1,
+      why: "Catching only the expected error means your own bugs still surface."
+    }
+    {
+      q: "Where should validation live?",
+      a: ["Deep inside helpers", "At the data boundary", "Only in the tests", "In the output writer"],
+      c: 1,
+      why: "Validating once at the boundary lets the rest of the program trust the data."
+    }
+  ]);
+</script>
+</body>
+</html>

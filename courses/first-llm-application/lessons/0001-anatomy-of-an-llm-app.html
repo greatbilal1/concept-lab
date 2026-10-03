@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 01 — Anatomy of an LLM Application</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="first-llm-application" data-lesson="1" data-lesson-id="anatomy-of-an-llm-app">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 01</span> · Architecture</span>
+
+  <h1 class="lesson-title">Anatomy of an LLM Application</h1>
+  <p class="lesson-lede">
+    The anatomy of an LLM application: user input, prompt construction, client invocation, response validation, and UI delivery.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You understand the five-stage architecture of production LLM applications.</span>
+    <span><b>Mission link</b> Mastering anatomy of an llm application across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Anatomy of an LLM Application</h2>
+  <p>Building an AI-powered software feature is not about writing raw prompts in chat sidebars. It is about constructing an <strong>end-to-end software pipeline</strong> that connects user input to language models, validates the result, and integrates with existing backend services.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    The anatomy of an LLM application: user input, prompt construction, client invocation, response validation, and UI delivery.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The 5-Stage LLM Application Pipeline</h2>
+  <p>A production LLM application consists of five sequential stages:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>API Pipeline Separation</h2>
+  <ul><li><strong>1. Input Ingestion & Sanitization:</strong> Capturing user requests, trimming whitespace, and stripping potential prompt injections.</li><li><strong>2. Dynamic Prompt Assembly:</strong> Merging user inputs with system rules, few-shot examples, and retrieved context into a structured message array.</li><li><strong>3. Model Client Invocation:</strong> Executing the API call (OpenAI, Anthropic, Ollama) with appropriate timeout and retry policies.</li><li><strong>4. Output Parsing & Validation:</strong> Validating the model's response against a strict schema (e.g. Pydantic) to ensure it did not hallucinate or omit fields.</li><li><strong>5. Delivery & Storage:</strong> Streaming results to the frontend and logging telemetry for analytics.</li></ul><pre><code># The Minimal Production LLM Endpoint in Python (FastAPI):
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
+from openai import OpenAI
+
+app = FastAPI()
+client = OpenAI()
+
+class SummaryRequest(BaseModel):
+    text: str
+
+@app.post("/api/summarize")
+def summarize_text(req: SummaryRequest):
+    if len(req.text.strip()) == 0:
+        raise HTTPException(status_code=400, detail="Text cannot be empty")
+    
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[
+            {"role": "system", "content": "Summarize the user text in exactly two sentences."},
+            {"role": "user", "content": req.text}
+        ],
+        temperature=0.3
+    )
+    return {"summary": response.choices[0].message.content}</code></pre><div class="callout"><p><strong>The Core Principle:</strong> Never expose raw model outputs directly to your database or frontend without passing through an explicit validation gate.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the LLM app anatomy sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You understand the five-stage architecture of production LLM applications.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where anatomy of an llm application applies.</li>
+    <li>Author a unit test or verification script exercising anatomy of an llm application.</li>
+    <li>Document team architectural conventions regarding anatomy of an llm application.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Anatomy of an LLM Application.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is the foundational architectural pipeline of an LLM-powered software application?",
+    a: ["User input -> Prompt Template -> Model API Invocation -> Output Schema Validation -> User Delivery","User input -> Database query -> Printer","User input -> Hard drive format -> Compiler","There is no pipeline"],
+    c: 0,
+    why: "Every LLM application follows this core pipeline: template assembly, API call, validation gate, and UI delivery."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1. Ingest & Sanitize",
+            "lines": [
+                  "Validate user input bounds",
+                  "Clean text & check limits"
+            ]
+      },
+      {
+            "title": "2. Prompt Assembly",
+            "lines": [
+                  "System prompt + Examples + User query",
+                  "Formatted as structured messages"
+            ]
+      },
+      {
+            "title": "3. Client Invocation",
+            "lines": [
+                  "SDK call with timeout & retries",
+                  "Network dispatch to LLM"
+            ]
+      },
+      {
+            "title": "4. Validation Gate",
+            "lines": [
+                  "Pydantic schema validation",
+                  "Guarantees data integrity"
+            ]
+      },
+      {
+            "title": "5. UI Stream Delivery",
+            "lines": [
+                  "Server-Sent Events streaming",
+                  "Instant user feedback"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Anatomy of an LLM Application",
+      "def execute_flow():",
+      "    # The anatomy of an LLM application: user input, pro...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Anatomy of an LLM Application"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Web Controller Layer"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "LLM Service Layer"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "A production LLM application passes user input through a prompt {1}, calls the model client, and validates output against a {2} before delivery."
+],
+    blanks: [
+      {
+            "a": [
+                  "template"
+            ],
+            "why": "Structured prompt framework"
+      },
+      {
+            "a": [
+                  "schema"
+            ],
+            "why": "Strict data validation contract"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why is client-side or backend validation of user inputs critical before calling an LLM API?",
+      a: ["To prevent empty queries, excessive token payloads, and obvious prompt injection attacks from reaching the API","To make Python run in parallel","Because APIs do not accept text","To turn on the computer monitor"],
+      c: 0,
+      why: "Input sanitization protects token budgets and blocks malicious inputs early."
+    },
+    {
+      q: "What happens if you do not validate the model's response before storing it in a database?",
+      a: ["The model could return malformed JSON, missing fields, or unexpected nulls that crash downstream application services","The database automatically repairs itself","The API refunds the cost","The operating system restarts"],
+      c: 0,
+      why: "Unvalidated LLM outputs can introduce malformed records that corrupt persistent application state."
+    },
+    {
+      q: "What layer in a web architecture should manage prompt templates and LLM client calls?",
+      a: ["A dedicated Service layer, completely decoupled from HTTP route handlers and controllers","The HTML template directly","The database migration script","The CSS stylesheet"],
+      c: 0,
+      why: "Decoupling AI logic into services keeps controllers clean and makes testing straightforward."
+    },
+    {
+      q: "How does setting temperature=0.3 benefit an endpoint performing text summarization?",
+      a: ["It keeps the summary factual and focused while allowing natural phrasing without erratic creative deviations","It makes the model run for free","It reduces network bandwidth by 90%","It translates text into French"],
+      c: 0,
+      why: "Low temperatures maintain factual alignment with source text."
+    }
+  ]);
+</script>
+</body>
+</html>

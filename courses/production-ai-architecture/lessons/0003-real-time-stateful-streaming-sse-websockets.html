@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 03 — Real-Time Stateful Streaming with WebSockets and SSE</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="production-ai-architecture" data-lesson="3" data-lesson-id="real-time-stateful-streaming-sse-websockets">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 03</span> · Streaming Architecture</span>
+
+  <h1 class="lesson-title">Real-Time Stateful Streaming with WebSockets and SSE</h1>
+  <p class="lesson-lede">
+    Streaming architectures: SSE vs WebSockets, connection state management, handling client disconnects, and stream backpressure.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to architect scalable, stateful streaming connections with SSE and WebSockets.</span>
+    <span><b>Mission link</b> Mastering real-time stateful streaming with websockets and sse across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Real-Time Stateful Streaming with WebSockets and SSE</h2>
+  <p>Streaming is the default user experience for modern AI. But serving 5,000 concurrent streaming connections requires careful architectural planning: open TCP connections consume server file descriptors, memory buffers, and connection state.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Streaming architectures: SSE vs WebSockets, connection state management, handling client disconnects, and stream backpressure.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>SSE vs WebSockets Protocol Comparison</h2>
+  <p>Choosing and Scaling Streaming Protocols:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Cancelling Ghost Streams</h2>
+  <ul><li><strong>1. Server-Sent Events (SSE) — The Text Gold Standard:</strong> Unidirectional (Server $\rightarrow$ Client). Built on standard HTTP. Ideal for chat: the user sends a standard HTTP POST, and the server replies with an SSE token stream. Native browser auto-reconnect!</li><li><strong>2. WebSockets — The Full-Duplex Champion:</strong> Bidirectional (Client $\leftrightarrow$ Server). Essential for real-time audio, live speech-to-speech models (OpenAI Realtime API), and interactive canvas manipulation where both client and server emit simultaneous events.</li><li><strong>3. Handling Mid-Stream Client Disconnections:</strong> If a user closes their laptop mid-stream, <strong>the server must cancel the upstream LLM generation immediately!</strong> Failing to listen for socket close events wastes expensive tokens generating text into the void.</li><li><strong>4. Connection Load Balancing:</strong> Use reverse proxies (NGINX, Envoy) configured with `proxy_buffering off` to prevent proxies from buffering tokens and destroying real-time streaming!</li></ul><pre><code># Detecting Client Disconnect in Streaming Endpoints (FastAPI):
+@app.post("/api/chat/stream")
+async def stream_chat(request: Request, prompt: str):
+    async def event_generator():
+        stream = await llm.astream(prompt)
+        async for chunk in stream:
+            # CRITICAL: Check if client closed browser tab!
+            if await request.is_disconnected():
+                logger.info("Client disconnected. Cancelling upstream LLM call!")
+                break # Aborts generation and saves money!
+            yield f"data: {json.dumps({'text': chunk.text})}\n\n"
+            
+    return StreamingResponse(event_generator(), media_type="text/event-stream")</code></pre><div class="callout"><p><strong>The Ghost Stream Rule:</strong> Always check `request.is_disconnected()` in streaming loops. In large apps, up to 15% of streams are abandoned mid-generation. Cancelling them saves thousands of dollars.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the streaming architecture sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to architect scalable, stateful streaming connections with SSE and WebSockets.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where real-time stateful streaming with websockets and sse applies.</li>
+    <li>Author a unit test or verification script exercising real-time stateful streaming with websockets and sse.</li>
+    <li>Document team architectural conventions regarding real-time stateful streaming with websockets and sse.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Real-Time Stateful Streaming with WebSockets and SSE.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "When should an architecture choose WebSockets over Server-Sent Events (SSE) for an AI application?",
+    a: ["When the application requires bidirectional real-time communication (e.g. streaming user audio while simultaneously streaming model audio/text)","When generating simple text","When downloading PDF files","WebSockets should never be used"],
+    c: 0,
+    why: "WebSockets provide full-duplex bidirectional streaming, essential for real-time voice and multi-modal conversation."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Server-Sent Events (SSE)",
+            "lines": [
+                  "Direction: Server -> Client (Unidirectional)",
+                  "Transport: Standard HTTP/HTTPS",
+                  "Best for: Text chat, code generation, status events"
+            ]
+      },
+      {
+            "title": "WebSockets (Full-Duplex)",
+            "lines": [
+                  "Direction: Client <-> Server (Bidirectional)",
+                  "Transport: Persistent TCP WebSocket",
+                  "Best for: Live voice, audio-to-audio, canvas editing"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Real-Time Stateful Streaming with WebSockets and SSE",
+      "def execute_flow():",
+      "    # Streaming architectures: SSE vs WebSockets, connec...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Real-Time Stateful Streaming with WebSockets and SSE"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "User Closes Tab at Token 50"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Streaming servers use Server-Sent Events for text chat and WebSockets for bidirectional voice, checking for client {1} to cancel upstream token {2}."
+],
+    blanks: [
+      {
+            "a": [
+                  "disconnects"
+            ],
+            "why": "Closed browser sockets"
+      },
+      {
+            "a": [
+                  "generation"
+            ],
+            "why": "Model token decoding"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What happens if a streaming reverse proxy has 'proxy_buffering on' enabled by default?",
+      a: ["The proxy holds onto streamed tokens until its internal buffer fills up (e.g. 4KB), destroying the real-time typewriter effect for users","The proxy catches fire","The proxy converts text to HTML","The server crashes"],
+      c: 0,
+      why: "Proxy buffering delays token delivery, transforming smooth streams into delayed block bursts."
+    },
+    {
+      q: "Why is checking for client disconnection during streaming generation critical for cost control?",
+      a: ["It halts the model provider's generation immediately if the user closes the tab, avoiding paying for unviewed tokens","It makes internet connections faster","It reduces GPU temperature","It is required by git"],
+      c: 0,
+      why: "Cancelling orphaned generation stops billing on abandoned requests."
+    },
+    {
+      q: "What browser API natively handles Server-Sent Events on the frontend?",
+      a: ["The EventSource API (or fetch with ReadableStream)","The Canvas API","The WebGL API","The AudioContext API"],
+      c: 0,
+      why: "EventSource is the built-in browser interface designed specifically for consuming SSE streams."
+    },
+    {
+      q: "Why are WebSockets preferred for real-time voice conversations like OpenAI's Realtime API?",
+      a: ["They allow simultaneous streaming of user microphone audio uplink and model voice audio downlink with sub-300ms latency","They use less memory than text","They run on paper","WebSockets are free of charge"],
+      c: 0,
+      why: "Bidirectional full-duplex communication is mandatory for natural, interruptible voice dialogue."
+    }
+  ]);
+</script>
+</body>
+</html>

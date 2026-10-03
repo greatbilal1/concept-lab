@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 05 — Status codes and what they mean</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="http" data-lesson="5" data-lesson-id="status-codes-and-what-they-mean">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 05</span> · Methods & Status Codes</span>
+
+  <h1 class="lesson-title">Status codes and what they mean</h1>
+  <p class="lesson-lede">
+    Stop returning 200 OK with error messages inside the body. Master the five status code families and the exact codes that speak clear truth to clients.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Select and interpret standard HTTP status codes across the 2xx, 3xx, 4xx, and 5xx families</span>
+    <span><b>Mission link</b> Enables proper error handling and automated client retry policies</span>
+  </div>
+
+  <h2><span class="n">1</span>The five numerical families</h2>
+  <p>HTTP status codes are grouped into five distinct families by their first digit: <b>1xx</b> (Informational), <b>2xx</b> (Success), <b>3xx</b> (Redirection), <b>4xx</b> (Client Error), and <b>5xx</b> (Server Error).</p><p>The crucial distinction is between 4xx and 5xx. A <b>4xx error</b> means the client did something wrong (bad parameters, unauthorized, resource missing). A <b>5xx error</b> means the server crashed, timed out, or encountered an unexpected internal defect.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    4xx errors are the client's fault; 5xx errors are the server's fault.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The core status code index</h2>
+  <p>Learn the standard status codes used across production REST APIs and web services.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing authentication vs authorization errors</h2>
+  <p>Trace how a server decides between 401 Unauthorized and 403 Forbidden.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your recall of HTTP status code mappings.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can accurately assign and diagnose HTTP status codes to communicate unambiguous outcomes to clients.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your API endpoints to replace 200 OK errors with appropriate 4xx codes.</li>
+    <li>Verify that resource creation endpoints return 201 Created with a Location header.</li>
+    <li>Check how your reverse proxy handles upstream timeouts with 504 Gateway Timeout.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    IETF RFC 9110: *HTTP Semantics*, Section 15: 'Status Codes'.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What status code should an API return when a client provides an invalid email syntax?",
+    a: ["200 OK","400 Bad Request","500 Internal Server Error","301 Moved Permanently"],
+    c: 1,
+    why: "Invalid client input syntax is a client error, properly categorized under 400 Bad Request."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "201 Created",
+            "lines": [
+                  "new resource created",
+                  "returns Location header"
+            ]
+      },
+      {
+            "title": "304 Not Modified",
+            "lines": [
+                  "cached copy is fresh",
+                  "empty body payload"
+            ]
+      },
+      {
+            "title": "401 vs 403",
+            "lines": [
+                  "401: who are you? (unauthenticated)",
+                  "403: you cannot enter (unauthorized)"
+            ]
+      },
+      {
+            "title": "502 Bad Gateway",
+            "lines": [
+                  "proxy/gateway failed",
+                  "upstream server unreachable"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Case 1: Missing Authorization token header",
+      "-> HTTP/1.1 401 Unauthorized (challenge: Bearer realm='api')",
+      "# Case 2: Valid token for normal user trying to access /admin/delete-all",
+      "-> HTTP/1.1 403 Forbidden (known identity, but insufficient permissions)"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "check": "missing auth header"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "status": "401: client needs to log in"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "check": "identity verified as user_id=42 (role: user)"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "status": "403: logged in, but forbidden from admin action"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The status code indicating a new resource was created is <0>.",
+      "The code for missing authentication credentials is <1>.",
+      "The code indicating an unhandled server crash is <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "201"
+            ],
+            "why": "201 Created confirms resource creation."
+      },
+      {
+            "a": [
+                  "401"
+            ],
+            "why": "401 Unauthorized indicates authentication is required."
+      },
+      {
+            "a": [
+                  "500"
+            ],
+            "why": "500 Internal Server Error signals unexpected server crashes."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the difference between status 401 Unauthorized and 403 Forbidden?",
+      a: ["401 means credentials are missing or invalid; 403 means identity is verified but permission is denied","401 applies to GET requests; 403 applies to POST requests","401 is a server crash; 403 is a client typo","There is no functional difference between 401 and 403"],
+      c: 0,
+      why: "401 asks 'Who are you?'; 403 says 'I know who you are, but you cannot perform this action.'"
+    },
+    {
+      q: "What does status code 304 Not Modified tell a web browser client?",
+      a: ["The client cached copy is still fresh and can be rendered without downloading the body again","The web server has refused to modify the database record","The website has been permanently shut down","The user needs to refresh the page ten times"],
+      c: 0,
+      why: "304 confirms cached data matches server state, saving bandwidth and latency."
+    },
+    {
+      q: "Why is returning '200 OK' with a body of {'error': 'not found'} considered an antipattern?",
+      a: ["It breaks automated HTTP client retry logic, monitoring alerts, and browser caching engines","It causes text editors to display syntax errors","It violates international intellectual property treaties","It corrupts database indexes on the server"],
+      c: 0,
+      why: "HTTP infrastructure relies on status codes in headers to trigger alerts, caches, and retries."
+    },
+    {
+      q: "What status code indicates that a reverse proxy or load balancer could not reach the backend app?",
+      a: ["502 Bad Gateway","200 OK","400 Bad Request","301 Moved Permanently"],
+      c: 0,
+      why: "502 signals that an edge proxy received an invalid response or connection drop from upstream."
+    }
+  ]);
+</script>
+</body>
+</html>

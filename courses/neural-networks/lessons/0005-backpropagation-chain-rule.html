@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 05 — Backpropagation: The Chain Rule in Action</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="neural-networks" data-lesson="5" data-lesson-id="backpropagation-chain-rule">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 05</span> · Backpropagation</span>
+
+  <h1 class="lesson-title">Backpropagation: The Chain Rule in Action</h1>
+  <p class="lesson-lede">
+    The mathematical engine of deep learning: computing exact parameter gradients efficiently using the calculus chain rule.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You understand the mathematics and computational mechanics of the backpropagation algorithm.</span>
+    <span><b>Mission link</b> Mastering backpropagation: the chain rule in action across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Backpropagation: The Chain Rule in Action</h2>
+  <p>Forward propagation flows data from left to right: $x \rightarrow z_1 \rightarrow a_1 \rightarrow z_2 \rightarrow \hat{y} \rightarrow L$. To update our weights, we need to know: <em>how much does a tiny nudge to a weight in layer 1 change the final loss $L$?</em> In calculus: $\frac{\partial L}{\partial W_1}$.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    The mathematical engine of deep learning: computing exact parameter gradients efficiently using the calculus chain rule.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Forward Pass vs Backward Pass</h2>
+  <p>Computing this directly for 100 billion parameters would take centuries. The breakthrough that unlocked modern AI is <strong>Backpropagation</strong> (Rumelhart, Hinton, & Williams, 1986). Backprop uses the <strong>Chain Rule</strong> to propagate error gradients backwards from the output to the input:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Computational Graph Node</h2>
+  <pre><code># The Chain Rule in Action:
+# Forward: x -> z -> a -> Loss
+# Backward (Backprop):
+# dLoss/dw = (dLoss/da) * (da/dz) * (dz/dw)
+# Each layer computes its local gradient and passes the error backwards!</code></pre><p>Backpropagation is dynamic programming for derivatives: by caching intermediate forward activations, it computes exact partial derivatives for <strong>all parameters in the network simultaneously</strong> in a single backward pass that costs only about twice the compute of the forward pass!</p><div class="callout"><p><strong>Autograd:</strong> Modern frameworks (PyTorch, JAX) build an internal computational graph during the forward pass and execute backprop automatically when you call `loss.backward()`.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the backpropagation sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You understand the mathematics and computational mechanics of the backpropagation algorithm.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where backpropagation: the chain rule in action applies.</li>
+    <li>Author a unit test or verification script exercising backpropagation: the chain rule in action.</li>
+    <li>Document team architectural conventions regarding backpropagation: the chain rule in action.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Backpropagation: The Chain Rule in Action.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What mathematical rule from calculus forms the foundational basis of the Backpropagation algorithm?",
+    a: ["The Chain Rule of calculus for composite functions: d(f(g(x)))/dx = f'(g(x)) * g'(x)","Pythagorean Theorem","Quadratic Formula","Euler's Identity"],
+    c: 0,
+    why: "Backpropagation is the reverse-mode automatic differentiation application of the calculus chain rule."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Forward Pass (Left -> Right)",
+            "lines": [
+                  "Compute Z1, A1, Z2, A2",
+                  "Evaluate Loss L against target y",
+                  "Cache activations in memory"
+            ]
+      },
+      {
+            "title": "Backward Pass (Right -> Left)",
+            "lines": [
+                  "dL/dA2 -> dL/dZ2 -> dL/dW2",
+                  "Apply Chain Rule to compute dL/dW1",
+                  "All gradients ready for optimizer"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Backpropagation: The Chain Rule in Action",
+      "def execute_flow():",
+      "    # The mathematical engine of deep learning: computin...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Backpropagation: The Chain Rule in Action"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Incoming Gradient"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Local Derivative"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Backpropagation computes parameter gradients by applying the calculus {1} rule in a reverse pass from {2} to input."
+],
+    blanks: [
+      {
+            "a": [
+                  "chain"
+            ],
+            "why": "Derivative of composite functions"
+      },
+      {
+            "a": [
+                  "loss"
+            ],
+            "why": "Final scalar error output"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why is Backpropagation vastly faster than calculating gradients numerically via perturbation (f(x+h) - f(x))/h?",
+      a: ["Numerical perturbation requires running the forward pass N separate times (once for every parameter), while backprop computes all gradients in a single pass","Backprop does not use math","Numerical perturbation is illegal in Python","Backprop uses less disk space"],
+      c: 0,
+      why: "Perturbation requires N forward passes; backprop computes all N derivatives in one backward pass."
+    },
+    {
+      q: "What does PyTorch do under the hood when a developer executes 'loss.backward()'?",
+      a: ["It traverses the dynamically constructed computational graph backwards, applying chain-rule derivatives to populate the .grad attribute of every tensor","It commits the code to git","It formats the file with Black","It reboots the computer"],
+      c: 0,
+      why: "loss.backward() runs reverse-mode automatic differentiation across the computational graph."
+    },
+    {
+      q: "Why does training a neural network consume significantly more GPU memory (VRAM) than running inference?",
+      a: ["Training must cache all intermediate forward-pass activations in VRAM to compute chain-rule gradients during the backward pass","Training downloads video files","Training uses uncompressed code","Inference deletes the model weights"],
+      c: 0,
+      why: "Activation caching across all layers is required for backprop and consumes large amounts of VRAM."
+    },
+    {
+      q: "What happens if a layer in a neural network has an activation function whose derivative is zero everywhere?",
+      a: ["The backward gradient is multiplied by zero, completely blocking error signals from reaching any earlier layers (Gradient Death)","The network trains 10x faster","The loss drops to zero","The computer runs out of power"],
+      c: 0,
+      why: "Because gradients multiply via the chain rule, a local zero gradient blocks all upstream learning."
+    }
+  ]);
+</script>
+</body>
+</html>

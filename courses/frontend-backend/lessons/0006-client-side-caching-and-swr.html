@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 06 — Client-side caching and SWR</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="frontend-backend" data-lesson="6" data-lesson-id="client-side-caching-and-swr">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 06</span> · Race Conditions & Sequencing</span>
+
+  <h1 class="lesson-title">Client-side caching and SWR</h1>
+  <p class="lesson-lede">
+    Stop refetching data every time a user switches tabs. Master client-side caching strategies and the Stale-While-Revalidate (SWR) pattern.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Implement client-side caching and Stale-While-Revalidate data synchronization</span>
+    <span><b>Mission link</b> Dramatically reduces redundant network requests and server load</span>
+  </div>
+
+  <h2><span class="n">1</span>The Stale-While-Revalidate pattern</h2>
+  <p>In traditional data fetching, every screen transition shows a loading spinner while waiting for fresh data. This feels slow even on fast connections.</p><p>The <b>Stale-While-Revalidate (SWR)</b> strategy (pioneered by HTTP RFC 5861 and popularized by tools like React Query and SWR) solves this: <b>1.</b> Serve cached (stale) data <i>immediately in 0ms</i>, <b>2.</b> Send a background fetch to revalidate with the server, and <b>3.</b> Silently update the UI if the fresh data has changed.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Serve cached data immediately in 0ms, then silently revalidate in the background.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The SWR workflow sequence</h2>
+  <p>Observe how client caches eliminate loading spinners on repeat visits.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing an in-memory client cache map</h2>
+  <p>Trace how a simple Map cache fulfills repeated requests without hitting the network.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of client-side caching.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can implement client-side caching strategies that deliver instant 0ms page transitions while keeping data fresh.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Implement a simple in-memory Map cache with a 60-second TTL.</li>
+    <li>Refetch data automatically when the user refocuses the browser window (window focus revalidation).</li>
+    <li>Invalidate and refetch a cached query after a successful POST mutation.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    IETF RFC 5861: *HTTP Cache-Control Extensions for Stale Content*.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What does the user see when navigating to a profile page under the Stale-While-Revalidate pattern?",
+    a: ["The cached profile renders instantly with zero loading spinner, while fresh updates sync in the background","A blank white screen for 2 seconds","A pop-up modal asking to clear browser cookies","An alert stating the data is expired"],
+    c: 0,
+    why: "SWR displays existing cached data instantly while validating freshness in the background."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "First Visit",
+            "lines": [
+                  "no cache present",
+                  "render skeleton -> fetch -> populate cache"
+            ]
+      },
+      {
+            "title": "Repeat Visit (0ms)",
+            "lines": [
+                  "cache hit!",
+                  "render cached data INSTANTLY in 0ms"
+            ]
+      },
+      {
+            "title": "Background Sync",
+            "lines": [
+                  "fetch latest data silently",
+                  "update UI seamlessly if modified"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "const cache = new Map();",
+      "async function getCached(url) {",
+      "    if (cache.has(url)) return cache.get(url); # 0ms cache hit!",
+      "    const data = await (await fetch(url)).json();",
+      "    cache.set(url, data);",
+      "    return data;",
+      "}"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "store": "in-memory Map cache initialized"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "call_1": "url not in cache -> fetches from network (150ms)"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "saved": "response saved to cache Map"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "call_2": "second call for same url -> returns from Map in 0.1ms!"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The pattern serving stale data while fetching fresh updates is Stale-While-<0>.",
+      "The acronym SWR stands for Stale While <1>.",
+      "Invalidating a client cache when an edit occurs is cache <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "Revalidate"
+            ],
+            "why": "Stale-While-Revalidate provides instant rendering."
+      },
+      {
+            "a": [
+                  "Revalidate"
+            ],
+            "why": "SWR is the standard abbreviation."
+      },
+      {
+            "a": [
+                  "invalidation",
+                  "mutation"
+            ],
+            "why": "Cache invalidation purges stale entries after updates."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What problem does Stale-While-Revalidate (SWR) solve for user experience?",
+      a: ["It eliminates jarring loading spinners on repeat page visits by serving cached data instantly","It compresses video files on the client device","It eliminates the need for backend servers","It translates text into other spoken languages"],
+      c: 0,
+      why: "SWR provides instantaneous UI rendering on repeat visits by backgrounding network checks."
+    },
+    {
+      q: "What is 'Window Focus Revalidation' in modern data-fetching libraries?",
+      a: ["Automatically refreshing data when the user switches back to the browser tab to keep data current","Adjusting the monitor brightness when the window is clicked","Clearing all user passwords whenever a tab loses focus","Minimizing background windows automatically"],
+      c: 0,
+      why: "Focus revalidation ensures that when users return to a tab, they view fresh data."
+    },
+    {
+      q: "What should happen to a cached list of items when a user successfully creates a new item via POST?",
+      a: ["The client should invalidate or update the cached list query so the new item appears immediately","The cache should be permanently disabled forever","The browser should restart","All cached items should be deleted without refetching"],
+      c: 0,
+      why: "Mutations must trigger cache invalidation so views reflect the newly created entity."
+    },
+    {
+      q: "What is the difference between an in-memory client cache and browser HTTP caching?",
+      a: ["Client caches (like Map or React Query) manage component state and deduplicate requests in JavaScript memory; HTTP cache is managed by the browser engine","HTTP cache only works on images; client cache only works on numbers","Client cache is forbidden on mobile phones","There is no difference between them"],
+      c: 0,
+      why: "Client caches operate in JavaScript memory to avoid redundant UI renders and component re-fetches."
+    }
+  ]);
+</script>
+</body>
+</html>

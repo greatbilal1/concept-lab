@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PostgreSQL — Cheat Sheet</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+<style>
+  .ref-toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0 8px; }
+  .ref-toc a { font-size: .8rem; border: 1px solid var(--border); background: #111a30; padding: 5px 11px; border-radius: 999px; color: var(--muted); text-decoration: none; border-bottom: 1px solid var(--border); }
+  .ref-toc a:hover { color: #fff; border-color: #3d5488; }
+  .lesson-wrap h2 { scroll-margin-top: 20px; }
+  .snippet { margin: 14px 0 22px; }
+  .snippet .lbl { font-size: .72rem; font-weight: 800; letter-spacing: .7px; text-transform: uppercase; color: var(--accent2); margin-bottom: 6px; }
+  .see { font-size: .82rem; color: var(--muted); margin: -6px 0 12px; }
+  .see a { color: var(--accent2); border-bottom: 0; }
+  .see a:hover { color: #fff; }
+  .snippet pre { padding-top: 34px; }
+  @media print { .snippet pre { padding-top: 18px; } }
+</style>
+</head>
+<body class="lesson-body" data-course="postgresql">
+
+<div class="lesson-wrap">
+
+  <span class="lesson-kicker">Reference · Cheat sheet</span>
+  <h1 class="lesson-title">PostgreSQL — Cheat Sheet</h1>
+  <p class="lesson-lede">
+    The whole course on one page. Every snippet links back to the lesson that
+    teaches it.
+  </p>
+
+  <div class="ref-toc">
+    <a href="#sec-1">JSONB Querying & Indexing</a>
+    <a href="#sec-2">Essential Extensions</a>
+    <a href="#sec-3">Row-Level Security (RLS)</a>
+    <a href="#sec-4">Backups & Maintenance</a>
+  </div>
+
+  <h2 id="sec-1"><span class="n">1</span>JSONB Querying & Indexing</h2>
+  <div class="snippet">
+    <div class="lbl">Semi-structured document storage</div>
+    <pre><code>-- Query nested JSONB properties
+SELECT data-&gt;&gt;'name' AS name, (data-&gt;'age')::int AS age
+FROM profiles
+WHERE data @&gt; '{"role": "admin"}';
+
+-- GIN Index for fast key/value queries
+CREATE INDEX idx_profiles_data ON profiles USING GIN (data);</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0002-jsonb-semi-structured-data-in-sql.html">Lesson 02 — JSONB: semi-structured data in SQL</a>.</p>
+
+  <h2 id="sec-2"><span class="n">2</span>Essential Extensions</h2>
+  <div class="snippet">
+    <div class="lbl">pg_trgm and pgcrypto</div>
+    <pre><code>-- Enable extensions
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+CREATE EXTENSION IF NOT EXISTS "pg_trgm";
+
+-- Fuzzy text matching with trigrams
+SELECT name, similarity(name, 'postgresql') AS score
+FROM software
+WHERE name % 'postgresql'
+ORDER BY score DESC;</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0004-postgresql-extensions-and-ecosystem.html">Lesson 04 — PostgreSQL extensions and ecosystem</a>.</p>
+
+  <h2 id="sec-3"><span class="n">3</span>Row-Level Security (RLS)</h2>
+  <div class="snippet">
+    <div class="lbl">Multi-tenant data isolation</div>
+    <pre><code>ALTER TABLE documents ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY tenant_isolation_policy ON documents
+  FOR ALL
+  USING (tenant_id = current_setting('app.current_tenant_id')::int);</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0006-roles-permissions-and-row-level-security.html">Lesson 06 — Roles, permissions, and Row-Level Security</a>.</p>
+
+  <h2 id="sec-4"><span class="n">4</span>Backups & Maintenance</h2>
+  <div class="snippet">
+    <div class="lbl">pg_dump and vacuum</div>
+    <pre><code># Dump database to compressed custom format
+pg_dump -Fc -h localhost -U postgres -d my_db &gt; backup.dump
+
+# Restore dump
+pg_restore -d my_db_restored backup.dump
+
+-- Reclaim storage and update statistics
+VACUUM (VERBOSE, ANALYZE);</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0008-backups-disaster-recovery-and-vacuum.html">Lesson 08 — Backups, disaster recovery, and vacuum</a>.</p>
+
+  <div class="lesson-foot">
+    <div class="links">
+      <a href="postgresql-glossary.html">📖 Glossary</a>
+      <a href="../course.html">← Course map</a>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

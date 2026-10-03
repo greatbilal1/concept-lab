@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 02 — Token Costs, Pricing, and Token-Per-Second Speeds</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="tokens-context" data-lesson="2" data-lesson-id="token-costs-pricing-speeds">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 02</span> · Token Economics</span>
+
+  <h1 class="lesson-title">Token Costs, Pricing, and Token-Per-Second Speeds</h1>
+  <p class="lesson-lede">
+    Inference economics: asymmetric input/output pricing, Time-to-First-Token (TTFT), and token-per-second (TPS) throughput.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You understand the economics, latency metrics, and GPU physics of token pricing.</span>
+    <span><b>Mission link</b> Mastering token costs, pricing, and token-per-second speeds across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Token Costs, Pricing, and Token-Per-Second Speeds</h2>
+  <p>Commercial model APIs (OpenAI, Anthropic, Google, DeepSeek) bill users based on <strong>per-million token pricing</strong>. When examining pricing sheets, you will notice an immediate asymmetry: <strong>Output tokens cost 3x to 5x more than input tokens!</strong></p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Inference economics: asymmetric input/output pricing, Time-to-First-Token (TTFT), and token-per-second (TPS) throughput.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Input vs Output Computational Physics</h2>
+  <p>Why the price gap? It is a direct reflection of GPU physics:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Latency Metrics: TTFT vs TPS</h2>
+  <ul><li><strong>Input Processing (Pre-Fill):</strong> When you send a 5,000-token prompt, the GPU processes all 5,000 tokens <strong>in parallel in a single forward pass</strong>. Highly efficient!</li><li><strong>Output Generation (Decoding):</strong> When the model generates text, it must run <strong>one full forward pass for every single token</strong> sequentially! Generating 1,000 output tokens requires 1,000 sequential passes.</li></ul><p>The two key latency metrics governing user experience are:</p><ul><li><strong>Time-to-First-Token (TTFT):</strong> How many milliseconds from sending the request until the first word streams back. Scales with prompt size.</li><li><strong>Tokens-Per-Second (TPS):</strong> Generation throughput (e.g. 50-100 tokens/sec). Dictates how fast text streams on screen.</li></ul><pre><code># The Economic Equation of an LLM Request:
+# Total Cost = (Input_Tokens / 1M * Input_Price) + (Output_Tokens / 1M * Output_Price)
+# Example (GPT-4o: $2.50/M input, $10.00/M output):
+# 10,000 input tokens:  $0.025
+# 1,000 output tokens:  $0.010
+# Total request cost:   $0.035</code></pre><div class="callout"><p><strong>The Architectural Rule:</strong> Design agents to be concise. Verbose outputs slow down TPS latency and quadruple your API billing!</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the token pricing sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You understand the economics, latency metrics, and GPU physics of token pricing.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where token costs, pricing, and token-per-second speeds applies.</li>
+    <li>Author a unit test or verification script exercising token costs, pricing, and token-per-second speeds.</li>
+    <li>Document team architectural conventions regarding token costs, pricing, and token-per-second speeds.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Token Costs, Pricing, and Token-Per-Second Speeds.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Why are Output Tokens significantly more expensive than Input Tokens across virtually all LLM API providers?",
+    a: ["Output tokens require sequential autoregressive generation (one GPU pass per token), while input tokens are processed in parallel in one pass","Output tokens use more bandwidth","Output tokens are legally copyrighted","Input tokens are subsidized by the government"],
+    c: 0,
+    why: "Input tokens are processed in parallel in a single matrix multiplication; output tokens require sequential serial forward passes."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Input Tokens (Pre-Fill)",
+            "lines": [
+                  "All prompt tokens processed in parallel",
+                  "1 forward pass across GPU cores",
+                  "Cheap, fast, high throughput"
+            ]
+      },
+      {
+            "title": "Output Tokens (Decoding)",
+            "lines": [
+                  "Sequential autoregressive passes",
+                  "1 GPU forward pass PER TOKEN!",
+                  "High latency, 3x-5x higher cost"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Token Costs, Pricing, and Token-Per-Second Speeds",
+      "def execute_flow():",
+      "    # Inference economics: asymmetric input/output prici...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Token Costs, Pricing, and Token-Per-Second Speeds"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Time-to-First-Token (TTFT)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Tokens-Per-Second (TPS)"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Output tokens cost more than input tokens because generation is {1}, requiring one sequential GPU forward pass per {2}."
+],
+    blanks: [
+      {
+            "a": [
+                  "autoregressive"
+            ],
+            "why": "Serial token-by-token generation"
+      },
+      {
+            "a": [
+                  "token"
+            ],
+            "why": "Single emitted unit of text"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is Time-to-First-Token (TTFT) and why is it critical for interactive apps?",
+      a: ["The latency between sending a prompt and receiving the first streamed token, defining perceived responsiveness","The time to download a model","The time to compile Python","The clock speed of the GPU"],
+      c: 0,
+      why: "Low TTFT makes interactive applications feel snappy and immediate to users."
+    },
+    {
+      q: "Why does a 100,000-token prompt exhibit a much higher TTFT than a 1,000-token prompt?",
+      a: ["The GPU must compute attention across all 100,000 input tokens in the pre-fill stage before emitting token #1","Large prompts get lost in internet cables","Language models read prompts with human eyes","Large prompts require manual approval"],
+      c: 0,
+      why: "Pre-fill computation scales with the volume of input tokens, delaying the first output token."
+    },
+    {
+      q: "How can engineering teams cut output token costs when using LLMs for data extraction?",
+      a: ["Instruct the model to return concise JSON with short keys and zero conversational filler text","Use temperature=2.0","Send the prompt in Latin","Ask the model to write poems"],
+      c: 0,
+      why: "Eliminating conversational fluff reduces billed output token volume directly."
+    },
+    {
+      q: "What is the Batch API offered by providers like OpenAI and Anthropic?",
+      a: ["A non-realtime API processing prompts within 24 hours at a 50% cost discount","An API that only runs on Saturdays","A tool for baking bread","An API with zero rate limits"],
+      c: 0,
+      why: "Batch APIs process asynchronous workloads during off-peak hours at half the standard pricing."
+    }
+  ]);
+</script>
+</body>
+</html>

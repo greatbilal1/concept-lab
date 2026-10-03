@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 07 — Tool Error Handling: Passing Errors Back to the Model</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="function-calling" data-lesson="7" data-lesson-id="tool-error-handling-self-correction">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 07</span> · Error Feedback</span>
+
+  <h1 class="lesson-title">Tool Error Handling: Passing Errors Back to the Model</h1>
+  <p class="lesson-lede">
+    Turning tool failures into learning loops: capturing exceptions, formatting error payloads, and model self-correction.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to design self-correcting tool error feedback loops.</span>
+    <span><b>Mission link</b> Mastering tool error handling: passing errors back to the model across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Tool Error Handling: Passing Errors Back to the Model</h2>
+  <p>In traditional programming, an unhandled exception crashes the process. But in an AI agent loop, <strong>a tool failure is an observation</strong>. If an agent calls <code>get_weather(city="Phily")</code>, and your weather API returns a 404 error, you don't crash the server.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Turning tool failures into learning loops: capturing exceptions, formatting error payloads, and model self-correction.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Self-Correction Error Loop</h2>
+  <p>You return the error as a <strong>first-class tool result</strong>:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Uninformative vs Actionable Errors</h2>
+  <pre><code># Feeding Tool Errors Back to the Model:
+# Tool execution caught an error:
+tool_result = {
+    "status": "error",
+    "error_code": "CITY_NOT_FOUND",
+    "message": "City 'Phily' was not found. Did you mean 'Philadelphia'?"
+}
+
+# Return this error payload as the tool message content!
+messages.append({
+    "role": "tool",
+    "tool_call_id": tool_call.id,
+    "content": json.dumps(tool_result)
+})</code></pre><p>What does the model do when it reads this error? It exhibits <strong>Autonomous Self-Correction</strong>: it says: <em>'Oh, let me try searching for Philadelphia instead!'</em> and issues a corrected tool call in the next turn!</p><div class="callout"><p><strong>The Helpful Error Rule:</strong> Write your tool error messages for the model to read! Include actionable guidance: <em>'Invalid date format. Expected YYYY-MM-DD, received MM/DD/YYYY.'</em></p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the tool error handling sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to design self-correcting tool error feedback loops.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where tool error handling: passing errors back to the model applies.</li>
+    <li>Author a unit test or verification script exercising tool error handling: passing errors back to the model.</li>
+    <li>Document team architectural conventions regarding tool error handling: passing errors back to the model.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Tool Error Handling: Passing Errors Back to the Model.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What should a backend do when a tool fails with an error (e.g. 'City not found' or 'Database connection timeout')?",
+    a: ["Return an informative JSON error message in the tool result content so the model can understand the failure and self-correct","Crash the entire backend application","Hide the error and return an empty string","Delete the user account"],
+    c: 0,
+    why: "Passing structured error details back in the tool result allows the model to adjust parameters or explain the issue."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1. Flawed Tool Call",
+            "lines": [
+                  "get_weather(city='Phily')",
+                  "Typo in city name parameter"
+            ]
+      },
+      {
+            "title": "2. Informative Error Result",
+            "lines": [
+                  "'CITY_NOT_FOUND. Did you mean Philadelphia?'",
+                  "Returned in role: 'tool' content"
+            ]
+      },
+      {
+            "title": "3. Autonomous Recovery",
+            "lines": [
+                  "Model issues corrected tool call",
+                  "get_weather(city='Philadelphia') -> SUCCESS!"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Tool Error Handling: Passing Errors Back to the Model",
+      "def execute_flow():",
+      "    # Turning tool failures into learning loops: capturi...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Tool Error Handling: Passing Errors Back to the Model"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Uninformative: 'Error 500'"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Actionable: 'SKU must start with PROD-'"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Capturing tool exceptions and returning informative {1} payloads enables the model to perform autonomous {2} in subsequent turns."
+],
+    blanks: [
+      {
+            "a": [
+                  "error"
+            ],
+            "why": "Actionable diagnostic feedback"
+      },
+      {
+            "a": [
+                  "self-correction"
+            ],
+            "why": "Fixing its own parameters"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why is returning 'Invalid date format. Expected YYYY-MM-DD' better than raising an unhandled exception?",
+      a: ["It allows the model to read the expected format, correct its arguments, and retry successfully without crashing the app","It saves hard drive space","It makes Python run faster","Exceptions are illegal in web APIs"],
+      c: 0,
+      why: "Explicit format feedback gives the model the exact information needed to formulate a valid retry."
+    },
+    {
+      q: "What should the agent do if a tool repeatedly returns a permanent permission error (e.g. '403 Forbidden')?",
+      a: ["Stop calling the tool and explain to the user in natural language that access to that resource is denied","Retry 1,000 times","Delete the user's files","Invent a fake answer"],
+      c: 0,
+      why: "Permanent permission failures should be communicated clearly to the user rather than retried."
+    },
+    {
+      q: "How does formatting tool errors as structured JSON objects benefit the model?",
+      a: ["It provides clean key-value separation between error codes, messages, and suggestions that models parse reliably","It turns off the terminal","It encrypts the error","It reduces GPU voltage"],
+      c: 0,
+      why: "Structured error dictionaries provide unambiguous diagnostic signals."
+    },
+    {
+      q: "What circuit breaker should wrap tool execution error loops?",
+      a: ["A retry count limit (e.g. max 3 retries per tool) to prevent the agent from thrashing indefinitely on unfixable errors","A physical fuse","A battery backup","A software license"],
+      c: 0,
+      why: "Capping retries prevents infinite loops when an underlying dependency is broken."
+    }
+  ]);
+</script>
+</body>
+</html>

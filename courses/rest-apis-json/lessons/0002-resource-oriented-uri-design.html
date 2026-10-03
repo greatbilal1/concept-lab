@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 02 — Resource-oriented URI design</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="rest-apis-json" data-lesson="2" data-lesson-id="resource-oriented-uri-design">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 02</span> · REST Architecture & Resources</span>
+
+  <h1 class="lesson-title">Resource-oriented URI design</h1>
+  <p class="lesson-lede">
+    URIs are nouns; verbs are methods. Learn how to structure clean, predictable REST endpoints for collections, individual items, and nested sub-resources.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Design clean, noun-based RESTful URI hierarchies for complex domain models</span>
+    <span><b>Mission link</b> Eliminates messy URL endpoints and establishes intuitive API conventions</span>
+  </div>
+
+  <h2><span class="n">1</span>Nouns, pluralization, and identifiers</h2>
+  <p>A well-designed REST API reads like an organized library catalogue. Endpoints identify <b>resources (nouns)</b>, never operations (verbs). By industry convention, collection URIs use lowercase plural nouns: <code>/users</code>, <code>/orders</code>, <code>/articles</code>.</p><p>Individual items are accessed by appending their unique identifier: <code>/users/42</code>. Nested sub-resources express ownership: <code>/users/42/orders</code> clearly identifies the orders belonging to user 42.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Use plural nouns for collections, identifiers for items, and nest only when strict ownership exists.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The standard resource matrix</h2>
+  <p>Combine plural noun endpoints with the five standard HTTP verbs to cover full CRUD operations.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing nested sub-resource limits</h2>
+  <p>Avoid nesting deeper than two levels; flatten deep relationships to keep URIs maintainable.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of URI design conventions.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can design intuitive, scalable URI hierarchies that require minimal documentation for developers to understand.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Take a messy RPC-style API and refactor it into clean noun-based REST endpoints.</li>
+    <li>Flatten a URI nested deeper than two levels into a top-level resource endpoint.</li>
+    <li>Verify that your collection endpoints use plural nouns consistently.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Leonard Richardson & Sam Ruby, *RESTful Web Services*, Chapter 4: 'The Resource-Oriented Architecture'.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Which URI pattern is the most idiomatic RESTful design for fetching comments on article 15?",
+    a: ["GET /api/v1/articles/15/comments","GET /api/v1/getCommentsForArticle?articleId=15","POST /api/v1/fetch_comments/15","GET /api/v1/article_comments_15"],
+    c: 0,
+    why: "Nesting /articles/15/comments cleanly reflects the parent-child relationship using noun paths."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "GET /articles",
+            "lines": [
+                  "list collection items",
+                  "supports filter query params"
+            ]
+      },
+      {
+            "title": "POST /articles",
+            "lines": [
+                  "create new item",
+                  "returns 201 Created + Location"
+            ]
+      },
+      {
+            "title": "GET/PATCH/DELETE /articles/:id",
+            "lines": [
+                  "retrieve, update, or delete single item",
+                  "identified by unique ID"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Bad: Over-nested URI (too deep!):",
+      "# GET /orgs/1/departments/4/teams/12/members/99/tasks/3",
+      "# Clean: Flattened resource reference:",
+      "# GET /tasks/3 (task IDs are globally unique!)"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "anti_pattern": "deep nesting creates fragile, brittle URLs"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "best_practice": "flatten once you reach unique entity identifiers"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "REST endpoint paths should be composed of <0>, not verbs.",
+      "By standard convention, resource collections are named with <1> nouns.",
+      "A resource owned by another entity is a <2>-resource."
+],
+    blanks: [
+      {
+            "a": [
+                  "nouns"
+            ],
+            "why": "URIs name resources (nouns); HTTP methods supply actions."
+      },
+      {
+            "a": [
+                  "plural",
+                  "pluralized"
+            ],
+            "why": "Collections use plural nouns like /users, /products."
+      },
+      {
+            "a": [
+                  "sub"
+            ],
+            "why": "Sub-resources represent nested child relationships."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why should collection URIs use plural nouns (e.g. /customers instead of /customer)?",
+      a: ["To consistently represent that the endpoint is a container of multiple resource entities","Because singular words are not supported in HTTP paths","To prevent database queries from crashing","Plural nouns use less network bandwidth"],
+      c: 0,
+      why: "Plural nouns clearly indicate a collection from which individual items can be addressed."
+    },
+    {
+      q: "What is the recommended maximum nesting depth for REST sub-resource paths?",
+      a: ["Two levels maximum (e.g. /parents/:id/children); deeper hierarchies should be flattened","At least ten levels deep","Nesting is forbidden entirely in REST","Infinite levels"],
+      c: 0,
+      why: "Nesting past two levels (/a/1/b/2/c/3) produces fragile URLs; top-level IDs are preferred."
+    },
+    {
+      q: "How should non-CRUD operations (like 'archive' or 'publish') be modeled in REST?",
+      a: ["Model them as sub-resource transitions (e.g. POST /articles/42/publications) or PATCH state fields","Invent new HTTP methods like ARCHIVE or PUBLISH","Use GET requests with actions in query parameters","Send an email to the server administrator"],
+      c: 0,
+      why: "Treating actions as state updates (PATCH status: 'archived') or sub-resources preserves REST semantics."
+    },
+    {
+      q: "Which casing convention is standard for RESTful URI path segments?",
+      a: ["kebab-case (lowercase with hyphens: /user-profiles)","camelCase (/userProfiles)","UPPER_SNAKE_CASE (/USER_PROFILES)","TitleCase (/UserProfiles)"],
+      c: 0,
+      why: "kebab-case is standard for URIs because URLs are case-insensitive on some servers."
+    }
+  ]);
+</script>
+</body>
+</html>

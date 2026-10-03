@@ -1,0 +1,3 @@
+# Mission — Building Your First LLM Application
+
+Transition from conversational chat toys to production-grade software engineering with Large Language Models. Master the five-stage application pipeline, manage API secrets with environment variables, structure three-role message arrays, stream tokens in real time via Server-Sent Events, build resilient retry loops with exponential backoff, validate outputs with Pydantic, track token costs, and deploy enterprise-ready REST endpoints.

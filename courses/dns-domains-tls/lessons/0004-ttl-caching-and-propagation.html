@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 04 — TTL, caching, and propagation</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="dns-domains-tls" data-lesson="4" data-lesson-id="ttl-caching-and-propagation">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 04</span> · DNS Records & Propagation</span>
+
+  <h1 class="lesson-title">TTL, caching, and propagation</h1>
+  <p class="lesson-lede">
+    Why does changing a DNS record take minutes or hours to take effect? Master Time to Live (TTL), resolver caching, and how to plan zero-downtime migrations.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Calculate DNS cache expiration and plan zero-downtime DNS migrations using TTL</span>
+    <span><b>Mission link</b> Prevents downtime and broken deployments during server transitions</span>
+  </div>
+
+  <h2><span class="n">1</span>The economics of DNS caching</h2>
+  <p>If every browser query hit authoritative servers directly, the internet's DNS infrastructure would collapse under billions of queries per second. DNS works because <b>almost every answer is aggressively cached</b>.</p><p>Every record carries a <b>TTL (Time to Live)</b> in seconds. A resolver caches the answer for that duration. During that window, any changes you make to your records on your authoritative nameserver are completely invisible to cached clients.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    A DNS record update will not be visible to cached clients until its previous TTL expires.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The zero-downtime migration protocol</h2>
+  <p>How to safely migrate an IP address without downtime by pre-lowering TTL values.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing TTL decrement in dig</h2>
+  <p>Trace how a cached DNS record's TTL counts down on successive terminal lookups.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your understanding of DNS caching dynamics.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can schedule and execute DNS migrations without service disruption by managing TTL lifecycles.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Run dig multiple times on a domain and watch the TTL number decrease.</li>
+    <li>Check the TTL of your company or personal domain.</li>
+    <li>Document the steps you would take to migrate an API server with zero downtime.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    IETF RFC 2308: *Negative Caching of DNS Queries (DNS NCACHE)*.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "If your A record has TTL=86400 (24 hours), and you change the IP at noon, when will all clients see the change?",
+    a: ["Instantly within 5 seconds","Gradually over the next 24 hours as individual resolver caches expire","Never, unless users reboot their computers","Only at midnight UTC"],
+    c: 1,
+    why: "Any resolver that cached the record right before noon will retain the old IP for up to 24 hours."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "T - 48 Hours",
+            "lines": [
+                  "lower TTL from 86400 to 300 (5m)",
+                  "wait for old 24h caches to clear"
+            ]
+      },
+      {
+            "title": "T = 0 (Migration)",
+            "lines": [
+                  "switch A record to new server IP",
+                  "clients switch within 5 minutes"
+            ]
+      },
+      {
+            "title": "T + 24 Hours",
+            "lines": [
+                  "verify stability",
+                  "raise TTL back to 86400 to reduce load"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Query 1 at 12:00:00 -> returns TTL 300",
+      "api.example.com.     300 IN A 93.184.216.34",
+      "# Query 2 at 12:02:00 (120s later) -> returns TTL 180",
+      "api.example.com.     180 IN A 93.184.216.34",
+      "# Query 3 at 12:05:01 (expired) -> resolver queries auth server again (refreshes to 300)"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "initial_ttl": "300 seconds (5 min)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "cache_remaining": "180 seconds left"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "expired": "cache refreshed from authoritative server"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The lifetime of a DNS cache entry in seconds is the <0>.",
+      "Caching the absence of a record is <1> caching.",
+      "The delay while global DNS resolvers refresh old cached records is <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "TTL"
+            ],
+            "why": "TTL stands for Time to Live."
+      },
+      {
+            "a": [
+                  "negative"
+            ],
+            "why": "Negative caching stores NXDOMAIN results to prevent repeated queries."
+      },
+      {
+            "a": [
+                  "propagation"
+            ],
+            "why": "Propagation describes the gradual worldwide cache refresh process."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What does a TTL of 300 mean on a DNS record?",
+      a: ["Resolvers and clients can cache the answer for 300 seconds (5 minutes) before re-querying","The server will shut down in 300 seconds","The website allows only 300 concurrent visitors","The record costs $3.00 per month"],
+      c: 0,
+      why: "TTL defines cache freshness duration in seconds."
+    },
+    {
+      q: "Why shouldn't you keep TTL set to 60 seconds permanently in production?",
+      a: ["Very short TTLs flood authoritative nameservers with high query volume and add lookup latency","Short TTLs cause computers to overheat","Short TTLs are illegal under ICANN regulations","Short TTLs disable HTTPS encryption"],
+      c: 0,
+      why: "Low TTL sacrifices caching efficiency, increasing server load and client query delays."
+    },
+    {
+      q: "What is 'negative caching' in DNS resolution?",
+      a: ["Caching the fact that a domain does NOT exist (NXDOMAIN) to prevent query spam","Deleting the root nameservers from operating system memory","Refusing to cache records that contain numbers","Subtracting latency from network connection packets"],
+      c: 0,
+      why: "Negative caching prevents clients from hammering authoritative servers for non-existent names."
+    },
+    {
+      q: "What should you do 48 hours before migrating a server to a new IP address?",
+      a: ["Lower the DNS record's TTL to a short duration like 300 seconds","Delete all DNS records immediately","Email all website users asking them to flush their local DNS","Turn off the production web server"],
+      c: 0,
+      why: "Lowering TTL ahead of time ensures that when you switch the IP, clients discover it within 5 minutes."
+    }
+  ]);
+</script>
+</body>
+</html>

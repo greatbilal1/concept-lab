@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 06 — Deadlocks: detection and prevention</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="transactions-data-integrity" data-lesson="6" data-lesson-id="deadlocks-detection-and-prevention">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 06</span> · Locking & Concurrency Control</span>
+
+  <h1 class="lesson-title">Deadlocks: detection and prevention</h1>
+  <p class="lesson-lede">
+    Transaction A waits for Transaction B; Transaction B waits for Transaction A. Learn how circular lock dependencies cause deadlocks, and the golden rule to prevent them.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Diagnose and prevent database deadlocks using ordered resource acquisition</span>
+    <span><b>Mission link</b> Eliminates frustrating deadlock exceptions in concurrent multi-row transactions</span>
+  </div>
+
+  <h2><span class="n">1</span>The deadly embrace</h2>
+  <p>A <b>Deadlock</b> occurs when two transactions each hold a lock the other transaction needs, and neither can proceed. Transaction 1 locks Account A and waits for Account B. Transaction 2 locks Account B and waits for Account A. Both transactions are frozen in a circular lock wait.</p><p>The database engine detects this cycle using a background <b>Deadlock Detector</b>. After a timeout (e.g. 1 second), the engine breaks the deadlock by forcibly aborting one transaction with: <code>ERROR: deadlock detected</code>.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    A deadlock is a circular lock dependency; databases break them by aborting one transaction.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The circular deadlock cycle</h2>
+  <p>Visualise the circular dependency cycle between two concurrent transactions.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing deterministic lock ordering</h2>
+  <p>Trace how sorting resource IDs before locking eliminates deadlocks completely.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of deadlock prevention.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can write concurrent multi-row transaction logic that is mathematically immune to database deadlocks.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Sort IDs in your application code before acquiring SELECT FOR UPDATE locks.</li>
+    <li>Inspect the deadlock_timeout setting in PostgreSQL (default 1000ms).</li>
+    <li>Implement an automated retry loop around transactions that catch serialization or deadlock errors.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    PostgreSQL Documentation: *Explicit Locking — Deadlocks* (postgresql.org/docs/current/explicit-locking.html#LOCKING-DEADLOCKS).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is the single most effective engineering rule for completely preventing deadlocks across your codebase?",
+    a: ["Always acquire locks in the exact same deterministic order everywhere (e.g. sort resource IDs from lowest to highest)","Never use transactions in your code","Set the database timeout to zero milliseconds","Reboot the database server every hour"],
+    c: 0,
+    why: "If all transactions acquire locks in strictly sorted order (Lock A before B), a circular cycle is mathematically impossible."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Tx 1: Transfer A -> B",
+            "lines": [
+                  "1. Locks Account A",
+                  "2. Requests lock on Account B (waits...)"
+            ]
+      },
+      {
+            "title": "Deadlock Cycle",
+            "lines": [
+                  "Tx 1 waits for Tx 2",
+                  "Tx 2 waits for Tx 1",
+                  "DEADLOCK DETECTED!"
+            ]
+      },
+      {
+            "title": "Tx 2: Transfer B -> A",
+            "lines": [
+                  "1. Locks Account B",
+                  "2. Requests lock on Account A (waits...)"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Goal: Transfer between Account 5 and Account 2",
+      "# Golden Rule: Always lock the smaller ID first!",
+      "accounts_to_lock = sorted([5, 2]) # [2, 5]",
+      "SELECT * FROM accounts WHERE id = 2 FOR UPDATE; # locks 2 first",
+      "SELECT * FROM accounts WHERE id = 5 FOR UPDATE; # locks 5 second",
+      "# Because all transactions lock in order (2 then 5), circular deadlocks CANNOT occur!"
+],
+    steps: [
+      {
+            "line": 2,
+            "vars": {
+                  "sorted_ids": "[2, 5]"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "lock_step_1": "locks account 2 first"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "lock_step_2": "locks account 5 second"
+            }
+      },
+      {
+            "line": 5,
+            "vars": {
+                  "mathematical_proof": "circular dependency eliminated by monotonic ordering"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "A circular lock dependency between transactions is a <0>.",
+      "Deadlocks are prevented by acquiring locks in a consistent, <1> order.",
+      "When a deadlock is detected, the database <2> one of the transactions."
+],
+    blanks: [
+      {
+            "a": [
+                  "deadlock"
+            ],
+            "why": "Deadlocks freeze two transactions mutually."
+      },
+      {
+            "a": [
+                  "sorted",
+                  "deterministic"
+            ],
+            "why": "Ordered acquisition prevents circular cycles."
+      },
+      {
+            "a": [
+                  "aborts",
+                  "terminates",
+                  "cancels"
+            ],
+            "why": "The engine aborts one transaction with an error."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "How does a relational database engine handle a deadlock when it occurs?",
+      a: ["It detects the circular wait cycle and aborts one transaction with an error, allowing the other to proceed","It turns off the database server","It deletes both tables involved in the deadlock","It waits forever until a human administrator intervenes"],
+      c: 0,
+      why: "The deadlock detector timer triggers, identifies the cycle, and rolls back the victim transaction."
+    },
+    {
+      q: "Why does sorting IDs (e.g. Lock ID 1 then ID 2) prevent deadlocks during balance transfers?",
+      a: ["Both transactions attempt to acquire Lock 1 first; the second waits for Lock 1 rather than holding Lock 2, preventing a cycle","Sorting numbers makes queries run ten times faster","The database only allows primary keys in numerical order","It converts the transactions into read-only queries"],
+      c: 0,
+      why: "Consistent ordering breaks the circular wait condition (one of Coffman's four deadlock conditions)."
+    },
+    {
+      q: "What should an application do when it catches a deadlock error from the database?",
+      a: ["Retry the entire transaction from the beginning with exponential backoff","Show a fatal crash screen to the user and log them out","Ignore the error and pretend the transaction succeeded","Reboot the application server container"],
+      c: 0,
+      why: "Deadlocks are transient concurrency collisions; retrying the transaction will almost always succeed."
+    },
+    {
+      q: "What PostgreSQL setting controls how long the engine waits before searching for deadlocks?",
+      a: ["deadlock_timeout (default: 1s)","lock_timeout","statement_timeout","max_connections"],
+      c: 0,
+      why: "deadlock_timeout caps how long a transaction can wait on a lock before checking for cycles."
+    }
+  ]);
+</script>
+</body>
+</html>

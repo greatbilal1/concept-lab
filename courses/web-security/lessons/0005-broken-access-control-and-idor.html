@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 05 — Broken Access Control and IDOR (Insecure Direct Object References)</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="web-security" data-lesson="5" data-lesson-id="broken-access-control-and-idor">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 05</span> · Access Control</span>
+
+  <h1 class="lesson-title">Broken Access Control and IDOR (Insecure Direct Object References)</h1>
+  <p class="lesson-lede">
+    The #1 web vulnerability: Insecure Direct Object References (IDOR), parameter tampering, horizontal vs vertical privilege escalation, and tenancy checks.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to diagnose, exploit, and prevent Broken Access Control and IDOR vulnerabilities.</span>
+    <span><b>Mission link</b> Mastering broken access control and idor (insecure direct object references) across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Broken Access Control and IDOR (Insecure Direct Object References)</h2>
+  <p>You log into your medical portal. The URL reads: `https://clinic.com/api/records/8492`. You change the URL to `https://clinic.com/api/records/8493`, hit enter, and <strong>see another patient's confidential medical records</strong>. This is an <strong>Insecure Direct Object Reference (IDOR)</strong>, and it is the single most common vulnerability discovered in enterprise web penetration tests.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    The #1 web vulnerability: Insecure Direct Object References (IDOR), parameter tampering, horizontal vs vertical privilege escalation, and tenancy checks.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Horizontal vs Vertical Privilege Escalation</h2>
+  <p>Types of Broken Access Control:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>The Mandatory Ownership Check</h2>
+  <ul><li><strong>Horizontal Privilege Escalation (IDOR):</strong> User A accesses records belonging to User B at the same permission level (e.g. Customer viewing another customer's invoice).</li><li><strong>Vertical Privilege Escalation:</strong> A regular user performs actions reserved for administrators (e.g. sending a request to `POST /api/admin/delete_user`).</li><li><strong>Missing Function-Level Access Control:</strong> Hiding a button in the UI, but leaving the underlying API endpoint completely unprotected against direct HTTP requests.</li></ul><pre><code># VULNERABLE CODE (IDOR): 
+@app.get("/api/invoices/{invoice_id}")
+async def get_invoice(invoice_id: int, current_user: User = Depends(get_current_user)):
+    # BUGS: Fetches invoice by ID directly without checking who owns it!
+    return await db.invoices.find(invoice_id)
+
+# SECURE CODE (Enforcing Ownership & Tenant Scoping):
+@app.get("/api/invoices/{invoice_id}")
+async def get_invoice(invoice_id: int, current_user: User = Depends(get_current_user)):
+    invoice = await db.invoices.find(invoice_id)
+    # Mandatory Authorization Ownership Gate:
+    if not invoice or invoice.tenant_id != current_user.tenant_id:
+        raise HTTPException(status_code=404, detail="Invoice not found")
+    return invoice</code></pre><div class="callout"><p><strong>The 404 Obfuscation Rule:</strong> When unauthorized access is attempted, return <code>404 Not Found</code> rather than <code>403 Forbidden</code>. Returning 403 confirms to an attacker that the target record ID actually exists.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the access control sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to diagnose, exploit, and prevent Broken Access Control and IDOR vulnerabilities.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where broken access control and idor (insecure direct object references) applies.</li>
+    <li>Author a unit test or verification script exercising broken access control and idor (insecure direct object references).</li>
+    <li>Document team architectural conventions regarding broken access control and idor (insecure direct object references).</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Broken Access Control and IDOR (Insecure Direct Object References).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is an 'Insecure Direct Object Reference' (IDOR) vulnerability in an API?",
+    a: ["When an endpoint accepts an object ID directly from user input (e.g. /invoices/1042) without verifying that the authenticated user actually owns that object","When an object in Python has no methods","A syntax error in JavaScript","A broken network router"],
+    c: 0,
+    why: "IDOR occurs when users access unauthorized records simply by guessing or tampering with object IDs in URLs."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Horizontal Escalation (IDOR)",
+            "lines": [
+                  "User A changes /invoices/1 to /invoices/2",
+                  "Views peer customer's private data",
+                  "Same permission level, unauthorized scope"
+            ]
+      },
+      {
+            "title": "Vertical Escalation",
+            "lines": [
+                  "Regular user calls /api/admin/users/delete",
+                  "Executes administrative operations",
+                  "Crosses privilege boundary"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Broken Access Control and IDOR (Insecure Direct Object References)",
+      "def execute_flow():",
+      "    # The #1 web vulnerability: Insecure Direct Object R...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Broken Access Control and IDOR (Insecure Direct Object References)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Vulnerable Query"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Secure Scoped Query"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "IDOR vulnerabilities occur when endpoints expose database IDs without verifying user {1}, allowing horizontal {2} escalation simply by tampering with URLs."
+],
+    blanks: [
+      {
+            "a": [
+                  "ownership"
+            ],
+            "why": "Verifying that the current user owns the record"
+      },
+      {
+            "a": [
+                  "privilege"
+            ],
+            "why": "Unauthorized access expansion"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why is hiding an 'Admin Settings' link in the frontend navigation insufficient for security?",
+      a: ["Attackers do not rely on UI buttons; they inspect API routes and send direct HTTP requests to /api/admin endpoints using tools like curl","Browsers cannot hide buttons","Users can guess buttons","Buttons are deprecated"],
+      c: 0,
+      why: "Security through obscurity in the UI fails; authorization must be enforced on the server endpoint."
+    },
+    {
+      q: "Why is using random UUIDv4 identifiers (e.g. /invoices/8f49-2b1a) better than sequential integers (e.g. /invoices/1042)?",
+      a: ["UUIDs are cryptographically unpredictable, preventing automated enumeration scripts from scraping sequential records across the database","UUIDs make databases faster","UUIDs use less disk space","UUIDs are required by Python"],
+      c: 0,
+      why: "Unpredictable UUIDs eliminate trivial integer enumeration attacks (though server authorization checks remain mandatory)."
+    },
+    {
+      q: "What should an API return when an authenticated user attempts to access a record belonging to another customer?",
+      a: ["HTTP 404 Not Found (to avoid confirming the existence of the resource to attackers)","HTTP 200 with blank data","HTTP 500 Server Crash","A friendly email"],
+      c: 0,
+      why: "Returning 404 prevents attackers from enumerating valid IDs via 403 versus 404 status differences."
+    },
+    {
+      q: "What is the single best architectural practice to eliminate IDOR across an entire engineering codebase?",
+      a: ["Automatically appending 'WHERE tenant_id = :current_tenant' to every database query in the data access layer","Banning user IDs","Deleting the database","Making all data public"],
+      c: 0,
+      why: "Enforcing tenant scoping systematically in data layer abstractions prevents developers from forgetting checks."
+    }
+  ]);
+</script>
+</body>
+</html>

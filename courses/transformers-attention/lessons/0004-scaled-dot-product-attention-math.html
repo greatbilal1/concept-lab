@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 04 — Scaled Dot-Product Attention: Math and Mechanics</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="transformers-attention" data-lesson="4" data-lesson-id="scaled-dot-product-attention-math">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 04</span> · Attention Math</span>
+
+  <h1 class="lesson-title">Scaled Dot-Product Attention: Math and Mechanics</h1>
+  <p class="lesson-lede">
+    The exact mathematical formula: Attention(Q, K, V) = softmax(Q K^T / sqrt(d_k)) V, and why the scale factor matters.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You understand the exact mathematical mechanics and quadratic complexity of scaled dot-product attention.</span>
+    <span><b>Mission link</b> Mastering scaled dot-product attention: math and mechanics across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Scaled Dot-Product Attention: Math and Mechanics</h2>
+  <p>The foundational mathematical equation of modern artificial intelligence is the <strong>Scaled Dot-Product Attention</strong> formula:</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    The exact mathematical formula: Attention(Q, K, V) = softmax(Q K^T / sqrt(d_k)) V, and why the scale factor matters.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Step-by-Step Attention Computation</h2>
+  $$\text{Attention}(Q, K, V) = \text{softmax}\left(\frac{Q K^T}{\sqrt{d_k}}\right) V$$
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>The Quadratic Scaling Curve</h2>
+  <p>Let us dissect every component of this historic equation:</p><ul><li><strong>$Q K^T$ (Pairwise Dot Products):</strong> Multiplies Queries by transposed Keys, producing an $N \times N$ matrix of raw compatibility scores between every pair of tokens.</li><li><strong>$\frac{1}{\sqrt{d_k}}$ (Scaling Factor):</strong> When the dimension $d_k$ is large (e.g. 64 or 128), dot products can grow very large in magnitude. Large values push the Softmax function into saturated regions where gradients are near zero! Dividing by $\sqrt{d_k}$ keeps the variance equal to $1.0$, maintaining healthy gradients.</li><li><strong>$\text{softmax}(\dots)$ (Attention Weights):</strong> Normalizes each row into a valid probability distribution that sums to $1.0$. Row $i$ shows how much token $i$ attends to all other tokens.</li><li><strong>$\dots V$ (Weighted Value Sum):</strong> Multiplies the attention weights by the Values $V$, producing the updated, contextualized token representations!</li></ul><pre><code># Scaled Dot-Product Attention in 6 Lines of Python:
+import numpy as np
+
+def scaled_dot_product_attention(Q, K, V):
+    d_k = Q.shape[-1]
+    # 1. Compute raw scores: Q @ K.T
+    scores = np.matmul(Q, K.swapaxes(-2, -1))
+    # 2. Scale by sqrt(d_k)
+    scaled_scores = scores / np.sqrt(d_k)
+    # 3. Softmax across the last axis
+    weights = np.exp(scaled_scores) / np.sum(np.exp(scaled_scores), axis=-1, keepdims=True)
+    # 4. Multiply weights by V
+    output = np.matmul(weights, V)
+    return output, weights</code></pre><div class="callout"><p><strong>The Quadratic Complexity:</strong> Computing the $N \times N$ matrix requires $O(N^2)$ memory and compute. Doubling sequence length quadruples the attention memory! This is the fundamental constraint behind context window limits.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the attention math sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You understand the exact mathematical mechanics and quadratic complexity of scaled dot-product attention.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where scaled dot-product attention: math and mechanics applies.</li>
+    <li>Author a unit test or verification script exercising scaled dot-product attention: math and mechanics.</li>
+    <li>Document team architectural conventions regarding scaled dot-product attention: math and mechanics.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Scaled Dot-Product Attention: Math and Mechanics.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Why is the dot product of Q and K divided by sqrt(d_k) in the scaled dot-product attention formula?",
+    a: ["To prevent the dot products from growing excessively large in high dimensions, which would push softmax into flat regions with vanishing gradients","To convert floating point numbers to integers","To make the matrix smaller on disk","To satisfy copyright regulations"],
+    c: 0,
+    why: "Scaling by sqrt(d_k) stabilizes the variance of the dot products, preventing softmax saturation and vanishing gradients."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1. Dot Product: Q @ K.T",
+            "lines": [
+                  "Pairwise compatibility",
+                  "Produces N x N score matrix"
+            ]
+      },
+      {
+            "title": "2. Scale: / sqrt(d_k)",
+            "lines": [
+                  "Divides by root dimension",
+                  "Stabilizes variance, prevents softmax saturation"
+            ]
+      },
+      {
+            "title": "3. Softmax Normalization",
+            "lines": [
+                  "Row sums equal 1.0",
+                  "Produces attention weight probabilities"
+            ]
+      },
+      {
+            "title": "4. Weight Values: W @ V",
+            "lines": [
+                  "Blends Value vectors",
+                  "Emits contextualized representations"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Scaled Dot-Product Attention: Math and Mechanics",
+      "def execute_flow():",
+      "    # The exact mathematical formula: Attention(Q, K, V)...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Scaled Dot-Product Attention: Math and Mechanics"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "1,000 Tokens (1k)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "32,000 Tokens (32k)"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "step": "128,000 Tokens (128k)"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "In scaled dot-product attention, raw Q K^T scores are divided by {1} before being normalized by {2} and multiplied by Values."
+],
+    blanks: [
+      {
+            "a": [
+                  "sqrt(d_k)"
+            ],
+            "why": "Square root of key dimension"
+      },
+      {
+            "a": [
+                  "softmax"
+            ],
+            "why": "Probability normalization function"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What happens if you omit the sqrt(d_k) scaling factor in high-dimensional attention?",
+      a: ["Dot product magnitudes grow large, causing softmax to saturate into a one-hot distribution with vanishing gradients","The matrix multiplication fails","The code runs 10x faster","The attention matrix becomes all zeros"],
+      c: 0,
+      why: "Without scaling, large variance pushes softmax into flat regions where derivatives vanish."
+    },
+    {
+      q: "What is the computational complexity of standard self-attention with respect to sequence length N?",
+      a: ["O(N^2) quadratic complexity in both computation time and memory","O(N) linear complexity","O(log N) logarithmic complexity","O(1) constant complexity"],
+      c: 0,
+      why: "Computing pairwise comparisons between every token and every other token requires N^2 operations."
+    },
+    {
+      q: "What does row 3 of the N x N attention weight matrix represent?",
+      a: ["The probability distribution showing how much token 3 is attending to every token in the sequence","The third layer weights","The user's password","The learning rate for token 3"],
+      c: 0,
+      why: "Each row i represents the attention distribution of token i across all tokens j."
+    },
+    {
+      q: "What is FlashAttention (Dao et al., 2022)?",
+      a: ["An exact, GPU-SRAM-tiled implementation of self-attention that avoids materializing the massive N x N matrix in HBM memory","A tool for making browser flash games","A technique that reduces model accuracy by 50%","A hardware cable"],
+      c: 0,
+      why: "FlashAttention uses GPU SRAM tiling to compute exact attention without memory-bandwidth bottlenecks."
+    }
+  ]);
+</script>
+</body>
+</html>

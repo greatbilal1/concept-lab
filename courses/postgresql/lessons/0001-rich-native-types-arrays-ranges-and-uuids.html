@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 01 — Rich native types: arrays, ranges, and UUIDs</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="postgresql" data-lesson="1" data-lesson-id="rich-native-types-arrays-ranges-and-uuids">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 01</span> · Advanced Types & JSONB</span>
+
+  <h1 class="lesson-title">Rich native types: arrays, ranges, and UUIDs</h1>
+  <p class="lesson-lede">
+    Beyond numbers and text: explore PostgreSQL's extraordinary native type system, including true array columns, date ranges, and network addresses.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Implement native arrays, range types, and UUIDs in table schemas</span>
+    <span><b>Mission link</b> Eliminates redundant junction tables for simple tags and temporal intervals</span>
+  </div>
+
+  <h2><span class="n">1</span>Beyond scalar columns</h2>
+  <p>Most databases only support basic primitives (ints, floats, strings). PostgreSQL treat types as first-class citizens, providing native support for <b>Arrays</b> (<code>text[]</code>, <code>integer[]</code>), <b>UUIDs</b>, and continuous <b>Range Types</b> (<code>daterange</code>, <code>numrange</code>).</p><p>Range types are particularly powerful: instead of storing <code>start_date</code> and <code>end_date</code> separately, a single <code>daterange</code> column allows you to query overlaps with the <code>&&</code> operator and enforce non-overlapping bookings via exclusion constraints!</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    PostgreSQL's rich type system replaces complex application logic with native database operators.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The PostgreSQL native type catalogue</h2>
+  <p>Examine specialized native data types that eliminate custom validation logic.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing exclusion constraint validation</h2>
+  <p>Trace how a PostgreSQL exclusion constraint prevents double-booking hotel rooms.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of PostgreSQL native types.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can leverage arrays, range types, and exclusion constraints to solve complex scheduling and categorization requirements natively.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Create a table with a tags text[] array column and query it using ANY(tags).</li>
+    <li>Implement a daterange column and test whether two dates overlap using the && operator.</li>
+    <li>Generate a random UUID using gen_random_uuid() as a column default.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    PostgreSQL Documentation: *Range Types* (postgresql.org/docs/current/rangetypes.html).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "How do you check if two daterange values overlap in PostgreSQL?",
+    a: ["Using the native overlap operator '&&' (e.g. range1 && range2)","Writing four separate <= and >= comparisons by hand","Converting the dates to strings and matching with LIKE","Overlap checks are forbidden in SQL"],
+    c: 0,
+    why: "The '&&' operator tests for set intersection and overlap natively across all range types."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Arrays (text[], int[])",
+            "lines": [
+                  "ordered lists inside a single column",
+                  "operators: @> (contains), = ANY(arr)"
+            ]
+      },
+      {
+            "title": "Range Types (daterange)",
+            "lines": [
+                  "discrete or continuous bounds",
+                  "operators: && (overlap), @> (contains)"
+            ]
+      },
+      {
+            "title": "Network Types (inet, cidr)",
+            "lines": [
+                  "IPv4 and IPv6 addresses with subnets",
+                  "enforces valid IP syntax automatically"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "CREATE TABLE bookings (",
+      "    room_id INT,",
+      "    during DATERANGE,",
+      "    EXCLUDE USING gist (room_id WITH =, during WITH &&)",
+      ");",
+      "# Booking 1: room 101, [2026-06-01, 2026-06-05) -> Accepted",
+      "# Booking 2: room 101, [2026-06-03, 2026-06-07) -> REJECTED (conflicting key: overlap detected!)"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "schema": "exclusion constraint created on room_id and date overlap"
+            }
+      },
+      {
+            "line": 5,
+            "vars": {
+                  "insert_1": "initial booking inserted cleanly"
+            }
+      },
+      {
+            "line": 6,
+            "vars": {
+                  "insert_2": "overlapping booking rejected by database engine in 0.1ms"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "An array of text in PostgreSQL is declared with the type <0>[].",
+      "The native type representing a date interval is date<1>.",
+      "The operator testing whether two ranges overlap is <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "text"
+            ],
+            "why": "text[] declares an array of strings."
+      },
+      {
+            "a": [
+                  "range"
+            ],
+            "why": "daterange represents date bounds."
+      },
+      {
+            "a": [
+                  "&&"
+            ],
+            "why": "&& is the overlap operator."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is an exclusion constraint (EXCLUDE) in PostgreSQL?",
+      a: ["A constraint that prevents rows from having overlapping ranges or conflicting values across specified operators","A rule that deletes users who have not logged in for 30 days","A constraint that blocks all SELECT queries on weekends","A password validation check"],
+      c: 0,
+      why: "Exclusion constraints generalize uniqueness to arbitrary operators (like range overlaps)."
+    },
+    {
+      q: "How do you query if the string 'python' exists inside an array column named 'skills'?",
+      a: ["'python' = ANY(skills)","skills CONTAINS 'python'","skills LIKE '%python%'","search(skills, 'python')"],
+      c: 0,
+      why: "'value = ANY(array)' is the standard PostgreSQL idiom to test for array membership."
+    },
+    {
+      q: "What does the 'inet' data type enforce in PostgreSQL?",
+      a: ["Valid IPv4 or IPv6 network addresses, and allows subnet inclusion queries (e.g. <<=)","Internet browser bookmark URLs","Credit card numbers","Email address syntax"],
+      c: 0,
+      why: "inet stores and validates host IP addresses and subnet masks natively."
+    },
+    {
+      q: "Why use native UUID types instead of VARCHAR(36) to store UUIDs in PostgreSQL?",
+      a: ["The native UUID type stores the identifier as a compact 16-byte binary integer, saving 55% disk space and speeding up index lookups","VARCHAR cannot store hyphens","VARCHAR is forbidden in modern PostgreSQL","There is no difference in storage size"],
+      c: 0,
+      why: "Native UUID is 16 bytes; storing it as a 36-character string wastes memory and disk bandwidth."
+    }
+  ]);
+</script>
+</body>
+</html>

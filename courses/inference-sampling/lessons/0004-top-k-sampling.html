@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 04 — Top-K Sampling: Limiting to the Top K Candidates</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="inference-sampling" data-lesson="4" data-lesson-id="top-k-sampling">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 04</span> · Top-K</span>
+
+  <h1 class="lesson-title">Top-K Sampling: Limiting to the Top K Candidates</h1>
+  <p class="lesson-lede">
+    Truncating the probability tail: Top-K sampling, preventing bizarre hallucinations, and its flat-cutoff limitations.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You understand the mechanics and trade-offs of Top-K tail truncation.</span>
+    <span><b>Mission link</b> Mastering top-k sampling: limiting to the top k candidates across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Top-K Sampling: Limiting to the Top K Candidates</h2>
+  <p>Even with reasonable temperature, a vocabulary of 128,000 tokens has a massive <strong>long tail</strong>. Even if 127,900 tokens each have a tiny $0.0001\%$ probability, their cumulative sum can equal $10\%$! Every ten tokens, the model might randomly sample a bizarre, context-breaking word.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Truncating the probability tail: Top-K sampling, preventing bizarre hallucinations, and its flat-cutoff limitations.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Top-K Tail Truncation</h2>
+  <p><strong>Top-K Sampling</strong> (Fan et al., 2018) provides a simple, aggressive truncation filter:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>The Fixed-K Dilemma</h2>
+  <ul><li><strong>1. Sort Vocabulary:</strong> Rank all 128,000 tokens by probability in descending order.</li><li><strong>2. Keep Top K:</strong> Retain only the top $K$ candidates (typically $K = 40$ or $K = 50$).</li><li><strong>3. Truncate the Tail:</strong> Set the probabilities of all remaining tokens to zero!</li><li><strong>4. Re-normalize:</strong> Re-normalize the top $K$ probabilities so they sum to $1.0$, and sample exclusively from this curated pool.</li></ul><pre><code># Top-K Truncation in Python:
+import numpy as np
+
+def top_k_sampling(probs, k=40):
+    # 1. Find the top K indices
+    top_k_indices = np.argsort(probs)[-k:]
+    # 2. Zero out everything else
+    filtered_probs = np.zeros_like(probs)
+    filtered_probs[top_k_indices] = probs[top_k_indices]
+    # 3. Re-normalize so sum is 1.0
+    return filtered_probs / np.sum(filtered_probs)</code></pre><p>The Limitation of Top-K: <strong>Rigid Thresholding</strong>. If the model is confident and there is only 1 sensible word, Top-K still forces 39 inferior words into the pool! Conversely, if the context is broad and there are 100 valid words, Top-K cuts off 60 great options.</p><div class="callout"><p><strong>The Transition:</strong> Because Top-K uses a rigid fixed number of tokens, modern AI largely replaced or paired it with <strong>Top-P (Nucleus) Sampling</strong>.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the Top-K sampling sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You understand the mechanics and trade-offs of Top-K tail truncation.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where top-k sampling: limiting to the top k candidates applies.</li>
+    <li>Author a unit test or verification script exercising top-k sampling: limiting to the top k candidates.</li>
+    <li>Document team architectural conventions regarding top-k sampling: limiting to the top k candidates.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Top-K Sampling: Limiting to the Top K Candidates.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "How does Top-K sampling prevent a language model from generating nonsensical or wildly irrelevant tokens?",
+    a: ["By sorting all tokens by probability and zeroing out everything outside the top K most probable candidates (e.g. K=40)","By deleting words starting with K","By running only K iterations of the loop","By limiting output text to K characters"],
+    c: 0,
+    why: "Top-K truncates the long tail of low-probability vocabulary tokens, eliminating bizarre outliers."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Full Vocabulary (128k tokens)",
+            "lines": [
+                  "Top 10 tokens: 88% mass",
+                  "Long tail of 127,990 tokens: 12% mass",
+                  "Tail invites random bizarre hallucinations"
+            ]
+      },
+      {
+            "title": "Top-K Filter (K = 40)",
+            "lines": [
+                  "Keeps only top 40 candidates",
+                  "Sets remaining 127,960 to ZERO probability",
+                  "Re-normalizes and samples safely"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Top-K Sampling: Limiting to the Top K Candidates",
+      "def execute_flow():",
+      "    # Truncating the probability tail: Top-K sampling, p...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Top-K Sampling: Limiting to the Top K Candidates"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "High Confidence Context"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Low Confidence Context"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Top-K sampling eliminates long-tail hallucinations by zeroing out all tokens outside the top {1} most probable {2}."
+],
+    blanks: [
+      {
+            "a": [
+                  "K"
+            ],
+            "why": "The fixed cutoff integer parameter"
+      },
+      {
+            "a": [
+                  "candidates"
+            ],
+            "why": "High-ranking vocabulary tokens"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the primary danger of sampling from a full, unfiltered 128,000-token probability distribution?",
+      a: ["The accumulated probability of thousands of tiny tail tokens will occasionally cause the model to generate a completely bizarre, context-breaking word","The GPU runs out of power","The vocabulary expands to 1 million words","The prompt is deleted"],
+      c: 0,
+      why: "The vast long tail can collectively accumulate substantial probability, leading to random gibberish."
+    },
+    {
+      q: "What is the typical default value for K in Top-K sampling configurations?",
+      a: ["Between 40 and 50","Exactly 1","10,000","0"],
+      c: 0,
+      why: "40-50 provides sufficient variety while cutting off bizarre low-probability tokens."
+    },
+    {
+      q: "Why is Top-K considered suboptimal when a model's prediction confidence changes dynamically?",
+      a: ["It uses a fixed number of tokens K regardless of whether the distribution has 1 obvious answer or 100 plausible options","It runs 10x slower on GPUs","It requires floating-point math","It only works on English words"],
+      c: 0,
+      why: "A static K does not adapt to the sharpness or flatness of the model's confidence distribution."
+    },
+    {
+      q: "If you set K = 1 in Top-K sampling, what decoding behavior does it produce?",
+      a: ["Greedy decoding (Argmax): only the single top-ranked token is kept","Random noise","The model halts","All words are output at once"],
+      c: 0,
+      why: "Keeping only the single top candidate (K=1) is mathematically identical to greedy decoding."
+    }
+  ]);
+</script>
+</body>
+</html>

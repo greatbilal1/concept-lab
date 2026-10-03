@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 03 — Compute Paradigms: Virtual Machines, Serverless, and Kubernetes</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="cloud-architecture" data-lesson="3" data-lesson-id="compute-paradigms-vms-serverless-k8s">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 03</span> · Compute Paradigms</span>
+
+  <h1 class="lesson-title">Compute Paradigms: Virtual Machines, Serverless, and Kubernetes</h1>
+  <p class="lesson-lede">
+    The compute spectrum: Infrastructure as a Service (EC2), Function as a Service (AWS Lambda), and Container Orchestration (Kubernetes/EKS).
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to evaluate and choose between Virtual Machines, Serverless functions, and Kubernetes.</span>
+    <span><b>Mission link</b> Mastering compute paradigms: virtual machines, serverless, and kubernetes across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Compute Paradigms: Virtual Machines, Serverless, and Kubernetes</h2>
+  <p>Cloud compute is not a single product; it is a <strong>spectrum of abstraction</strong>. Choosing the wrong compute paradigm results in either massive operational overhead (managing operating systems) or crippling architectural limitations (serverless timeouts and cold starts).</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    The compute spectrum: Infrastructure as a Service (EC2), Function as a Service (AWS Lambda), and Container Orchestration (Kubernetes/EKS).
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Cloud Compute Spectrum</h2>
+  <p>The Three Primary Cloud Compute Paradigms:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Scale-to-Zero vs Persistent Provisioning</h2>
+  <ul><li><strong>1. Virtual Machines (IaaS — AWS EC2):</strong> Maximum control. You manage the OS, kernel tuning, custom GPU drivers, and local NVMe storage. <em>Trade-off:</em> High operational overhead: you must patch the OS, configure autoscaling groups, and pay 24/7 even when traffic is low. Ideal for heavy ML model training and dedicated GPU serving clusters.</li><li><strong>2. Serverless / FaaS (AWS Lambda, Google Cloud Functions):</strong> Zero server management. Upload code; the cloud executes it in response to events (HTTP request, S3 file upload). <strong>Scales to zero when idle (zero cost!)</strong> and scales to 1,000 instances in seconds. <em>Trade-off:</em> Execution time capped at 15 minutes; suffers from 'cold starts'; unsuitable for persistent GPU weights.</li><li><strong>3. Container Orchestration (CaaS — Kubernetes / AWS EKS):</strong> The enterprise sweet spot. Packages microservices into standardized containers with automated scheduling, self-healing restarts, service discovery, and declarative scaling.</li></ul><pre><code># The Compute Decision Matrix:
+# Workload Type                  | Optimal Paradigm       | Why?
+# ----------------------------------------------------------------------------------
+# High-traffic Web API / Svc     | Kubernetes (EKS / ECS) | Predictable cost, fast scaling, rich networking
+# Webhook processor / Cron job   | Serverless (Lambda)    | Scales to zero, zero idle cost, event-driven
+# Heavy LLM Fine-Tuning / vLLM   | Dedicated VM (EC2 GPU) | Direct hardware access, persistent GPU memory</code></pre><div class="callout"><p><strong>The Cold Start Reality:</strong> A Serverless function takes 200ms to 2s to initialize a new runtime on cold invocation. Never use serverless for latency-critical sub-100ms APIs unless provisioned concurrency is enabled.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the compute paradigms sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to evaluate and choose between Virtual Machines, Serverless functions, and Kubernetes.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where compute paradigms: virtual machines, serverless, and kubernetes applies.</li>
+    <li>Author a unit test or verification script exercising compute paradigms: virtual machines, serverless, and kubernetes.</li>
+    <li>Document team architectural conventions regarding compute paradigms: virtual machines, serverless, and kubernetes.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Compute Paradigms: Virtual Machines, Serverless, and Kubernetes.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "When should an engineering team choose Serverless Functions (AWS Lambda) over persistent Kubernetes clusters?",
+    a: ["For event-driven, sporadic, or bursty workloads that need instant auto-scaling to zero when idle with zero infrastructure maintenance overhead","For hosting heavy 70B parameter models requiring 24/7 GPU memory","For running legacy operating systems","Serverless should always be used for everything"],
+    c: 0,
+    why: "Serverless excels at sporadic, event-driven tasks that benefit from scaling to zero with zero server maintenance."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Virtual Machines (EC2)",
+            "lines": [
+                  "Control: Full OS & Kernel access",
+                  "Scaling: Auto-Scaling Groups (Minutes)",
+                  "Cost: Billed 24/7 per second (No scale-to-zero)",
+                  "Best for: GPU model training & custom kernels"
+            ]
+      },
+      {
+            "title": "Containers (EKS / ECS)",
+            "lines": [
+                  "Control: Container runtime & environment",
+                  "Scaling: Horizontal Pod Autoscaler (Seconds)",
+                  "Cost: Billed for cluster node capacity",
+                  "Best for: Microservices & distributed web backends"
+            ]
+      },
+      {
+            "title": "Serverless (Lambda)",
+            "lines": [
+                  "Control: Pure application code only",
+                  "Scaling: Instant concurrent invocations",
+                  "Cost: $0.00 when idle (Scales to zero!)",
+                  "Best for: Webhooks, event triggers, cron jobs"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Compute Paradigms: Virtual Machines, Serverless, and Kubernetes",
+      "def execute_flow():",
+      "    # The compute spectrum: Infrastructure as a Service ...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Compute Paradigms: Virtual Machines, Serverless, and Kubernetes"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Sporadic Traffic (10 calls/hr)"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The compute spectrum balances control against management overhead, ranging from full-control Virtual Machines to containerized Kubernetes and event-driven {1} functions that scale to {2} when idle."
+],
+    blanks: [
+      {
+            "a": [
+                  "serverless"
+            ],
+            "why": "Function-as-a-Service cloud compute"
+      },
+      {
+            "a": [
+                  "zero"
+            ],
+            "why": "No active instances or cost when traffic ceases"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is a 'Cold Start' in Serverless computing (AWS Lambda)?",
+      a: ["The initial latency delay required for the cloud provider to allocate an execution sandbox, download code, and initialize the runtime on the first request","Starting a computer in winter","A reboot of the data center","A cold beverage in the office"],
+      c: 0,
+      why: "Cold starts represent the container provisioning and initialization delay on first invocation."
+    },
+    {
+      q: "Why is deploying a large 70-billion parameter language model to AWS Lambda generally impractical?",
+      a: ["Lambda has strict memory limits (max 10GB RAM), execution timeouts (max 15 mins), and lacks dedicated persistent multi-GPU hardware attachments","Lambda only supports HTML","Lambda is illegal for AI","Lambda runs in black and white"],
+      c: 0,
+      why: "Heavy LLMs require persistent GPU VRAM (40GB-80GB+) and long-lived model serving memory."
+    },
+    {
+      q: "What is the primary operational advantage of Kubernetes (EKS) over managing individual EC2 virtual machines?",
+      a: ["Kubernetes automates container scheduling, automated self-healing restarts of failed pods, rolling updates, and cluster packing","Kubernetes makes servers free","Kubernetes eliminates the need for software engineering","Kubernetes runs without an operating system"],
+      c: 0,
+      why: "Kubernetes abstracts infrastructure into a self-healing, declarative container orchestration platform."
+    },
+    {
+      q: "How does 'Fargate' simplify container management in AWS ECS and EKS?",
+      a: ["It is a serverless compute engine for containers where AWS manages the underlying EC2 instances, eliminating host OS patching and cluster scaling","It writes Dockerfiles automatically","It deletes old code","It turns off the internet"],
+      c: 0,
+      why: "AWS Fargate runs containers serverlessly without requiring developers to manage underlying EC2 worker nodes."
+    }
+  ]);
+</script>
+</body>
+</html>

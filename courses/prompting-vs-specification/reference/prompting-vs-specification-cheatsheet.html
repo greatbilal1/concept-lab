@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prompting vs Specification — Cheat Sheet</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+<style>
+  .ref-toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0 8px; }
+  .ref-toc a { font-size: .8rem; border: 1px solid var(--border); background: #111a30; padding: 5px 11px; border-radius: 999px; color: var(--muted); text-decoration: none; border-bottom: 1px solid var(--border); }
+  .ref-toc a:hover { color: #fff; border-color: #3d5488; }
+  .lesson-wrap h2 { scroll-margin-top: 20px; }
+  .snippet { margin: 14px 0 22px; }
+  .snippet .lbl { font-size: .72rem; font-weight: 800; letter-spacing: .7px; text-transform: uppercase; color: var(--accent2); margin-bottom: 6px; }
+  .see { font-size: .82rem; color: var(--muted); margin: -6px 0 12px; }
+  .see a { color: var(--accent2); border-bottom: 0; }
+  .see a:hover { color: #fff; }
+  .snippet pre { padding-top: 34px; }
+  @media print { .snippet pre { padding-top: 18px; } }
+</style>
+</head>
+<body class="lesson-body" data-course="prompting-vs-specification">
+
+<div class="lesson-wrap">
+
+  <span class="lesson-kicker">Reference · Cheat sheet</span>
+  <h1 class="lesson-title">Prompting vs Specification — Cheat Sheet</h1>
+  <p class="lesson-lede">
+    The whole course on one page. Every snippet links back to the lesson that
+    teaches it.
+  </p>
+
+  <div class="ref-toc">
+    <a href="#sec-1">Agent Specification Template</a>
+    <a href="#sec-2">Machine-Verifiable Acceptance Check</a>
+    <a href="#sec-3">Concrete JSON Example Pattern</a>
+    <a href="#sec-4">Spec Invariants Clause</a>
+  </div>
+
+  <h2 id="sec-1"><span class="n">1</span>Agent Specification Template</h2>
+  <div class="snippet">
+    <div class="lbl">Four essential sections</div>
+    <pre><code>## 1. Goal & Context
+What we are building and why.
+## 2. Requirements
+Inputs, outputs, schemas, endpoints.
+## 3. Constraints & Non-Goals
+What NOT to touch or install.
+## 4. Verification
+Exact commands to verify: `pytest tests/test_feature.py`</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0002-anatomy-of-a-specification.html">Lesson 02 — Anatomy of a Software Specification</a>.</p>
+
+  <h2 id="sec-2"><span class="n">2</span>Machine-Verifiable Acceptance Check</h2>
+  <div class="snippet">
+    <div class="lbl">Binary objective criteria</div>
+    <pre><code># BAD: 'Make sure billing is reliable'
+# GOOD:
+- [ ] `pytest tests/test_billing.py` passes 10/10 tests
+- [ ] `ruff check src/billing/` reports 0 errors
+- [ ] POST /api/v1/charge returns HTTP 402 on card decline</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0004-verifiable-acceptance-criteria.html">Lesson 04 — Acceptance Criteria Agents Can Actually Verify</a>.</p>
+
+  <h2 id="sec-3"><span class="n">3</span>Concrete JSON Example Pattern</h2>
+  <div class="snippet">
+    <div class="lbl">Few-shot schema grounding</div>
+    <pre><code>### Request Example:
+{
+  "sku": "ITEM-42",
+  "qty": 2,
+  "price_cents": 1999
+}
+### Response (201):
+{
+  "order_id": "ord_104",
+  "total_cents": 3998
+}</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0006-example-driven-specifications.html">Lesson 06 — Example-Driven Specifications</a>.</p>
+
+  <h2 id="sec-4"><span class="n">4</span>Spec Invariants Clause</h2>
+  <div class="snippet">
+    <div class="lbl">Guarding non-negotiable rules</div>
+    <pre><code>### Invariants (MUST NEVER BE VIOLATED):
+1. Account balance cannot be negative.
+2. Shipped orders cannot be cancelled.
+3. Write test for each invariant before modifying code.</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0005-edge-cases-invariants-non-goals.html">Lesson 05 — Edge Cases, Invariants, and Non-Goals</a>.</p>
+
+  <div class="lesson-foot">
+    <div class="links">
+      <a href="prompting-vs-specification-glossary.html">📖 Glossary</a>
+      <a href="../course.html">← Course map</a>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

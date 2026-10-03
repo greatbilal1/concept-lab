@@ -1,0 +1,3 @@
+# Mission — Distributed Systems & Scalability
+
+Master the science of reasoning about many machines cooperating as one unified system. Understand partial failure and the fallacies of distributed computing, navigate the CAP and PACELC trade-offs between consistency, availability, and latency, achieve infallible cluster agreement using Raft consensus and quorums, scale data horizontally with consistent hashing rings and virtual nodes, architect single-leader, multi-leader, and leaderless quorum replication systems, coordinate distributed transactions using the Saga pattern, and resolve concurrent edits with Vector Clocks and CRDTs.

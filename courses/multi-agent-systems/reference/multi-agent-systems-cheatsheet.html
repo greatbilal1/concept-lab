@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Multi-Agent Systems — Cheat Sheet</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+<style>
+  .ref-toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0 8px; }
+  .ref-toc a { font-size: .8rem; border: 1px solid var(--border); background: #111a30; padding: 5px 11px; border-radius: 999px; color: var(--muted); text-decoration: none; border-bottom: 1px solid var(--border); }
+  .ref-toc a:hover { color: #fff; border-color: #3d5488; }
+  .lesson-wrap h2 { scroll-margin-top: 20px; }
+  .snippet { margin: 14px 0 22px; }
+  .snippet .lbl { font-size: .72rem; font-weight: 800; letter-spacing: .7px; text-transform: uppercase; color: var(--accent2); margin-bottom: 6px; }
+  .see { font-size: .82rem; color: var(--muted); margin: -6px 0 12px; }
+  .see a { color: var(--accent2); border-bottom: 0; }
+  .see a:hover { color: #fff; }
+  .snippet pre { padding-top: 34px; }
+  @media print { .snippet pre { padding-top: 18px; } }
+</style>
+</head>
+<body class="lesson-body" data-course="multi-agent-systems">
+
+<div class="lesson-wrap">
+
+  <span class="lesson-kicker">Reference · Cheat sheet</span>
+  <h1 class="lesson-title">Multi-Agent Systems — Cheat Sheet</h1>
+  <p class="lesson-lede">
+    The whole course on one page. Every snippet links back to the lesson that
+    teaches it.
+  </p>
+
+  <div class="ref-toc">
+    <a href="#sec-1">LangGraph Multi-Agent Workflow Template</a>
+    <a href="#sec-2">Structured Handoff Payload Pattern</a>
+    <a href="#sec-3">Arbitrator Conflict Resolution</a>
+    <a href="#sec-4">Shared Blackboard State Schema</a>
+  </div>
+
+  <h2 id="sec-1"><span class="n">1</span>LangGraph Multi-Agent Workflow Template</h2>
+  <div class="snippet">
+    <div class="lbl">Cyclic state graph setup</div>
+    <pre><code>from langgraph.graph import StateGraph, END
+
+workflow = StateGraph(AgentState)
+workflow.add_node("coder", coder_node)
+workflow.add_node("qa", qa_node)
+
+workflow.set_entry_point("coder")
+workflow.add_edge("coder", "qa")
+# Route back to coder if tests fail; otherwise finish:
+workflow.add_conditional_edges(
+    "qa",
+    lambda state: "coder" if not state["tests_passed"] else END
+)
+app = workflow.compile()</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0008-orchestrating-swarms-langgraph-autogen.html">Lesson 08 — Orchestrating Multi-Agent Swarms with LangGraph and AutoGen</a>.</p>
+
+  <h2 id="sec-2"><span class="n">2</span>Structured Handoff Payload Pattern</h2>
+  <div class="snippet">
+    <div class="lbl">Lossless agent delegation</div>
+    <pre><code>class HandoffPayload(BaseModel):
+    task_id: str
+    target_files: list[str]
+    invariants: list[str]
+    verification_cmd: str
+
+# Pass pure typed artifact, NOT noisy conversation history:
+transfer_to_coder(HandoffPayload(...))</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0004-agent-handoffs-communication-protocols.html">Lesson 04 — Agent Handoffs and Communication Protocols</a>.</p>
+
+  <h2 id="sec-3"><span class="n">3</span>Arbitrator Conflict Resolution</h2>
+  <div class="snippet">
+    <div class="lbl">Resolving agent disagreements</div>
+    <pre><code># Evaluates conflicting specialist arguments:
+verdict = arbitrator.evaluate(
+    arg_a="Security: Must use 256-bit hashing",
+    arg_b="Performance: Use 128-bit for sub-10ms latency",
+    criteria="Evaluate against corporate security compliance standards"
+)</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0006-conflict-resolution-voting-consensus.html">Lesson 06 — Conflict Resolution, Voting, and Consensus Mechanisms</a>.</p>
+
+  <h2 id="sec-4"><span class="n">4</span>Shared Blackboard State Schema</h2>
+  <div class="snippet">
+    <div class="lbl">Centralized workspace dictionary</div>
+    <pre><code>class BlackboardState(TypedDict):
+    goal: str
+    shared_artifacts: dict[str, str] # e.g. {'schema': 'user_id, email'}
+    subsystem_status: dict[str, str] # e.g. {'db': 'DONE', 'api': 'WIP'}
+    messages: list[dict]</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0005-shared-state-blackboard-isolated-state.html">Lesson 05 — Shared State, Blackboard Architecture, and Isolated State</a>.</p>
+
+  <div class="lesson-foot">
+    <div class="links">
+      <a href="multi-agent-systems-glossary.html">📖 Glossary</a>
+      <a href="../course.html">← Course map</a>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 01 — What is software architecture and why it matters</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="software-architecture-patterns" data-lesson="1" data-lesson-id="what-is-software-architecture-and-why-it-matters">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 01</span> · Macro Architecture & Monoliths</span>
+
+  <h1 class="lesson-title">What is software architecture and why it matters</h1>
+  <p class="lesson-lede">
+    Architecture is not drawing pretty boxes on whiteboards. Discover Ralph Johnson's definition: architecture is the shared understanding of the decisions that are hard to change.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Articulate the definition of software architecture and document trade-offs with ADRs</span>
+    <span><b>Mission link</b> The foundation of all macro-level technical decision-making</span>
+  </div>
+
+  <h2><span class="n">1</span>The decisions that are expensive to reverse</h2>
+  <p>What separates architecture from everyday coding? Ralph Johnson provided the classic definition: <b>Architecture is the decisions that are hard to change.</b></p><p>Choosing a variable name is cheap: refactoring it takes 2 seconds. Choosing whether your system is an asynchronous event-driven system or a synchronous REST API is expensive: changing your mind two years later requires rewriting the entire system. Software architecture is the discipline of making these high-stakes structural decisions consciously through <b>trade-off analysis</b>.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Architecture consists of high-stakes structural decisions that are difficult and expensive to change later.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Architecture Decision Record (ADR)</h2>
+  <p>How senior architects capture the context, options, and consequences of structural decisions.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing architectural trade-off evaluation</h2>
+  <p>Trace how an architect evaluates latency versus consistency requirements before choosing a pattern.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of architecture fundamentals.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can articulate the scope of architectural decisions and evaluate candidate patterns using structured trade-off analysis.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Write an Architecture Decision Record (ADR) documenting your team's choice of database.</li>
+    <li>List three architectural decisions in your project that would take months to reverse.</li>
+    <li>Explain to a junior developer why microservices are an architectural trade-off, not a goal.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Mark Richards & Neal Ford, *Fundamentals of Software Architecture*, Chapter 1: 'Introduction' (O'Reilly, 2020).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is the primary danger of choosing a software architecture based on industry hype rather than business trade-offs?",
+    a: ["You inherit all the operational complexity and failure modes of the pattern without having the scale or problem it was designed to solve","The computer compiler will reject the code","The database automatically formats the hard drive","There are no downsides to adopting trendy architectures"],
+    c: 0,
+    why: "Adopting complex architectures (like microservices) prematurely introduces massive operational overhead without benefit."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Context",
+            "lines": [
+                  "business requirement & problem",
+                  "scale, latency, and team constraints"
+            ]
+      },
+      {
+            "title": "Decision",
+            "lines": [
+                  "the chosen architectural shape",
+                  "e.g. Adopt Modular Monolith"
+            ]
+      },
+      {
+            "title": "Consequences (+ and -)",
+            "lines": [
+                  "benefits gained (deployment ease)",
+                  "trade-offs accepted (shared DB scaling limit)"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Requirement: Global e-commerce store with 100ms response time worldwide",
+      "# Option A: Single SQL Monolith (strong consistency, but 300ms transoceanic latency!)",
+      "# Option B: Event-Driven with Edge Replicas (sub-50ms local reads, eventual consistency)",
+      "# Architectural Decision: Option B chosen; business accepts 2-second inventory sync delay!"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "constraint": "strict global latency SLA: <100ms"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "rejected": "Option A rejected due to speed-of-light physical constraints"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "verdict": "Option B adopted; explicit trade-off acknowledged and documented"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Architecture represents the structural decisions that are hard to <0>.",
+      "A document recording an architectural choice and its trade-offs is an <1>.",
+      "In software architecture, there are no solutions, only <2>-offs."
+],
+    blanks: [
+      {
+            "a": [
+                  "change"
+            ],
+            "why": "Ralph Johnson defined architecture as decisions that are hard to change."
+      },
+      {
+            "a": [
+                  "ADR"
+            ],
+            "why": "ADR stands for Architecture Decision Record."
+      },
+      {
+            "a": [
+                  "trade"
+            ],
+            "why": "Every architectural choice involves explicit trade-offs."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What did Ralph Johnson famously define as 'Software Architecture'?",
+      a: ["Architecture is the decisions that you wish you could get right early in a project, because they are hard and expensive to change later","Architecture is drawing colorful diagrams using Microsoft Visio","Architecture is configuring Kubernetes clusters","Architecture is the physical layout of computer hardware in server racks"],
+      c: 0,
+      why: "Johnson's definition focuses on the difficulty of reversing foundational structural decisions."
+    },
+    {
+      q: "What is the primary rule of thumb regarding architectural trade-offs?",
+      a: ["If an architect cannot clearly articulate the downsides and disadvantages of an architecture, they do not understand it","The most complex architecture is always the best architecture","Always copy the exact architecture of Netflix and Google","Architecture should change every week"],
+      c: 0,
+      why: "Every architectural choice buys certain qualities (scalability, velocity) at the expense of others (complexity, consistency)."
+    },
+    {
+      q: "What are the core components of an Architecture Decision Record (ADR)?",
+      a: ["Title, Status, Context, Decision, and Consequences (both positive and negative)","Username, Password, and Database Name","HTML, CSS, and JavaScript","Source Code, Compiled Binary, and License"],
+      c: 0,
+      why: "ADRs capture context, decision rationale, and accepted trade-offs for future engineering generations."
+    },
+    {
+      q: "Why is premature distribution (splitting a system into microservices too early) dangerous?",
+      a: ["It introduces network latency, distributed transactions, partial failures, and deployment complexity before domain boundaries are stable","It turns off database backups","It makes the computer screen flicker","It is forbidden by open-source licenses"],
+      c: 0,
+      why: "Distributed systems introduce immense operational friction; premature splitting before boundaries stabilize is fatal."
+    }
+  ]);
+</script>
+</body>
+</html>

@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 05 — Active Latency and Error Rate Routing</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="ai-model-routing" data-lesson="5" data-lesson-id="active-latency-error-routing">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 05</span> · Adaptive Routing</span>
+
+  <h1 class="lesson-title">Active Latency and Error Rate Routing</h1>
+  <p class="lesson-lede">
+    Adaptive traffic routing: real-time health scoring, EWMA latency tracking, and routing to the fastest available region or provider.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to implement adaptive latency and error-rate routing using EWMA health scoring.</span>
+    <span><b>Mission link</b> Mastering active latency and error rate routing across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Active Latency and Error Rate Routing</h2>
+  <p>Cloud provider performance fluctuates constantly. At 2:00 PM, OpenAI's US-East region might have a 3-second p95 latency due to peak traffic, while Europe-West has a 400ms latency. Static routing sends traffic blindly into the traffic jam; <strong>Adaptive Routing</strong> routes around it.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Adaptive traffic routing: real-time health scoring, EWMA latency tracking, and routing to the fastest available region or provider.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Static Routing vs Adaptive Routing</h2>
+  <p>How Adaptive Latency & Health Routing works:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>EWMA Rolling Health Score</h2>
+  <ul><li><strong>1. Exponentially Weighted Moving Average (EWMA):</strong> Maintain a real-time rolling latency score for every provider endpoint: $\text{EWMA}_t = \alpha \cdot \text{Latency}_t + (1 - \alpha) \cdot \text{EWMA}_{t-1}$. Gives heavy weight to recent seconds!</li><li><strong>2. Health & Error Penalty:</strong> If an endpoint returns an HTTP 500 or 429, artificially inflate its virtual latency score by 5,000ms. Traffic naturally steers away from degraded endpoints!</li><li><strong>3. Dynamic Weight Distribution:</strong> Dispatch 80% of traffic to the current lowest-latency winner, and 20% exploration traffic to secondary providers to continuously measure their recovery.</li></ul><pre><code># EWMA Adaptive Latency Router Scorecard:
+# Endpoint                | Rolling EWMA Latency | Error Rate | Traffic Weight
+# ----------------------------------------------------------------------------
+# OpenAI us-east          | 2,400ms (Congested)  | 0.2%       | 10%
+# OpenAI eu-west          | 380ms (Fast & Clear) | 0.0%       | 65% (WINNER!)
+# Anthropic claude-sonnet | 420ms (Healthy)      | 0.0%       | 25%</code></pre><div class="callout"><p><strong>The Global Performance Edge:</strong> Adaptive routing reduces global p95 user latency by up to 45% compared to static single-region endpoints.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the adaptive routing sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to implement adaptive latency and error-rate routing using EWMA health scoring.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where active latency and error rate routing applies.</li>
+    <li>Author a unit test or verification script exercising active latency and error rate routing.</li>
+    <li>Document team architectural conventions regarding active latency and error rate routing.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Active Latency and Error Rate Routing.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is 'Adaptive Latency-Based Routing' in distributed AI infrastructure?",
+    a: ["Dynamically directing requests to the model provider or cloud region currently exhibiting the lowest rolling response latency","Changing the color of the application based on speed","Slow down user requests on purpose","A feature in Wi-Fi routers"],
+    c: 0,
+    why: "Adaptive routing directs requests to the lowest-latency, healthiest available provider in real time."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Static Routing (Brittle)",
+            "lines": [
+                  "100% traffic sent to US-East",
+                  "US-East gets congested (3s latency)",
+                  "All users suffer slow responses"
+            ]
+      },
+      {
+            "title": "Adaptive Routing (Intelligent)",
+            "lines": [
+                  "Detects US-East congestion via EWMA",
+                  "Dynamically steers 70% traffic to EU-West",
+                  "Maintains sub-500ms latency globally!"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Active Latency and Error Rate Routing",
+      "def execute_flow():",
+      "    # Adaptive traffic routing: real-time health scoring...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Active Latency and Error Rate Routing"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Recent Latency Drops"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Error Spike Detected"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Adaptive routing monitors rolling {1} response times using EWMA metrics to steer user traffic dynamically toward the {2} available provider."
+],
+    blanks: [
+      {
+            "a": [
+                  "latency"
+            ],
+            "why": "Round-trip execution duration"
+      },
+      {
+            "a": [
+                  "fastest"
+            ],
+            "why": "Lowest latency endpoint"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the advantage of using an Exponentially Weighted Moving Average (EWMA) over a simple 24-hour average for latency tracking?",
+      a: ["EWMA gives higher mathematical weight to recent seconds, reacting immediately to sudden traffic spikes or performance degradations","EWMA runs in C++","EWMA uses fewer variables","EWMA works without numbers"],
+      c: 0,
+      why: "EWMA rapidly adapts to recent fluctuations while filtering out single-query noise."
+    },
+    {
+      q: "Why should an adaptive router send 10-20% 'exploration traffic' to slower secondary providers?",
+      a: ["To continuously measure whether those secondary providers have recovered and become fast again, preventing permanent traffic lockout","To waste money","To crash the secondary providers","It is required by law"],
+      c: 0,
+      why: "Exploration traffic provides active telemetry on alternative endpoints so the router knows when they recover."
+    },
+    {
+      q: "How does an adaptive router respond if a cloud region begins returning HTTP 503 Service Unavailable?",
+      a: ["It immediately applies a severe latency penalty to that endpoint, draining active user traffic away within milliseconds","It crashes the application","It sends all traffic to the failing region","It deletes the database"],
+      c: 0,
+      why: "Penalizing failing endpoints automatically shifts traffic to healthy alternatives."
+    },
+    {
+      q: "What is the primary benefit of multi-region deployment for global SaaS AI applications?",
+      a: ["Lower geographic network latency and resilience against single-datacenter regional cloud outages","Cheaper electricity bills","Fewer lines of code","Free computer hardware"],
+      c: 0,
+      why: "Multi-region architecture optimizes client-server proximity and isolates regional failures."
+    }
+  ]);
+</script>
+</body>
+</html>

@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 02 — The Lost in the Middle Phenomenon</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="context-engineering" data-lesson="2" data-lesson-id="lost-in-the-middle">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 02</span> · Attention Bias</span>
+
+  <h1 class="lesson-title">The Lost in the Middle Phenomenon</h1>
+  <p class="lesson-lede">
+    Overcoming the U-shaped attention curve where models recall beginnings and endings while missing the middle.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to strategically position prompt elements to defeat attention bias.</span>
+    <span><b>Mission link</b> Mastering the lost in the middle phenomenon across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of The Lost in the Middle Phenomenon</h2>
+  <p>In 2023, Stanford and UC Berkeley researchers published a landmark paper: <em>'Lost in the Middle: How Language Models Use Long Contexts'</em>. They proved that language models exhibit a severe <strong>U-shaped retrieval bias</strong>.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Overcoming the U-shaped attention curve where models recall beginnings and endings while missing the middle.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The U-Shaped Recall Curve</h2>
+  <p>When information is placed at the very beginning of the prompt (the system instructions) or at the very end (the immediate user query), retrieval accuracy is near 95-100%. But when that same critical fact is buried in the middle of a 50k-token prompt, retrieval accuracy plummets—sometimes falling below 50%!</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>The Sandwich Prompting Pattern</h2>
+  <pre><code># The U-Shaped Attention Curve:
+# Position 0% (Beginning):   [████████████████████] 98% Recall (System Prompt)
+# Position 25% (Early-Mid):  [██████████          ] 55% Recall
+# Position 50% (DEAD CENTER): [█████               ] 35% Recall (BURIED & LOST!)
+# Position 75% (Late-Mid):   [██████████          ] 58% Recall
+# Position 100% (End):       [████████████████████] 99% Recall (Recent Query)</code></pre><p>To engineer resilient context, exploit this physics:</p><ul><li><strong>Put Core Invariants at the Top:</strong> System instructions and primary constraints belong at the beginning.</li><li><strong>Put Repetitive Data in the Middle:</strong> File dumps, logs, and background context go in the middle.</li><li><strong>Restate Critical Invariants at the Bottom:</strong> Re-anchor the model just before the generation point: <em>'Remember: Return only valid JSON. Do not modify User.py.'</em></li></ul><div class="callout"><p><strong>The Sandwich Pattern:</strong> State your critical constraint at the beginning, and restate it as a concise reminder at the very end of the prompt.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Fill in the attention curve sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to strategically position prompt elements to defeat attention bias.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where the lost in the middle phenomenon applies.</li>
+    <li>Author a unit test or verification script exercising the lost in the middle phenomenon.</li>
+    <li>Document team architectural conventions regarding the lost in the middle phenomenon.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for The Lost in the Middle Phenomenon.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Where in a long prompt are language models most likely to overlook critical instructions?",
+    a: ["In the middle third of the context window","At the very first line","At the very last line","Models never overlook instructions"],
+    c: 0,
+    why: "Transformer models exhibit a U-shaped recall curve, performing best at the start and end of context."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Beginning (0-10%)",
+            "lines": [
+                  "System instructions",
+                  "95%+ recall accuracy"
+            ]
+      },
+      {
+            "title": "The Middle (30-70%)",
+            "lines": [
+                  "Verbose file dumps",
+                  "Recall drops below 50% (Danger Zone)"
+            ]
+      },
+      {
+            "title": "End (90-100%)",
+            "lines": [
+                  "Immediate query & reminder",
+                  "98%+ recall accuracy"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing The Lost in the Middle Phenomenon",
+      "def execute_flow():",
+      "    # Overcoming the U-shaped attention curve where mode...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "The Lost in the Middle Phenomenon"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Top Slice"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Middle Filling"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "step": "Bottom Slice"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The Lost in the Middle phenomenon shows that transformer models recall information best at the {1} and {2} of long prompts."
+],
+    blanks: [
+      {
+            "a": [
+                  "beginning"
+            ],
+            "why": "Top of the context window"
+      },
+      {
+            "a": [
+                  "end"
+            ],
+            "why": "Bottom of the context window"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the primary recommendation of the 'Sandwich Pattern' in context engineering?",
+      a: ["State primary constraints at the start of the prompt, and reinforce them at the very end after long context dumps","Put emojis around all variable names","Only send three words per prompt","Split prompts into three separate API calls"],
+      c: 0,
+      why: "The Sandwich Pattern leverages the high recall regions at the start and end of context."
+    },
+    {
+      q: "Why should long raw file dumps never be placed at the very end of a prompt?",
+      a: ["It pushes your actual instruction and query into the low-recall middle, increasing the risk the agent ignores your goal","It causes syntax errors in JSON","Files cannot be placed at the end of text","Operating systems truncate end-of-file bytes"],
+      c: 0,
+      why: "The final tokens should always be the immediate task and actionable instructions."
+    },
+    {
+      q: "Does upgrading from a 32k model to a 1M token model eliminate the Lost in the Middle effect?",
+      a: ["No; larger context windows increase total capacity, but the U-shaped attention bias remains an intrinsic architectural trait","Yes; 1M models have 100% flat recall everywhere","Only in models trained on JavaScript","Only when running on local GPUs"],
+      c: 0,
+      why: "Empirical benchmarks show U-shaped recall persists even in multi-million token architectures."
+    },
+    {
+      q: "What type of information is safest to place in the middle of a context window?",
+      a: ["Reference documentation, retrieved code snippets, and background context that the model consults on demand","The primary system instruction","The user's secret API key","The non-negotiable constraints"],
+      c: 0,
+      why: "Reference material in the middle can be referenced when explicitly prompted by top and bottom instructions."
+    }
+  ]);
+</script>
+</body>
+</html>

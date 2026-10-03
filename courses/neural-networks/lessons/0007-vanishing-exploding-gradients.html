@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 07 — Vanishing and Exploding Gradients</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="neural-networks" data-lesson="7" data-lesson-id="vanishing-exploding-gradients">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 07</span> · Gradient Stability</span>
+
+  <h1 class="lesson-title">Vanishing and Exploding Gradients</h1>
+  <p class="lesson-lede">
+    Conquering gradient failure modes: vanishing gradients, exploding gradients, residual skip connections, and LayerNorm.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how residual skip connections and normalization conquer gradient instability in deep networks.</span>
+    <span><b>Mission link</b> Mastering vanishing and exploding gradients across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Vanishing and Exploding Gradients</h2>
+  <p>Because backpropagation multiplies local derivatives layer by layer ($G_{layer1} = G_{out} \cdot J_L \cdot J_{L-1} \dots J_2$), deep networks face an exponential numerical stability challenge:</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Conquering gradient failure modes: vanishing gradients, exploding gradients, residual skip connections, and LayerNorm.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Residual Gradient Highway</h2>
+  <ul><li><strong>Vanishing Gradients ($0.5^{50} \approx 10^{-15}$):</strong> If layer derivatives are less than 1, multiplying them across 50 layers causes gradients to shrink exponentially toward zero. Early layers receive no signal and stop learning!</li><li><strong>Exploding Gradients ($1.5^{50} \approx 637,000,000$):</strong> If layer derivatives exceed 1, multiplying them across 50 layers causes gradients to explode toward infinity, corrupting weights with `NaN` (Not a Number).</li></ul>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Layer Normalization Stability</h2>
+  <p>Modern deep learning conquered this using two architectural breakthroughs:</p><ul><li><strong>1. Residual Skip Connections (ResNets & Transformers):</strong> Adding the input directly to the layer output: $y = F(x) + x$. When taking the derivative, $\frac{d(F(x)+x)}{dx} = F'(x) + 1$. The $+1$ term provides an uninterrupted <strong>gradient highway</strong> that carries error signals directly back to early layers!</li><li><strong>2. Layer Normalization (LayerNorm):</strong> Normalizing activations across the feature dimension within each layer to maintain zero mean and unit variance, keeping numbers stable.</li></ul><pre><code># The Residual Skip Connection in PyTorch:
+class ResidualBlock(nn.Module):
+    def __init__(self, layer):
+        super().__init__()
+        self.layer = layer
+
+    def forward(self, x):
+        # y = F(x) + x (The '+ x' creates the gradient highway!)
+        return self.layer(x) + x</code></pre><div class="callout"><p><strong>The Transformer Secret:</strong> Every single transformer block in GPT-4 and Claude uses residual skip connections and LayerNorm. Without residual connections, deep transformers cannot train!</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the gradient stability sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how residual skip connections and normalization conquer gradient instability in deep networks.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where vanishing and exploding gradients applies.</li>
+    <li>Author a unit test or verification script exercising vanishing and exploding gradients.</li>
+    <li>Document team architectural conventions regarding vanishing and exploding gradients.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Vanishing and Exploding Gradients.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What architectural innovation in ResNets (He et al., 2015) enabled neural networks to train past 100+ layers without vanishing gradients?",
+    a: ["Residual Skip Connections (y = F(x) + x), which provide an identity gradient highway directly back to early layers","Using larger computer monitors","Writing code in assembly language","Deleting negative numbers"],
+    c: 0,
+    why: "Residual skip connections allow gradients to flow back through identity highways without attenuation."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Standard Deep Network",
+            "lines": [
+                  "Gradients multiply layer by layer",
+                  "Shrinks to 0.0000000001 (Vanished!)",
+                  "Early layers learn nothing"
+            ]
+      },
+      {
+            "title": "Residual Network (Skip)",
+            "lines": [
+                  "y = F(x) + x -> dy/dx = F'(x) + 1",
+                  "The '+ 1' term carries gradient 100% intact",
+                  "Trains 1,000+ layers smoothly"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Vanishing and Exploding Gradients",
+      "def execute_flow():",
+      "    # Conquering gradient failure modes: vanishing gradi...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Vanishing and Exploding Gradients"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Unnormalized Layers"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Layer Normalization"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Residual skip connections solve vanishing gradients by adding a shortcut connection, providing a gradient {1} with a constant {2} term."
+],
+    blanks: [
+      {
+            "a": [
+                  "highway"
+            ],
+            "why": "Unattenuated path for gradients"
+      },
+      {
+            "a": [
+                  "plus one"
+            ],
+            "why": "Derivative of the identity shortcut x"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What error value in training logs indicates that gradients have exploded and corrupted weights?",
+      a: ["Loss: NaN (Not a Number) or Inf (Infinity)","Loss: 0.0","Loss: 1.0","Exit code 0"],
+      c: 0,
+      why: "Exploding gradients produce numerical overflow, resulting in NaN or Inf values in weights and loss."
+    },
+    {
+      q: "Why does the derivative of y = F(x) + x prevent the gradient from vanishing?",
+      a: ["The derivative with respect to x is dF/dx + 1; the '+ 1' term ensures that gradient magnitude can never drop below 1.0 even if dF/dx is zero","It doubles the learning rate","It turns off the loss function","It deletes all negative numbers"],
+      c: 0,
+      why: "The identity shortcut provides an additive gradient path that cannot be attenuated to zero."
+    },
+    {
+      q: "What does Layer Normalization (LayerNorm) normalize in a transformer?",
+      a: ["The activation vector of each individual token across all hidden feature dimensions","The total size of the dataset on disk","The number of lines of code","The temperature of the GPU"],
+      c: 0,
+      why: "LayerNorm normalizes across the feature dimensions for each individual sequence element."
+    },
+    {
+      q: "What simple technique stops exploding gradients during backpropagation without changing architecture?",
+      a: ["Gradient clipping: clamping the maximum norm of the gradient vector to a fixed threshold","Increasing the batch size to 1 million","Deleting the training data","Turning off the computer monitor"],
+      c: 0,
+      why: "Gradient clipping scales down gradients whose L2 norm exceeds a maximum threshold."
+    }
+  ]);
+</script>
+</body>
+</html>

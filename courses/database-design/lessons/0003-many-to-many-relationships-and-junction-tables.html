@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 03 — Many-to-many relationships and junction tables</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="database-design" data-lesson="3" data-lesson-id="many-to-many-relationships-and-junction-tables">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 03</span> · Many-to-Many & Keys</span>
+
+  <h1 class="lesson-title">Many-to-many relationships and junction tables</h1>
+  <p class="lesson-lede">
+    Students have many courses; courses have many students. How do you model many-to-many relationships without breaking the relational model? Master junction tables.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Design many-to-many relationships using junction tables with composite primary keys</span>
+    <span><b>Mission link</b> The universal design pattern for representing multi-directional relationships</span>
+  </div>
+
+  <h2><span class="n">1</span>The many-to-many dilemma</h2>
+  <p>In a <b>Many-to-Many (N:M)</b> relationship, entities on both sides can have multiple partners: an Article has multiple Tags, and a Tag applies to multiple Articles. Neither table can hold the foreign key without storing invalid arrays.</p><p>The relational solution is an intermediary <b>Junction Table</b> (also called a join or pivot table). The junction table decomposes one N:M relationship into <b>two 1:N relationships</b>: Article (1) &rarr; ArticleTags (N) &larr; (1) Tag.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    A junction table converts an impossible N:M relationship into two clean 1:N relationships.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The junction table architecture</h2>
+  <p>Observe how the junction table bridges two entities while supporting relationship metadata.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing junction table querying</h2>
+  <p>Trace how a junction table allows querying all tags for an article in a single join.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of many-to-many modeling.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can design and query many-to-many relationships using junction tables with composite primary keys.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Create an articles, tags, and article_tags schema with composite primary key.</li>
+    <li>Add a metadata column (like enrolled_at TIMESTAMP) to an enrollments junction table.</li>
+    <li>Query all students enrolled in a specific course using an INNER JOIN through the junction table.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Alan Beaulieu, *Learning SQL*, Chapter 10: 'Joins Revisited'.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What columns must a junction table linking 'students' and 'courses' contain at minimum?",
+    a: ["student_id and course_id (both as foreign keys referencing their respective tables)","Only student_id","The entire student name and course syllabus text duplicated","A password column"],
+    c: 0,
+    why: "A junction table links foreign keys from both participating parent tables."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Articles Table",
+            "lines": [
+                  "id: 1, title: 'Learn SQL'",
+                  "parent entity A"
+            ]
+      },
+      {
+            "title": "Article_Tags (Junction)",
+            "lines": [
+                  "article_id: 1, tag_id: 5",
+                  "composite PK: (article_id, tag_id)",
+                  "optional metadata: created_at"
+            ]
+      },
+      {
+            "title": "Tags Table",
+            "lines": [
+                  "id: 5, name: 'Databases'",
+                  "parent entity B"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "SELECT tags.name",
+      "FROM tags",
+      "JOIN article_tags ON tags.id = article_tags.tag_id",
+      "WHERE article_tags.article_id = 42;"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "target": "fetch tag names"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "join": "connects tags to junction table"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "filter": "article_id = 42 yields tags: ['SQL', 'Databases', 'Web']"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The table used to resolve a many-to-many relationship is a <0> table.",
+      "A primary key composed of multiple columns together is a <1> key.",
+      "Additional columns on a junction table (e.g. enrolled_at) represent relationship <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "junction",
+                  "join",
+                  "pivot"
+            ],
+            "why": "Junction tables mediate many-to-many associations."
+      },
+      {
+            "a": [
+                  "composite"
+            ],
+            "why": "Composite keys combine multiple foreign keys into a unique PK."
+      },
+      {
+            "a": [
+                  "metadata",
+                  "attributes"
+            ],
+            "why": "Junction tables can store attributes of the relationship itself."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What should serve as the PRIMARY KEY of a junction table in clean relational design?",
+      a: ["A composite primary key combining both foreign key columns: PRIMARY KEY (student_id, course_id)","A random text string","No primary key is permitted on junction tables","The student name"],
+      c: 0,
+      why: "A composite PK guarantees that a student cannot be enrolled in the exact same course twice."
+    },
+    {
+      q: "Can a junction table store additional attributes besides foreign keys?",
+      a: ["Yes, attributes that describe the relationship itself (e.g. role, created_at, grade) belong on the junction table","No, junction tables are strictly limited to two columns only","Only on Oracle databases","Only if the attributes contain numbers"],
+      c: 0,
+      why: "Junction tables often carry payload metadata describing the relationship (e.g. course grade)."
+    },
+    {
+      q: "Why is an index essential on BOTH foreign key columns in a junction table?",
+      a: ["To ensure fast queries in both directions: finding all tags for an article, AND finding all articles for a tag","Because SQL crashes if both columns are not indexed","To encrypt the data on disk","Indexes are not needed on junction tables"],
+      c: 0,
+      why: "Bidirectional lookups require indexing both (A, B) and (B) to avoid table scans."
+    },
+    {
+      q: "What cascade deletion rule should usually be configured on a junction table's foreign keys?",
+      a: ["ON DELETE CASCADE on both foreign keys so deleting either parent cleanly purges the junction link","ON DELETE RESTRICT permanently","ON DELETE NO ACTION","ON DELETE SET NULL"],
+      c: 0,
+      why: "If a student or course is deleted, the enrollment association should be deleted automatically."
+    }
+  ]);
+</script>
+</body>
+</html>

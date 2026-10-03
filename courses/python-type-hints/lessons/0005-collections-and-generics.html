@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 05 — Collections and generics</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="python-type-hints" data-lesson="5" data-lesson-id="collections-and-generics">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 05</span> · Generics</span>
+
+  <h1 class="lesson-title">Collections and generics</h1>
+  <p class="lesson-lede">
+    A list is not just a list — it is a list <i>of something</i>. Generics let you
+    say what, and that is where checking starts to pay off.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~12 min</span>
+    <span><b>Win</b> Annotate any collection</span>
+    <span><b>Mission link</b> Types that carry their contents</span>
+  </div>
+
+  <h2><span class="n">1</span>Collections take a parameter</h2>
+
+  <p>
+    Write the element type inside square brackets:
+  </p>
+
+  <pre><code>names: list[str] = ["Ada", "Grace"]
+ages: dict[str, int] = {"Ada": 36}
+tags: set[str] = {"python", "typing"}
+point: tuple[float, float] = (1.0, 2.0)</code></pre>
+
+  <p>
+    A bare <code>list</code> tells the checker nothing about the contents. A
+    <code>list[str]</code> lets it catch <code>names.append(42)</code> immediately.
+  </p>
+
+  <div id="intro1"></div>
+
+  <h2><span class="n">2</span>Tuples are special</h2>
+
+  <p>
+    A tuple annotation lists one type per position, so a fixed-shape record is
+    expressible:
+  </p>
+
+  <pre><code>row: tuple[str, int, bool] = ("Ada", 36, True)
+many: tuple[int, ...] = (1, 2, 3)</code></pre>
+
+  <p>
+    The ellipsis means "any number of this type". Use it when the length is not
+    fixed but every element is the same type.
+  </p>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">3</span>TypeVar</h2>
+
+  <p>
+    Sometimes you need to say "these two positions must be the <i>same</i> type,
+    whatever it is". That is what <code>TypeVar</code> is for:
+  </p>
+
+  <pre><code>T = TypeVar("T")
+
+def first(items: list[T]) -> T:
+    return items[0]</code></pre>
+
+  <div id="diagram1"></div>
+
+  <p>
+    Now <code>first(["a"])</code> is a <code>str</code> and
+    <code>first([1])</code> is an <code>int</code>, and the checker tracks that
+    relationship instead of falling back to <code>Any</code>.
+  </p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Why this matters</h2>
+
+  <p>
+    Generics are the difference between "a container" and "a container of the thing
+    I expect". Almost every real bug that a checker catches in a large codebase is
+    a mismatch between what a collection holds and what the code assumes it holds.
+  </p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Always parameterise your collections. A bare <code>list</code> is a missed
+    opportunity; <code>list[str]</code> is a promise the checker can enforce.
+  </div>
+
+  <h2><span class="n">5</span>Check yourself</h2>
+
+  <p>
+    Answer from memory — do not scroll back up. Each option has the same number of
+    words, so nothing gives the answer away.
+  </p>
+
+  <div id="fill1"></div>
+  <div id="quiz"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>
+      You can annotate lists, dicts, sets and tuples with their element types, and
+      explain what <code>TypeVar</code> is for.
+    </p>
+  </div>
+
+  <h2><span class="n">6</span>Do this next</h2>
+
+  <ol>
+    <li>Find every bare <code>list</code> or <code>dict</code> annotation you have.</li>
+    <li>Parameterise each one with the type it actually holds.</li>
+    <li>Write one generic helper using <code>TypeVar</code>.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Read the
+    <a href="https://docs.python.org/3/library/typing.html">typing module docs</a>
+    on generics and <code>TypeVar</code>.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher (me) anything — "when do I need
+    TypeVar?", "what about nested lists?", "is tuple[int, ...] common?". There are
+    no bad questions here.
+  </div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  /* collection vocabulary */
+  TeachWidgets.introCards("#intro1", {
+    cards: [
+      { ico: "📋", title: "list[T]", body: "An ordered sequence of T." },
+      { ico: "🗺️", title: "dict[K, V]", body: "Keys of K mapping to values of V." },
+      { ico: "🎯", title: "set[T]", body: "Unique values, all of type T." },
+      { ico: "📌", title: "tuple[A, B]", body: "One type per fixed position." }
+    ]
+  });
+
+  /* predict-then-reveal */
+  TeachWidgets.predict("#predict1", {
+    q: "What does tuple[int, ...] mean?",
+    a: ["Exactly two integers", "Any number of integers", "A list of integers"],
+    c: 1,
+    why: "The ellipsis means any number of elements, all of the same type."
+  });
+
+  /* generics */
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      { title: "list[T]", lines: ["T is a placeholder", "bound at the call"] },
+      { title: "first([\"a\"])", lines: ["T becomes str", "returns str"] },
+      { title: "first([1])", lines: ["T becomes int", "returns int"] }
+    ]
+  });
+
+  /* step-through trace */
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "T = TypeVar(\"T\")",
+      "def first(items: list[T]) -> T:",
+      "  return items[0]",
+      "first([\"a\", \"b\"])",
+      "first([1, 2])"
+    ],
+    steps: [
+      { line: 0, vars: { T: "placeholder" } },
+      { line: 1, vars: { items: "list[T]", returns: "T" } },
+      { line: 2, vars: { body: "index 0" } },
+      { line: 3, vars: { T: "str", result: "str" } },
+      { line: 4, vars: { T: "int", result: "int" } }
+    ]
+  });
+
+  /* recall from memory */
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — generics",
+    lines: [
+      "A list of strings is written <0>",
+      "A dict of strings to ints is <1>",
+      "The placeholder type is called <2>"
+    ],
+    blanks: [
+      { a: ["list[str]"], why: "The element type goes inside square brackets." },
+      { a: ["dict[str, int]"], why: "A dict annotation lists the key type then the value type." },
+      { a: ["TypeVar", "a TypeVar"], why: "TypeVar expresses that two positions share one type." }
+    ]
+  });
+
+  /* the quiz — every option is exactly three words */
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "How do you annotate a list?",
+      a: ["list of str", "list[str]", "list(str)", "list: str"],
+      c: 1,
+      why: "The element type goes inside square brackets: list[str]."
+    },
+    {
+      q: "What does tuple[int, ...] mean?",
+      a: ["Exactly two integers", "Any number of integers", "A list of integers", "A pair of tuples"],
+      c: 1,
+      why: "The ellipsis means any number of elements, all of the same type."
+    },
+    {
+      q: "What is TypeVar for?",
+      a: ["Naming a variable type", "Linking two positions", "Creating a new class", "Converting between types"],
+      c: 1,
+      why: "TypeVar expresses that two positions must share the same type."
+    },
+    {
+      q: "What does a bare list do?",
+      a: ["Checks the contents", "Says nothing useful", "Defaults to Any", "Raises a warning"],
+      c: 1,
+      why: "A bare list annotation tells the checker nothing about the element type."
+    }
+  ]);
+</script>
+</body>
+</html>

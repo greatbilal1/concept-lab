@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 01 — The inheritance trap and 'is-a' versus 'has-a'</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="composition-vs-inheritance" data-lesson="1" data-lesson-id="the-inheritance-trap-and-is-a-versus-has-a">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 01</span> · Inheritance & The Coupling Trap</span>
+
+  <h1 class="lesson-title">The inheritance trap and 'is-a' versus 'has-a'</h1>
+  <p class="lesson-lede">
+    Is a duck an animal, or does a duck have flying and quacking behaviors? Discover why modeling real-world taxonomies with class inheritance leads to architectural paralysis.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Distinguish between 'is-a' inheritance and 'has-a' composition modeling</span>
+    <span><b>Mission link</b> The foundational mental model distinguishing flexible systems from rigid hierarchies</span>
+  </div>
+
+  <h2><span class="n">1</span>The real-world taxonomy trap</h2>
+  <p>When people learn object-oriented programming, they are taught biology examples: <code>Dog extends Animal</code>, <code>Cat extends Animal</code>. This leads developers to believe that inheritance is the primary way to model the world.</p><p>In reality, <b>class inheritance is the tightest form of coupling in all of object-oriented design</b>. When you inherit, you inherit <i>everything</i>: all fields, all methods, and all bugs, whether you want them or not. Furthermore, the binding is locked at compile-time: an object cannot change its superclass while running!</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Inheritance binds classes at compile-time; composition connects objects dynamically at runtime.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>is-a versus has-a</h2>
+  <p>Contrast the rigidity of subclassing with the modular freedom of component composition.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing runtime behavior switching</h2>
+  <p>Trace how composition allows an entity to alter its behavior while the application is running.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of inheritance versus composition.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can evaluate relationship models and default to composition ('has-a') to build flexible, runtime-swappable architectures.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit a 3-level class hierarchy in your project and identify if capabilities can be modeled as components.</li>
+    <li>Refactor an inheritance tree into a parent class that holds pluggable strategy objects.</li>
+    <li>Read Item 18 ('Favor composition over inheritance') in Joshua Bloch's *Effective Java*.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Erich Gamma et al., *Design Patterns: Elements of Reusable Object-Oriented Software*, Chapter 1: 'Favoring Object Composition over Class Inheritance'.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What happens when you try to model a character that can both 'Fly' and 'Swim' using single inheritance?",
+    a: ["You face the Deadly Diamond problem or are forced to duplicate code because a class cannot inherit from two parent branches","The programming language compiler automatically merges the code with AI","The computer turns off","The classes run in parallel"],
+    c: 0,
+    why: "Hierarchical trees cannot represent multi-dimensional capabilities without massive code duplication."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Inheritance (is-a)",
+            "lines": [
+                  "class FlyingMonster extends Monster",
+                  "rigid compile-time hierarchy",
+                  "subclass inherits all parent baggage"
+            ]
+      },
+      {
+            "title": "Composition (has-a)",
+            "lines": [
+                  "class Monster { capabilities: [] }",
+                  "monster.add(new FlyingBehavior())",
+                  "capabilities swappable at runtime!"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Composition allows dynamic runtime swapping:",
+      "hero = Player(movement=WalkingBehavior())",
+      "hero.move() # walks across grass",
+      "# Player picks up a jetpack item in game:",
+      "hero.movement = FlyingBehavior() # swapped in 0.001ms!",
+      "hero.move() # now flies through the air! (Impossible with rigid class inheritance)"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "initial_behavior": "hero has WalkingBehavior"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "runtime_swap": "movement collaborator replaced with FlyingBehavior"
+            }
+      },
+      {
+            "line": 5,
+            "vars": {
+                  "dynamic_execution": "behavior changed dynamically without mutating player class"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Class inheritance represents an <0>-a relationship.",
+      "Object composition represents a <1>-a relationship.",
+      "The Gang of Four principle states: favor object composition over class <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "is"
+            ],
+            "why": "is-a represents taxonomic inheritance."
+      },
+      {
+            "a": [
+                  "has"
+            ],
+            "why": "has-a represents compositional containment."
+      },
+      {
+            "a": [
+                  "inheritance"
+            ],
+            "why": "Favor composition over inheritance is the golden rule."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why is class inheritance described as 'white-box reuse'?",
+      a: ["Subclasses are exposed to the internal private implementation details of their superclass, violating encapsulation","Because code must be printed on white paper","Because it only works in light theme IDEs","Because it runs without computer memory"],
+      c: 0,
+      why: "In inheritance, the parent class's internal details are visible and leak to subclasses (white-box)."
+    },
+    {
+      q: "Why is object composition described as 'black-box reuse'?",
+      a: ["Objects interact strictly through well-defined public interfaces, without exposing internal implementation details","Because the code is encrypted in binary","Because it only runs inside airplane flight recorders","Because it runs in dark mode"],
+      c: 0,
+      why: "In composition, objects interact through interfaces without knowing how collaborators are implemented."
+    },
+    {
+      q: "What is 'Class Explosion' in deep inheritance trees?",
+      a: ["The exponential multiplication of subclasses required to support every permutation of features (e.g. ElectricFlyingCar, GasSwimmingCar)","A compile error that deletes files","A computer processor overheating from too many classes","A database running out of disk space"],
+      c: 0,
+      why: "Inheritance hierarchies multiply exponentially when trying to combine multiple independent traits."
+    },
+    {
+      q: "Can an object change its superclass while running in standard object-oriented languages?",
+      a: ["No, inheritance binds types permanently at compile-time; composition allows swapping behaviors dynamically at runtime","Yes, by calling object.changeClass()","Only on Linux computers","Yes, if the class has fewer than ten methods"],
+      c: 0,
+      why: "Subclass inheritance is static and fixed at compile-time; composition is dynamic and mutable."
+    }
+  ]);
+</script>
+</body>
+</html>

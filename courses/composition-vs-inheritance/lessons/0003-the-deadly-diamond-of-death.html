@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 03 — The Deadly Diamond of Death</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="composition-vs-inheritance" data-lesson="3" data-lesson-id="the-deadly-diamond-of-death">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 03</span> · The Fragile Base Class Problem</span>
+
+  <h1 class="lesson-title">The Deadly Diamond of Death</h1>
+  <p class="lesson-lede">
+    What happens when Class D inherits from both Class B and Class C, which both inherit from Class A? Discover the Deadly Diamond of multiple inheritance and Method Resolution Order.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Explain the multiple inheritance Diamond Problem and Python's C3 Method Resolution Order</span>
+    <span><b>Mission link</b> Explains why most modern programming languages forbid multiple class inheritance</span>
+  </div>
+
+  <h2><span class="n">1</span>The ambiguity of the diamond</h2>
+  <p>In languages that support multiple class inheritance (like C++ or Python), a classic architectural trap emerges: <b>The Deadly Diamond of Death</b>.</p><p>Class <code>A</code> defines a method <code>save()</code>. Class <code>B</code> and Class <code>C</code> both inherit from <code>A</code> and both override <code>save()</code> with different logic. Now, Class <code>D</code> inherits from both <code>B</code> and <code>C</code>. When you call <code>d.save()</code>, <b>which version executes? B's or C's?</b> The ambiguity creates chaos.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    The Diamond Problem creates method ambiguity when multiple parent classes inherit from a common ancestor.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Diamond shape diagram</h2>
+  <p>Visualise the diamond dependency shape that causes method resolution collisions.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing Python's C3 MRO resolution</h2>
+  <p>Trace how Python uses the C3 Linearization algorithm (Method Resolution Order) to pick a deterministic winner.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of the Diamond Problem.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can explain the Diamond Problem and inspect Method Resolution Order (MRO) when navigating multiple inheritance in Python.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Inspect the __mro__ attribute on a Python class that uses multiple inheritance.</li>
+    <li>Demonstrate how changing class D(B, C) to class D(C, B) alters which method runs.</li>
+    <li>Explain why interfaces/protocols avoid the diamond problem by providing contracts without state.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Michele Simionato: *The Python 2.3 Method Resolution Order (C3 Algorithm)* (python.org/download/releases/2.3/mro/).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Why do languages like Java, C#, and Rust forbid multiple class inheritance entirely?",
+    a: ["To completely eliminate the Diamond Problem and the complexities of multiple state inheritance","Because computers only have one monitor","Because multiple inheritance was patented by Microsoft","Because it causes hard drives to lose electrical power"],
+    c: 0,
+    why: "Banning multiple class inheritance prevents method ambiguity and memory layout collisions."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Top: Class A",
+            "lines": [
+                  "defines method: process()",
+                  "root common ancestor"
+            ]
+      },
+      {
+            "title": "Left: Class B (overrides)",
+            "lines": [
+                  "process(): does B logic",
+                  "inherits from A"
+            ]
+      },
+      {
+            "title": "Right: Class C (overrides)",
+            "lines": [
+                  "process(): does C logic",
+                  "inherits from A"
+            ]
+      },
+      {
+            "title": "Bottom: Class D (Collision!)",
+            "lines": [
+                  "inherits from BOTH B and C!",
+                  "Which process() should D run?"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "class A: def ping(self): print('A')",
+      "class B(A): def ping(self): print('B')",
+      "class C(A): def ping(self): print('C')",
+      "class D(B, C): pass",
+      "# In Python, check D.__mro__:",
+      "# [D, B, C, A, object] -> D.ping() calls B.ping() because B was listed first!"
+],
+    steps: [
+      {
+            "line": 3,
+            "vars": {
+                  "diamond": "D inherits from B, then C"
+            }
+      },
+      {
+            "line": 5,
+            "vars": {
+                  "mro_chain": "Python C3 algorithm resolves: D -> B -> C -> A -> object"
+            }
+      },
+      {
+            "line": 6,
+            "vars": {
+                  "executed": "B executes; C's implementation is masked unless super() is coordinated"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The method collision problem in multiple inheritance is the Deadly <0>.",
+      "In Python, the order in which base classes are searched is the <1> Resolution Order.",
+      "The algorithm Python uses to compute MRO is the <2> linearization algorithm."
+],
+    blanks: [
+      {
+            "a": [
+                  "Diamond"
+            ],
+            "why": "The Diamond problem describes multiple inheritance collisions."
+      },
+      {
+            "a": [
+                  "Method",
+                  "MRO"
+            ],
+            "why": "Method Resolution Order governs lookup order."
+      },
+      {
+            "a": [
+                  "C3"
+            ],
+            "why": "C3 Linearization guarantees monotonic class resolution."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the 'Deadly Diamond of Death' in object-oriented programming?",
+      a: ["An ambiguity that arises when a class inherits from two parent classes that both inherit from a common ancestor, creating conflicting method implementations","A fatal hardware failure in computer monitors","A memory leak that occurs every four days","A software license dispute between companies"],
+      c: 0,
+      why: "It describes the method resolution ambiguity in diamond-shaped multiple inheritance hierarchies."
+    },
+    {
+      q: "How does Python solve the Diamond Problem deterministically?",
+      a: ["Using the C3 Linearization algorithm to compute a deterministic, monotonic Method Resolution Order (MRO)","By flipping a random coin at runtime","By throwing a syntax error whenever multiple inheritance is written","By executing both parent methods simultaneously in parallel"],
+      c: 0,
+      why: "Python calculates a strict, deterministic search order (__mro__) using C3 linearization."
+    },
+    {
+      q: "Why is multiple interface inheritance permitted in Java and C# while multiple class inheritance is forbidden?",
+      a: ["Interfaces declare method signatures without state or field data; there is zero state collision or memory layout ambiguity","Interfaces are written in English while classes are written in Latin","Interfaces do not require compilation","Interfaces can only have one method"],
+      c: 0,
+      why: "Interfaces provide method contracts without state, eliminating field offset collisions."
+    },
+    {
+      q: "What keyword in Python coordinates cooperative multiple inheritance across superclasses?",
+      a: ["super()","parent()","base()","this()"],
+      c: 0,
+      why: "super() calls the next class in the computed MRO, enabling cooperative multiple inheritance."
+    }
+  ]);
+</script>
+</body>
+</html>

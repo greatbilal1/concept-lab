@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 01 — The FastAPI foundations: type hints and Pydantic</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="fastapi" data-lesson="1" data-lesson-id="the-fastapi-foundations-type-hints-and-pydantic">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 01</span> · FastAPI & Pydantic Foundations</span>
+
+  <h1 class="lesson-title">The FastAPI foundations: type hints and Pydantic</h1>
+  <p class="lesson-lede">
+    Type hints are not just for linters. Discover how FastAPI leverages Python types and Pydantic to deliver automatic validation, serialization, and interactive Swagger docs.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Build validated FastAPI endpoints using Pydantic models and type hints</span>
+    <span><b>Mission link</b> The foundational pattern of the entire FastAPI framework</span>
+  </div>
+
+  <h2><span class="n">1</span>The trifecta: Type hints, Pydantic, and OpenAPI</h2>
+  <p>Before FastAPI, Python web developers had to write repetitive code: validate incoming JSON schemas by hand, parse datatypes, write serialization logic, and manually update documentation.</p><p>FastAPI unites these into a single definition: by declaring a <b>Pydantic Model</b> with standard Python type annotations, FastAPI automatically <b>validates incoming data</b> (returning 422 on errors), <b>deserializes JSON</b> into typed objects, and <b>generates interactive Swagger documentation at <code>/docs</code></b> with zero extra code.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    A single Pydantic model drives data validation, type conversion, and Swagger documentation simultaneously.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The single-declaration model</h2>
+  <p>Observe how one Pydantic model powers three essential backend requirements.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing automatic validation execution</h2>
+  <p>Trace how FastAPI intercepts bad inputs before your route function is even called.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of FastAPI foundations.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can write clean, self-documenting FastAPI endpoints that automatically validate client inputs.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Create a FastAPI app and run it using uvicorn main:app --reload.</li>
+    <li>Open http://127.0.0.1:8000/docs in your browser and test an endpoint interactively.</li>
+    <li>Add a Pydantic field validator using @field_validator to enforce custom rules.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Sebastián Ramírez, *FastAPI Tutorial — User Guide: First Steps* (fastapi.tiangolo.com/tutorial/first-steps/).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What does FastAPI return if a client POSTs an invalid email string to an endpoint typed with 'EmailStr'?",
+    a: ["Status 422 Unprocessable Entity with a detailed JSON array describing the exact validation failure","Status 500 Internal Server Error","Status 200 OK with the invalid string accepted","The server crashes"],
+    c: 0,
+    why: "FastAPI catches Pydantic validation errors natively and formats them into standard 422 responses."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Pydantic Model",
+            "lines": [
+                  "class User(BaseModel):",
+                  "  email: EmailStr, age: int"
+            ]
+      },
+      {
+            "title": "1. Runtime Validation",
+            "lines": [
+                  "parses JSON bytes",
+                  "enforces types; rejects bad input (422)"
+            ]
+      },
+      {
+            "title": "2. Swagger Docs (/docs)",
+            "lines": [
+                  "generates OpenAPI 3.1 JSON",
+                  "interactive browser testing UI!"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "@app.post('/items')",
+      "async def create_item(item: ItemSchema):",
+      "    # This function only executes if ItemSchema passed 100% validation!",
+      "    return {'status': 'saved', 'data': item}"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "request": "POST /items received with {'price': 'not_a_number'}"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "pydantic_check": "validation fails: price is not a valid float"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "short_circuit": "422 Unprocessable Entity returned immediately; function body skipped!"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The data validation library powering FastAPI is <0>.",
+      "The status code returned by FastAPI for validation failures is <1>.",
+      "Interactive OpenAPI documentation is hosted by default at /<2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "Pydantic"
+            ],
+            "why": "Pydantic enforces schemas via type annotations."
+      },
+      {
+            "a": [
+                  "422"
+            ],
+            "why": "422 Unprocessable Entity is the validation error standard."
+      },
+      {
+            "a": [
+                  "docs"
+            ],
+            "why": "Swagger UI is served at /docs."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What role does Pydantic play inside the FastAPI framework?",
+      a: ["It validates incoming request data, coerces types into Python primitives, and serializes response outputs","It manages physical database disk storage","It acts as a reverse proxy load balancer","It compiles Python into machine assembly"],
+      c: 0,
+      why: "Pydantic provides parsing, validation, and serialization for request and response payloads."
+    },
+    {
+      q: "What web server is standard for running asynchronous FastAPI applications in development and production?",
+      a: ["Uvicorn (an ASGI server)","Apache HTTP Server (pre-fork)","Node.js npm server","Internet Information Services (IIS)"],
+      c: 0,
+      why: "Uvicorn is the high-performance ASGI server designed to run asynchronous Python frameworks."
+    },
+    {
+      q: "What happens if a route parameter is typed as 'int' and the client sends '?page=two'?",
+      a: ["FastAPI rejects the request with a 422 Unprocessable Entity error stating that 'two' is not a valid integer","The function receives page = 0","The server crashes with an unhandled exception","The client is permanently blocked from the website"],
+      c: 0,
+      why: "FastAPI automatically validates query parameters against their declared type annotations."
+    },
+    {
+      q: "What is the URL path where FastAPI serves raw OpenAPI JSON specifications?",
+      a: ["/openapi.json","/swagger.yaml","/api-spec.txt","/routes.json"],
+      c: 0,
+      why: "FastAPI dynamically compiles and serves the OpenAPI 3.1 specification at /openapi.json."
+    }
+  ]);
+</script>
+</body>
+</html>
