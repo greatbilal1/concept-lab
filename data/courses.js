@@ -185,6 +185,9 @@ window.COURSES = [
     concepts: ["object", "class", "method", "attribute", "inheritance", "composition",
                "abstraction", "encapsulation", "state"],
     sections: [
+      { id: "core", title: "Core concepts" },
+      { id: "relationships", title: "Relationships between classes" },
+      { id: "tools", title: "Tools & conventions" },
       { id: "intro", title: "Introduction: why object-oriented programming matters", anim: "OopMentalModel", icon: "spark",
         takeaway: "OOP groups data and the actions on it into one unit, so your code mirrors the real-world things it models." },
       { id: "mental", title: "The mental model", anim: "OopMentalModel", icon: "layers",
@@ -257,6 +260,13 @@ window.COURSES = [
     lessons: { href: "courses/algorithms-problem-solving/course.html", label: "Guided lessons" },
     glossary: "courses/algorithms-problem-solving/reference/algorithms-problem-solving-glossary.html",
     meta: "8 lessons · interactive quizzes · worked examples",
+    sections: [
+      { id: "sorting", title: "Sorting" },
+      { id: "searching", title: "Searching" },
+      { id: "recursion", title: "Recursion" },
+      { id: "habits", title: "Problem-solving habits" },
+      { id: "together", title: "Putting it together" }
+    ],
     tags: ["cs", "algorithms"],
     prereq: ["data-structures"], related: ["big-o-complexity", "testing-fundamentals"],
     paths: ["cs-foundations"],
@@ -271,6 +281,12 @@ window.COURSES = [
     lessons: { href: "courses/big-o-complexity/course.html", label: "Guided lessons" },
     glossary: "courses/big-o-complexity/reference/big-o-complexity-glossary.html",
     meta: "8 lessons · interactive quizzes · worked examples",
+    sections: [
+      { id: "growth", title: "Growth & Scaling" },
+      { id: "notation", title: "Big O Notation" },
+      { id: "classes", title: "Complexity Classes" },
+      { id: "tradeoffs", title: "Space & Trade-Offs" }
+    ],
     tags: ["cs", "complexity"],
     prereq: ["algorithms-problem-solving"], related: ["database-indexes-performance", "distributed-systems"],
     paths: ["cs-foundations"],
@@ -289,6 +305,14 @@ window.COURSES = [
     lessons: { href: "courses/python-fundamentals/course.html", label: "Guided lessons" },
     glossary: "courses/python-fundamentals/reference/python-fundamentals-glossary.html",
     meta: "10 lessons · interactive quizzes · worked examples",
+    sections: [
+      { id: "syntax", title: "Syntax & values" },
+      { id: "types", title: "Types" },
+      { id: "control", title: "Control flow" },
+      { id: "functions", title: "Functions" },
+      { id: "modules", title: "Modules & the standard library" },
+      { id: "together", title: "Putting it together" }
+    ],
     tags: ["python", "basics"],
     prereq: ["functions-modular-thinking"], related: ["python-modules-packages", "oop"],
     paths: ["python-developer", "cs-foundations", "backend-engineer", "ai-engineer", "data-analyst"],
@@ -323,6 +347,13 @@ window.COURSES = [
     lessons: { href: "courses/python-errors-exceptions/course.html", label: "Guided lessons" },
     glossary: "courses/python-errors-exceptions/reference/python-errors-exceptions-glossary.html",
     meta: "8 lessons · interactive quizzes · worked examples",
+    sections: [
+      { id: "tracebacks", title: "Tracebacks" },
+      { id: "catching", title: "Catching" },
+      { id: "raising", title: "Raising" },
+      { id: "design", title: "Designing failure" },
+      { id: "together", title: "Putting it together" }
+    ],
     tags: ["python", "errors"],
     prereq: ["python-fundamentals"], related: ["debugging-code", "testing-fundamentals"],
     paths: ["python-developer", "backend-engineer"],
@@ -404,6 +435,13 @@ window.COURSES = [
     lessons: { href: "courses/git-version-control/course.html", label: "Guided lessons" },
     glossary: "courses/git-version-control/reference/git-version-control-glossary.html",
     meta: "8 lessons · interactive quizzes · worked examples",
+    sections: [
+      { id: "basics", title: "The basics" },
+      { id: "history", title: "History & commits" },
+      { id: "branching", title: "Branching & merging" },
+      { id: "recovery", title: "Recovery" },
+      { id: "together", title: "Putting it together" }
+    ],
     tags: ["git", "tooling"],
     prereq: [], related: ["ci-cd", "software-project-structure"],
     paths: ["python-developer", "backend-engineer", "devops", "cs-foundations"],

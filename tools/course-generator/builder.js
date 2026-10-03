@@ -62,6 +62,7 @@ ${manifestGlossary}
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>${title} — Lesson Map</title>
+<link rel="icon" type="image/svg+xml" href="../../assets/icons/favicon.svg">
 <link rel="stylesheet" href="../../assets/css/tokens.css">
 <link rel="stylesheet" href="../../assets/css/components.css">
 <style>
@@ -215,7 +216,7 @@ ${manifestGlossary}
       }).join("");
       return '<div class="topic"><div class="topic-head"><h2>' + t.name +
         '</h2><div class="line"></div><span class="count">' + t.items.length +
-        " lessons</span></div>" + cards + "</div>";
+        (t.items.length === 1 ? " lesson" : " lessons") + "</span></div>" + cards + "</div>";
     }).join("");
   }
 
@@ -241,6 +242,7 @@ ${manifestGlossary}
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>${title} — Glossary</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
 <link rel="stylesheet" href="../../../assets/css/tokens.css">
 <link rel="stylesheet" href="../../../assets/css/components.css">
 <style>
@@ -311,6 +313,7 @@ ${manifestGlossary}
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>${title} — Cheat Sheet</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
 <link rel="stylesheet" href="../../../assets/css/tokens.css">
 <link rel="stylesheet" href="../../../assets/css/components.css">
 <style>
@@ -402,6 +405,7 @@ ${cheatBody}
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Lesson ${pad2(l.n)} — ${l.title}</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
 <link rel="stylesheet" href="../../../assets/css/tokens.css">
 <link rel="stylesheet" href="../../../assets/css/components.css">
 </head>

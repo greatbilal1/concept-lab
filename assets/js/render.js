@@ -168,18 +168,39 @@
     var host = $("#courseGrid");
     if (!host) return;
 
-    /* The home page shows only courses that are ready to start. The full
-       catalogue (including planned courses) lives on courses.html. */
-    var liveOnly = host.dataset.liveOnly === "true";
-    var list = liveOnly
-      ? COURSES.filter(function (c) { return c.status === "live"; })
-      : COURSES;
+    /* The home page shows a curated set of featured starter courses.
+       The full 100-course catalogue with complete filtering lives on courses.html. */
+    var isFeatured = host.dataset.featured === "true";
+    var list;
+    if (isFeatured) {
+      var featuredIds = [
+        "how-computers-work",
+        "python-fundamentals",
+        "data-structures",
+        "oop",
+        "rest-apis-json",
+        "first-llm-application",
+        "ai-agents",
+        "system-design"
+      ];
+      list = featuredIds.map(byId).filter(Boolean);
+    } else if (host.dataset.liveOnly === "true") {
+      list = COURSES.filter(function (c) { return c.status === "live"; });
+    } else {
+      list = COURSES;
+    }
     host.innerHTML = list.map(courseCard).join("");
 
     /* ---- filter bar: difficulty + tier + status ----
-       Built from the data, mirrors the glossary tag filter. */
+       Built from the data, mirrors the glossary tag filter.
+       On the featured grid, we suppress the 15-chip filter bar
+       to keep the homepage clean, fast, and focused. */
     var bar = $("#courseLevels");
     if (!bar) return;
+    if (isFeatured) {
+      bar.innerHTML = "";
+      return;
+    }
 
     var levelOrder = ["beginner", "intermediate", "advanced"];
     var levelCounts = {};
@@ -256,6 +277,14 @@
     if (el) el.textContent = COURSES.length;
     var ready = $("#statReady");
     if (ready) ready.textContent = COURSES.filter(function (c) { return c.status === "live"; }).length;
+    var lessonsEl = $("#statLessons");
+    if (lessonsEl) {
+      var total = COURSES.reduce(function (sum, c) {
+        var m = c.meta && c.meta.match(/(\d+)\s+lessons/);
+        return sum + (m ? parseInt(m[1], 10) : 8);
+      }, 0);
+      lessonsEl.textContent = total + "+";
+    }
   }
 
   /* ---------- hub: learning paths ---------- */
@@ -435,7 +464,9 @@
     GLOSSARY.forEach(function (g) {
       (g.tags || []).forEach(function (t) { tagSet[t] = (tagSet[t] || 0) + 1; });
     });
-    var tags = Object.keys(tagSet).sort();
+    var tags = Object.keys(tagSet).filter(function (t) {
+      return tagSet[t] >= 8;
+    }).sort();
     var activeTag = "";
 
     if (tagBar) {
