@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 03 — Querying data with SELECT and WHERE</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="sql-relational-databases" data-lesson="3" data-lesson-id="querying-data-with-select-and-where">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 03</span> · Declarative Querying & Filtering</span>
+
+  <h1 class="lesson-title">Querying data with SELECT and WHERE</h1>
+  <p class="lesson-lede">
+    How do you ask the database for exactly what you need? Master the SELECT projection, filtering with WHERE, sorting with ORDER BY, and pagination with LIMIT/OFFSET.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Write expressive declarative SQL queries with precise filtering and sorting</span>
+    <span><b>Mission link</b> The primary daily tool for extracting business data from relational databases</span>
+  </div>
+
+  <h2><span class="n">1</span>The clauses of a query</h2>
+  <p>A basic SQL query contains four clauses: <code>SELECT</code> (which columns to return), <code>FROM</code> (which table to read), <code>WHERE</code> (which rows to include), and <code>ORDER BY</code> (how to sort them).</p><p>A critical insight: <b>The database does NOT execute clauses in the order you write them!</b> Although you write SELECT first, the database evaluates <code>FROM</code> first, then <code>WHERE</code>, then aggregates, then <code>SELECT</code>, and finally <code>ORDER BY</code> and <code>LIMIT</code>.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    SQL is written SELECT -> FROM -> WHERE, but executed FROM -> WHERE -> SELECT -> ORDER BY.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>SQL execution order versus written order</h2>
+  <p>Memorise the actual order in which the database engine processes query clauses.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing query execution</h2>
+  <p>Trace how a filtered, sorted query narrows 10,000 users down to the top 3 active accounts.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of SQL query clauses.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can write high-performance SQL queries with exact filtering, pattern matching, and deterministic sorting.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Write a query using LIKE '%term%' to search for strings.</li>
+    <li>Sort results by multiple columns (e.g. ORDER BY status ASC, created_at DESC).</li>
+    <li>Observe an error when trying to use a SELECT alias inside a WHERE clause.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Alan Beaulieu, *Learning SQL*, Chapter 3: 'Query Primer' & Chapter 4: 'Filtering'.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Why can't you use a column alias declared in SELECT (e.g. 'SELECT price * 2 AS double_price') inside the WHERE clause?",
+    a: ["Because the WHERE clause executes BEFORE the SELECT projection calculates the alias","Because aliases are only permitted in the ORDER BY clause","Because double quotes are required around all numbers","Because SQL engines do not support multiplication"],
+    c: 0,
+    why: "Query execution order: FROM -> WHERE -> SELECT. Aliases don't exist yet during WHERE filtering."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1. FROM & JOIN",
+            "lines": [
+                  "identifies source tables",
+                  "gathers raw row sets"
+            ]
+      },
+      {
+            "title": "2. WHERE",
+            "lines": [
+                  "filters individual rows",
+                  "discards non-matching rows"
+            ]
+      },
+      {
+            "title": "3. SELECT",
+            "lines": [
+                  "computes expressions & aliases",
+                  "projects required columns"
+            ]
+      },
+      {
+            "title": "4. ORDER BY & LIMIT",
+            "lines": [
+                  "sorts the final result set",
+                  "slices pagination window"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "SELECT id, name, score",
+      "FROM users",
+      "WHERE active = true AND score >= 100",
+      "ORDER BY score DESC",
+      "LIMIT 3;"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "from": "accesses 10,000 rows in users table"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "where": "filters to 450 active users with score >= 100"
+            }
+      },
+      {
+            "line": 0,
+            "vars": {
+                  "select": "extracts id, name, score attributes"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "order_by": "sorts 450 candidates from highest to lowest score"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "limit": "delivers exactly the top 3 rows"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The clause specifying which table to query is <0>.",
+      "The clause specifying row filtering criteria is <1>.",
+      "The clause controlling row output sort sequence is <2> BY."
+],
+    blanks: [
+      {
+            "a": [
+                  "FROM"
+            ],
+            "why": "FROM identifies the source relation."
+      },
+      {
+            "a": [
+                  "WHERE"
+            ],
+            "why": "WHERE filters rows before projection."
+      },
+      {
+            "a": [
+                  "ORDER"
+            ],
+            "why": "ORDER BY sorts the returned result set."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the true logical execution order of an SQL query?",
+      a: ["FROM -> WHERE -> GROUP BY -> HAVING -> SELECT -> ORDER BY -> LIMIT","SELECT -> FROM -> WHERE -> ORDER BY -> LIMIT","LIMIT -> ORDER BY -> SELECT -> FROM -> WHERE","WHERE -> FROM -> SELECT -> ORDER BY"],
+      c: 0,
+      why: "Logical query processing gathers tables (FROM), filters rows (WHERE), projects columns (SELECT), and sorts (ORDER BY)."
+    },
+    {
+      q: "What does the SQL operator 'IN' do in a WHERE clause (e.g. WHERE status IN ('active', 'pending'))?",
+      a: ["Checks if the column value matches ANY item in the specified list of values","Checks if the column value matches ALL items in the list simultaneously","Translates the column text into Spanish","Calculates the logarithm of the numbers"],
+      c: 0,
+      why: "IN is shorthand for multiple OR equality checks: (status = 'active' OR status = 'pending')."
+    },
+    {
+      q: "What does 'SELECT *' do, and why is it discouraged in production application code?",
+      a: ["Returns every column in the table, wasting network bandwidth and breaking code if table schemas change","Deletes all rows from the table","Multiplies all numbers by two","SELECT * is actually recommended everywhere in production"],
+      c: 0,
+      why: "Explicit column projection (SELECT id, name) avoids transferring unnecessary columns and protects contracts."
+    },
+    {
+      q: "How does the 'LIKE' operator with the '%' wildcard behave in SQL?",
+      a: ["The '%' wildcard matches any sequence of zero or more characters (e.g. '%@gmail.com')","The '%' wildcard calculates a percentage discount","The '%' wildcard matches exactly one character only","The '%' wildcard reverses the text"],
+      c: 0,
+      why: "'%' matches arbitrary character sequences; '_' matches a single character."
+    }
+  ]);
+</script>
+</body>
+</html>

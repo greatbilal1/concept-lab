@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hallucination & Reliability Engineering — Cheat Sheet</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+<style>
+  .ref-toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0 8px; }
+  .ref-toc a { font-size: .8rem; border: 1px solid var(--border); background: #111a30; padding: 5px 11px; border-radius: 999px; color: var(--muted); text-decoration: none; border-bottom: 1px solid var(--border); }
+  .ref-toc a:hover { color: #fff; border-color: #3d5488; }
+  .lesson-wrap h2 { scroll-margin-top: 20px; }
+  .snippet { margin: 14px 0 22px; }
+  .snippet .lbl { font-size: .72rem; font-weight: 800; letter-spacing: .7px; text-transform: uppercase; color: var(--accent2); margin-bottom: 6px; }
+  .see { font-size: .82rem; color: var(--muted); margin: -6px 0 12px; }
+  .see a { color: var(--accent2); border-bottom: 0; }
+  .see a:hover { color: #fff; }
+  .snippet pre { padding-top: 34px; }
+  @media print { .snippet pre { padding-top: 18px; } }
+</style>
+</head>
+<body class="lesson-body" data-course="hallucination-reliability">
+
+<div class="lesson-wrap">
+
+  <span class="lesson-kicker">Reference · Cheat sheet</span>
+  <h1 class="lesson-title">Hallucination & Reliability Engineering — Cheat Sheet</h1>
+  <p class="lesson-lede">
+    The whole course on one page. Every snippet links back to the lesson that
+    teaches it.
+  </p>
+
+  <div class="ref-toc">
+    <a href="#sec-1">NLI Hallucination Verification Pattern</a>
+    <a href="#sec-2">Grounding by Construction Schema</a>
+    <a href="#sec-3">Quotes-First Defensive Prompt</a>
+    <a href="#sec-4">High-Risk Audit Table Schema</a>
+  </div>
+
+  <h2 id="sec-1"><span class="n">1</span>NLI Hallucination Verification Pattern</h2>
+  <div class="snippet">
+    <div class="lbl">DeBERTa entailment check</div>
+    <pre><code>from transformers import pipeline
+nli = pipeline("text-classification", model="cross-encoder/nli-deberta-v3-base")
+# Check if source text entails the generated claim:
+res = nli({"text": source_doc, "text_pair": generated_claim})
+if res['label'] == 'contradiction': raise HallucinationError('Contradicted!')
+if res['label'] == 'neutral': raise HallucinationError('Unsupported claim!')</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0002-detecting-hallucinations-entailment-consistency.html">Lesson 02 — Detecting Hallucinations: Entailment, Self-Check, and Consistency</a>.</p>
+
+  <h2 id="sec-2"><span class="n">2</span>Grounding by Construction Schema</h2>
+  <div class="snippet">
+    <div class="lbl">Zero-hallucination Literal enums</div>
+    <pre><code>from typing import Literal
+from pydantic import BaseModel
+
+class BoundedSelection(BaseModel):
+    # Model is grammatically blocked from inventing fake IDs:
+    selected_id: Literal["DOC_1", "DOC_2", "DOC_3", "NONE"]
+    category: Literal["billing", "technical", "compliance"]</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0003-grounding-by-construction.html">Lesson 03 — Grounding by Construction: Constraining Search Spaces</a>.</p>
+
+  <h2 id="sec-3"><span class="n">3</span>Quotes-First Defensive Prompt</h2>
+  <div class="snippet">
+    <div class="lbl">Anchoring attention in verbatim text</div>
+    <pre><code>prompt = f"""Answer the question using the &lt;document&gt; below.
+Step 1: Extract verbatim quotes that answer the question into &lt;quotes&gt;...&lt;/quotes&gt;.
+Step 2: If no quotes exist, reply: 'Information not found.'
+Step 3: Synthesize your answer strictly from those quotes.
+
+&lt;document&gt;
+{context_text}
+&lt;/document&gt;
+"""</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0006-defensive-prompt-design-truthfulness.html">Lesson 06 — Defensive Prompt Design for Truthfulness</a>.</p>
+
+  <h2 id="sec-4"><span class="n">4</span>High-Risk Audit Table Schema</h2>
+  <div class="snippet">
+    <div class="lbl">Human verification tracking</div>
+    <pre><code>CREATE TABLE medical_reports (
+    id UUID PRIMARY KEY,
+    generated_text TEXT NOT NULL,
+    unverified_claims INT DEFAULT 0,
+    physician_id UUID REFERENCES doctors(id),
+    approved_at TIMESTAMPTZ,
+    status VARCHAR(20) DEFAULT 'PENDING_APPROVAL'
+);</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0007-human-verification-high-risk-domains.html">Lesson 07 — Human Verification Workflows for High-Risk Domains</a>.</p>
+
+  <div class="lesson-foot">
+    <div class="links">
+      <a href="hallucination-reliability-glossary.html">📖 Glossary</a>
+      <a href="../course.html">← Course map</a>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

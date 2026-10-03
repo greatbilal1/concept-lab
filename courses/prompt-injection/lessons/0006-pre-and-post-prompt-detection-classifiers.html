@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 06 — Pre-Prompt and Post-Prompt Detection Classifiers</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="prompt-injection" data-lesson="6" data-lesson-id="pre-and-post-prompt-detection-classifiers">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 06</span> · Safety Classifiers</span>
+
+  <h1 class="lesson-title">Pre-Prompt and Post-Prompt Detection Classifiers</h1>
+  <p class="lesson-lede">
+    Machine-learning defense: fine-tuned injection classifiers (Llama Guard, DeBERTa), perplexity filtering, and dual-gate inspection.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to deploy pre-prompt and post-prompt classifiers to detect and block injection attacks.</span>
+    <span><b>Mission link</b> Mastering pre-prompt and post-prompt detection classifiers across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Pre-Prompt and Post-Prompt Detection Classifiers</h2>
+  <p>Prompt engineering alone cannot solve prompt injection; probabilistic models can always be coaxed by novel linguistic phrasing. To achieve enterprise reliability, you must deploy <strong>Dedicated Safety Classifiers</strong> around the model.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Machine-learning defense: fine-tuned injection classifiers (Llama Guard, DeBERTa), perplexity filtering, and dual-gate inspection.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Dual-Gate Classifier Architecture</h2>
+  <p>The Dual-Gate Classifier Pipeline:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Perplexity Anomaly Detection</h2>
+  <ul><li><strong>1. Pre-Prompt Classifier (Input Perimeter):</strong> A lightweight, highly fine-tuned classification model (e.g. DeBERTa-v3 or Llama Guard 3) evaluates the input string in <strong>under 25 milliseconds</strong>. It outputs an `adversarial_probability` score ($0.0$ to $1.0$). If score $> 0.85$, block the request immediately!</li><li><strong>2. Perplexity & Token Entropy Anomaly Filters:</strong> Adversarial attacks (like GCG suffix attacks: <code>! ! ! describing \n\n write ...</code>) often have bizarre token distributions with high perplexity. Anomaly filters flag high-perplexity inputs instantly.</li><li><strong>3. Post-Prompt Classifier (Output Egress):</strong> Inspects the generated response before returning it to the user. Did the model emit forbidden system phrases, leaked instructions, or harmful payloads?</li></ul><pre><code># Dual-Gate Classifier Pipeline in Python:
+async def secure_llm_inference(user_prompt: str) -> str:
+    # Gate 1: Pre-Prompt Injection Classifier (DeBERTa / Llama Guard)
+    threat_score = await injection_classifier.predict(user_prompt)
+    if threat_score > 0.85:
+        logger.warning(f"Prompt injection BLOCKED at perimeter! Score: {threat_score:.2f}")
+        return "I cannot process this request due to security policy violations."
+        
+    # Primary Model Generation
+    response_text = await target_model.generate(user_prompt)
+    
+    # Gate 2: Post-Prompt Egress Verification
+    if await contains_leaked_policy_or_harm(response_text):
+        logger.warning("Output blocked by egress safety classifier!")
+        return "Response blocked by safety policy."
+        
+    return response_text</code></pre><div class="callout"><p><strong>The Specialized Model Advantage:</strong> A 100M-parameter DeBERTa classifier trained specifically on adversarial prompt injection datasets detects attacks vastly better than relying on GPT-4 to police itself.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the safety classifiers sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to deploy pre-prompt and post-prompt classifiers to detect and block injection attacks.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where pre-prompt and post-prompt detection classifiers applies.</li>
+    <li>Author a unit test or verification script exercising pre-prompt and post-prompt detection classifiers.</li>
+    <li>Document team architectural conventions regarding pre-prompt and post-prompt detection classifiers.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Pre-Prompt and Post-Prompt Detection Classifiers.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is the role of a 'Pre-Prompt Detection Classifier' in an AI security pipeline?",
+    a: ["A fast specialized model that inspects incoming user text to detect prompt injections or adversarial syntax before calling the main LLM","A spellchecker for user prompts","A tool for translating prompts to French","A compiler for Python"],
+    c: 0,
+    why: "Pre-prompt classifiers screen inputs at the perimeter, blocking adversarial injections before model execution."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1. Pre-Prompt Classifier (20ms)",
+            "lines": [
+                  "DeBERTa / Llama Guard inspects input",
+                  "Calculates adversarial probability score",
+                  "Blocks jailbreaks at the perimeter"
+            ]
+      },
+      {
+            "title": "2. Primary Model Execution",
+            "lines": [
+                  "Processes clean, verified prompt",
+                  "Generates candidate response"
+            ]
+      },
+      {
+            "title": "3. Post-Prompt Egress Gate",
+            "lines": [
+                  "Scans output for leaked secrets & harm",
+                  "Ensures zero unsafe text reaches user"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Pre-Prompt and Post-Prompt Detection Classifiers",
+      "def execute_flow():",
+      "    # Machine-learning defense: fine-tuned injection cla...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Pre-Prompt and Post-Prompt Detection Classifiers"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Adversarial Suffix Attack (GCG)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Perplexity Gate"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Dual-gate AI security deploys lightweight {1} classifiers to intercept prompt injections at the input perimeter and verify responses at the {2} boundary."
+],
+    blanks: [
+      {
+            "a": [
+                  "DeBERTa"
+            ],
+            "why": "Fine-tuned transformer classification model"
+      },
+      {
+            "a": [
+                  "egress"
+            ],
+            "why": "Output exit boundary"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is a 'GCG' (Greedy Coordinate Gradient) attack in AI security research?",
+      a: ["An adversarial optimization technique that appends nonsensical token sequences to prompts to mathematically force open-weights models into answering harmful requests","A graphics card driver","A programming language","A database query"],
+      c: 0,
+      why: "GCG appends optimized adversarial token suffixes that disrupt model safety alignment."
+    },
+    {
+      q: "Why is running a dedicated classifier faster and cheaper than asking a frontier model 'Is this prompt safe?'",
+      a: ["A small 100M-parameter classifier runs locally on CPU/GPU in 15ms at zero API cost, whereas a frontier model takes 800ms and costs money","Classifiers run without electricity","Frontier models cannot evaluate safety","Classifiers use no memory"],
+      c: 0,
+      why: "Small specialized models provide fast, low-cost classification at the application boundary."
+    },
+    {
+      q: "What does a high 'Perplexity' score indicate when screening incoming text prompts?",
+      a: ["The text contains statistically unnatural, jumbled, or random character sequences typical of automated adversarial suffix attacks","The user is very polite","The text is written in Latin","The prompt is too short"],
+      c: 0,
+      why: "Adversarial suffix attacks produce unnatural token sequences that exhibit high language model perplexity."
+    },
+    {
+      q: "Where in the software pipeline should the pre-prompt detection classifier be positioned?",
+      a: ["At the API gateway ingress boundary before the prompt is dispatched to any database, model, or agent","Inside the user's browser only","After the response is delivered to the user","On the developer's laptop"],
+      c: 0,
+      why: "Ingress screening stops malicious payloads before they can interact with models or internal services."
+    }
+  ]);
+</script>
+</body>
+</html>

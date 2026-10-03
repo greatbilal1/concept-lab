@@ -1,0 +1,3 @@
+# Mission — Securing AI Agents & Tools
+
+Master the engineering discipline of securing autonomous AI agents and execution tools. Understand the autonomous blast radius when models mutate real-world state, isolate code execution in hardened Docker and gVisor sandboxes with zero networking, scope tool permissions using read-only database accounts and sanitized views, prevent Server-Side Request Forgery (SSRF) and metadata theft (169.254.169.254), implement human-in-the-loop confirmation gates for high-consequence actions, defend ReAct reasoning loops against observation hijacking, and build immutable forensic audit logs.

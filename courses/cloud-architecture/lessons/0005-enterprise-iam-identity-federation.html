@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 05 — IAM and Identity Federation at Enterprise Scale</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="cloud-architecture" data-lesson="5" data-lesson-id="enterprise-iam-identity-federation">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 05</span> · Enterprise IAM</span>
+
+  <h1 class="lesson-title">IAM and Identity Federation at Enterprise Scale</h1>
+  <p class="lesson-lede">
+    Enterprise access governance: AWS IAM architecture, Service Control Policies (SCPs), Permission Boundaries, and Single Sign-On (SSO).
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to govern enterprise cloud identity using multi-account organizations, SCPs, and SSO.</span>
+    <span><b>Mission link</b> Mastering iam and identity federation at enterprise scale across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of IAM and Identity Federation at Enterprise Scale</h2>
+  <p>In a startup with 3 engineers, managing one AWS account with individual IAM users works. But in an enterprise with 500 engineers, 50 microservices, and 20 AWS accounts (Production, Staging, Security, Data), creating individual IAM users is an unmanageable security disaster.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Enterprise access governance: AWS IAM architecture, Service Control Policies (SCPs), Permission Boundaries, and Single Sign-On (SSO).
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Multi-Account Organization Hierarchy</h2>
+  <p><strong>Enterprise IAM Architecture</strong> is governed by centralized federation:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Human Access via SSO</h2>
+  <ul><li><strong>1. Multi-Account Strategy (AWS Organizations):</strong> Separate workloads into isolated AWS accounts (e.g. `Account-Prod`, `Account-Dev`, `Account-Audit`). Blast radius is strictly isolated!</li><li><strong>2. Single Sign-On (AWS IAM Identity Center / Okta):</strong> <strong>Zero IAM users in production accounts!</strong> Human engineers authenticate through corporate Single Sign-On (Okta / Google Workspace with MFA) and assume temporary roles dynamically.</li><li><strong>3. Service Control Policies (SCPs):</strong> Guardrails enforced from the parent organization: <code>Deny: ec2:StopLogging</code> or <code>Deny: * IF aws:RequestedRegion NOT IN [us-east-1, eu-west-1]</code>. Even a root account admin cannot bypass an SCP!</li><li><strong>4. Permission Boundaries:</strong> Advanced IAM guardrails that cap the maximum permissions a delegated developer can grant when creating new IAM roles.</li></ul><pre><code># Service Control Policy (SCP) Enforcing Geographic Region Guardrail:
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "DenyAllOutsideApprovedRegions",
+      "Effect": "Deny",
+      "NotAction": [
+        "iam:*", "organizations:*", "route53:*", "cloudfront:*"
+      ],
+      "Resource": "*",
+      "Condition": {
+        "StringNotEquals": {
+          "aws:RequestedRegion": ["us-east-1", "us-west-2"]
+        }
+      }
+    }
+  ]
+}</code></pre><div class="callout"><p><strong>The Enterprise Identity Standard:</strong> Individual IAM users with static console passwords and long-lived access keys must be completely banned in production. Use centralized SSO and IAM Roles exclusively.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the enterprise IAM sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to govern enterprise cloud identity using multi-account organizations, SCPs, and SSO.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where iam and identity federation at enterprise scale applies.</li>
+    <li>Author a unit test or verification script exercising iam and identity federation at enterprise scale.</li>
+    <li>Document team architectural conventions regarding iam and identity federation at enterprise scale.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for IAM and Identity Federation at Enterprise Scale.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is the function of a 'Service Control Policy' (SCP) in AWS Organizations?",
+    a: ["A guardrail policy applied at the organization level that defines the maximum allowable permissions across member accounts, superseding local account admins","A policy that controls employee work hours","A firewall that blocks internet connections","A billing receipt"],
+    c: 0,
+    why: "SCPs act as organizational guardrails, restricting what member account administrators can do."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "AWS Organizations Root",
+            "lines": [
+                  "Service Control Policies (SCPs) enforced globally",
+                  "Blocks forbidden regions & security tampering"
+            ]
+      },
+      {
+            "title": "Production OU (Account A)",
+            "lines": [
+                  "Strict least privilege, read-only audit logging"
+            ]
+      },
+      {
+            "title": "Development OU (Account B)",
+            "lines": [
+                  "Sandbox account for experimentation",
+                  "Zero access to production customer data!"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing IAM and Identity Federation at Enterprise Scale",
+      "def execute_flow():",
+      "    # Enterprise access governance: AWS IAM architecture...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "IAM and Identity Federation at Enterprise Scale"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Corporate Okta / Google SSO"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "IAM Identity Center"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Enterprise identity governance bans individual IAM users in favor of centralized {1} integration, enforcing organization-wide guardrails using Service {2} Policies."
+],
+    blanks: [
+      {
+            "a": [
+                  "SSO"
+            ],
+            "why": "Single Sign-On authentication"
+      },
+      {
+            "a": [
+                  "Control"
+            ],
+            "why": "Service Control Policies (SCPs)"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What happens if a local administrator in a member AWS account attempts to delete CloudTrail audit logs, but a parent SCP denies 'cloudtrail:DeleteTrail'?",
+      a: ["The action is rejected with an explicit Access Denied error; Service Control Policies override all local account permissions","The logs are deleted anyway","The AWS account is deleted","The computer restarts"],
+      c: 0,
+      why: "SCPs act as hard guardrails that cannot be overridden by local account administrators or root users."
+    },
+    {
+      q: "Why is separating production and development into distinct AWS accounts better than separating them using IAM tags in one account?",
+      a: ["Account boundaries provide absolute physical, network, billing, and IAM isolation, guaranteeing a bug or breach in Dev cannot touch Prod","Multiple accounts are free of charge","Single accounts have a 10-user limit","It is required by Python syntax"],
+      c: 0,
+      why: "Account-level separation eliminates shared IAM and network risks, confining failures to isolated boundaries."
+    },
+    {
+      q: "What is an IAM 'Permission Boundary'?",
+      a: ["An advanced control that sets the maximum allowable permissions an IAM entity can have, preventing delegated developers from escalating their own privileges","A physical fence outside a data center","A type of network router","A database firewall"],
+      c: 0,
+      why: "Permission boundaries prevent developers from creating administrator roles for themselves."
+    },
+    {
+      q: "How does centralized Single Sign-On (SSO) improve security when an employee leaves a company?",
+      a: ["Deactivating the employee's corporate identity in Okta/Google instantly revokes their access across all 50 AWS accounts in one click","The employee keeps access for 30 days","An administrator must manually log into every account","The servers must be rebooted"],
+      c: 0,
+      why: "Centralized SSO ensures immediate, comprehensive offboarding across all cloud infrastructure."
+    }
+  ]);
+</script>
+</body>
+</html>

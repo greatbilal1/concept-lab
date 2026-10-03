@@ -1,0 +1,3 @@
+# Mission — Multi-Agent Systems
+
+Master the architecture and orchestration of multi-agent engineering squads. Understand why monolithic single agents break at scale, navigate topologies (Router, Supervisor, Swarm), engineer specialized roles with least-privilege toolsets, establish lossless structured handoffs, coordinate shared state with the Blackboard pattern, resolve conflicts through debate and arbitration, manage token coordination overhead, and build cyclic agent graphs with LangGraph.

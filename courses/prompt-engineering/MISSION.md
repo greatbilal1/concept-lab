@@ -1,0 +1,3 @@
+# Mission — Prompt Engineering
+
+Elevate prompt craft from casual chatting to rigorous software engineering. Master the four-part system prompt architecture, isolate untrusted data with XML delimiters, unlock in-context learning with few-shot examples, activate working memory via Chain-of-Thought reasoning, calibrate domain depth with expert personas, enforce boundaries with negative constraints, mandate clarifying questions, and build automated prompt eval suites.

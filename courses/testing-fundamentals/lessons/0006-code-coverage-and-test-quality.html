@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 06 — Code Coverage vs Test Quality</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="testing-fundamentals" data-lesson="6" data-lesson-id="code-coverage-and-test-quality">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 06</span> · Coverage & Quality</span>
+
+  <h1 class="lesson-title">Code Coverage vs Test Quality</h1>
+  <p class="lesson-lede">
+    Measuring test effectiveness with line, branch, and mutation coverage without falling into vanity metrics.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You understand the true relationship between coverage metrics and software quality.</span>
+    <span><b>Mission link</b> Mastering code coverage vs test quality across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Code Coverage vs Test Quality</h2>
+  <p><strong>Code coverage</strong> measures the percentage of your production source code executed while running the test suite. It is typically reported as <strong>Line Coverage</strong> (statements executed) and <strong>Branch Coverage</strong> (branches of `if/else` conditions traversed).</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Measuring test effectiveness with line, branch, and mutation coverage without falling into vanity metrics.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Coverage Metrics Compared</h2>
+  <p>While coverage is a useful metric for discovering completely untested modules, Goodhart's law applies: <em>When a measure becomes a target, it ceases to be a good measure.</em></p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Mutation Testing Cycle</h2>
+  <pre><code># Example: 100% Line Coverage with ZERO Quality
+def delete_account(user_id):
+    user = db.get(user_id)
+    if user:
+        db.delete(user)
+        send_audit_log("User deleted")
+
+def test_delete_account_vanity():
+    # Executes every line, but asserts NOTHING!
+    delete_account(42)
+    # Did it delete? Was audit sent? We have no idea!</code></pre><p>To test whether your tests are genuinely effective, engineers use <strong>Mutation Testing</strong>. Mutation testing tools (such as `mutmut` in Python) automatically inject small changes (mutants) into your source code—flipping `>` to `<=`, or replacing `True` with `False`. If your test suite still passes, the mutant <em>survived</em>, revealing a gap in your assertions.</p><div class="callout"><p><strong>Rule:</strong> Aim for 80-90% branch coverage on core business logic. Do not chase 100% coverage on trivial boilerplate or framework glue code.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Fill in the code coverage concepts</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You understand the true relationship between coverage metrics and software quality.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where code coverage vs test quality applies.</li>
+    <li>Author a unit test or verification script exercising code coverage vs test quality.</li>
+    <li>Document team architectural conventions regarding code coverage vs test quality.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Code Coverage vs Test Quality.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Can a codebase have 100% line coverage and still have severe undetected bugs?",
+    a: ["Yes, because lines can execute without asserting anything about the resulting state or edge cases","No, 100% coverage mathematically guarantees zero bugs","Only in compiled languages like C++","Only if the CPU hardware has a defect"],
+    c: 0,
+    why: "Line coverage only measures execution, not verification. A test without assertions can achieve 100% coverage."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Line Coverage",
+            "lines": [
+                  "Did the line execute?",
+                  "Blind to assertions and logic"
+            ]
+      },
+      {
+            "title": "Branch Coverage",
+            "lines": [
+                  "Did both true/false paths run?",
+                  "Catches missing else conditions"
+            ]
+      },
+      {
+            "title": "Mutation Coverage",
+            "lines": [
+                  "Did tests fail when code broke?",
+                  "Measures real assertion strength"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Code Coverage vs Test Quality",
+      "def execute_flow():",
+      "    # Measuring test effectiveness with line, branch, an...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Code Coverage vs Test Quality"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "1. Inject Mutation"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "2. Run Tests"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "step": "3. Evaluate Mutant"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "While {1} coverage checks if code ran, {2} testing alters source code to verify that assertions catch bugs."
+],
+    blanks: [
+      {
+            "a": [
+                  "line"
+            ],
+            "why": "Basic percentage of statements executed"
+      },
+      {
+            "a": [
+                  "mutation"
+            ],
+            "why": "Testing technique that introduces deliberate code flaws"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the difference between line coverage and branch coverage?",
+      a: ["Branch coverage verifies that both True and False branches of decision points were executed","Line coverage is only for Python while branch coverage is for JavaScript","Branch coverage counts git branches in version control","Line coverage checks comments while branch coverage skips them"],
+      c: 0,
+      why: "Branch coverage ensures all conditional evaluation paths are tested, catching missing edge cases."
+    },
+    {
+      q: "What is a 'surviving mutant' in mutation testing?",
+      a: ["A deliberate bug injected into the codebase that the test suite failed to catch","A test that took longer than 10 seconds to finish","A corrupted fixture file on the disk","A git merge conflict in test files"],
+      c: 0,
+      why: "If tests pass despite intentional bugs, the mutant survives, indicating inadequate assertions."
+    },
+    {
+      q: "Why is mandating 100% code coverage often counter-productive?",
+      a: ["It encourages low-value tests that assert trivial boilerplate just to hit the metric quota","It makes Python run out of memory","It causes git push commands to fail","It prevents developers from using IDEs"],
+      c: 0,
+      why: "Quotas incentivize developers to write shallow assertion-free tests that inflate coverage."
+    },
+    {
+      q: "What code deserves the highest testing rigor and coverage?",
+      a: ["Complex domain business logic with financial, safety, or security impact","Generated database migrations","Configuration files and YAML","Auto-generated getters and setters"],
+      c: 0,
+      why: "Core business rules carry the highest risk and business value."
+    }
+  ]);
+</script>
+</body>
+</html>

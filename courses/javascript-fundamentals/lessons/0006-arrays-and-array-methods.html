@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 06 — Arrays and modern array methods</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="javascript-fundamentals" data-lesson="6" data-lesson-id="arrays-and-array-methods">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 06</span> · Objects & Collections</span>
+
+  <h1 class="lesson-title">Arrays and modern array methods</h1>
+  <p class="lesson-lede">
+    Stop writing manual for-loops. Master declarative, immutable array pipelines using map, filter, reduce, find, and some.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Transform collections declaratively using pure array methods and reduce</span>
+    <span><b>Mission link</b> The core functional style of modern idiomatic JavaScript</span>
+  </div>
+
+  <h2><span class="n">1</span>Imperative loops versus declarative pipelines</h2>
+  <p>In older code, transforming a list meant declaring an empty array, writing a <code>for (let i = 0; i &lt; len; i++)</code> loop, and pushing mutated values. This is <b>imperative</b>: it details every step of how to do it.</p><p>Modern JavaScript uses <b>declarative higher-order array methods</b>: <code>map</code> (transform each item), <code>filter</code> (keep matching items), and <code>reduce</code> (aggregate into a single value). They produce new arrays without mutating the original, preventing side-effect bugs.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    map transforms; filter selects; reduce accumulates; all three leave the original array untouched.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The array methods toolkit</h2>
+  <p>Distinguish between pure non-mutating methods and legacy in-place mutating methods.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing an array pipeline</h2>
+  <p>Trace how a chain of filter and reduce calculates the total cost of pending orders.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of array methods.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can write expressive, non-mutating data pipelines that process collections cleanly and reliably.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Replace a traditional for-loop with a map or filter expression.</li>
+    <li>Use reduce to count the frequency of categories in an array of objects.</li>
+    <li>Use the modern toSorted() method to sort an array without mutating the original.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    MDN Web Docs: *Array methods* (developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What does [1, 2, 3].map(x => x * 2) return, and does it modify the original array?",
+    a: ["Returns [2, 4, 6] as a brand new array; the original [1, 2, 3] is unchanged","Mutates the original array in place to [2, 4, 6]","Returns the single number 12","Returns [1, 2, 3, 2, 4, 6]"],
+    c: 0,
+    why: "map produces a new array of transformed values without mutating the source array."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Pure / Non-Mutating",
+            "lines": [
+                  ".map(), .filter(), .reduce()",
+                  ".slice(), .find(), .some()",
+                  "returns new data safely"
+            ]
+      },
+      {
+            "title": "Mutating / Destructive",
+            "lines": [
+                  ".push(), .pop(), .splice()",
+                  ".sort(), .reverse()",
+                  "mutates original array in place!"
+            ]
+      },
+      {
+            "title": "Modern ES2023 Safe",
+            "lines": [
+                  ".toSorted(), .toReversed()",
+                  "safe non-mutating alternatives"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "const orders = [ { id: 1, total: 30, pending: true }, { id: 2, total: 50, pending: false }, { id: 3, total: 20, pending: true } ];",
+      "const pendingTotal = orders",
+      "    .filter(o => o.pending)",
+      "    .reduce((sum, o) => sum + o.total, 0);",
+      "# Filter -> orders 1 and 3; Reduce -> 30 + 20 = 50"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "initial": "3 orders"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "filter": "kept orders 1 and 3"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "reduce": "accumulated total: 50"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The method that creates a new array of transformed items is .<0>().",
+      "The method that selects a subset of items matching a condition is .<1>().",
+      "The method that aggregates an entire array down to a single value is .<2>()."
+],
+    blanks: [
+      {
+            "a": [
+                  "map"
+            ],
+            "why": "map applies a transformation to each item."
+      },
+      {
+            "a": [
+                  "filter"
+            ],
+            "why": "filter keeps items where the predicate returns true."
+      },
+      {
+            "a": [
+                  "reduce"
+            ],
+            "why": "reduce accumulates array values into a single result."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the difference between Array.prototype.slice() and Array.prototype.splice()?",
+      a: ["slice() returns a shallow copy of a portion of an array without mutating it; splice() mutates the original array","slice() works on strings; splice() works on numbers","splice() is an asynchronous operation returning a Promise","There is no difference between slice and splice"],
+      c: 0,
+      why: "slice is pure and non-mutating; splice modifies the array in-place by removing or inserting items."
+    },
+    {
+      q: "What does 'array.find(predicate)' return if no element matches the condition?",
+      a: ["undefined","null","-1","An empty array []"],
+      c: 0,
+      why: "find returns the first matching element, or undefined if no element satisfies the predicate."
+    },
+    {
+      q: "What is the initial value argument in array.reduce(callback, initialValue)?",
+      a: ["The starting value passed to the accumulator on the first iteration","The maximum number of items the reducer is allowed to process","The timeout delay in milliseconds","The index where reduction should start"],
+      c: 0,
+      why: "initialValue initializes the accumulator; omitting it defaults to the first array element."
+    },
+    {
+      q: "What does 'array.some(predicate)' return?",
+      a: ["true if AT LEAST ONE element in the array satisfies the predicate function","true only if ALL elements satisfy the predicate function","A random subset of array elements","The total count of matching items"],
+      c: 0,
+      why: "some checks if any item passes; every checks if all items pass."
+    }
+  ]);
+</script>
+</body>
+</html>

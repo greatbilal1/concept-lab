@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 03 — The with statement</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="python-files-json-data" data-lesson="3" data-lesson-id="the-with-statement">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 03</span> · Files</span>
+
+  <h1 class="lesson-title">The with statement</h1>
+  <p class="lesson-lede">
+    Manual <code>close()</code> works until an exception skips it. The
+    <code>with</code> statement guarantees cleanup no matter how the block exits —
+    and it is the form you should use every single time.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Never leak a file handle</span>
+    <span><b>Mission link</b> Correct even when things fail</span>
+  </div>
+
+  <h2><span class="n">1</span>The problem with manual close</h2>
+
+  <p>
+    Look at this code. It looks fine, and it is wrong:
+  </p>
+
+  <pre><code>f = open("data.txt")
+text = f.read()
+process(text)     # if this raises...
+f.close()         # ...this never runs</code></pre>
+
+  <p>
+    An exception between <code>open()</code> and <code>close()</code> skips the
+    close entirely. The handle leaks. In a loop, you eventually exhaust the
+    operating system's limit.
+  </p>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The with form</h2>
+
+  <p>
+    <code>with</code> moves the cleanup out of your hands and into the language:
+  </p>
+
+  <pre><code>with open("data.txt") as f:
+    text = f.read()
+    process(text)
+# f is closed here — always, even if process() raised</code></pre>
+
+  <p>
+    The block ends, the file closes. There is no path through the code that skips
+    it, because the closing is not a statement you wrote — it is a guarantee the
+    language provides.
+  </p>
+
+  <div id="intro1"></div>
+
+  <h2><span class="n">3</span>What "context manager" means</h2>
+
+  <p>
+    <code>with</code> works with any object that defines two methods:
+    <code>__enter__</code> (setup) and <code>__exit__</code> (teardown).
+    <code>open()</code> returns exactly such an object.
+  </p>
+
+  <div id="trace1"></div>
+
+  <p>
+    <code>__exit__</code> runs whether the block finished normally or raised. That
+    is the whole trick, and it is why <code>with</code> is not just shorter — it is
+    <b>safer</b>.
+  </p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    <code>with</code> is a <b>guarantee</b>, not a shortcut. It ties cleanup to the
+    block's exit, however that exit happens.
+  </div>
+
+  <h2><span class="n">4</span>Multiple files at once</h2>
+
+  <p>
+    You can open several files in one statement, which keeps the nesting flat:
+  </p>
+
+  <pre><code>with open("in.txt") as src, open("out.txt", "w") as dst:
+    for line in src:
+        dst.write(line.upper())</code></pre>
+
+  <div id="diagram1"></div>
+
+  <p>
+    Both handles close when the block ends, in reverse order. This is the shape you
+    will use constantly when converting between formats later in the course.
+  </p>
+
+  <div class="note good">
+    <span class="note-label">Why this matters later</span>
+    Every file operation in the rest of this course uses <code>with</code>. Once
+    you stop thinking about closing, you can focus on the data — which is the
+    actual subject.
+  </div>
+
+  <h2><span class="n">5</span>Check yourself</h2>
+
+  <p>
+    Answer from memory — do not scroll back up. Each option has the same number of
+    words, so nothing gives the answer away.
+  </p>
+
+  <div id="fill1"></div>
+  <div id="quiz"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>
+      You can now write file code that cleans up correctly even when it fails, and
+      you can explain what a context manager is. This is the habit that separates
+      scripts that work from scripts that work reliably.
+    </p>
+  </div>
+
+  <h2><span class="n">6</span>Do this next</h2>
+
+  <ol>
+    <li>
+      Rewrite a manual open/close pair using <code>with</code> and confirm the
+      behaviour is identical.
+    </li>
+    <li>
+      Raise an exception inside a <code>with</code> block and confirm the file still
+      closes.
+    </li>
+    <li>
+      Open two files in one <code>with</code> statement and copy one to the other.
+    </li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Read the Python docs on
+    <a href="https://docs.python.org/3/reference/compound_stmts.html#the-with-statement">the with statement</a>
+    and the
+    <a href="https://docs.python.org/3/reference/datamodel.html#context-managers">context manager protocol</a>.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher (me) anything — "can I write my own
+    context manager?", "what is contextlib?", "does with catch exceptions?". There
+    are no bad questions here.
+  </div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  /* the with form */
+  TeachWidgets.introCards("#intro1", {
+    cards: [
+      { ico: "🔓", title: "__enter__", body: "Runs at the start of the block and returns the object." },
+      { ico: "🧱", title: "the block", body: "Your code runs here, with the handle available." },
+      { ico: "🔒", title: "__exit__", body: "Runs at the end — normally or after an exception." }
+    ]
+  });
+
+  /* predict-then-reveal */
+  TeachWidgets.predict("#predict1", {
+    q: "An exception is raised inside a `with open(...)` block. What happens to the file?",
+    a: ["It stays open forever", "It is closed anyway", "It is deleted from disk"],
+    c: 1,
+    why: "The context manager's __exit__ runs even when the block raises, so the file always closes."
+  });
+
+  /* step-through trace of the protocol */
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "with open(\"data.txt\") as f:",
+      "  __enter__ -> f",
+      "  text = f.read()",
+      "  __exit__  -> f.close()",
+      "  (runs even on error)"
+    ],
+    steps: [
+      { line: 0, vars: { entering: "with block" } },
+      { line: 1, vars: { returned: "file handle" } },
+      { line: 2, vars: { reading: "contents" } },
+      { line: 3, vars: { closing: "handle" } },
+      { line: 4, vars: { guarantee: "always runs" } }
+    ]
+  });
+
+  /* multiple files */
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      { title: "open in.txt", lines: ["read handle", "source"] },
+      { title: "open out.txt", lines: ["write handle", "destination"] },
+      { title: "block ends", lines: ["both close", "reverse order"] }
+    ]
+  });
+
+  /* recall from memory */
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — the protocol",
+    lines: [
+      "The setup method is <code>__<0>__</code>",
+      "The teardown method is <code>__<1>__</code>",
+      "The statement that guarantees cleanup is <code><2></code>"
+    ],
+    blanks: [
+      { a: ["enter"], why: "__enter__ runs at the start of the block and returns the object." },
+      { a: ["exit"], why: "__exit__ runs at the end, whether the block succeeded or raised." },
+      { a: ["with"], why: "The with statement ties cleanup to the block's exit." }
+    ]
+  });
+
+  /* the quiz — every option is exactly three words */
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why is manual close risky?",
+      a: ["It is slower to run", "An exception skips it", "It needs extra imports", "It closes too early"],
+      c: 1,
+      why: "If an exception occurs before close(), the handle is never released."
+    },
+    {
+      q: "What does with guarantee?",
+      a: ["The file is cached", "Cleanup always runs", "The data is valid", "The write is atomic"],
+      c: 1,
+      why: "The context manager's teardown runs however the block exits."
+    },
+    {
+      q: "What is a context manager?",
+      a: ["A file path object", "An object with enter and exit", "A type of exception", "A text encoding scheme"],
+      c: 1,
+      why: "Any object defining __enter__ and __exit__ can be used with the with statement."
+    }
+    {
+      q: "Can one with open two files?",
+      a: ["No, never at all", "Yes, separated by commas", "Only in Python 2", "Only for reading files"],
+      c: 1,
+      why: "You can list several context managers in one with statement, separated by commas."
+    }
+  ]);
+</script>
+</body>
+</html>

@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 08 — Engineering Resilient Distributed Systems</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="distributed-systems" data-lesson="8" data-lesson-id="engineering-resilient-distributed-systems">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 08</span> · Distributed Systems Synthesis</span>
+
+  <h1 class="lesson-title">Engineering Resilient Distributed Systems</h1>
+  <p class="lesson-lede">
+    Synthesizing distributed systems: unifying CAP trade-offs, Raft consensus, consistent hashing, quorums, and the Saga pattern.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You have completed the Distributed Systems & Scalability course.</span>
+    <span><b>Mission link</b> Mastering engineering resilient distributed systems across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Engineering Resilient Distributed Systems</h2>
+  <p>We have covered the foundational reality of distributed systems: network fallacies, partial failure, the CAP and PACELC theorems, Raft consensus, consistent hashing, quorum replication, the Saga pattern, and CRDTs.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Synthesizing distributed systems: unifying CAP trade-offs, Raft consensus, consistent hashing, quorums, and the Saga pattern.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Master Distributed Systems Stack</h2>
+  <p>Now, we synthesize these into a <strong>Unified Resilient Distributed Architecture</strong>:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Embracing Partial Failure</h2>
+  <ul><li><strong>1. Coordination Layer (CP — Raft / etcd):</strong> Cluster leader election, service discovery, and configuration state are managed by a 5-node Raft consensus cluster. Linearizable and split-brain immune!</li><li><strong>2. Data Partitioning Layer (Consistent Hashing):</strong> Distributed caching and document partitions use a consistent hashing ring with virtual nodes. Minimal reshuffling ($1/N$) during node scaling!</li><li><strong>3. Distributed Storage Layer (Leaderless Quorum):</strong> Storage nodes use Dynamo-style quorum ($W=2, R=2, N=3$) with $W + R > N$ guarantees, surviving individual node failures.</li><li><strong>4. Cross-Service Business Workflows (The Saga Pattern):</strong> Multi-microservice transactions use asynchronous event-driven sagas with automated compensating rollbacks, eliminating blocking 2PC locks.</li></ul><pre><code># The Master Distributed Systems Blueprint:
+# ├── Coordination Tier (etcd / Raft):    Guarantees CP leader election (Odd 5-node cluster)
+# ├── Routing Tier (Consistent Hashing):  Partitions traffic across N horizontal nodes
+# ├── Storage Tier (Quorum W+R > N):     Leaderless replication, survives 1 node death
+# └── Workflow Tier (Saga Pattern):       Non-blocking eventual consistency across services</code></pre><div class="callout"><p><strong>The Final Engineering Truth:</strong> You cannot prevent networks from failing. But by designing with consensus, consistent hashing, quorums, and compensating workflows, you build distributed systems that operate flawlessly in an imperfect physical world.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the distributed synthesis sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You have completed the Distributed Systems & Scalability course.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where engineering resilient distributed systems applies.</li>
+    <li>Author a unit test or verification script exercising engineering resilient distributed systems.</li>
+    <li>Document team architectural conventions regarding engineering resilient distributed systems.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Engineering Resilient Distributed Systems.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What architectural mindset defines master distributed systems engineers?",
+    a: ["Designing systems that accept failure and network partitions as inevitable, building self-healing consensus, partitioning, and compensating workflows","Hoping servers never crash","Buying the most expensive hardware available","Writing all software on a single computer"],
+    c: 0,
+    why: "Master engineers assume failure is constant, building self-healing architectures with consensus, consistent hashing, and sagas."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1. Coordination (Raft / etcd)",
+            "lines": [
+                  "5-node odd cluster for leader election",
+                  "CP linearizable state, split-brain immune"
+            ]
+      },
+      {
+            "title": "2. Partitioning (Consistent Hash)",
+            "lines": [
+                  "Virtual nodes balance traffic across ring",
+                  "Minimal 1/N reshuffling during scaling"
+            ]
+      },
+      {
+            "title": "3. Storage (Quorum W+R > N)",
+            "lines": [
+                  "Dynamo-style replication across 3 nodes",
+                  "Survives independent server crashes"
+            ]
+      },
+      {
+            "title": "4. Workflows (Saga Pattern)",
+            "lines": [
+                  "Event-driven non-blocking transactions",
+                  "Compensating rollbacks on failure"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Engineering Resilient Distributed Systems",
+      "def execute_flow():",
+      "    # Synthesizing distributed systems: unifying CAP tra...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Engineering Resilient Distributed Systems"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Single-Node Architecture"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Resilient Distributed Architecture"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Resilient distributed systems achieve planetary scalability by combining Raft consensus for coordination, consistent {1} for partitioning, and {2} workflows for distributed transactions."
+],
+    blanks: [
+      {
+            "a": [
+                  "hashing"
+            ],
+            "why": "Ring-based key distribution algorithm"
+      },
+      {
+            "a": [
+                  "Saga"
+            ],
+            "why": "Compensating transaction pattern"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the primary role of etcd in a distributed Kubernetes cluster?",
+      a: ["Providing a strongly consistent (CP) distributed key-value store using Raft consensus to manage cluster state and leader election","Storing video files","Running user Python scripts","Serving web pages directly to users"],
+      c: 0,
+      why: "etcd uses Raft to provide infallible, linearizable consensus for all Kubernetes cluster state."
+    },
+    {
+      q: "How does combining consistent hashing with quorum replication build a highly scalable storage engine like Amazon Dynamo?",
+      a: ["Consistent hashing routes keys to specific nodes on the ring, while quorum replication ensures that data is copied to W overlapping replicas for durability","It makes storage free","It eliminates the need for hard drives","It translates code to C"],
+      c: 0,
+      why: "Consistent hashing partitions keys horizontally; quorum replication guarantees fault tolerance."
+    },
+    {
+      q: "Why is the Saga pattern preferred over Two-Phase Commit for long-running workflows spanning multiple microservices?",
+      a: ["Sagas do not hold blocking database locks across network hops, preventing system freezes and allowing services to scale independently","Sagas are written in Python","Sagas eliminate database backups","Sagas run without memory"],
+      c: 0,
+      why: "Sagas decouple transactions into local steps with compensating rollbacks, avoiding blocking locks."
+    },
+    {
+      q: "What is the ultimate mark of an expert Distributed Systems Architect?",
+      a: ["Designing systems that embrace network unreliability, partial failure, and concurrency by construction, delivering dependable service at massive scale","Assuming the network is 100% reliable","Building everything on a single giant computer","Refusing to measure latency"],
+      c: 0,
+      why: "Architecting systems that thrive amidst partial failure and network partitions defines elite mastery."
+    }
+  ]);
+</script>
+</body>
+</html>

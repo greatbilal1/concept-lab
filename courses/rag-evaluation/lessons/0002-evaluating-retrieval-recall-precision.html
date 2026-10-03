@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 02 — Evaluating Retrieval: Context Recall and Precision</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="rag-evaluation" data-lesson="2" data-lesson-id="evaluating-retrieval-recall-precision">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 02</span> · Retrieval Metrics</span>
+
+  <h1 class="lesson-title">Evaluating Retrieval: Context Recall and Precision</h1>
+  <p class="lesson-lede">
+    Measuring retrieval quality: Context Recall (did we find all required facts?), Context Precision (is the ranking clean?), and MRR/NDCG.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to evaluate vector retrieval using Context Recall, Context Precision, and ranking metrics.</span>
+    <span><b>Mission link</b> Mastering evaluating retrieval: context recall and precision across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Evaluating Retrieval: Context Recall and Precision</h2>
+  <p>You cannot evaluate a vector database by typing one search query and saying 'looks okay'. You must evaluate retrieval quantitatively across a benchmark dataset using two foundational information retrieval metrics: <strong>Context Recall</strong> and <strong>Context Precision</strong>.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Measuring retrieval quality: Context Recall (did we find all required facts?), Context Precision (is the ranking clean?), and MRR/NDCG.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Context Recall vs Context Precision</h2>
+  <ul><li><strong>1. Context Recall (Did we find everything?):</strong> To answer a complex query, suppose three distinct facts are required: Fact A (eligibility), Fact B (fee), Fact C (deadline). If your retriever returns chunks containing Facts A and B, but misses Fact C, Context Recall is $2/3 = 66.7\%$. The LLM will be incapable of giving a complete answer!</li><li><strong>2. Context Precision (Is the ranking clean?):</strong> Did the relevant chunks appear at Rank #1 and #2, or were they buried at Rank #5 underneath three noisy, irrelevant chunks? Higher precision means higher signal-to-noise ratio in the top positions.</li><li><strong>3. Mean Reciprocal Rank (MRR) & NDCG:</strong> Standard ranking metrics measuring how close the first relevant document is to the top of the search results list.</li></ul>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Impact of Poor Retrieval</h2>
+  <pre><code># Computing Context Recall with an Evaluator LLM:
+# Evaluator prompt:
+"You are an evaluation judge.
+Given the Ground Truth Answer: '{ground_truth}'
+And the Retrieved Context: '{retrieved_chunks}'
+Decompose the ground truth into atomic statements.
+For each statement, determine if it can be directly attributed to the context.
+Calculate Context Recall = (Attributed Statements) / (Total Statements)"</code></pre><div class="callout"><p><strong>The Retrieval Rule:</strong> If Context Recall is below 90%, your downstream generation is doomed. Optimize chunking, hybrid search, and embeddings until recall hits 95%+.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the retrieval metrics sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to evaluate vector retrieval using Context Recall, Context Precision, and ranking metrics.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where evaluating retrieval: context recall and precision applies.</li>
+    <li>Author a unit test or verification script exercising evaluating retrieval: context recall and precision.</li>
+    <li>Document team architectural conventions regarding evaluating retrieval: context recall and precision.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Evaluating Retrieval: Context Recall and Precision.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What does 'Context Recall' measure in RAG retrieval evaluation?",
+    a: ["The proportion of ground-truth factual statements needed to answer the question that were successfully captured in the retrieved chunks","The speed of the database query in milliseconds","The size of the vector embedding in bytes","The number of users logged into the system"],
+    c: 0,
+    why: "Context recall evaluates whether the retriever found all necessary factual pieces needed to answer the query."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Context Recall (Completeness)",
+            "lines": [
+                  "Necessary facts: [Fact A, Fact B, Fact C]",
+                  "Retrieved chunks contain: [Fact A, Fact B]",
+                  "Recall = 2/3 = 67% (Incomplete!)"
+            ]
+      },
+      {
+            "title": "Context Precision (Ranking)",
+            "lines": [
+                  "Are relevant chunks at Rank #1 and #2?",
+                  "Buried at Rank #5? Low precision!"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Evaluating Retrieval: Context Recall and Precision",
+      "def execute_flow():",
+      "    # Measuring retrieval quality: Context Recall (did w...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Evaluating Retrieval: Context Recall and Precision"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Low Recall (< 70%)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Low Precision (Noisy)"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Context {1} evaluates whether all necessary factual statements were retrieved, while context {2} evaluates whether relevant chunks were ranked at the top."
+],
+    blanks: [
+      {
+            "a": [
+                  "recall"
+            ],
+            "why": "Completeness of retrieved facts"
+      },
+      {
+            "a": [
+                  "precision"
+            ],
+            "why": "Cleanliness of candidate ranking"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is Mean Reciprocal Rank (MRR) in search evaluation?",
+      a: ["The average of the reciprocal ranks of the first relevant document across all queries: sum(1 / rank) / N","The speed of the network router","The average price of cloud servers","The memory size of the database"],
+      c: 0,
+      why: "MRR rewards search engines that place the first relevant result at Rank #1."
+    },
+    {
+      q: "Why is Context Precision critical even if Context Recall is 100%?",
+      a: ["Because burying relevant chunks underneath irrelevant noise triggers the Lost-in-the-Middle effect and inflates token bills","It is required by Python syntax","Low precision causes hard drives to crash","Precision makes fonts sharper"],
+      c: 0,
+      why: "High noise dilutes attention and increases latency and cost even if all facts are present."
+    },
+    {
+      q: "How can you improve Context Recall if your RAG system is missing relevant documents?",
+      a: ["Increase Top-K, implement hybrid BM25 search, adjust chunk size, or upgrade to a stronger embedding model","Delete the vector database","Ask the user to type shorter queries","Restart the server"],
+      c: 0,
+      why: "Hybrid search, larger K, and tuned chunking directly expand retrieval coverage."
+    },
+    {
+      q: "What tool in the RAG ecosystem automatically computes Context Recall and Context Precision?",
+      a: ["The Ragas framework (ragas.io) or TruLens","Photoshop","Git bash","Microsoft Excel"],
+      c: 0,
+      why: "Ragas is the open-source industry standard library for RAG-specific retrieval and generation metrics."
+    }
+  ]);
+</script>
+</body>
+</html>

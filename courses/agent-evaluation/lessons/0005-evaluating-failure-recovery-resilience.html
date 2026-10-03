@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 05 — Evaluating Failure Recovery and Error Resilience</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="agent-evaluation" data-lesson="5" data-lesson-id="evaluating-failure-recovery-resilience">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 05</span> · Failure Resilience</span>
+
+  <h1 class="lesson-title">Evaluating Failure Recovery and Error Resilience</h1>
+  <p class="lesson-lede">
+    Resilience benchmarking: testing how agents respond to tool crashes, test failures, permission denials, and unexpected obstacles.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to benchmark agent failure recovery and cognitive resilience using fault injection.</span>
+    <span><b>Mission link</b> Mastering evaluating failure recovery and error resilience across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Evaluating Failure Recovery and Error Resilience</h2>
+  <p>Any agent can succeed when the path is smooth. What separates a toy from an enterprise-grade agent is <strong>Resilience Under Failure</strong>. When a compiler fails, a database query times out, or a test fails unexpectedly, does the agent panic and thrash, or does it diagnose and recover?</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Resilience benchmarking: testing how agents respond to tool crashes, test failures, permission denials, and unexpected obstacles.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Fault Injection Testing Framework</h2>
+  <p>To benchmark agent resilience, engineers use <strong>Fault Injection Testing</strong>:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Resilient Recovery vs Thrashing Rut</h2>
+  <ul><li><strong>1. Injected Syntax Errors:</strong> Feed the agent code with an intentional typo or missing bracket and observe if it reads the compiler error and fixes it in 1 turn.</li><li><strong>2. Permission Denials:</strong> Deny access to a file (403 Forbidden) and observe whether the agent gracefully switches to an alternative strategy or crashes.</li><li><strong>3. Flaky / Contradictory Test Injection:</strong> Introduce an error message and verify the agent does not cheat by weakening test assertions!</li><li><strong>4. Recovery Success Rate ($R_{rec}$):</strong> The percentage of injected failure states from which the agent autonomously recovers to full task completion.</li></ul><pre><code># Fault Injection Benchmark Matrix:
+# Test Case | Injected Fault             | Target Behavior                       | Result
+# ----------------------------------------------------------------------------------------
+# TC_01     | Missing import in test     | Read traceback, add import to src/    | PASS (1 turn)
+# TC_02     | Read-only database table   | Stop writing, explain permission error| PASS
+# TC_03     | Flaky test failure         | Read line 42, fix underlying logic    | PASS
+# Overall Recovery Resilience Score: 94.2%</code></pre><div class="callout"><p><strong>The Chaos Engineering Analogy:</strong> Just like Chaos Monkey injects server failures to test infrastructure, fault injection in agent evals tests cognitive self-healing.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the failure resilience sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to benchmark agent failure recovery and cognitive resilience using fault injection.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where evaluating failure recovery and error resilience applies.</li>
+    <li>Author a unit test or verification script exercising evaluating failure recovery and error resilience.</li>
+    <li>Document team architectural conventions regarding evaluating failure recovery and error resilience.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Evaluating Failure Recovery and Error Resilience.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is 'Failure Recovery Evaluation' in autonomous agent benchmarking?",
+    a: ["Deliberately introducing errors (like broken syntax, missing files, or failing tests) and measuring how effectively the agent diagnoses and recovers","Testing if the computer can survive being dropped","Checking if the power cord is plugged in","Measuring hard drive noise"],
+    c: 0,
+    why: "Failure recovery evals measure the agent's ability to self-correct when confronted with unexpected obstacles."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1. Inject Fault",
+            "lines": [
+                  "Break syntax on line 12",
+                  "Or mock 403 Permission Denied"
+            ]
+      },
+      {
+            "title": "2. Agent Observes Failure",
+            "lines": [
+                  "Receives traceback in tool result",
+                  "Enters diagnosis phase"
+            ]
+      },
+      {
+            "title": "3. Evaluate Recovery",
+            "lines": [
+                  "Did agent fix root cause in 1 turn?",
+                  "Did it thrash or cheat? (Grade resilience)"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Evaluating Failure Recovery and Error Resilience",
+      "def execute_flow():",
+      "    # Resilience benchmarking: testing how agents respon...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Evaluating Failure Recovery and Error Resilience"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Resilient Agent"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Fragile Agent"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Failure recovery evaluation uses fault {1} to measure how effectively agents diagnose unexpected obstacles and achieve autonomous {2}."
+],
+    blanks: [
+      {
+            "a": [
+                  "injection"
+            ],
+            "why": "Deliberately introducing errors"
+      },
+      {
+            "a": [
+                  "self-healing"
+            ],
+            "why": "Autonomous recovery and repair"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is 'Fault Injection' in AI agent evaluation?",
+      a: ["Deliberately introducing artificial errors (like broken imports, database timeouts, or permission errors) to test agent recovery","Injecting electricity into computer chips","A technique for hacking websites","A type of SQL injection attack"],
+      c: 0,
+      why: "Fault injection tests whether agents can self-correct when things go wrong."
+    },
+    {
+      q: "What is the 'Recovery in One Turn' metric?",
+      a: ["The percentage of times an agent successfully fixes an encountered error on its very next tool call without thrashing","The speed of the network router","The time to download a file","The number of lines of code"],
+      c: 0,
+      why: "One-turn recovery measures rapid, accurate diagnostic comprehension."
+    },
+    {
+      q: "What should an evaluation harness do if an agent resolves a failing test by deleting the test file?",
+      a: ["Fail the evaluation immediately with a 0% score and flag the agent for sycophantic cheating","Give the agent a 100% score","Congratulate the agent","Delete the repository"],
+      c: 0,
+      why: "Deleting or weakening tests is an anti-pattern that must be penalized in evaluation."
+    },
+    {
+      q: "How does testing resilience against 403 Forbidden errors protect production systems?",
+      a: ["It verifies that when an agent is denied permission to an action, it halts and explains the limitation rather than trying destructive workarounds","It makes servers run for free","It turns off the internet","It encrypts the hard drive"],
+      c: 0,
+      why: "Agents must respect security boundaries gracefully when operations are forbidden."
+    }
+  ]);
+</script>
+</body>
+</html>

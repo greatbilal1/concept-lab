@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 08 — Penetration Testing and Hardening a Web Application</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="web-security" data-lesson="8" data-lesson-id="penetration-testing-and-hardening">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 08</span> · Hardening</span>
+
+  <h1 class="lesson-title">Penetration Testing and Hardening a Web Application</h1>
+  <p class="lesson-lede">
+    Synthesizing web security: penetration testing tools (ZAP, Burp Suite), automated vulnerability scanning, and hardening checklists.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You have completed the Web Application Security course.</span>
+    <span><b>Mission link</b> Mastering penetration testing and hardening a web application across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Penetration Testing and Hardening a Web Application</h2>
+  <p>We have covered the complete landscape of Web Application Security: the OWASP Top 10, SQL and command injection, XSS defenses, CSRF and SameSite cookies, IDOR and broken access control, browser security headers, and secure API design.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Synthesizing web security: penetration testing tools (ZAP, Burp Suite), automated vulnerability scanning, and hardening checklists.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Security Testing Pipeline</h2>
+  <p>Now, we synthesize these into a <strong>Web Application Hardening & Penetration Testing Workflow</strong>:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>The Battle-Hardened Application</h2>
+  <ul><li><strong>1. Automated DAST Scanning (OWASP ZAP / Burp Suite):</strong> Run automated dynamic application security testing (DAST) in staging to probe for SQLi, XSS, and missing security headers.</li><li><strong>2. Static Analysis Security Testing (SAST):</strong> Integrate tools like Bandit (Python) and Semgrep into CI to catch hardcoded secrets and vulnerable functions in code commits.</li><li><strong>3. The Production Web Hardening Checklist:</strong><ul><li>[x] All SQL queries use parameterized prepared statements.</li><li>[x] User HTML rendered with DOMPurify; session cookies use <code>HttpOnly; Secure; SameSite=Lax</code>.</li><li>[x] Strict resource-level authorization checks on all endpoints (zero IDOR).</li><li>[x] Security headers enforced: CSP, HSTS (max-age=1 year), X-Frame-Options: DENY.</li><li>[x] Rate limiting active on login and password reset routes.</li></ul></li></ul><pre><code># Running an Automated OWASP ZAP Baseline Scan in CI:
+# (GitHub Actions step)
+- name: ZAP Dynamic Security Scan
+  uses: zaproxy/action-baseline@v0.12.0
+  with:
+    target: 'https://staging.company.com'
+    rules_file_name: '.zap/rules.tsv'
+    fail_action: true # Fails CI if High-severity vulnerability discovered!</code></pre><div class="callout"><p><strong>The Continuous Security Mandate:</strong> Security is not a one-time audit; it is a continuous pipeline. Run automated SAST and DAST scans on every release to ensure new code remains hardened.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the web hardening sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You have completed the Web Application Security course.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where penetration testing and hardening a web application applies.</li>
+    <li>Author a unit test or verification script exercising penetration testing and hardening a web application.</li>
+    <li>Document team architectural conventions regarding penetration testing and hardening a web application.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Penetration Testing and Hardening a Web Application.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is 'Penetration Testing' (Pen Testing) in web application engineering?",
+    a: ["A simulated authorized cyberattack against a software system to evaluate security, discover vulnerabilities, and verify defensive controls","Testing if a pen can write on a screen","Measuring internet cable durability","Writing code as fast as possible"],
+    c: 0,
+    why: "Penetration testing simulates real-world attack techniques to find and patch vulnerabilities before adversaries exploit them."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1. SAST (Static Code Scan)",
+            "lines": [
+                  "Semgrep / Bandit scans source code in CI",
+                  "Catches hardcoded secrets & unsafe sinks"
+            ]
+      },
+      {
+            "title": "2. DAST (Dynamic Web Probe)",
+            "lines": [
+                  "OWASP ZAP probes running staging app",
+                  "Tests real endpoints for SQLi, XSS, & headers"
+            ]
+      },
+      {
+            "title": "3. Manual Pen Testing",
+            "lines": [
+                  "Human ethical hacker probes business logic",
+                  "Catches subtle IDOR and workflow bypasses"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Penetration Testing and Hardening a Web Application",
+      "def execute_flow():",
+      "    # Synthesizing web security: penetration testing too...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Penetration Testing and Hardening a Web Application"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Hardened Web Perimeter"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Web application hardening combines static code analysis (SAST) with dynamic vulnerability scanning (DAST) using tools like OWASP {1} to verify {2} controls."
+],
+    blanks: [
+      {
+            "a": [
+                  "ZAP"
+            ],
+            "why": "Zed Attack Proxy open-source tool"
+      },
+      {
+            "a": [
+                  "security"
+            ],
+            "why": "Defensive controls and safeguards"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the difference between SAST (Static Application Security Testing) and DAST (Dynamic Application Security Testing)?",
+      a: ["SAST scans source code directly without running the application; DAST tests a running web application by sending real HTTP attack probes","SAST is for hardware; DAST is for software","SAST only runs on Windows","They are identical tools"],
+      c: 0,
+      why: "SAST inspects source code; DAST probes active running web applications from the outside."
+    },
+    {
+      q: "What popular open-source tool is maintained by OWASP for dynamic vulnerability scanning?",
+      a: ["OWASP ZAP (Zed Attack Proxy)","Photoshop","React Native","Flask"],
+      c: 0,
+      why: "OWASP ZAP is the world's most widely used open-source dynamic web vulnerability scanner."
+    },
+    {
+      q: "Why is automated security scanning in CI/CD pipelines superior to annual manual security audits alone?",
+      a: ["CI/CD scanning catches newly introduced vulnerabilities immediately on pull requests before vulnerable code reaches production","Annual audits are illegal","CI/CD scanning eliminates the need for software engineering","It makes servers free"],
+      c: 0,
+      why: "Continuous automated scanning prevents vulnerabilities from slipping into production between manual audits."
+    },
+    {
+      q: "What is the ultimate mark of an expert web security engineer?",
+      a: ["Building web applications that are secure by default: parameterized queries, sanitized DOMs, SameSite cookies, and strict authorization on every endpoint","Using the longest possible passwords","Banning user logins","Writing code in assembly language"],
+      c: 0,
+      why: "Architecting applications that are secure by design neutralizes entire classes of vulnerabilities automatically."
+    }
+  ]);
+</script>
+</body>
+</html>

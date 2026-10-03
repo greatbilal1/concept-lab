@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 07 — Security, Authentication, and Permission Scoping in MCP</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="mcp" data-lesson="7" data-lesson-id="mcp-security-authentication-permissions">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 07</span> · MCP Security</span>
+
+  <h1 class="lesson-title">Security, Authentication, and Permission Scoping in MCP</h1>
+  <p class="lesson-lede">
+    Securing tool-connected systems: OAuth2 authentication, permission scoping, read-only roots, and human-in-the-loop approval.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to enforce permissions, root scoping, and security boundaries in MCP architectures.</span>
+    <span><b>Mission link</b> Mastering security, authentication, and permission scoping in mcp across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Security, Authentication, and Permission Scoping in MCP</h2>
+  <p>Connecting an AI model to an MCP server gives that model <strong>real-world power</strong> over your files, databases, and APIs. If you connect an MCP server with a tool <code>delete_database_table()</code>, you must ensure that malicious prompt injections cannot trick the model into executing catastrophic commands.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Securing tool-connected systems: OAuth2 authentication, permission scoping, read-only roots, and human-in-the-loop approval.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Three MCP Security Tiers</h2>
+  <p>The three security boundaries in the Model Context Protocol:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Directory Traversal Protection</h2>
+  <ul><li><strong>1. Client-Side Confirmation Prompts:</strong> The MCP client (e.g. Claude Desktop or Cursor) acts as the security guardian. When a tool is invoked, the client displays an explicit prompt: <em>'The agent wants to execute `edit_file` on `src/auth.py`. Allow once or Always allow?'</em></li><li><strong>2. Roots and File Scoping:</strong> In file servers, clients declare explicit <code>roots</code>: <em>'You are permitted to access ONLY `/Users/alice/projects/billing/`; all other directories are strictly forbidden.'</em></li><li><strong>3. Remote Authentication (OAuth2 / Bearer Tokens):</strong> When using remote SSE servers, secure the endpoints using industry-standard Bearer tokens or OAuth2 workflows to verify client identity.</li></ul><pre><code># Secure Root Scoping in MCP Filesystem Server:
+# The server enforces that all paths must reside within approved roots:
+def validate_path(requested_path: str, approved_roots: list[str]):
+    resolved = os.path.realpath(requested_path)
+    if not any(resolved.startswith(root) for root in approved_roots):
+        raise PermissionError(f"Access denied: Path '{resolved}' is outside approved project roots!")
+    return resolved</code></pre><div class="callout"><p><strong>The Golden Security Rule:</strong> Never run an unvetted third-party MCP server with root privileges on your machine. Inspect what tools a server exposes before adding it to your configuration!</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the MCP security sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to enforce permissions, root scoping, and security boundaries in MCP architectures.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where security, authentication, and permission scoping in mcp applies.</li>
+    <li>Author a unit test or verification script exercising security, authentication, and permission scoping in mcp.</li>
+    <li>Document team architectural conventions regarding security, authentication, and permission scoping in mcp.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Security, Authentication, and Permission Scoping in MCP.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Why is human-in-the-loop confirmation particularly critical in MCP client applications?",
+    a: ["MCP servers can expose powerful local tools (like editing files or deleting database rows); clients must prompt users before executing destructive actions","Models refuse to run tools without human applause","Computers run out of RAM during tool calls","It is required by the US Constitution"],
+    c: 0,
+    why: "Clients act as the security boundary, prompting humans for explicit authorization before executing destructive server tools."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1. Client Confirmation Gate",
+            "lines": [
+                  "Prompts user: 'Allow tool call?'",
+                  "Human must authorize sensitive actions"
+            ]
+      },
+      {
+            "title": "2. Filesystem Root Scoping",
+            "lines": [
+                  "Constrained strictly to project folder",
+                  "Blocks directory traversal (../etc/passwd)"
+            ]
+      },
+      {
+            "title": "3. Remote Network Auth",
+            "lines": [
+                  "OAuth2 / Bearer token on SSE",
+                  "Guarantees tenant isolation in cloud"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Security, Authentication, and Permission Scoping in MCP",
+      "def execute_flow():",
+      "    # Securing tool-connected systems: OAuth2 authentica...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Security, Authentication, and Permission Scoping in MCP"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Malicious Tool Call"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Root Validation Defense"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "MCP clients enforce security through human {1} dialogs, while servers protect filesystems by scoping access to approved {2} directories."
+],
+    blanks: [
+      {
+            "a": [
+                  "confirmation"
+            ],
+            "why": "Manual approval prompts"
+      },
+      {
+            "a": [
+                  "root"
+            ],
+            "why": "Top-level authorized folders"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is a 'Path Traversal' attack and how does an MCP filesystem server prevent it?",
+      a: ["An attacker uses '../' sequences to escape the project directory; servers resolve canonical real paths to ensure files stay inside approved roots","An attack that renames folders","A bug in the keyboard","A compiler error"],
+      c: 0,
+      why: "Resolving canonical paths ensures requests cannot break out of designated directory roots."
+    },
+    {
+      q: "Why does Claude Desktop ask 'Allow this action?' before executing certain MCP tools?",
+      a: ["It enforces human-in-the-loop authorization to ensure users are aware of and approve actions that access external data or modify files","It has forgotten the user's name","It is testing the user's patience","To reduce battery usage"],
+      c: 0,
+      why: "Confirmation dialogs provide user agency and prevent unintended automated side effects."
+    },
+    {
+      q: "What authentication header is standard when connecting an MCP client to a remote SSE server across the web?",
+      a: ["Authorization: Bearer <token>","Content-Type: text/plain","User-Agent: Mozilla","Host: localhost"],
+      c: 0,
+      why: "Standard Bearer token authorization validates client identity over HTTP."
+    },
+    {
+      q: "Why should you never add an untrusted, unvetted MCP server to your desktop configuration?",
+      a: ["Local MCP servers execute code as child processes on your laptop with your user permissions, creating severe security risks if malicious","It makes your screen black","It turns off the internet","It deletes your browser history"],
+      c: 0,
+      why: "Local servers run with the user's permissions and must be audited for safety before installation."
+    }
+  ]);
+</script>
+</body>
+</html>

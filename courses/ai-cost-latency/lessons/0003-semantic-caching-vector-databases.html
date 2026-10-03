@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 03 — Semantic Caching with Vector Databases (GPTCache)</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="ai-cost-latency" data-lesson="3" data-lesson-id="semantic-caching-vector-databases">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 03</span> · Semantic Caching</span>
+
+  <h1 class="lesson-title">Semantic Caching with Vector Databases (GPTCache)</h1>
+  <p class="lesson-lede">
+    Zero-latency response reuse: embedding user queries, cosine similarity thresholds, and caching responses with GPTCache and Redis.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to architect and configure semantic vector caches to eliminate redundant LLM calls.</span>
+    <span><b>Mission link</b> Mastering semantic caching with vector databases (gptcache) across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Semantic Caching with Vector Databases (GPTCache)</h2>
+  <p>In traditional web development, caches use exact key matching: <code>cache.get(hash(query_string))</code>. But in conversational AI, users never type the exact same string twice: <em>'How do I cancel?'</em>, <em>'Cancel my account please'</em>, and <em>'I want to unsubscribe'</em> are three different strings with the exact same intent.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Zero-latency response reuse: embedding user queries, cosine similarity thresholds, and caching responses with GPTCache and Redis.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Exact Match vs Semantic Caching</h2>
+  <p><strong>Semantic Caching</strong> brings caching to natural language:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>The Semantic Cache Pipeline</h2>
+  <ul><li><strong>1. Vector Embedding Lookup:</strong> When a user query arrives, embed it using a fast embedding model (e.g. `text-embedding-3-small` in 10ms).</li><li><strong>2. Similarity Search:</strong> Query a vector cache index (Redis Vector Store, Qdrant) for the nearest neighbor vector.</li><li><strong>3. Cosine Threshold ($\ge 0.96$):</strong> If the nearest cached query has cosine similarity $\ge 0.96$, <strong>return the cached answer instantly!</strong></li><li><strong>4. Zero-Cost, 15ms Response:</strong> You deliver a high-quality answer in 15ms at $0.00001$ embedding cost, bypassing the $0.03$ LLM call entirely!</li></ul><pre><code># Semantic Caching with Redis & Embeddings in Python:
+async def get_ai_response_with_semantic_cache(user_query: str) -> str:
+    query_vector = embed(user_query)
+    match = await redis_vector_store.find_nearest(query_vector, threshold=0.96)
+    
+    if match:
+        logger.info(f"Semantic cache HIT! (Similarity: {match.score:.3f})")
+        return match.cached_response # 15ms response, $0.00 LLM cost!
+        
+    # Cache MISS -> Call LLM & save to cache
+    response_text = await call_llm(user_query)
+    await redis_vector_store.save(query_vector, response_text, ttl=86400)
+    return response_text</code></pre><div class="callout"><p><strong>The High-Traffic Superpower:</strong> In customer support and documentation search, 30% to 50% of incoming queries are semantic duplicates. Semantic caching slashes total LLM bills in half overnight.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the semantic caching sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to architect and configure semantic vector caches to eliminate redundant LLM calls.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where semantic caching with vector databases (gptcache) applies.</li>
+    <li>Author a unit test or verification script exercising semantic caching with vector databases (gptcache).</li>
+    <li>Document team architectural conventions regarding semantic caching with vector databases (gptcache).</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Semantic Caching with Vector Databases (GPTCache).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is a 'Semantic Cache' and how does it differ from a traditional exact-match web cache?",
+    a: ["A semantic cache matches queries based on embedding vector similarity rather than exact string equality, returning cached answers for rephrased questions","A cache for storing dictionary words","A cache that uses grammar rules","A web browser history file"],
+    c: 0,
+    why: "Semantic caches recognize that 'How do I cancel?' and 'Where can I cancel my plan?' share the same meaning and answer."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Exact-Match Cache (Fails)",
+            "lines": [
+                  "Key: 'How do I refund?'",
+                  "User asks: 'Can I get a refund?'",
+                  "Result: CACHE MISS (Different strings!)"
+            ]
+      },
+      {
+            "title": "Semantic Cache (Succeeds)",
+            "lines": [
+                  "cos(Query A, Query B) = 0.98",
+                  "Result: CACHE HIT! (Same meaning)",
+                  "Returns answer in 15ms at zero LLM cost!"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Semantic Caching with Vector Databases (GPTCache)",
+      "def execute_flow():",
+      "    # Zero-latency response reuse: embedding user querie...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Semantic Caching with Vector Databases (GPTCache)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "1. Embed Query (10ms)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "2. Vector Index Check"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "step": "3. Fallback to LLM"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Semantic caching intercepts queries by computing embedding {1} similarity against previously answered questions, returning cached answers at sub-20ms {2}."
+],
+    blanks: [
+      {
+            "a": [
+                  "vector"
+            ],
+            "why": "Mathematical representation of meaning"
+      },
+      {
+            "a": [
+                  "latency"
+            ],
+            "why": "Response turnaround time"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What happens if the semantic cache similarity threshold is set too low (e.g. 0.80 instead of 0.96)?",
+      a: ["False cache hits: the system returns cached answers to queries that are subtly different in intent, confusing users","The cache deletes all data","The server runs out of RAM","The computer restarts"],
+      c: 0,
+      why: "Low thresholds match superficially related queries that actually require different answers."
+    },
+    {
+      q: "What open-source library is specifically designed for building semantic caches for LLMs?",
+      a: ["GPTCache","Photoshop","Git","React"],
+      c: 0,
+      why: "GPTCache is the dedicated open-source framework for semantic response caching."
+    },
+    {
+      q: "Why should personalized, user-specific data (like 'What is my current balance?') NEVER be stored in a shared semantic cache?",
+      a: ["It would leak User A's private personal account details to User B if they ask a similar question","It takes too much hard drive space","It slows down the vector database","It is forbidden by Python syntax"],
+      c: 0,
+      why: "Shared caches must only store public, generic answers to prevent cross-tenant data leaks."
+    },
+    {
+      q: "How does setting a Time-to-Live (TTL) on cached items protect response freshness?",
+      a: ["It automatically evicts stale answers after a period (e.g. 24 hours), ensuring answers reflect updated documentation","It deletes the database","It turns off the server","It speeds up network cables"],
+      c: 0,
+      why: "TTLs ensure that answers are refreshed periodically as policies and documentation evolve."
+    }
+  ]);
+</script>
+</body>
+</html>

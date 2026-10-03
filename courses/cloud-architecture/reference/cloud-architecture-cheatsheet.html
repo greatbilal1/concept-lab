@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cloud Architecture — Cheat Sheet</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+<style>
+  .ref-toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0 8px; }
+  .ref-toc a { font-size: .8rem; border: 1px solid var(--border); background: #111a30; padding: 5px 11px; border-radius: 999px; color: var(--muted); text-decoration: none; border-bottom: 1px solid var(--border); }
+  .ref-toc a:hover { color: #fff; border-color: #3d5488; }
+  .lesson-wrap h2 { scroll-margin-top: 20px; }
+  .snippet { margin: 14px 0 22px; }
+  .snippet .lbl { font-size: .72rem; font-weight: 800; letter-spacing: .7px; text-transform: uppercase; color: var(--accent2); margin-bottom: 6px; }
+  .see { font-size: .82rem; color: var(--muted); margin: -6px 0 12px; }
+  .see a { color: var(--accent2); border-bottom: 0; }
+  .see a:hover { color: #fff; }
+  .snippet pre { padding-top: 34px; }
+  @media print { .snippet pre { padding-top: 18px; } }
+</style>
+</head>
+<body class="lesson-body" data-course="cloud-architecture">
+
+<div class="lesson-wrap">
+
+  <span class="lesson-kicker">Reference · Cheat sheet</span>
+  <h1 class="lesson-title">Cloud Architecture — Cheat Sheet</h1>
+  <p class="lesson-lede">
+    The whole course on one page. Every snippet links back to the lesson that
+    teaches it.
+  </p>
+
+  <div class="ref-toc">
+    <a href="#sec-1">AWS S3 Pre-Signed Upload URL (Python)</a>
+    <a href="#sec-2">Terraform Multi-AZ VPC Subnet (HCL)</a>
+    <a href="#sec-3">AWS Service Control Policy (SCP)</a>
+    <a href="#sec-4">RDS PostgreSQL Multi-AZ Terraform</a>
+  </div>
+
+  <h2 id="sec-1"><span class="n">1</span>AWS S3 Pre-Signed Upload URL (Python)</h2>
+  <div class="snippet">
+    <div class="lbl">Direct-to-S3 client upload delegation</div>
+    <pre><code>import boto3
+s3 = boto3.client('s3')
+url = s3.generate_presigned_url(
+    ClientMethod='put_object',
+    Params={'Bucket': 'company-assets', 'Key': 'uploads/doc.pdf'},
+    ExpiresIn=3600
+) # Client uploads directly to URL without hitting app server!</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0004-cloud-storage-hierarchy-s3-ebs-efs.html">Lesson 04 — Cloud Storage Hierarchy: Object, Block, and File Storage</a>.</p>
+
+  <h2 id="sec-2"><span class="n">2</span>Terraform Multi-AZ VPC Subnet (HCL)</h2>
+  <div class="snippet">
+    <div class="lbl">Declarative network subnet definition</div>
+    <pre><code>resource "aws_subnet" "private_app_a" {
+  vpc_id            = aws_vpc.main.id
+  cidr_block        = "10.0.2.0/24"
+  availability_zone = "us-east-1a"
+  tags = { Name = "private-app-us-east-1a" }
+}</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0002-virtual-private-clouds-subnets-routing.html">Lesson 02 — Virtual Private Clouds (VPC): Subnets, Gateways, and Route Tables</a>.</p>
+
+  <h2 id="sec-3"><span class="n">3</span>AWS Service Control Policy (SCP)</h2>
+  <div class="snippet">
+    <div class="lbl">Restricting allowed geographic cloud regions</div>
+    <pre><code>{
+  "Effect": "Deny",
+  "NotAction": ["iam:*", "organizations:*", "route53:*", "cloudfront:*"],
+  "Resource": "*",
+  "Condition": { "StringNotEquals": { "aws:RequestedRegion": ["us-east-1"] } }
+}</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0005-enterprise-iam-identity-federation.html">Lesson 05 — IAM and Identity Federation at Enterprise Scale</a>.</p>
+
+  <h2 id="sec-4"><span class="n">4</span>RDS PostgreSQL Multi-AZ Terraform</h2>
+  <div class="snippet">
+    <div class="lbl">Synchronous cross-AZ database replication</div>
+    <pre><code>resource "aws_db_instance" "database" {
+  allocated_storage = 50
+  engine            = "postgres"
+  instance_class    = "db.m6g.large"
+  multi_az          = true # Automated synchronous cross-AZ failover!
+  skip_final_snapshot = false
+}</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0008-architecting-highly-available-cloud.html">Lesson 08 — Architecting a Highly Available, Fault-Tolerant Cloud Infrastructure</a>.</p>
+
+  <div class="lesson-foot">
+    <div class="links">
+      <a href="cloud-architecture-glossary.html">📖 Glossary</a>
+      <a href="../course.html">← Course map</a>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 04 — Distributed Context and Session Storage (Redis, PostgreSQL)</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="production-ai-architecture" data-lesson="4" data-lesson-id="distributed-context-session-storage">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 04</span> · Session Storage</span>
+
+  <h1 class="lesson-title">Distributed Context and Session Storage (Redis, PostgreSQL)</h1>
+  <p class="lesson-lede">
+    Managing multi-turn state: stateless app servers, fast sliding session windows in Redis, persistent archival in PostgreSQL, and context pruning.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to architect distributed context and session memory across Redis and PostgreSQL.</span>
+    <span><b>Mission link</b> Mastering distributed context and session storage (redis, postgresql) across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Distributed Context and Session Storage (Redis, PostgreSQL)</h2>
+  <p>In a production Kubernetes cluster with 20 backend pods, User Turn 1 might hit Pod A, while User Turn 2 hits Pod B. If you store conversation messages in a local Python list (`session_history = []`), <strong>Pod B has zero memory of Turn 1</strong>! Modern AI backends must be completely <strong>stateless</strong>.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Managing multi-turn state: stateless app servers, fast sliding session windows in Redis, persistent archival in PostgreSQL, and context pruning.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Two-Tier Session Architecture</h2>
+  <p>The <strong>Two-Tier Distributed Context Architecture</strong>:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Sliding Window Context Pruning</h2>
+  <ul><li><strong>1. Tier 1: Fast Ephemeral Session Cache (Redis):</strong> Stores the active sliding window of the last 10-20 turns in Redis Lists or JSON. Retrievable in <strong>under 2 milliseconds</strong>. Configured with a 7-day TTL.</li><li><strong>2. Tier 2: Persistent Relational History (PostgreSQL):</strong> Stores complete immutable conversation transcripts, user metadata, token counts, and feedback scores for long-term audits and analytics.</li><li><strong>3. Context Pruning & Summarization:</strong> When a conversation exceeds the model's optimal window (e.g. $> 8,000$ tokens), a background worker summarizes older turns into a compact paragraph: <code>[Summary of Turns 1-15] + [Verbatim Turns 16-20]</code>.</li></ul><pre><code># The Stateless Session Hydration Pattern:
+async def chat_endpoint(session_id: str, new_user_message: str):
+    # 1. Hydrate active session window from Redis in 1.5ms
+    active_history = await redis.lrange(f"session:{session_id}:window", 0, -1)
+    
+    # 2. Append new message & call LLM
+    response = await llm_generate(active_history + [new_user_message])
+    
+    # 3. Asynchronously update Redis window & persist to PostgreSQL
+    await redis.rpush(f"session:{session_id}:window", new_user_message, response.text)
+    asyncio.create_task(db.save_message_pair(session_id, new_user_message, response.text))
+    
+    return {"answer": response.text}</code></pre><div class="callout"><p><strong>The Stateless Rule:</strong> Application pods must be cattle, not pets. Any pod should be able to crash or restart without losing a single token of user conversation state.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the session storage sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to architect distributed context and session memory across Redis and PostgreSQL.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where distributed context and session storage (redis, postgresql) applies.</li>
+    <li>Author a unit test or verification script exercising distributed context and session storage (redis, postgresql).</li>
+    <li>Document team architectural conventions regarding distributed context and session storage (redis, postgresql).</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Distributed Context and Session Storage (Redis, PostgreSQL).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Why must AI conversation history be stored in an external distributed data store rather than server local memory?",
+    a: ["In distributed cloud architectures, user requests hit different server instances; external stores ensure conversation state is available on any node","Server memory cannot store text","Local memory is illegal under GDPR","External stores make models smarter"],
+    c: 0,
+    why: "Stateless application nodes rely on centralized stores (Redis/Postgres) so any node can serve any turn of a conversation."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Tier 1: Redis In-Memory Cache (1ms)",
+            "lines": [
+                  "Active sliding window of last 10 turns",
+                  "Hydrates prompt context instantly on any pod",
+                  "Configured with 7-day rolling TTL"
+            ]
+      },
+      {
+            "title": "Tier 2: PostgreSQL Persistent Store",
+            "lines": [
+                  "Complete immutable conversation audit trail",
+                  "Stores token spend, feedback, & timestamps",
+                  "Used for analytics & long-term history"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Distributed Context and Session Storage (Redis, PostgreSQL)",
+      "def execute_flow():",
+      "    # Managing multi-turn state: stateless app servers, ...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Distributed Context and Session Storage (Redis, PostgreSQL)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Summary of Older Turns"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Verbatim Recent Turns"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Stateless AI platforms store active sliding conversation windows in {1} for sub-2ms retrieval while archiving complete transcripts in {2} for persistence."
+],
+    blanks: [
+      {
+            "a": [
+                  "Redis"
+            ],
+            "why": "In-memory key-value store"
+      },
+      {
+            "a": [
+                  "PostgreSQL"
+            ],
+            "why": "Relational database system"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why is keeping application backend pods completely stateless essential for autoscaling?",
+      a: ["Pods can scale from 2 to 50 instances dynamically during traffic surges without worrying about which specific pod holds a user's session","Stateless pods use no electricity","Stateful pods cannot run Python","It is required by copyright law"],
+      c: 0,
+      why: "Statelessness allows load balancers to distribute traffic freely across any available container instance."
+    },
+    {
+      q: "What is the purpose of sliding window context pruning in long chat sessions?",
+      a: ["It prevents the prompt from growing indefinitely into tens of thousands of tokens, controlling costs and avoiding context window overflow","It deletes old customer accounts","It changes the font size","It translates text to Spanish"],
+      c: 0,
+      why: "Sliding windows bound token consumption and keep prompt sizes predictable."
+    },
+    {
+      q: "How does using an asynchronous background task (e.g. asyncio.create_task) to write to PostgreSQL optimize user response times?",
+      a: ["The response is returned to the user immediately after writing to fast Redis, without waiting for the slower disk database write to complete","It makes the database free","It turns off logging","It encrypts the hard drive"],
+      c: 0,
+      why: "Decoupling persistent database writes from the critical path minimizes user latency."
+    },
+    {
+      q: "What Redis data structure is commonly used to maintain a rolling sliding window of messages?",
+      a: ["Redis Lists (using RPUSH and LTRIM commands)","Redis Bitmaps","Redis HyperLogLog","Redis Streams only"],
+      c: 0,
+      why: "RPUSH combined with LTRIM maintains a fixed-capacity list of recent messages with O(1) performance."
+    }
+  ]);
+</script>
+</body>
+</html>

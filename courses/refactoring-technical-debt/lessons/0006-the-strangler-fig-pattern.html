@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 06 — The Strangler Fig Pattern for Large Refactors</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="refactoring-technical-debt" data-lesson="6" data-lesson-id="the-strangler-fig-pattern">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 06</span> · Architectural Refactoring</span>
+
+  <h1 class="lesson-title">The Strangler Fig Pattern for Large Refactors</h1>
+  <p class="lesson-lede">
+    Replacing large legacy systems incrementally using the Strangler Fig pattern without risky big-bang rewrites.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to safely decompose legacy monoliths using the Strangler Fig pattern.</span>
+    <span><b>Mission link</b> Mastering the strangler fig pattern for large refactors across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of The Strangler Fig Pattern for Large Refactors</h2>
+  <p>When faced with a massive, terrifying legacy monolith, management or frustrated engineers often propose: <em>'Let's throw it all away and do a complete rewrite from scratch!'</em> History proves this is almost always a catastrophe. While the team spends 18 months rebuilding the system, the old system must still be maintained, business requirements drift, and the rewrite launches with a mountain of fresh bugs.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Replacing large legacy systems incrementally using the Strangler Fig pattern without risky big-bang rewrites.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Strangler Fig Migration</h2>
+  <p>Martin Fowler named the alternative after Australian vines: the <strong>Strangler Fig Pattern</strong>. A strangler fig seed germinates in the branches of a host tree, slowly grows roots downward toward the soil, and gradually envelops the host tree until the old tree rots away and only the new fig tree remains.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Big Bang vs Strangler Fig Risk Profile</h2>
+  <p>In software, you replace a legacy system <strong>one endpoint or capability at a time</strong>:</p><ul><li><strong>1. Intercept:</strong> Place a proxy or API gateway (like NGINX, Cloudflare, or an in-app router) in front of the legacy monolith.</li><li><strong>2. Carve Out:</strong> Build the first small capability (e.g. `/api/v2/notifications`) in the clean new service.</li><li><strong>3. Route:</strong> Configure the gateway to route `/notifications` traffic to the new service while all other traffic goes to the monolith.</li><li><strong>4. Repeat:</strong> Gradually migrate endpoints until the monolith handles 0% of traffic and can be decommissioned safely.</li></ul><pre><code># Architectural Gateway Routing (Strangler Fig)
+# incoming: /api/v1/billing      -> Legacy Monolith (Old)
+# incoming: /api/v1/auth         -> Legacy Monolith (Old)
+# incoming: /api/v1/notifications -> Modern Service (New! Migrated!)</code></pre><div class="callout"><p><strong>The Superpower:</strong> The Strangler Fig delivers immediate business value from week one. If a new microservice has a bug, you can revert traffic back to the monolith in seconds at the gateway.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Fill in the Strangler Fig migration terms</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to safely decompose legacy monoliths using the Strangler Fig pattern.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where the strangler fig pattern for large refactors applies.</li>
+    <li>Author a unit test or verification script exercising the strangler fig pattern for large refactors.</li>
+    <li>Document team architectural conventions regarding the strangler fig pattern for large refactors.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for The Strangler Fig Pattern for Large Refactors.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Why do 'Big Bang' total software rewrites fail so frequently?",
+    a: ["The legacy system continues moving forward while the rewrite takes years, accumulates scope creep, and ships with new bugs","Rewriting code is prohibited by modern cloud providers","Rewrites can only be performed in C++","Developers forget how to code after two years"],
+    c: 0,
+    why: "Big-bang rewrites take too long, aim at moving targets, and forfeit iterative customer feedback."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Phase 1: Intercept",
+            "lines": [
+                  "Proxy in front of monolith",
+                  "100% traffic to monolith"
+            ]
+      },
+      {
+            "title": "Phase 2: Migrate Slice",
+            "lines": [
+                  "Build Notifications service",
+                  "Route /notifications to new service"
+            ]
+      },
+      {
+            "title": "Phase 3: Decommission",
+            "lines": [
+                  "Monolith shrinks to empty shell",
+                  "Safely unplug old servers"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing The Strangler Fig Pattern for Large Refactors",
+      "def execute_flow():",
+      "    # Replacing large legacy systems incrementally using...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "The Strangler Fig Pattern for Large Refactors"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Big Bang Rewrite"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Strangler Fig"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The Strangler Fig pattern places a {1} in front of legacy software to incrementally route traffic to new {2} services."
+],
+    blanks: [
+      {
+            "a": [
+                  "proxy gateway"
+            ],
+            "why": "Reverse proxy or router like NGINX"
+      },
+      {
+            "a": [
+                  "modern"
+            ],
+            "why": "Clean replacement services"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the core benefit of the Strangler Fig pattern over a complete rewrite?",
+      a: ["It delivers continuous value in production while allowing instant rollback if a migrated service fails","It allows developers to stop writing unit tests","It eliminates the need for database migrations","It runs both systems on a single CPU core"],
+      c: 0,
+      why: "Incremental migration avoids catastrophic big-bang release risks and provides immediate value."
+    },
+    {
+      q: "What component sits between incoming client requests and the two systems in a Strangler Fig architecture?",
+      a: ["An API gateway or reverse proxy that routes requests based on URL path or headers","A continuous integration build runner","A manual QA verification station","A database foreign key constraint"],
+      c: 0,
+      why: "The proxy/gateway intercepts traffic and directs requests to either the legacy or new service."
+    },
+    {
+      q: "What happens if a newly migrated service in a Strangler Fig setup crashes in production?",
+      a: ["Traffic can be rerouted back to the legacy system at the proxy level in seconds","The entire internet connection goes down","The database tables are permanently deleted","Developers must rewrite the application from scratch"],
+      c: 0,
+      why: "The existing legacy system remains functional as a safety net during early migration stages."
+    },
+    {
+      q: "When is the legacy system finally turned off in a Strangler Fig migration?",
+      a: ["When 100% of functional capabilities have been migrated and the legacy system handles zero traffic","After the first two weeks of the project","As soon as the proxy gateway is installed","Never; the legacy system must run forever"],
+      c: 0,
+      why: "Once all routes and features are successfully migrated, the old monolith is decommissioned safely."
+    }
+  ]);
+</script>
+</body>
+</html>

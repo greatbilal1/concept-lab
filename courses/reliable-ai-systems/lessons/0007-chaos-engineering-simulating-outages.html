@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 07 — Chaos Engineering for AI: Simulating Degradation and Outages</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="reliable-ai-systems" data-lesson="7" data-lesson-id="chaos-engineering-simulating-outages">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 07</span> · AI Chaos</span>
+
+  <h1 class="lesson-title">Chaos Engineering for AI: Simulating Degradation and Outages</h1>
+  <p class="lesson-lede">
+    Chaos testing for AI: simulating provider rate limits, network latency spikes, corrupted JSON payloads, and testing system recovery.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to design and execute chaos engineering experiments to harden AI platforms against failure.</span>
+    <span><b>Mission link</b> Mastering chaos engineering for ai: simulating degradation and outages across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Chaos Engineering for AI: Simulating Degradation and Outages</h2>
+  <p>You cannot claim your AI system is reliable just because you wrote a circuit breaker. How do you know the circuit breaker actually trips under real load? How do you know your fallback provider activates within 200ms? <strong>You don't hope; you inject chaos</strong>.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Chaos testing for AI: simulating provider rate limits, network latency spikes, corrupted JSON payloads, and testing system recovery.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The 4 AI Chaos Experiments</h2>
+  <p>The Four AI Chaos Experiments:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Proving the Hypotheses</h2>
+  <ul><li><strong>Experiment 1: Injected Provider Rate Limits (HTTP 429):</strong> Mock your primary model API to return HTTP 429 on 100% of requests. <em>Hypothesis:</em> Circuit breaker must trip to OPEN in &lt; 5 seconds, and 100% of traffic must failover to Secondary Provider with zero dropped user requests!</li><li><strong>Experiment 2: Artificial Network Latency Spike:</strong> Inject a 15-second latency delay on upstream API calls. <em>Hypothesis:</em> Client-facing timeout gates must abort upstream calls at 3.0s and engage Level 3 cached fallback!</li><li><strong>Experiment 3: Corrupted Output Payloads:</strong> Inject malformed JSON missing closing brackets into 20% of responses. <em>Hypothesis:</em> Automated Pydantic repair loop must heal syntax with 100% success!</li><li><strong>Experiment 4: Sudden Context Overflow:</strong> Inject an unexpected 150,000-token prompt. <em>Hypothesis:</em> Gateway must reject request with clean 413 Payload Too Large rather than crashing.</li></ul><pre><code># The Chaos Injection Interceptor Pattern in Python:
+class ChaosTestingMiddleware:
+    def __init__(self, failure_rate=0.0, latency_ms=0):
+        self.failure_rate = failure_rate
+        self.latency_ms = latency_ms
+
+    async def intercept_model_call(self, prompt):
+        if random.random() < self.failure_rate:
+            logger.warning("CHAOS INJECTION: Simulating HTTP 429 RateLimit!")
+            raise openai.RateLimitError("Simulated Chaos Outage", response=None, body=None)
+            
+        if self.latency_ms > 0:
+            await asyncio.sleep(self.latency_ms / 1000.0)</code></pre><div class="callout"><p><strong>The Chaos Rule:</strong> Run chaos experiments automatically in staging every week. The best time to discover a broken fallback is in your test pipeline on Tuesday, not during a real cloud outage on Black Friday.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the chaos engineering sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to design and execute chaos engineering experiments to harden AI platforms against failure.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where chaos engineering for ai: simulating degradation and outages applies.</li>
+    <li>Author a unit test or verification script exercising chaos engineering for ai: simulating degradation and outages.</li>
+    <li>Document team architectural conventions regarding chaos engineering for ai: simulating degradation and outages.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Chaos Engineering for AI: Simulating Degradation and Outages.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is 'Chaos Engineering' in modern AI systems architecture?",
+    a: ["The discipline of intentionally injecting synthetic failures (timeouts, rate limits, corrupt JSON) into staging environments to verify system resilience","Breaking physical computer hardware with hammers","Typing random letters into production","Turning off the office lights"],
+    c: 0,
+    why: "Chaos engineering proactively injects realistic failure modes into test systems to prove that defenses work before outages strike."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1. 100% HTTP 429 Rate Limit",
+            "lines": [
+                  "Simulates primary vendor throttling",
+                  "Verifies instant failover to secondary provider"
+            ]
+      },
+      {
+            "title": "2. 15s Latency Hang",
+            "lines": [
+                  "Simulates degraded network transit",
+                  "Verifies timeout cancellation & cache fallback"
+            ]
+      },
+      {
+            "title": "3. Corrupted JSON Injection",
+            "lines": [
+                  "Simulates malformed model output",
+                  "Verifies automated self-healing schema repair"
+            ]
+      },
+      {
+            "title": "4. Massive Token Flood",
+            "lines": [
+                  "Simulates context overflow attack",
+                  "Verifies clean 413 rejection at gateway"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Chaos Engineering for AI: Simulating Degradation and Outages",
+      "def execute_flow():",
+      "    # Chaos testing for AI: simulating provider rate lim...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Chaos Engineering for AI: Simulating Degradation and Outages"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Untested System"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Chaos-Hardened System"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Chaos engineering for AI proactively injects simulated rate limits, latency hangs, and corrupted {1} payloads to prove system {2} before real outages strike."
+],
+    blanks: [
+      {
+            "a": [
+                  "JSON"
+            ],
+            "why": "Data formatting syntax"
+      },
+      {
+            "a": [
+                  "resilience"
+            ],
+            "why": "Ability to recover and survive"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the primary goal of running chaos experiments on AI applications?",
+      a: ["To uncover hidden failure modes, race conditions, and broken fallback configurations under simulated stress before they impact real customers","To break the computers permanently","To delete company data","To slow down the internet"],
+      c: 0,
+      why: "Proactive fault injection reveals architectural weaknesses in controlled environments."
+    },
+    {
+      q: "What should happen during a simulated 100% failure rate chaos test against the primary model provider?",
+      a: ["The circuit breaker should trip immediately and reroute all traffic to the secondary fallback provider with zero failed user requests","The entire application should crash","The database should shut down","Users should see HTTP 500 error screens"],
+      c: 0,
+      why: "A healthy resilient system fails over seamlessly to alternative providers under primary outage."
+    },
+    {
+      q: "Why is testing corrupted JSON output injection valuable?",
+      a: ["It verifies that downstream parsers and automated self-healing repair loops gracefully recover from syntax anomalies without crashing","It makes JSON files smaller","It compiles Python to C","It removes the need for schemas"],
+      c: 0,
+      why: "Injecting malformed payloads validates that defensive parsers and repair prompts operate reliably."
+    },
+    {
+      q: "Where should automated chaos experiments be executed regularly?",
+      a: ["In automated staging and pre-production integration test environments","On production servers during peak business hours without warning","On developer laptops only","Chaos testing should never be executed"],
+      c: 0,
+      why: "Staging environments allow teams to safely validate resilience mechanisms without customer disruption."
+    }
+  ]);
+</script>
+</body>
+</html>

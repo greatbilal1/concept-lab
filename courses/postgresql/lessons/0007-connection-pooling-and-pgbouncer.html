@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 07 — Connection pooling and PgBouncer</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="postgresql" data-lesson="7" data-lesson-id="connection-pooling-and-pgbouncer">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 07</span> · Operations & Backups</span>
+
+  <h1 class="lesson-title">Connection pooling and PgBouncer</h1>
+  <p class="lesson-lede">
+    PostgreSQL processes are not lightweight threads. Discover why opening 500 connections exhausts memory and CPU, and how connection poolers like PgBouncer enable 10,000 clients.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Configure connection pooling with PgBouncer to prevent database process exhaustion</span>
+    <span><b>Mission link</b> Prevents database crashes caused by connection spikes in modern serverless and container apps</span>
+  </div>
+
+  <h2><span class="n">1</span>The cost of a PostgreSQL connection</h2>
+  <p>Unlike some databases that use lightweight threads, <b>PostgreSQL forks an entire operating system process for every connection</b>. Each connection consumes about 10MB of RAM and incurs CPU overhead during context switching. If 500 clients connect simultaneously, memory is exhausted and the CPU spends all its time switching processes.</p><p>A <b>Connection Pooler</b> (like <b>PgBouncer</b>) sits between clients and PostgreSQL. It holds a small pool of active database connections (e.g. 20) and multiplexes thousands of incoming client requests over them seamlessly.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    PostgreSQL uses heavy OS processes; connection poolers multiplex thousands of clients over a few connections.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The three PgBouncer pooling modes</h2>
+  <p>Understand the three pooling levels supported by PgBouncer and their trade-offs.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing connection multiplexing</h2>
+  <p>Trace how PgBouncer multiplexes 500 web clients across only 15 real PostgreSQL server processes.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of connection pooling concepts.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can architect high-concurrency systems using PgBouncer to protect PostgreSQL from connection exhaustion.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Check your current connection limit using SHOW max_connections in PostgreSQL.</li>
+    <li>Inspect active connections using SELECT count(*) FROM pg_stat_activity.</li>
+    <li>Configure PgBouncer in transaction pooling mode for a containerized backend.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    PgBouncer Documentation: *Features and Architecture* (pgbouncer.org).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What happens if a serverless backend spawns 2,000 Lambda functions that each open a direct PostgreSQL connection?",
+    a: ["The database exhausts max_connections, runs out of memory, and crashes with connection refused errors","PostgreSQL smoothly handles all 2,000 connections with zero latency","The server automatically downloads more RAM","The queries run in reverse order"],
+    c: 0,
+    why: "Direct connections from serverless bursts overwhelm PostgreSQL process limits instantly."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Session Pooling",
+            "lines": [
+                  "connection kept for entire client session",
+                  "safest, supports all features",
+                  "limits total concurrent clients"
+            ]
+      },
+      {
+            "title": "Transaction Pooling (Most Popular)",
+            "lines": [
+                  "connection released after each COMMIT",
+                  "maximum client multiplexing!",
+                  "cannot use SET or prepared statements"
+            ]
+      },
+      {
+            "title": "Statement Pooling",
+            "lines": [
+                  "connection released after each statement",
+                  "no multi-statement transactions!",
+                  "rarely used"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# 500 web app containers connect to PgBouncer on port 6432",
+      "# PgBouncer holds exactly 15 persistent connections to PostgreSQL on port 5432",
+      "# Client A sends: BEGIN; UPDATE ...; COMMIT; -> uses Conn #1 for 5ms, then releases it!",
+      "# Client B immediately grabs Conn #1 -> 15 server connections easily serve 5,000 req/sec!"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "frontend_load": "500 concurrent client connections"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "backend_pool": "strictly 15 backend processes in PostgreSQL"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "multiplex": "transactions claim and release connections in milliseconds"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "result": "CPU load stays below 20%; zero connection exhaustion"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The standard lightweight connection pooler for PostgreSQL is Pg<0>.",
+      "PostgreSQL allocates a dedicated OS <1> for every client connection.",
+      "The pooling mode that reassigns connections upon COMMIT is <2> pooling."
+],
+    blanks: [
+      {
+            "a": [
+                  "Bouncer"
+            ],
+            "why": "PgBouncer is the industry standard pooler."
+      },
+      {
+            "a": [
+                  "process"
+            ],
+            "why": "Postgres uses heavy processes rather than light threads."
+      },
+      {
+            "a": [
+                  "transaction"
+            ],
+            "why": "Transaction pooling multiplexes at transaction boundaries."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why shouldn't you simply increase 'max_connections = 5000' in postgresql.conf to handle traffic spikes?",
+      a: ["Thousands of PostgreSQL backend processes cause devastating CPU context switching overhead and memory exhaustion","PostgreSQL strictly limits max_connections to 100 by law","Increasing connections deletes table indexes","It turns off the database query cache"],
+      c: 0,
+      why: "Process thrashing and memory bloat cause severe performance collapse past a few hundred connections."
+    },
+    {
+      q: "What is the restriction of using PgBouncer in 'Transaction Pooling' mode?",
+      a: ["Session-level features like named prepared statements and SET commands do not persist across transactions","You cannot write INSERT or UPDATE queries","Transactions can only contain one line of SQL","It only works with SQLite databases"],
+      c: 0,
+      why: "Because subsequent transactions run on different backend connections, session state is lost."
+    },
+    {
+      q: "What system view in PostgreSQL shows all currently active queries and connection states?",
+      a: ["pg_stat_activity","pg_connections","pg_active_queries","pg_stat_tables"],
+      c: 0,
+      why: "pg_stat_activity reports client IPs, active queries, states, and transaction durations."
+    },
+    {
+      q: "How does a connection pooler improve application latency during traffic surges?",
+      a: ["It eliminates the expensive CPU overhead of repeatedly establishing and tearing down TCP/TLS connections to PostgreSQL","It increases the internet download speed of client computers","It compresses query text by eighty percent","It automatically fixes slow SQL queries"],
+      c: 0,
+      why: "Reusing persistent backend connections saves tens of milliseconds on every database interaction."
+    }
+  ]);
+</script>
+</body>
+</html>

@@ -1,0 +1,3 @@
+# Mission — Agent Evaluation
+
+Master the science of evaluating multi-step autonomous AI agents. Adopt the End-State Principle, measure task success with Pass@1 and Pass@K, audit tool selection accuracy and schema validity, analyze trajectory step efficiency and redundant actions, benchmark failure recovery using fault injection, build hermetic Docker sandboxes with deterministic replay, analyze SWE-bench architecture, and construct custom agent evaluation harnesses for proprietary codebases.

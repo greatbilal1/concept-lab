@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 06 — Reciprocal Rank Fusion (RRF) and Re-ranking Models</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="vector-databases" data-lesson="6" data-lesson-id="rrf-and-reranking-models">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 06</span> · Re-ranking</span>
+
+  <h1 class="lesson-title">Reciprocal Rank Fusion (RRF) and Re-ranking Models</h1>
+  <p class="lesson-lede">
+    Fusing and scoring results: Reciprocal Rank Fusion (RRF) mathematics and Cross-Encoder re-ranking (Cohere, BGE).
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to merge search results with RRF and polish accuracy with cross-encoder re-rankers.</span>
+    <span><b>Mission link</b> Mastering reciprocal rank fusion (rrf) and re-ranking models across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Reciprocal Rank Fusion (RRF) and Re-ranking Models</h2>
+  <p>When you run hybrid search, BM25 returns scores like <code>14.2</code>, while vector search returns cosine similarity scores like <code>0.84</code>. You cannot simply add <code>14.2 + 0.84</code>; their mathematical scales are completely incompatible!</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Fusing and scoring results: Reciprocal Rank Fusion (RRF) mathematics and Cross-Encoder re-ranking (Cohere, BGE).
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Two-Stage Retrieval Pipeline</h2>
+  <p>How do you merge two different candidate rankings fairly? Using <strong>Reciprocal Rank Fusion (RRF)</strong> (Cormack et al., 2009):</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Reciprocal Rank Fusion Math</h2>
+  $$\text{RRF}(d) = \sum_{m \in \text{systems}} \frac{1}{k + \text{rank}_m(d)}$$<p>Where $k$ is a constant (typically $60$) and $\text{rank}_m(d)$ is the position of document $d$ in system $m$. Documents that rank high in <em>both</em> lists get a massive boost, while documents that rank high in only one list still get considered!</p><p>The Final Quality Polish: <strong>Cross-Encoder Re-Ranking</strong>:</p><ul><li><strong>Stage 1 (Fast Hybrid Retrieval):</strong> Retrieve the top 50 candidates using BM25 and vector search merged with RRF (takes 5ms).</li><li><strong>Stage 2 (Cross-Encoder Re-Ranking):</strong> Pass the query and each of the 50 candidates into a dedicated <strong>Cross-Encoder Re-Ranker</strong> (e.g. Cohere Re-rank, BGE-Reranker). The cross-encoder evaluates full cross-attention between query and document, outputting an ultra-precise relevance score!</li></ul><pre><code># The Two-Stage Retrieval Pipeline:
+# 1. Broad Hybrid Search: BM25 + Vector -> RRF -> Top 50 Candidates (Fast: 5ms)
+# 2. Deep Re-Ranker: Cohere Re-Rank -> Scrutinizes Top 50 -> Emits Top 5 Gold Chunks (Accurate!)</code></pre><div class="callout"><p><strong>The Winning Pattern:</strong> Bi-encoders cast a wide, fast net to find the top 50; cross-encoder re-rankers perform deep scrutiny to deliver the top 5 gold nuggets to your LLM.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the re-ranking sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to merge search results with RRF and polish accuracy with cross-encoder re-rankers.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where reciprocal rank fusion (rrf) and re-ranking models applies.</li>
+    <li>Author a unit test or verification script exercising reciprocal rank fusion (rrf) and re-ranking models.</li>
+    <li>Document team architectural conventions regarding reciprocal rank fusion (rrf) and re-ranking models.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Reciprocal Rank Fusion (RRF) and Re-ranking Models.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "How does Reciprocal Rank Fusion (RRF) merge two different search result lists (e.g. BM25 and Vector Search) without normalizing scores?",
+    a: ["By scoring each document based on the reciprocal of its rank position in each list: RRF_score = sum(1 / (k + rank))","By averaging their prices","By sorting by file size","By flipping a coin"],
+    c: 0,
+    why: "RRF scores documents based purely on rank positions, eliminating the need to normalize incompatible score scales."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Stage 1: Hybrid Retrieval (Fast)",
+            "lines": [
+                  "BM25 + Vector Search (HNSW)",
+                  "Merged via RRF -> 50 candidates in 5ms"
+            ]
+      },
+      {
+            "title": "Stage 2: Cross-Encoder Re-Ranker",
+            "lines": [
+                  "Full cross-attention on 50 pairs",
+                  "Outputs top 5 gold-standard chunks"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Reciprocal Rank Fusion (RRF) and Re-ranking Models",
+      "def execute_flow():",
+      "    # Fusing and scoring results: Reciprocal Rank Fusion...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Reciprocal Rank Fusion (RRF) and Re-ranking Models"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Document A Ranks"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Document B Ranks"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Reciprocal Rank Fusion merges candidate lists using rank {1}, while Cross-Encoders re-rank the top candidates using deep cross-{2}."
+],
+    blanks: [
+      {
+            "a": [
+                  "positions"
+            ],
+            "why": "Document rank order (1st, 2nd, 3rd)"
+      },
+      {
+            "a": [
+                  "attention"
+            ],
+            "why": "Full attention between query and text"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why is Reciprocal Rank Fusion (RRF) immune to the problem of incompatible score scales?",
+      a: ["It ignores raw scores entirely and computes fusion scores based strictly on the relative rank positions of documents in each list","It converts scores to dollars","It multiplies scores by zero","It runs on paper"],
+      c: 0,
+      why: "RRF operates on ordinal rankings rather than arbitrary scalar score values."
+    },
+    {
+      q: "Why don't we run Cross-Encoder re-rankers across all 1 million documents in a database directly?",
+      a: ["Cross-encoders must process the query and document together through a transformer, which is 1,000x too slow to run across millions of rows","Cross-encoders are illegal for large databases","Databases refuse to store cross-encoders","Cross-encoders delete documents"],
+      c: 0,
+      why: "Cross-encoders have heavy pairwise computational overhead; they are only viable for re-ranking small candidate sets (20-100)."
+    },
+    {
+      q: "What is the standard value for the smoothing constant k in the RRF formula?",
+      a: ["Approximately 60","1,000,000","0","Negative 5"],
+      c: 0,
+      why: "Cormack et al. proved k=60 balances top-rank rewards while avoiding outlier dominance."
+    },
+    {
+      q: "What commercial API provides state-of-the-art cross-encoder re-ranking as a service?",
+      a: ["Cohere Rerank API","Photoshop","Google Sheets","GitHub Copilot"],
+      c: 0,
+      why: "Cohere's Rerank API is an industry-leading hosted cross-encoder service."
+    }
+  ]);
+</script>
+</body>
+</html>

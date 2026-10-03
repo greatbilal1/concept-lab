@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 03 — Distance Metrics: Cosine, L2 (Euclidean), and Inner Product</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="vector-databases" data-lesson="3" data-lesson-id="vector-database-distance-metrics">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 03</span> · Metric Alignment</span>
+
+  <h1 class="lesson-title">Distance Metrics: Cosine, L2 (Euclidean), and Inner Product</h1>
+  <p class="lesson-lede">
+    Configuring vector index metrics: Cosine Distance, Euclidean (L2), and Inner Product (IP), and why metric matching is mandatory.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to configure and match distance metrics in vector databases.</span>
+    <span><b>Mission link</b> Mastering distance metrics: cosine, l2 (euclidean), and inner product across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Distance Metrics: Cosine, L2 (Euclidean), and Inner Product</h2>
+  <p>When initializing a vector index in pgvector, Chroma, or Pinecone, you must specify the <strong>Distance Metric</strong>. Configuring the wrong metric is a silent bug: the database runs smoothly, returns 20 results in 2ms, but the results are semantically wrong!</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Configuring vector index metrics: Cosine Distance, Euclidean (L2), and Inner Product (IP), and why metric matching is mandatory.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>pgvector Distance Operators</h2>
+  <p>The three standard vector index metrics:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>The Normalization Equivalence</h2>
+  <ul><li><strong>1. Cosine Distance ($1 - \cos(\theta)$):</strong> Measures the angular divergence between vectors. In pgvector: <code><=></code> operator. Standard for text embeddings because it ignores document length differences.</li><li><strong>2. Inner Product / Dot Product ($- u \cdot v$):</strong> In pgvector: <code><#></code> operator. The raw dot product (multiplied by $-1$ so smaller is closer). Fastest to compute on hardware!</li><li><strong>3. Euclidean Distance (L2) ($\sqrt{\sum (u_i - v_i)^2}$):</strong> In pgvector: <code><-></code> operator. Straight-line distance. Used in computer vision (facial recognition) and clustering.</li></ul><pre><code># Creating an HNSW Index with Cosine Distance in PostgreSQL (pgvector):
+CREATE TABLE document_chunks (
+    id SERIAL PRIMARY KEY,
+    content TEXT,
+    embedding vector(1536) -- OpenAI embedding dimension
+);
+
+-- Create HNSW index using cosine distance operator (<=>):
+CREATE INDEX ON document_chunks 
+USING hnsw (embedding vector_cosine_ops)
+WITH (m = 16, ef_construction = 64);</code></pre><div class="callout"><p><strong>The Normalization Shortcut:</strong> If you L2-normalize all vectors (length = 1.0) before inserting them, Euclidean Distance, Cosine Distance, and Dot Product become mathematically monotonic equivalents!</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the distance metric sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to configure and match distance metrics in vector databases.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where distance metrics: cosine, l2 (euclidean), and inner product applies.</li>
+    <li>Author a unit test or verification script exercising distance metrics: cosine, l2 (euclidean), and inner product.</li>
+    <li>Document team architectural conventions regarding distance metrics: cosine, l2 (euclidean), and inner product.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Distance Metrics: Cosine, L2 (Euclidean), and Inner Product.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What happens if an embedding model was trained using Cosine Distance, but you configure your vector index to use Euclidean L2 distance on unnormalized vectors?",
+    a: ["Search results will be corrupted by document length differences, returning suboptimal or completely irrelevant nearest neighbors","The database will refuse to start","The computer processor will overheat","Vectors will be deleted"],
+    c: 0,
+    why: "Index distance metrics must match the training objective of the embedding model to preserve semantic geometry."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "<=> (Cosine Distance)",
+            "lines": [
+                  "vector_cosine_ops",
+                  "1.0 - cosine_similarity",
+                  "Standard for text embeddings"
+            ]
+      },
+      {
+            "title": "<#> (Negative Inner Product)",
+            "lines": [
+                  "vector_ip_ops",
+                  "- (u . v)",
+                  "Blazing fast on normalized unit vectors"
+            ]
+      },
+      {
+            "title": "<-> (Euclidean L2 Distance)",
+            "lines": [
+                  "vector_l2_ops",
+                  "Straight line distance in hyperspace",
+                  "Standard for vision embeddings"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Distance Metrics: Cosine, L2 (Euclidean), and Inner Product",
+      "def execute_flow():",
+      "    # Configuring vector index metrics: Cosine Distance,...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Distance Metrics: Cosine, L2 (Euclidean), and Inner Product"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Unnormalized Vectors"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Unit Normalized (||v|| = 1)"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "In pgvector, text embeddings standardly use {1} distance using vector_cosine_ops, which simplifies to dot product when vectors are {2}."
+],
+    blanks: [
+      {
+            "a": [
+                  "cosine"
+            ],
+            "why": "Angular directional distance"
+      },
+      {
+            "a": [
+                  "normalized"
+            ],
+            "why": "Scaled to unit length 1.0"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What pgvector operator computes cosine distance between two vector columns?",
+      a: ["<=>","<->","<#>","=="],
+      c: 0,
+      why: "<=> represents cosine distance in pgvector."
+    },
+    {
+      q: "Why does Inner Product (IP) search run faster on hardware than Cosine Distance?",
+      a: ["It requires only multiplication and addition, avoiding expensive square root and vector norm divisions","It runs on paper","It uses no RAM","It is written in assembly"],
+      c: 0,
+      why: "Dot product avoids computing vector lengths at query time."
+    },
+    {
+      q: "What happens if you query an index built with 'vector_l2_ops' using the '<=>' cosine operator?",
+      a: ["PostgreSQL cannot use the HNSW index and falls back to a slow, brute-force sequential table scan","The query crashes the database","The table is deleted","The server reboots"],
+      c: 0,
+      why: "Index operator classes must match query operators for the database planner to use the index."
+    },
+    {
+      q: "Why is Euclidean L2 distance commonly used in facial recognition embeddings?",
+      a: ["Face embedding models (like FaceNet) are explicitly trained with triplet loss to map faces to absolute Euclidean coordinates","Faces are flat","Cameras only measure L2 distance","Humans look like Euclidean geometry"],
+      c: 0,
+      why: "FaceNet models train directly using Euclidean distance loss on the unit hypersphere."
+    }
+  ]);
+</script>
+</body>
+</html>

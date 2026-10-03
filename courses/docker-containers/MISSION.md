@@ -1,0 +1,3 @@
+# Mission — Docker & Containers
+
+Master the art of containerization with Docker. Understand Linux namespaces and cgroups, optimize Union File System layer caching to slash build times, write secure multi-stage Dockerfiles running as unprivileged non-root users, architect inter-container networks with embedded DNS, persist database state with Named Volumes and bind mounts, orchestrate multi-tier stacks with Docker Compose healthchecks, harden containers using distroless images and capability dropping, and deploy immutable container artifacts.

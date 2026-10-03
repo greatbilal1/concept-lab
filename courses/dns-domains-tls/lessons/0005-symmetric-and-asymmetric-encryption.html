@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 05 — Symmetric and asymmetric encryption</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="dns-domains-tls" data-lesson="5" data-lesson-id="symmetric-and-asymmetric-encryption">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 05</span> · Encryption & Certificates</span>
+
+  <h1 class="lesson-title">Symmetric and asymmetric encryption</h1>
+  <p class="lesson-lede">
+    How do two strangers on the internet create a secret conversation in plain sight of eavesdroppers? Discover the mathematics of public and private keys.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Explain the complementary roles of asymmetric key exchange and symmetric bulk ciphers</span>
+    <span><b>Mission link</b> The cryptographic cornerstone of all internet security and privacy</span>
+  </div>
+
+  <h2><span class="n">1</span>The problem of key exchange</h2>
+  <p>If Alice and Bob want to send secret messages, they can use <b>symmetric encryption</b> (like AES-256): the same secret key encrypts and decrypts the data. It is blazing fast and mathematically unbreakable.</p><p>But how do Alice and Bob agree on the secret key if Eve is eavesdropping on the network cable? Sending the key in plaintext destroys security. This is the central problem solved by <b>asymmetric cryptography</b>.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Symmetric encryption is fast but requires a shared key; asymmetric encryption solves key sharing.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The hybrid encryption model</h2>
+  <p>Modern systems use hybrid encryption: asymmetric cryptography negotiates a session key, which symmetric ciphers use to encrypt bulk data.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing the Diffie-Hellman key exchange</h2>
+  <p>Trace how Diffie-Hellman calculates a shared secret over a public wire without ever transmitting the secret.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of cryptographic primitives.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can articulate how hybrid cryptosystems combine asymmetric key exchange with symmetric ciphers to protect web communications.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Generate an asymmetric RSA or Ed25519 key pair using ssh-keygen.</li>
+    <li>Inspect the public key (.pub) and verify it can be shared openly.</li>
+    <li>Explain why your private key must never leave your machine.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Whitfield Diffie and Martin Hellman, *New Directions in Cryptography* (IEEE Transactions on Information Theory, 1976).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "In asymmetric cryptography (public-key cryptography), which key can be shared openly with the public?",
+    a: ["The public key can be shared openly; the private key must be kept secret","The private key can be shared openly; the public key must be kept secret","Both keys must be kept strictly secret","Neither key can ever be transmitted over the internet"],
+    c: 0,
+    why: "Anyone can encrypt with your public key, but only your private key can decrypt the message."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Asymmetric (Slow)",
+            "lines": [
+                  "RSA or Elliptic Curves (ECDHE)",
+                  "authenticates & exchanges shared secret"
+            ]
+      },
+      {
+            "title": "Ephemeral Secret",
+            "lines": [
+                  "both sides compute identical key",
+                  "never transmitted across wire"
+            ]
+      },
+      {
+            "title": "Symmetric (Blazing Fast)",
+            "lines": [
+                  "AES-GCM or ChaCha20",
+                  "encrypts bulk application payload"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Alice has private key 'a'; sends public g^a mod p",
+      "# Bob has private key 'b'; sends public g^b mod p",
+      "# Alice computes (g^b)^a mod p",
+      "# Bob computes (g^a)^b mod p",
+      "# Both independently arrive at identical shared secret g^(ab) mod p!"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "alice_private": "kept secret by Alice"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "bob_private": "kept secret by Bob"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "math": "mathematical properties of discrete logarithms"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "shared_secret": "identical symmetric key derived on both ends"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Encryption using the same key to encrypt and decrypt is <0>.",
+      "Encryption using a public and private key pair is <1>.",
+      "The fast symmetric cipher used in almost all HTTPS sessions is <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "symmetric"
+            ],
+            "why": "Symmetric encryption uses a single shared key."
+      },
+      {
+            "a": [
+                  "asymmetric"
+            ],
+            "why": "Asymmetric encryption uses public/private key pairs."
+      },
+      {
+            "a": [
+                  "AES",
+                  "AES-256",
+                  "AES-GCM"
+            ],
+            "why": "Advanced Encryption Standard (AES) is the gold standard bulk cipher."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why doesn't HTTPS use asymmetric public-key cryptography to encrypt the entire web session?",
+      a: ["Asymmetric math is thousands of times slower and computationally expensive compared to symmetric ciphers","Asymmetric encryption can only encrypt text containing English letters","Public keys expire after transmitting 1 megabyte of data","Web browsers do not support public keys"],
+      c: 0,
+      why: "Asymmetric encryption is computationally heavy; it is used only to negotiate a fast symmetric key."
+    },
+    {
+      q: "If someone intercepts your public key while you browse the web, can they decrypt your messages?",
+      a: ["No, messages encrypted with a public key can only be decrypted by the matching private key","Yes, possessing the public key allows anyone to decrypt the message","Only if they have an administrator password","Yes, if they use a supercomputer for 5 minutes"],
+      c: 0,
+      why: "One-way mathematical trapdoor: public keys encrypt; only the private key decrypts."
+    },
+    {
+      q: "What property does 'Forward Secrecy' (PFS) provide in modern TLS?",
+      a: ["Compromise of the server private key in the future cannot decrypt past recorded sessions","The website automatically loads in the background before you type the URL","The client can browse without using an IP address","All passwords are encrypted with biological fingerprints"],
+      c: 0,
+      why: "Ephemeral keys generated per-session ensure that past sessions remain secure even if keys leak later."
+    },
+    {
+      q: "Which cipher algorithm is the industry standard for high-performance symmetric encryption?",
+      a: ["AES (Advanced Encryption Standard)","MD5 (Message Digest 5)","ROT13 (Rotate by 13)","Base64 Encoding"],
+      c: 0,
+      why: "AES is hardware-accelerated on modern CPUs and provides military-grade security."
+    }
+  ]);
+</script>
+</body>
+</html>

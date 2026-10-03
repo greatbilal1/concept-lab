@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Software Architecture Patterns — Cheat Sheet</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+<style>
+  .ref-toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0 8px; }
+  .ref-toc a { font-size: .8rem; border: 1px solid var(--border); background: #111a30; padding: 5px 11px; border-radius: 999px; color: var(--muted); text-decoration: none; border-bottom: 1px solid var(--border); }
+  .ref-toc a:hover { color: #fff; border-color: #3d5488; }
+  .lesson-wrap h2 { scroll-margin-top: 20px; }
+  .snippet { margin: 14px 0 22px; }
+  .snippet .lbl { font-size: .72rem; font-weight: 800; letter-spacing: .7px; text-transform: uppercase; color: var(--accent2); margin-bottom: 6px; }
+  .see { font-size: .82rem; color: var(--muted); margin: -6px 0 12px; }
+  .see a { color: var(--accent2); border-bottom: 0; }
+  .see a:hover { color: #fff; }
+  .snippet pre { padding-top: 34px; }
+  @media print { .snippet pre { padding-top: 18px; } }
+</style>
+</head>
+<body class="lesson-body" data-course="software-architecture-patterns">
+
+<div class="lesson-wrap">
+
+  <span class="lesson-kicker">Reference · Cheat sheet</span>
+  <h1 class="lesson-title">Software Architecture Patterns — Cheat Sheet</h1>
+  <p class="lesson-lede">
+    The whole course on one page. Every snippet links back to the lesson that
+    teaches it.
+  </p>
+
+  <div class="ref-toc">
+    <a href="#sec-1">Architecture Comparison Matrix</a>
+    <a href="#sec-2">Event-Driven Topologies</a>
+    <a href="#sec-3">CQRS Pattern</a>
+    <a href="#sec-4">The CAP Theorem</a>
+  </div>
+
+  <h2 id="sec-1"><span class="n">1</span>Architecture Comparison Matrix</h2>
+  <div class="snippet">
+    <div class="lbl">Evaluating macro patterns</div>
+    <pre><code>Pattern            Complexity  Deployability  Scalability
+Layered Monolith   Low         Easy           Vertical / Clustered
+Modular Monolith   Medium      Easy           Vertical / Modular
+Event-Driven       High        Medium         Very High (Decoupled)
+Microservices      Very High   Independent    Independent Services</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0002-monoliths-modular-monoliths-and-microservices.html">Lesson 02 — Monoliths, modular monoliths, and microservices</a>.</p>
+
+  <h2 id="sec-2"><span class="n">2</span>Event-Driven Topologies</h2>
+  <div class="snippet">
+    <div class="lbl">Broker versus Mediator</div>
+    <pre><code>// Broker Topology (Decentralized Choreography):
+Event: "OrderPlaced" -&gt; [Message Broker] -&gt; InventoryService, EmailService
+
+// Mediator Topology (Centralized Orchestrator):
+Event: "OrderPlaced" -&gt; [OrderMediator]
+  -&gt; calls InventoryService.reserve()
+  -&gt; calls PaymentService.charge()
+  -&gt; calls ShippingService.createLabel()</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0004-broker-versus-mediator-event-topologies.html">Lesson 04 — Broker versus mediator event topologies</a>.</p>
+
+  <h2 id="sec-3"><span class="n">3</span>CQRS Pattern</h2>
+  <div class="snippet">
+    <div class="lbl">Separating reads and writes</div>
+    <pre><code>Write Path (Commands):
+  POST /orders -&gt; OrderCommandHandler -&gt; Normalized DB (3NF, ACID)
+  Emits: OrderCreatedEvent -&gt; Updates Read Store!
+
+Read Path (Queries):
+  GET /orders/summary -&gt; Fast Denormalized View (Elasticsearch / Redis)
+  Optimized for instant O(1) query latency!</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0005-cqrs-command-query-responsibility-segregation.html">Lesson 05 — CQRS: Command Query Responsibility Segregation</a>.</p>
+
+  <h2 id="sec-4"><span class="n">4</span>The CAP Theorem</h2>
+  <div class="snippet">
+    <div class="lbl">Distributed trade-off triangle</div>
+    <pre><code>Under Network Partition (P), you MUST choose:
+- Consistency (CP): Return error or wait if replicas are out of sync (MongoDB, HBase)
+- Availability (AP): Return most recent local data immediately, even if stale (Cassandra, DynamoDB)</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0007-the-cap-theorem-and-distributed-trade-offs.html">Lesson 07 — The CAP theorem and distributed trade-offs</a>.</p>
+
+  <div class="lesson-foot">
+    <div class="links">
+      <a href="software-architecture-patterns-glossary.html">📖 Glossary</a>
+      <a href="../course.html">← Course map</a>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

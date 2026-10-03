@@ -1,0 +1,3 @@
+# Mission — Vector Databases & Semantic Search
+
+Master the storage and search engines powering modern AI retrieval at scale. Understand why relational B-trees fail on high-dimensional vectors, navigate Approximate Nearest Neighbor (ANN) index algorithms (HNSW, IVFFlat), configure distance metrics (Cosine, Dot Product, L2), solve filtered search with single-stage HNSW, combine BM25 and vector search with Reciprocal Rank Fusion, evaluate leading vector stores (pgvector, Chroma, Qdrant, Pinecone), and manage production scaling.

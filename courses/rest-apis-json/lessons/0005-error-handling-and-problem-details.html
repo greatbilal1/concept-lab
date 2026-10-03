@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 05 — Error handling and Problem Details</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="rest-apis-json" data-lesson="5" data-lesson-id="error-handling-and-problem-details">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 05</span> · API Design Patterns & Errors</span>
+
+  <h1 class="lesson-title">Error handling and Problem Details</h1>
+  <p class="lesson-lede">
+    Stop inventing custom error JSON shapes. Master RFC 7807 / 9457 Problem Details for HTTP APIs to deliver consistent, machine-readable error responses.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Implement standardized RFC 9457 Problem Details error responses across APIs</span>
+    <span><b>Mission link</b> Provides predictable error contracts that automated clients can parse reliably</span>
+  </div>
+
+  <h2><span class="n">1</span>The problem with ad-hoc error formats</h2>
+  <p>In most poorly designed APIs, error responses are chaotic: one endpoint returns <code>{"error": "bad"}</code>, another returns <code>{"message": "failed"}</code>, and another returns plain HTML error pages.</p><p>To fix this, the IETF standardized <b>RFC 7807 (updated by RFC 9457): Problem Details for HTTP APIs</b>. It specifies the <code>application/problem+json</code> media type with standard fields: <code>type</code>, <code>title</code>, <code>status</code>, <code>detail</code>, and <code>instance</code>.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Standardize API errors using RFC 9457 Problem Details so clients parse errors uniformly.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Problem Details schema</h2>
+  <p>Understand the standard fields of an RFC 9457 Problem Details JSON payload.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing validation error responses</h2>
+  <p>Trace a validation error payload providing field-specific error feedback to an API consumer.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of standard API error handling.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can implement consistent, machine-readable error responses using standard Problem Details specifications.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Adopt application/problem+json as the error response format across your backend.</li>
+    <li>Include granular invalid-params arrays when returning 422 validation errors.</li>
+    <li>Ensure your error handler never returns sensitive database stack traces in production.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    IETF RFC 9457: *Problem Details for HTTP APIs* (2023).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is the standard MIME type for RFC 9457 Problem Details responses?",
+    a: ["application/problem+json","text/plain","application/error+xml","application/json-error"],
+    c: 0,
+    why: "RFC 9457 defines the registered media type application/problem+json."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "type (URI)",
+            "lines": [
+                  "URI reference identifying error type",
+                  "https://api.example.com/errors/out-of-credit"
+            ]
+      },
+      {
+            "title": "title & status",
+            "lines": [
+                  "short human-readable summary",
+                  "matches HTTP status code (e.g. 403)"
+            ]
+      },
+      {
+            "title": "detail & instance",
+            "lines": [
+                  "specific explanation for this occurrence",
+                  "URI identifying the specific resource request"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "HTTP/1.1 422 Unprocessable Entity",
+      "Content-Type: application/problem+json",
+      "{",
+      "  'type': 'https://api.example.com/errors/validation',",
+      "  'title': 'Your request parameters failed validation',",
+      "  'invalid-params': [ { 'name': 'age', 'reason': 'must be >= 18' } ]",
+      "}"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "status": "422 Unprocessable Entity"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "mime": "application/problem+json"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "doc_type": "standard problem type URI"
+            }
+      },
+      {
+            "line": 5,
+            "vars": {
+                  "field_errors": "granular array detailing which inputs failed"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The IETF standard for HTTP error responses is Problem <0>.",
+      "The MIME type for Problem Details is application/problem+<1>.",
+      "The HTTP status code for semantic validation failure is <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "Details"
+            ],
+            "why": "RFC 7807 / 9457 is titled Problem Details for HTTP APIs."
+      },
+      {
+            "a": [
+                  "json"
+            ],
+            "why": "application/problem+json specifies JSON formatting."
+      },
+      {
+            "a": [
+                  "422"
+            ],
+            "why": "422 Unprocessable Entity is standard for schema validation errors."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the primary benefit of adopting RFC 9457 Problem Details across an API?",
+      a: ["All endpoints speak a standardized error contract, allowing client libraries to parse and handle errors uniformly","It eliminates all bugs from backend server code","It converts error messages into multiple spoken languages automatically","It prevents web servers from ever crashing"],
+      c: 0,
+      why: "Consistent error envelopes eliminate the chaos of different error formats across endpoints."
+    },
+    {
+      q: "What should the 'status' member of a Problem Details JSON object contain?",
+      a: ["The numeric HTTP status code generated by the origin server for this occurrence","The string 'success' or 'error'","The current time of day in milliseconds","The user account balance"],
+      c: 0,
+      why: "The status field explicitly mirrors the HTTP status code (e.g. 404, 422, 500)."
+    },
+    {
+      q: "Why is returning stack traces in production API error responses dangerous?",
+      a: ["Stack traces leak internal file paths, library versions, and database schemas to potential attackers","Stack traces cause client mobile phones to run out of memory","Browsers refuse to render JSON that contains line breaks","It violates international domain registration agreements"],
+      c: 0,
+      why: "Internal implementation details in stack traces expose valuable intelligence to attackers."
+    },
+    {
+      q: "What is the difference between 400 Bad Request and 422 Unprocessable Entity?",
+      a: ["400 is for malformed syntax (unparseable JSON); 422 is for valid syntax that violates business rules","400 is a server crash; 422 is a client crash","400 is used on mobile; 422 is used on desktop","There is no difference between 400 and 422"],
+      c: 0,
+      why: "400 handles malformed bytes; 422 handles syntactically valid JSON that fails domain validation."
+    }
+  ]);
+</script>
+</body>
+</html>

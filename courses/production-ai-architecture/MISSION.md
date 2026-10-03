@@ -1,0 +1,3 @@
+# Mission — Production AI Architecture
+
+Transition from fragile prototype scripts to enterprise-grade AI platforms. Master decoupled system architectures, implement asynchronous job queues with Celery and BullMQ, build scalable real-time streaming backends with client-disconnect cancellation, design stateless distributed session storage across Redis and PostgreSQL, enforce multi-dimensional token bucket rate limiters, guarantee multi-tenant data isolation with hard vector partitioning and RLS, and architect hybrid private cloud topologies.

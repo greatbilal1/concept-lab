@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 06 — CD Strategies: Blue-Green Deployments and Canary Releases</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="ci-cd" data-lesson="6" data-lesson-id="cd-strategies-blue-green-canary">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 06</span> · Deployment Strategies</span>
+
+  <h1 class="lesson-title">CD Strategies: Blue-Green Deployments and Canary Releases</h1>
+  <p class="lesson-lede">
+    Eliminating deployment downtime: Rolling Updates, Blue-Green Deployments (instant traffic cutover), and Canary Releases (gradual exposure).
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to design and execute Rolling Updates, Blue-Green cutovers, and Canary releases.</span>
+    <span><b>Mission link</b> Mastering cd strategies: blue-green deployments and canary releases across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of CD Strategies: Blue-Green Deployments and Canary Releases</h2>
+  <p>In the early days of the web, deploying meant stopping the server, replacing the binary, and starting it again. Users saw a <code>502 Bad Gateway</code> maintenance screen for 3 minutes. In modern cloud engineering, <strong>deployment downtime is unacceptable</strong>.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Eliminating deployment downtime: Rolling Updates, Blue-Green Deployments (instant traffic cutover), and Canary Releases (gradual exposure).
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Three Deployment Strategies</h2>
+  <p>The Three Modern Production Deployment Strategies:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Database Backward Compatibility</h2>
+  <ul><li><strong>1. Rolling Updates (Standard Kubernetes / ECS):</strong> Incrementally replaces old container pods with new ones one by one. Traffic is routed only to pods whose healthchecks have passed. Zero downtime, but old and new versions run concurrently for a few minutes.</li><li><strong>2. Blue-Green Deployments (Instant Atomic Cutover):</strong><ul><li><em>Blue (Active):</em> Currently serving 100% of live production traffic.</li><li><em>Green (Idle):</em> Deploy the new version here. Run end-to-end smoke tests against Green in isolation.</li><li><em>The Cutover:</em> Flip the load balancer / CDN router from Blue to Green in <strong>under 1 second</strong>! If an issue arises, flip back to Blue instantly!</li></ul></li><li><strong>3. Canary Releases (Risk-Bounded Rollout):</strong> Route 1% of live traffic to the new version (the Canary). If error rates remain flat for 15 minutes, increase to 10%, 50%, and finally 100%.</li></ul><pre><code># Blue-Green Router Traffic Cutover (NGINX / Cloudflare): 
+# Step 1: Green environment verified healthy via smoke tests.
+# Step 2: Update upstream pointer and reload router:
+upstream production_backend {
+    # server blue-app.internal:8000; # PREVIOUS ACTIVE (Standby for rollback)
+    server green-app.internal:8000;  # NEW ACTIVE (Instant 1-second cutover!)
+}</code></pre><div class="callout"><p><strong>The Database Migration Caveat:</strong> In Blue-Green and Rolling deployments, old and new code run at the same time. Database migrations must always be backwards-compatible (expand before contract)!</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the deployment strategies sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to design and execute Rolling Updates, Blue-Green cutovers, and Canary releases.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where cd strategies: blue-green deployments and canary releases applies.</li>
+    <li>Author a unit test or verification script exercising cd strategies: blue-green deployments and canary releases.</li>
+    <li>Document team architectural conventions regarding cd strategies: blue-green deployments and canary releases.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for CD Strategies: Blue-Green Deployments and Canary Releases.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is a 'Blue-Green Deployment' in continuous delivery architecture?",
+    a: ["Running two identical production environments (Blue and Green); deploying the new version to Green, testing it, and switching router traffic instantly","Painting the servers blue and green","Deploying software on Earth Day","A type of color-blindness test"],
+    c: 0,
+    why: "Blue-Green deployments maintain two identical environments, enabling instant cutover and zero-downtime rollbacks."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Rolling Update",
+            "lines": [
+                  "Pod 1 -> Pod 2 -> Pod 3 updated incrementally",
+                  "Standard K8s default, zero downtime",
+                  "Old & new versions run simultaneously"
+            ]
+      },
+      {
+            "title": "Blue-Green Cutover",
+            "lines": [
+                  "Two identical environments (Blue & Green)",
+                  "Instant 1-second router traffic switch",
+                  "Instant one-click rollback if bugs occur!"
+            ]
+      },
+      {
+            "title": "Canary Rollout",
+            "lines": [
+                  "1% -> 10% -> 50% -> 100% gradual traffic",
+                  "Limits blast radius of bugs to tiny audience",
+                  "Automated rollback on error rate spikes"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing CD Strategies: Blue-Green Deployments and Canary Releases",
+      "def execute_flow():",
+      "    # Eliminating deployment downtime: Rolling Updates, ...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "CD Strategies: Blue-Green Deployments and Canary Releases"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Step 1: Expand"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Step 2: Deploy"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "step": "Step 3: Contract"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Blue-Green deployments eliminate downtime by switching load balancer traffic between identical environments, while {1} releases gradually route small traffic percentages to limit {2} radius."
+],
+    blanks: [
+      {
+            "a": [
+                  "canary"
+            ],
+            "why": "Gradual percentage traffic rollout"
+      },
+      {
+            "a": [
+                  "blast"
+            ],
+            "why": "Scope of potential failure impact"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the primary advantage of a Blue-Green deployment over a standard rolling update?",
+      a: ["Instantaneous atomic cutover and instantaneous rollback: if a defect is found, traffic can be redirected back to the old environment in one second","Blue-Green uses half the servers","Blue-Green requires no load balancer","Blue-Green is free of charge"],
+      c: 0,
+      why: "Flipping load balancer pointers enables instantaneous rollback to the warm standby environment."
+    },
+    {
+      q: "Why must database migrations be backwards-compatible during Rolling and Blue-Green deployments?",
+      a: ["Both the old version and new version of the application run concurrently against the same database during the transition period","Databases cannot run migrations","Old code deletes new tables","Migrations only run on Linux"],
+      c: 0,
+      why: "Concurrent version execution requires schemas that satisfy both old and new code contracts simultaneously."
+    },
+    {
+      q: "What is the 'Expand and Contract' pattern in database schema migrations?",
+      a: ["A multi-step migration practice where new columns/tables are added first without breaking old code, and deprecated fields are deleted only after rollout completes","Compressing database files","Expanding hard drive partitions","A technique for shrinking RAM"],
+      c: 0,
+      why: "Expand and contract decouples database schema evolution from application code rollouts."
+    },
+    {
+      q: "How does an automated Canary deployment decide when to roll back?",
+      a: ["By continuously comparing Prometheus/Datadog error rates, HTTP 500s, and latency between the canary and control pools","By checking user tweets","By waiting 3 weeks","By asking the developer"],
+      c: 0,
+      why: "Automated canaries monitor telemetry deltas, triggering rollbacks if canary error rates exceed thresholds."
+    }
+  ]);
+</script>
+</body>
+</html>

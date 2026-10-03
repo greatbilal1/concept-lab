@@ -1,0 +1,3 @@
+# Mission — Building Reliable AI Systems
+
+Master the discipline of engineering mission-critical, five-nines (99.999%) reliability into generative AI systems. Understand the three pillars of AI failure, design idempotent agent workflows with deduplication keys, architect multi-tiered graceful degradation pyramids, monitor and detect data drift and concept drift, implement exponential backoff with full randomized jitter, execute shadow deployments and canary testing, run automated chaos engineering experiments in staging, and achieve five-nines operational availability.

@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 05 — Connecting MCP Clients (Claude Desktop, Cursor, Copilot)</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="mcp" data-lesson="5" data-lesson-id="connecting-mcp-clients-configuration">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 05</span> · Client Config</span>
+
+  <h1 class="lesson-title">Connecting MCP Clients (Claude Desktop, Cursor, Copilot)</h1>
+  <p class="lesson-lede">
+    Configuring MCP clients: editing claude_desktop_config.json, environment variables, command paths, and tool discovery.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to configure and connect MCP clients to local servers.</span>
+    <span><b>Mission link</b> Mastering connecting mcp clients (claude desktop, cursor, copilot) across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Connecting MCP Clients (Claude Desktop, Cursor, Copilot)</h2>
+  <p>Once you build an MCP server, how do you actually plug it into an AI client like Claude Desktop, Cursor, or VS Code? You declare it in the client's <strong>JSON configuration file</strong>.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Configuring MCP clients: editing claude_desktop_config.json, environment variables, command paths, and tool discovery.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Client Configuration Anatomy</h2>
+  <p>In Claude Desktop, the configuration file is located at:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Automatic Tool Discovery</h2>
+  <ul><li><strong>macOS:</strong> <code>~/Library/Application Support/Claude/claude_desktop_config.json</code></li><li><strong>Windows:</strong> <code>%APPDATA%\Claude\claude_desktop_config.json</code></li></ul><p>The configuration specifies the executable command, arguments, and environment variables for each server:</p><pre><code>// claude_desktop_config.json Example:
+{
+  "mcpServers": {
+    "system-monitor": {
+      "command": "/Users/alice/.venv/bin/python",
+      "args": ["/Users/alice/projects/mcp-servers/monitor.py"],
+      "env": {
+        "MONITOR_INTERVAL": "1"
+      }
+    },
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "ghp_12345..."
+      }
+    }
+  }
+}</code></pre><p>When Claude Desktop launches, it spawns each declared server as a child subprocess, completes the initialization handshake, and displays the tools in the UI (marked with a hammer icon!). The user can now ask questions, and Claude invokes your local server tools seamlessly!</p><div class="callout"><p><strong>The Absolute Path Rule:</strong> Always use <strong>absolute paths</strong> to your Python interpreter (e.g. inside your virtual environment). Relative paths will fail because GUI applications run with minimal default system PATHs.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the client configuration sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to configure and connect MCP clients to local servers.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where connecting mcp clients (claude desktop, cursor, copilot) applies.</li>
+    <li>Author a unit test or verification script exercising connecting mcp clients (claude desktop, cursor, copilot).</li>
+    <li>Document team architectural conventions regarding connecting mcp clients (claude desktop, cursor, copilot).</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Connecting MCP Clients (Claude Desktop, Cursor, Copilot).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Where are MCP servers configured in Claude Desktop?",
+    a: ["In the claude_desktop_config.json configuration file located in the application support directory","In the computer's BIOS settings","In the user's browser history","In the macOS trash can"],
+    c: 0,
+    why: "Clients read server definitions from JSON configuration files specifying executable commands and arguments."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Server Identifier",
+            "lines": [
+                  "'system-monitor', 'github'",
+                  "Unique key naming the server in the client UI"
+            ]
+      },
+      {
+            "title": "Command & Args",
+            "lines": [
+                  "command: '/path/to/python'",
+                  "args: ['/path/to/server.py'] (Absolute paths!)"
+            ]
+      },
+      {
+            "title": "Environment Secrets",
+            "lines": [
+                  "env: { GITHUB_TOKEN: '...' }",
+                  "Injected directly into server process environment"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Connecting MCP Clients (Claude Desktop, Cursor, Copilot)",
+      "def execute_flow():",
+      "    # Configuring MCP clients: editing claude_desktop_co...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Connecting MCP Clients (Claude Desktop, Cursor, Copilot)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Client Launches"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Tools Discovered"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Clients connect to local MCP servers by declaring the executable command and absolute file paths in their {1} configuration {2}."
+],
+    blanks: [
+      {
+            "a": [
+                  "JSON"
+            ],
+            "why": "JavaScript Object Notation file format"
+      },
+      {
+            "a": [
+                  "file"
+            ],
+            "why": "Configuration document on disk"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why must you use absolute paths (e.g. /Users/name/.venv/bin/python) in MCP client configuration files?",
+      a: ["GUI desktop applications do not inherit your terminal shell's activated virtualenv PATH, causing generic 'python' commands to fail","Relative paths are forbidden by JSON","Absolute paths make the code run faster","It encrypts the configuration"],
+      c: 0,
+      why: "Desktop GUI applications execute with basic system PATHs; absolute paths ensure the correct interpreter is invoked."
+    },
+    {
+      q: "What visual icon indicates that tools are active and available in Claude Desktop?",
+      a: ["A hammer icon in the bottom corner of the prompt box","A green light on the keyboard","A smiley face emoji","A pop-up warning window"],
+      c: 0,
+      why: "Claude Desktop displays a hammer icon showing active MCP tool integrations."
+    },
+    {
+      q: "How does an MCP client pass sensitive API keys (like GitHub tokens) to an MCP server?",
+      a: ["Through the 'env' dictionary in the server configuration, injecting them as environment variables into the server process","By posting them to Twitter","In the URL query string","By printing them in chat"],
+      c: 0,
+      why: "The env block safely injects credentials into the subprocess without exposing them to the model context."
+    },
+    {
+      q: "What happens if an error exists in the syntax of claude_desktop_config.json?",
+      a: ["The client fails to parse the file and will not load any MCP servers, displaying an error in the developer logs","The computer hard drive is formatted","The operating system restarts","The file is deleted automatically"],
+      c: 0,
+      why: "Syntax errors in configuration JSON cause the parser to fail safely without loading servers."
+    }
+  ]);
+</script>
+</body>
+</html>

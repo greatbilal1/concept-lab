@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 06 — Resilient Communication: Circuit Breakers, Bulkheads, and Backpressure</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="system-design" data-lesson="6" data-lesson-id="resilient-communication-circuit-breakers-bulkheads">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 06</span> · Resilient Communication</span>
+
+  <h1 class="lesson-title">Resilient Communication: Circuit Breakers, Bulkheads, and Backpressure</h1>
+  <p class="lesson-lede">
+    Cascading failure defense: Circuit Breakers, the Bulkhead pattern (thread pool isolation), rate limiting, and Backpressure flow control.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to protect distributed architectures using Circuit Breakers, Bulkheads, and Backpressure.</span>
+    <span><b>Mission link</b> Mastering resilient communication: circuit breakers, bulkheads, and backpressure across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Resilient Communication: Circuit Breakers, Bulkheads, and Backpressure</h2>
+  <p>In a ship, watertight bulkheads divide the hull into isolated compartments. If water punctures Compartment 1, only that compartment floods; the rest of the ship stays afloat. In distributed software, <strong>The Bulkhead Pattern prevents a slow dependency from sinking your entire backend</strong>.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Cascading failure defense: Circuit Breakers, the Bulkhead pattern (thread pool isolation), rate limiting, and Backpressure flow control.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Shared Resource Pool vs Bulkhead Isolation</h2>
+  <p>Three Pillars of <strong>Resilient Inter-Service Communication</strong>:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Backpressure Mechanics</h2>
+  <ul><li><strong>1. The Bulkhead Pattern (Resource Pool Isolation):</strong> Don't share a single HTTP connection pool across all microservices! If the `RecommendationService` slows down to 10 seconds, it will consume all 100 threads in a shared pool, starving the critical `PaymentService`! Allocate dedicated, isolated thread pools per dependency: <code>payments: 50 threads; recommendations: 10 threads</code>.</li><li><strong>2. Circuit Breakers:</strong> Monitor dependency failure rates. If recommendations fail 5 times consecutively, trip the circuit breaker to OPEN! Return an empty list fallback in 1ms rather than waiting for 10-second timeouts.</li><li><strong>3. Backpressure Flow Control:</strong> When a consumer is overwhelmed by incoming messages, it signals the producer to slow down (rate throttle or TCP window reduction), preventing memory buffer overflows.</li></ul><pre><code># The Bulkhead & Circuit Breaker Architecture:
+# Shared Pool (Vulnerable - Sinks the Ship):
+# [Incoming Requests] ──> [Shared 100 Thread Pool]
+#                             ├── 95 Threads stuck waiting for slow Recommendation API!
+#                             └── 5 Threads left for Payment API -> PAYMENTS FAIL! TOTAL OUTAGE!
+#
+# Bulkhead Isolation (Resilient - Compartmentalized):
+# [Incoming Requests] ──>
+#   ├── Dedicated Payment Pool (50 Threads) ──> [Payment API] (100% HEALTHY!)
+#   └── Dedicated Recommendation Pool (10 Threads + Circuit Breaker) (Isolated failure!)</code></pre><div class="callout"><p><strong>The Isolation Mandate:</strong> Never allow non-critical features (recommendations, analytics) to share thread pools or database connections with core transactional paths (checkout, authentication).</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the resilient communication sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to protect distributed architectures using Circuit Breakers, Bulkheads, and Backpressure.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where resilient communication: circuit breakers, bulkheads, and backpressure applies.</li>
+    <li>Author a unit test or verification script exercising resilient communication: circuit breakers, bulkheads, and backpressure.</li>
+    <li>Document team architectural conventions regarding resilient communication: circuit breakers, bulkheads, and backpressure.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Resilient Communication: Circuit Breakers, Bulkheads, and Backpressure.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is the 'Bulkhead Pattern' in distributed systems architecture?",
+    a: ["Isolating resources (like thread pools and connection pools) into discrete compartments so that the failure or exhaustion of one dependency cannot sink the entire ship","A metal wall in a submarine","A computer monitor stand","A firewall rule"],
+    c: 0,
+    why: "The Bulkhead pattern isolates resource pools so exhaustion in one dependency does not starve other services."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Shared Thread Pool (Fragile)",
+            "lines": [
+                  "One slow dependency consumes all 100 threads",
+                  "Starves critical payment & login services",
+                  "Cascading failure crashes whole company"
+            ]
+      },
+      {
+            "title": "Bulkhead Isolation (Resilient)",
+            "lines": [
+                  "Dedicated thread pool per service",
+                  "Slow recommendation service exhausts only its 10 threads",
+                  "Payments and auth remain 100% operational!"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Resilient Communication: Circuit Breakers, Bulkheads, and Backpressure",
+      "def execute_flow():",
+      "    # Cascading failure defense: Circuit Breakers, the B...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Resilient Communication: Circuit Breakers, Bulkheads, and Backpressure"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Unbounded Ingestion (Crash)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Backpressure (Protected)"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The Bulkhead pattern prevents cascading system crashes by isolating thread and connection pools into discrete {1}, while circuit breakers trip to stop {2} timeouts."
+],
+    blanks: [
+      {
+            "a": [
+                  "compartments"
+            ],
+            "why": "Isolated resource pools"
+      },
+      {
+            "a": [
+                  "cascading"
+            ],
+            "why": "Spreading failure across dependencies"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What failure scenario occurs when microservices share a single unconstrained HTTP thread pool?",
+      a: ["A single degraded downstream service consumes all available worker threads, starving healthy critical services and causing a complete application outage","The computer processor speeds up","Threads convert to processes","The database deletes data"],
+      c: 0,
+      why: "Shared thread pools allow a single slow dependency to exhaust resources for the entire application."
+    },
+    {
+      q: "How does the Bulkhead pattern protect mission-critical operations like payments?",
+      a: ["By allocating a dedicated, reserved thread and connection pool for payments that cannot be consumed by secondary non-critical services","By encrypting payments","By making payments free","By turning off the internet"],
+      c: 0,
+      why: "Isolated resource pools guarantee that critical workflows retain dedicated capacity regardless of secondary service degradation."
+    },
+    {
+      q: "What is 'Backpressure' in distributed stream processing?",
+      a: ["A mechanism where an overloaded consumer signals upstream producers to slow down their transmission rate, preventing memory buffer overflows","Water pressure in cooling pipes","Air pressure in a server room","A network cable defect"],
+      c: 0,
+      why: "Backpressure prevents fast producers from overwhelming slow consumers with unbounded memory buffering."
+    },
+    {
+      q: "What is an acceptable fallback response when a circuit breaker trips on a product recommendation service?",
+      a: ["Return a pre-computed list of top-selling products or an empty list, allowing the main product page to render without delay","Crash the user's browser","Display an HTTP 500 error screen","Log out the user"],
+      c: 0,
+      why: "Degrading to static fallbacks keeps the primary user experience intact without waiting for timeouts."
+    }
+  ]);
+</script>
+</body>
+</html>

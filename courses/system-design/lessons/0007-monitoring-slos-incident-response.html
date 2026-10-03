@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 07 — Monitoring, SLOs, and Incident Response in Production</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="system-design" data-lesson="7" data-lesson-id="monitoring-slos-incident-response">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 07</span> · SLOs & Incident Response</span>
+
+  <h1 class="lesson-title">Monitoring, SLOs, and Incident Response in Production</h1>
+  <p class="lesson-lede">
+    Site Reliability Engineering (SRE): Service Level Indicators (SLIs), Service Level Objectives (SLOs), Error Budgets, and incident playbooks.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to define SLIs, set realistic SLOs, manage error budgets, and run blameless incident response post-mortems.</span>
+    <span><b>Mission link</b> Mastering monitoring, slos, and incident response in production across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Monitoring, SLOs, and Incident Response in Production</h2>
+  <p>100% uptime is the wrong target: it is astronomically expensive and paralyzes engineering innovation. Site Reliability Engineering (SRE), pioneered by Google, replaces perfectionism with <strong>Service Level Objectives (SLOs) and Error Budgets</strong>.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Site Reliability Engineering (SRE): Service Level Indicators (SLIs), Service Level Objectives (SLOs), Error Budgets, and incident playbooks.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The SRE Reliability Trinity</h2>
+  <p>The SRE Trinity of Reliability Metrics:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>The Error Budget Policy</h2>
+  <ul><li><strong>1. Service Level Indicator (SLI):</strong> A quantifiable measure of service performance. E.g. <em>'The percentage of HTTP requests returning status &lt; 500 in under 200ms over 30 days.'</em></li><li><strong>2. Service Level Objective (SLO):</strong> The target reliability goal agreed upon by engineering and product: <code>SLO = 99.9%</code> (three nines allows 43 minutes of downtime per month).</li><li><strong>3. Error Budget ($100\% - \text{SLO}$):</strong> The allowable downtime cushion ($0.1\% = 43\text{ minutes}$). If you have error budget left, deploy features rapidly! <strong>If error budget is exhausted, freeze feature deployments and focus 100% on reliability engineering!</strong></li><li><strong>4. Incident Response Playbooks:</strong> Clear, step-by-step diagnostic runbooks. When PagerDuty triggers an alert at 2 AM, the on-call engineer follows a verified runbook rather than guessing under stress.</li></ul><pre><code># The SRE Error Budget Policy:
+# SLO Target: 99.9% Uptime over rolling 30 days
+# Error Budget: 0.1% (43 minutes of allowable failure)
+#
+# Scenario A: 10 minutes used this month (33 mins remaining) -> Ship features boldly!
+# Scenario B: 45 minutes used this month (BUDGET BREACHED!)   -> Feature freeze engaged!
+#             All engineering sprints redirect to automated tests, circuit breakers, & infra!</code></pre><div class="callout"><p><strong>The Blameless Post-Mortem:</strong> After an outage, never blame human error. Humans make mistakes. Fix the underlying tooling, safeguards, and automated tests so that identical human mistakes cannot cause an outage again.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the SRE sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to define SLIs, set realistic SLOs, manage error budgets, and run blameless incident response post-mortems.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where monitoring, slos, and incident response in production applies.</li>
+    <li>Author a unit test or verification script exercising monitoring, slos, and incident response in production.</li>
+    <li>Document team architectural conventions regarding monitoring, slos, and incident response in production.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Monitoring, SLOs, and Incident Response in Production.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is an 'Error Budget' in Site Reliability Engineering (SRE)?",
+    a: ["The allowable amount of unreliability or downtime a service can experience over a period (e.g. 0.01% for 99.99% availability) before deployments must halt","The amount of money paid to fix bugs","A budget for buying new computers","A fine paid to customers"],
+    c: 0,
+    why: "An error budget defines allowable unreliability, balancing rapid feature deployment against system stability."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1. SLI (Measurement)",
+            "lines": [
+                  "Real-world metric: % of requests < 200ms",
+                  "Quantitative telemetry from Datadog"
+            ]
+      },
+      {
+            "title": "2. SLO (Target)",
+            "lines": [
+                  "Agreed reliability target: 99.9% availability",
+                  "Contract between Product and Engineering"
+            ]
+      },
+      {
+            "title": "3. Error Budget (Cushion)",
+            "lines": [
+                  "Allowable failure: 0.1% (43 mins/mo)",
+                  "Balances feature velocity with stability"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Monitoring, SLOs, and Incident Response in Production",
+      "def execute_flow():",
+      "    # Site Reliability Engineering (SRE): Service Level ...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Monitoring, SLOs, and Incident Response in Production"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Budget Remaining (Green)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Budget Exhausted (Red)"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Site Reliability Engineering balances feature velocity against system stability by measuring Service Level {1} against target SLOs and tracking remaining {2} budgets."
+],
+    blanks: [
+      {
+            "a": [
+                  "Indicators"
+            ],
+            "why": "SLIs — quantitative performance metrics"
+      },
+      {
+            "a": [
+                  "error"
+            ],
+            "why": "Allowable failure allowance (100% - SLO)"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the primary purpose of an 'Error Budget' in Site Reliability Engineering?",
+      a: ["To establish an agreed mathematical threshold that balances shipping new features quickly against maintaining system stability","To pay developers overtime","To buy backup servers","To calculate customer refunds"],
+      c: 0,
+      why: "Error budgets provide an objective governance mechanism balancing development velocity and reliability."
+    },
+    {
+      q: "What should an engineering team do when its service exhausts its monthly Error Budget?",
+      a: ["Halt new feature deployments and dedicate engineering capacity exclusively to fixing reliability defects and automated tests","Fire the on-call engineer","Increase the error budget to 100%","Delete the monitoring dashboard"],
+      c: 0,
+      why: "Exhausted error budgets trigger feature freezes to prioritize stability and prevent outages."
+    },
+    {
+      q: "What is a 'Blameless Post-Mortem' following a production outage?",
+      a: ["A retrospective analysis focused on identifying systemic architectural and process flaws rather than punishing individuals","A meeting where nobody speaks","A legal deposition","A performance review"],
+      c: 0,
+      why: "Blameless post-mortems build psychological safety, focusing on systemic defenses rather than individual blame."
+    },
+    {
+      q: "What is an 'Incident Runbook' (Playbook) used for in production operations?",
+      a: ["A documented, step-by-step troubleshooting guide that on-call engineers follow during specific alert incidents to restore service quickly","A book of programming jokes","An employee contract","A marketing brochure"],
+      c: 0,
+      why: "Runbooks provide clear, tested procedures for rapid incident remediation under operational stress."
+    }
+  ]);
+</script>
+</body>
+</html>

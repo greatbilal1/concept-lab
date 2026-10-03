@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 04 — Pipes and text processing</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="command-line-shell" data-lesson="4" data-lesson-id="pipes-and-text-processing">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 04</span> · Streams & Pipes</span>
+
+  <h1 class="lesson-title">Pipes and text processing</h1>
+  <p class="lesson-lede">
+    The UNIX philosophy: write programs that do one thing well, and connect them with pipes. Combine grep, awk, cut, and sort into powerful processing pipelines.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Build multi-stage text processing pipelines using pipes and core utilities</span>
+    <span><b>Mission link</b> Enables immediate text analysis without writing custom scripts</span>
+  </div>
+
+  <h2><span class="n">1</span>The pipeline operator</h2>
+  <p>A pipe (<code>|</code>) connects the standard output of one command directly to the standard input of the next. The data never touches disk; the operating system streams bytes through a memory buffer in real time.</p><p>By combining small, focused filters — like <code>grep</code> (search lines), <code>cut</code> (extract columns), <code>sort</code> (order lines), and <code>uniq -c</code> (count duplicates) — you can analyze gigabytes of log data with a single line of shell.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Pipes stream data directly through memory buffers between concurrent processes.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The core text toolkit</h2>
+  <p>Learn the standard Unix text-processing utilities and their specialized roles.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing a pipeline execution</h2>
+  <p>Trace how a pipeline finds the top 3 most frequent IP addresses in a log file.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of composable text utilities.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can assemble multi-tool pipelines to extract, filter, and summarize complex text data instantly.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Filter a CSV file by a specific column using cut or awk.</li>
+    <li>Count the frequency of each unique word in a document using sort | uniq -c.</li>
+    <li>Inspect the first 5 lines of a long pipeline output using head -n 5.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Kernighan & Pike, *The UNIX Programming Environment* (Chapter 4: 'Filters').
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What does 'cat access.log | grep '404' | wc -l' calculate?",
+    a: ["The file size of access.log in kilobytes","The number of lines containing HTTP 404 errors in the log","The time taken to download access.log from the server","The IP addresses of all visitors to the website"],
+    c: 1,
+    why: "grep filters for lines matching '404', and wc -l counts the filtered lines."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "grep",
+            "lines": [
+                  "filter lines by regex",
+                  "grep -E 'ERROR|WARN'"
+            ]
+      },
+      {
+            "title": "sort & uniq",
+            "lines": [
+                  "order lines alphabetically",
+                  "uniq -c counts occurrences"
+            ]
+      },
+      {
+            "title": "awk & cut",
+            "lines": [
+                  "extract columns and fields",
+                  "awk '{print $1, $4}'"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Stream: log -> extract IP -> sort -> count unique -> sort top 3",
+      "cat access.log | awk '{print $1}' | sort | uniq -c | sort -nr | head -n 3"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "raw": "10,000 log lines"
+            }
+      },
+      {
+            "line": 0,
+            "vars": {
+                  "awk": "extracted 10,000 raw IPs"
+            }
+      },
+      {
+            "line": 0,
+            "vars": {
+                  "uniq": "grouped counts: 400 1.1.1.1, 250 8.8.8.8..."
+            }
+      },
+      {
+            "line": 0,
+            "vars": {
+                  "result": "top 3 highest frequency IP addresses"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The symbol used to pipe output between commands is <0>.",
+      "The command to count lines, words, and characters is <1>.",
+      "To eliminate adjacent duplicate lines, use the command <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "|",
+                  "pipe",
+                  "vertical bar"
+            ],
+            "why": "The vertical pipe character connects stdout to stdin."
+      },
+      {
+            "a": [
+                  "wc"
+            ],
+            "why": "wc stands for word count."
+      },
+      {
+            "a": [
+                  "uniq"
+            ],
+            "why": "uniq filters out consecutive identical lines."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why must you sort data before passing it to 'uniq'?",
+      a: ["uniq only compares adjacent neighboring lines for duplicates","Sorting automatically converts ASCII text into Unicode","The pipe operator will crash if lines are not alphabetical","uniq deletes non-sorted files from the hard drive"],
+      c: 0,
+      why: "uniq operates in a streaming fashion, comparing each line only to the preceding line."
+    },
+    {
+      q: "What does 'grep -v' do when filtering text?",
+      a: ["Inverts the match, printing only lines that do NOT contain the pattern","Prints verbose memory statistics about regex compilation","Validates that the file has a valid digital signature","Converts all uppercase letters to lowercase characters"],
+      c: 0,
+      why: "The -v flag inverts matching logic to filter out unwanted lines."
+    },
+    {
+      q: "How does data travel between processes connected by a pipe?",
+      a: ["Through an in-memory kernel buffer without touching physical storage disk","Through temporary hidden files created in /tmp directory","Over external internet TCP network connections","By writing data directly into video display graphics memory"],
+      c: 0,
+      why: "Pipes use high-performance kernel memory buffers to stream data concurrently."
+    },
+    {
+      q: "Which command extracts the first column from a space-delimited text stream?",
+      a: ["awk '{print $1}'","cat --col 1","grep --column=1","echo $1"],
+      c: 0,
+      why: "In awk, $1 refers to the first whitespace-separated field on each line."
+    }
+  ]);
+</script>
+</body>
+</html>

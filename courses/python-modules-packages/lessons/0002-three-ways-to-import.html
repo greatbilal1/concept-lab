@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 02 — Three ways to import</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="python-modules-packages" data-lesson="2" data-lesson-id="three-ways-to-import">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 02</span> · Imports</span>
+
+  <h1 class="lesson-title">Three ways to import</h1>
+  <p class="lesson-lede">
+    Python gives you three spellings for the same operation, and they are not
+    interchangeable. Each one binds a different name in your file, and choosing
+    badly is how codebases end up with names nobody can trace.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Pick the right import form</span>
+    <span><b>Mission link</b> Readable names are a design decision</span>
+  </div>
+
+  <h2><span class="n">1</span>Same operation, three bindings</h2>
+
+  <p>
+    Every import does the same work underneath: find the file, run it once, cache
+    it. What differs is <b>what name lands in your namespace</b>. That is the only
+    question that matters when you choose a form.
+  </p>
+
+  <div id="intro1"></div>
+
+  <p>
+    Read those three lines again and notice the difference. The first binds
+    <code>helpers</code>. The second binds <code>with_tax</code>. The third binds
+    <code>h</code>. Three different names, one module.
+  </p>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Plain import: the default</h2>
+
+  <p>
+    <code>import helpers</code> is the form you should reach for first. It binds
+    the module object, and every use is prefixed with the module name:
+  </p>
+
+  <pre><code>import helpers
+
+helpers.with_tax(50)
+helpers.TAX_RATE</code></pre>
+
+  <p>
+    The prefix looks like extra typing. It is not — it is <b>provenance</b>. Six
+    months from now, <code>helpers.with_tax</code> tells you exactly where the
+    function came from. A bare <code>with_tax</code> tells you nothing.
+  </p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Prefer the form that keeps the <b>origin visible</b> at the call site. Plain
+    import does that by default, which is why it is the safe choice.
+  </div>
+
+  <h2><span class="n">3</span>from-import: bind the name directly</h2>
+
+  <p>
+    <code>from helpers import with_tax</code> skips the module object and binds the
+    function itself. Now you call <code>with_tax(50)</code> with no prefix.
+  </p>
+
+  <p>
+    This is genuinely useful when the module name adds nothing — <code>from math
+    import sqrt</code> reads better than <code>math.sqrt</code> in a formula. But
+    it has a cost: the name in your file no longer says where it came from, and it
+    can be shadowed by anything else you define.
+  </p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Aliases: rename on the way in</h2>
+
+  <p>
+    <code>import helpers as h</code> binds the module under a new name. Aliases
+    exist for two honest reasons: the real name is long, or the real name collides.
+  </p>
+
+  <pre><code>import numpy as np
+import pandas as pd
+from myapp.very.long.path import config as cfg</code></pre>
+
+  <p>
+    The first two are community conventions — everyone writes <code>np</code> and
+    <code>pd</code>, so using anything else is a small act of hostility. The third
+    is a local decision: shorten a path that would otherwise dominate every line.
+  </p>
+
+  <div id="diagram1"></div>
+
+  <div class="note good">
+    <span class="note-label">Why this matters later</span>
+    When you read someone else's code, the import block is the map. Plain imports
+    tell you which modules are in play; from-imports tell you which names were
+    pulled in; aliases tell you what the author decided to abbreviate. Learn to
+    read that block and you can orient in any codebase in a minute.
+  </div>
+
+  <h2><span class="n">5</span>Check yourself</h2>
+
+  <p>
+    Answer from memory — do not scroll back up. Each option has the same number of
+    words, so nothing gives the answer away.
+  </p>
+
+  <div id="fill1"></div>
+  <div id="quiz"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>
+      You can now read any import block and say exactly which names it created,
+      and you can choose a form deliberately instead of by habit. That is the
+      difference between code that is merely working and code that is legible.
+    </p>
+  </div>
+
+  <h2><span class="n">6</span>Do this next</h2>
+
+  <ol>
+    <li>
+      Take yesterday's split script and rewrite the import all three ways. Run it
+      each time and confirm the output is identical.
+    </li>
+    <li>
+      Find a from-import in your own code where the module name would have added
+      clarity. Change it to a plain import and see if the call sites read better.
+    </li>
+    <li>
+      Look up the import block of a library you use. Count how many aliases it
+      uses and guess why each one exists.
+    </li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Read the Python tutorial's
+    <a href="https://docs.python.org/3/tutorial/modules.html">Modules chapter</a>,
+    section 6.1 ("More on Modules"), which covers all three forms and the alias
+    syntax in a few paragraphs.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher (me) anything — "when is from-import
+    actually the right call?", "can I alias a from-import?", "why does everyone use
+    np?". There are no bad questions here.
+  </div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  /* the three forms side by side */
+  TeachWidgets.introCards("#intro1", {
+    cards: [
+      { ico: "📦", title: "import helpers", body: "Binds the module object. Use it as helpers.with_tax." },
+      { ico: "🎯", title: "from helpers import with_tax", body: "Binds the function itself. Use it as with_tax." },
+      { ico: "🏷️", title: "import helpers as h", body: "Binds the module under a new name. Use it as h.with_tax." }
+    ]
+  });
+
+  /* predict-then-reveal */
+  TeachWidgets.predict("#predict1", {
+    q: "After `from helpers import with_tax`, what name exists in your file?",
+    a: ["Only the name helpers", "Only the name with_tax", "Both helpers and with_tax"],
+    c: 1,
+    why: "from-import binds only the names you list. The module object itself is loaded and cached, but no 'helpers' name is created in your namespace."
+  });
+
+  /* step-through trace of a from-import */
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "from helpers import with_tax",
+      "  -> load and cache helpers",
+      "  -> read attribute with_tax",
+      "  -> bind with_tax here",
+      "with_tax(50)"
+    ],
+    steps: [
+      { line: 0, vars: { statement: "from helpers import with_tax" } },
+      { line: 1, vars: { cached: "sys.modules['helpers']" } },
+      { line: 2, vars: { attribute: "helpers.with_tax" } },
+      { line: 3, vars: { bound: "with_tax -> function" } },
+      { line: 4, vars: { result: "60.0" } }
+    ]
+  });
+
+  /* what each form binds */
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      { title: "import x", lines: ["binds x", "module object"] },
+      { title: "from x import y", lines: ["binds y", "the attribute"] },
+      { title: "import x as z", lines: ["binds z", "module object"] }
+    ]
+  });
+
+  /* recall from memory */
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — name the binding",
+    lines: [
+      "<code>import json</code> binds the name <0>",
+      "<code>from json import dumps</code> binds the name <1>",
+      "<code>import json as j</code> binds the name <2>"
+    ],
+    blanks: [
+      { a: ["json"], why: "Plain import binds the module under its own name." },
+      { a: ["dumps"], why: "from-import binds the listed attribute directly." },
+      { a: ["j"], why: "The as clause renames the module object to the alias." }
+    ]
+  });
+
+  /* the quiz — every option is exactly three words */
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What does plain import bind?",
+      a: ["The module object itself", "Each function by name", "A copy of the file", "Nothing until first use"],
+      c: 0,
+      why: "import helpers creates a name 'helpers' pointing at the module object."
+    },
+    {
+      q: "What does from-import bind?",
+      a: ["The module object itself", "Only the listed names", "Every public name inside", "A renamed module object"],
+      c: 1,
+      why: "from helpers import with_tax binds with_tax only — the module name is not created."
+    },
+    {
+      q: "Why use an alias?",
+      a: ["To make imports faster", "To shorten or disambiguate", "To hide the real module", "To avoid running the file"],
+      c: 1,
+      why: "Aliases exist for long names (numpy as np) and for collisions between two modules."
+    },
+    {
+      q: "Which form shows provenance?",
+      a: ["The plain import form", "The from import form", "The aliased import form", "None of these forms"],
+      c: 0,
+      why: "helpers.with_tax names its origin at the call site; a bare with_tax does not."
+    }
+  ]);
+</script>
+</body>
+</html>

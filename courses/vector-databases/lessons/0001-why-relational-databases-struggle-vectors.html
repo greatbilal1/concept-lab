@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 01 — Why Relational Databases Struggle with Vector Similarity at Scale</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="vector-databases" data-lesson="1" data-lesson-id="why-relational-databases-struggle-vectors">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 01</span> · Vector Scale</span>
+
+  <h1 class="lesson-title">Why Relational Databases Struggle with Vector Similarity at Scale</h1>
+  <p class="lesson-lede">
+    The curse of dimensionality: why standard B-tree indexes fail on high-dimensional vectors and demand specialized indexes.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You understand why high-dimensional vectors require specialized index architectures.</span>
+    <span><b>Mission link</b> Mastering why relational databases struggle with vector similarity at scale across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Why Relational Databases Struggle with Vector Similarity at Scale</h2>
+  <p>Relational databases are the bedrock of software engineering. For decades, standard <strong>B-Tree indexes</strong> made queries over numbers, strings, and dates lightning fast: <code>WHERE age > 21</code> runs in $O(\log N)$ time by traversing a sorted tree.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    The curse of dimensionality: why standard B-tree indexes fail on high-dimensional vectors and demand specialized indexes.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>B-Trees vs High Dimensions</h2>
+  <p>However, when you store 1,536-dimensional embedding vectors, traditional B-tree indexing fails completely due to the <strong>Curse of Dimensionality</strong>:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Exact Flat vs Approximate Search (ANN)</h2>
+  <ul><li><strong>No 1D Scalar Order:</strong> Is $[0.2, 0.8]$ 'greater than' $[0.7, 0.1]$? There is no single linear order in high dimensions. A B-tree cannot sort multi-dimensional vectors!</li><li><strong>The Linear Scan Collapse:</strong> Without an index, finding the nearest neighbor requires a <strong>Brute-Force Flat Scan ($O(N)$)</strong>: computing cosine similarity against every single row in the table! At 10 million rows, a single search takes 45 seconds and consumes 100% CPU.</li></ul><pre><code># The Brute-Force Collapse at Scale (Flat Search):
+# 1,000 vectors:        Takes 0.002s (Fast)
+# 100,000 vectors:      Takes 0.25s  (Sluggish)
+# 10,000,000 vectors:   Takes 25.0s  (Unusable in production!)
+#
+# Solution: Specialized Vector Indexes (HNSW, IVFFlat)
+# Trade exact precision for 99% accuracy at 2 milliseconds!</code></pre><p>To search millions of vectors in single-digit milliseconds, computer science invented <strong>Approximate Nearest Neighbor (ANN)</strong> indexing.</p><div class="callout"><p><strong>The Trade-off:</strong> Vector databases trade a tiny fraction of accuracy (1-2% recall) for a 1,000x speedup, making million-scale semantic search instantaneous.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the vector scale sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You understand why high-dimensional vectors require specialized index architectures.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where why relational databases struggle with vector similarity at scale applies.</li>
+    <li>Author a unit test or verification script exercising why relational databases struggle with vector similarity at scale.</li>
+    <li>Document team architectural conventions regarding why relational databases struggle with vector similarity at scale.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Why Relational Databases Struggle with Vector Similarity at Scale.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Why can standard relational B-tree indexes (like those in PostgreSQL or MySQL) not index 1,536-dimensional vectors?",
+    a: ["B-trees rely on a 1D scalar ordering (greater than / less than), which does not exist in high-dimensional vector spaces","B-trees cannot store floating point numbers","B-trees are prohibited by SQL standards","Relational databases cannot store arrays"],
+    c: 0,
+    why: "B-trees require a total scalar ordering; in 1,536 dimensions, there is no single greater-than direction."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1D Scalar Data (B-Tree)",
+            "lines": [
+                  "Numbers: 1 < 5 < 12 < 42",
+                  "B-tree sorts linearly in O(log N)"
+            ]
+      },
+      {
+            "title": "1,536D Vector Space",
+            "lines": [
+                  "No greater-than scalar order",
+                  "B-tree fails -> Collapses to O(N) full table scan!"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Why Relational Databases Struggle with Vector Similarity at Scale",
+      "def execute_flow():",
+      "    # The curse of dimensionality: why standard B-tree i...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Why Relational Databases Struggle with Vector Similarity at Scale"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Exact Flat Search (Brute Force)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Approximate Nearest Neighbor (ANN)"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Relational B-tree indexes fail on high-dimensional vectors because multidimensional space lacks a single {1} order, forcing brute-force {2} scans."
+],
+    blanks: [
+      {
+            "a": [
+                  "scalar"
+            ],
+            "why": "One-dimensional greater-than order"
+      },
+      {
+            "a": [
+                  "table"
+            ],
+            "why": "Checking every row sequentially"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is an Approximate Nearest Neighbor (ANN) algorithm?",
+      a: ["An index algorithm that finds vectors close to a query in milliseconds by searching a structured graph or cluster, trading slight precision for massive speed","An algorithm that guesses randomly","A tool for finding lost neighbors","A relational database join"],
+      c: 0,
+      why: "ANN indexes navigate sub-spaces to find nearest neighbors in sub-linear time."
+    },
+    {
+      q: "What is 'Recall@K' in vector search benchmarking?",
+      a: ["The percentage of true nearest neighbors found by the approximate ANN index compared to an exhaustive brute-force search","The speed of the network cable","The cost of the cloud server","The number of rows in the table"],
+      c: 0,
+      why: "Recall@K evaluates how accurately an approximate index approximates exact brute-force search."
+    },
+    {
+      q: "Why does a flat vector search (without an index) work acceptably on small datasets of 500 rows?",
+      a: ["Modern CPUs can compute 500 dot products in microseconds using SIMD instructions; scale only becomes problematic past tens of thousands of rows","Flat search is powered by AI","Small datasets use 2D vectors","500 rows bypass linear algebra"],
+      c: 0,
+      why: "SIMD hardware acceleration handles small vector collections easily without indexing overhead."
+    },
+    {
+      q: "What happens to the computational cost of brute-force vector search as the dataset size N doubles?",
+      a: ["The search duration doubles linearly: O(N) complexity","The search duration quadruples","The search duration is cut in half","The search duration stays constant"],
+      c: 0,
+      why: "Brute-force comparison checks every vector, scaling linearly with row count."
+    }
+  ]);
+</script>
+</body>
+</html>

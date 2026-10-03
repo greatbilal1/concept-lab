@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 04 — Authentication vs Authorization and Access Control (RBAC, ABAC)</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="cybersecurity-fundamentals" data-lesson="4" data-lesson-id="authentication-vs-authorization-rbac-abac">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 04</span> · Auth & Access</span>
+
+  <h1 class="lesson-title">Authentication vs Authorization and Access Control (RBAC, ABAC)</h1>
+  <p class="lesson-lede">
+    Disentangling identity from permissions: Authentication (AuthN - who are you?) vs Authorization (AuthZ - what can you do?), RBAC, and ABAC.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to implement robust Authentication and enforce RBAC and ABAC access controls.</span>
+    <span><b>Mission link</b> Mastering authentication vs authorization and access control (rbac, abac) across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Authentication vs Authorization and Access Control (RBAC, ABAC)</h2>
+  <p>Confusing Authentication with Authorization is one of the most common causes of critical security vulnerabilities (like Broken Access Control). A user can be 100% authenticated, but completely unauthorized to view someone else's payroll.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Disentangling identity from permissions: Authentication (AuthN - who are you?) vs Authorization (AuthZ - what can you do?), RBAC, and ABAC.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Authentication vs Authorization</h2>
+  <p>The Twin Pillars of Access:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>RBAC vs ABAC Comparison</h2>
+  <ul><li><strong>1. Authentication (AuthN — 'Who are you?'):</strong> Verifying claimed identity. E.g. Passwords with MFA, Passkeys (WebAuthn), OAuth2 social logins, API keys. Result: An authenticated user identity (e.g. `user_id = 42`).</li><li><strong>2. Authorization (AuthZ — 'What are you allowed to do?'):</strong> Evaluating permissions on a specific resource. E.g. <em>Can user 42 edit invoice 99?</em></li><li><strong>3. Role-Based Access Control (RBAC):</strong> Assigning permissions to roles (Admin, Editor, Viewer). Users belong to roles. Simple, intuitive, standard for 90% of business applications.</li><li><strong>4. Attribute-Based Access Control (ABAC):</strong> Evaluating dynamic context: <code>allow IF user.role == 'Doctor' AND patient.assigned_doctor == user.id AND time.is_business_hours()</code>. Necessary for complex healthcare, government, and multi-tenant architectures.</li></ul><pre><code># The RBAC vs ABAC Decision in Code:
+# RBAC (Coarse-Grained):
+@require_role("BILLING_ADMIN")
+def delete_invoice(invoice_id):
+    # Only users with the explicit 'BILLING_ADMIN' role can execute this!
+    db.invoices.delete(invoice_id)
+
+# ABAC (Fine-Grained Contextual Check):
+def view_medical_record(user: User, record: MedicalRecord):
+    # Evaluates attributes across user, record, and context:
+    if user.role == "DOCTOR" and record.patient_id in user.assigned_patients:
+        return record.data
+    raise ForbiddenException("Access denied: Not your assigned patient!")</code></pre><div class="callout"><p><strong>The Core Access Law:</strong> Never rely on authentication alone. Always check authorization on every single request at the specific resource level.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the auth sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to implement robust Authentication and enforce RBAC and ABAC access controls.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where authentication vs authorization and access control (rbac, abac) applies.</li>
+    <li>Author a unit test or verification script exercising authentication vs authorization and access control (rbac, abac).</li>
+    <li>Document team architectural conventions regarding authentication vs authorization and access control (rbac, abac).</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Authentication vs Authorization and Access Control (RBAC, ABAC).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is the difference between Authentication (AuthN) and Authorization (AuthZ)?",
+    a: ["Authentication verifies WHO you are (identity); Authorization determines WHAT actions you are allowed to perform (permissions)","Authentication is for computers; authorization is for humans","They are identical synonyms","Authentication happens on the database; authorization on the browser"],
+    c: 0,
+    why: "Authentication verifies identity (credentials); authorization enforces access policies on resources."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Authentication (AuthN)",
+            "lines": [
+                  "Answers: 'Who are you?'",
+                  "Mechanisms: Passwords, MFA, Passkeys, SSO",
+                  "Output: Authenticated user identity"
+            ]
+      },
+      {
+            "title": "Authorization (AuthZ)",
+            "lines": [
+                  "Answers: 'Can you do this action?'",
+                  "Mechanisms: RBAC, ABAC, ACLs",
+                  "Output: Allow or Deny verdict"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Authentication vs Authorization and Access Control (RBAC, ABAC)",
+      "def execute_flow():",
+      "    # Disentangling identity from permissions: Authentic...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Authentication vs Authorization and Access Control (RBAC, ABAC)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Role-Based (RBAC)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Attribute-Based (ABAC)"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "While {1} verifies who an entity is using credentials, {2} evaluates whether that authenticated entity has permission to perform a specific action."
+],
+    blanks: [
+      {
+            "a": [
+                  "authentication"
+            ],
+            "why": "Identity verification process"
+      },
+      {
+            "a": [
+                  "authorization"
+            ],
+            "why": "Permission granting process"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What vulnerability occurs when an application authenticates a user but fails to check authorization before displaying private user records?",
+      a: ["Broken Access Control / Insecure Direct Object Reference (IDOR)","SQL Injection","Cross-Site Scripting","Denial of Service"],
+      c: 0,
+      why: "Failing to verify that an authenticated user owns the requested record allows unauthorized access."
+    },
+    {
+      q: "What is an advantage of Attribute-Based Access Control (ABAC) over traditional RBAC?",
+      a: ["ABAC can evaluate dynamic contextual conditions like time of day, geographic location, and resource ownership rather than just static roles","ABAC requires no computers","ABAC makes software free","ABAC runs without databases"],
+      c: 0,
+      why: "ABAC evaluates granular dynamic context (who, what, where, when) to make authorization decisions."
+    },
+    {
+      q: "Why is Multi-Factor Authentication (MFA) vastly superior to passwords alone for authentication?",
+      a: ["Even if an attacker steals or guesses a user's password, they cannot authenticate without access to the secondary physical factor (phone/hardware token)","MFA makes typing faster","MFA is required by Python syntax","MFA makes passwords unnecessary"],
+      c: 0,
+      why: "MFA requires two independent factors (knowledge + possession), neutralizing stolen password attacks."
+    },
+    {
+      q: "What standard token format is widely used to transmit digitally signed identity claims between web services?",
+      a: ["JSON Web Token (JWT)","CSV spreadsheet","HTML document","ZIP archive"],
+      c: 0,
+      why: "JWT is the open standard format for securely transmitting verifiable identity claims between parties."
+    }
+  ]);
+</script>
+</body>
+</html>

@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 05 — Rate Limiting, Throttling, and Fair-Share Scheduling</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="production-ai-architecture" data-lesson="5" data-lesson-id="rate-limiting-throttling-fair-share">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 05</span> · Rate Limiting</span>
+
+  <h1 class="lesson-title">Rate Limiting, Throttling, and Fair-Share Scheduling</h1>
+  <p class="lesson-lede">
+    Protecting infrastructure: Token Bucket rate limiters, concurrency throttling, fair-share scheduling, and defending against noisy neighbors.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to enforce multi-dimensional rate limits and fair-share scheduling across AI platforms.</span>
+    <span><b>Mission link</b> Mastering rate limiting, throttling, and fair-share scheduling across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Rate Limiting, Throttling, and Fair-Share Scheduling</h2>
+  <p>Unlike traditional web APIs where requests take 5ms of CPU, a single AI request can consume <strong>100% of a GPU for 8 seconds</strong>. If one automated script sends 100 concurrent requests, it will starve every other customer in your company, causing widespread outages (the <strong>Noisy Neighbor Problem</strong>).</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Protecting infrastructure: Token Bucket rate limiters, concurrency throttling, fair-share scheduling, and defending against noisy neighbors.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Multi-Dimensional AI Rate Limiting</h2>
+  <p>Production platforms enforce <strong>Three-Tier Rate Limiting & Scheduling</strong>:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Fair-Share Queue Scheduling</h2>
+  <ul><li><strong>1. Requests-Per-Minute (RPM) Limits:</strong> Traditional rate limits implemented via Redis Token Bucket. Free users get 10 RPM; Enterprise users get 600 RPM.</li><li><strong>2. Tokens-Per-Minute (TPM) Limits:</strong> In AI, requests have wildly different weights. A query with 50,000 prompt tokens consumes 500x more GPU attention than a 100-token query! We track and throttle cumulative <strong>tokens consumed per minute</strong> per tenant.</li><li><strong>3. Concurrent Request Throttling:</strong> Cap the number of <em>simultaneous in-flight requests</em> per tenant (e.g. Free: max 2 in-flight; Pro: max 20 in-flight).</li><li><strong>4. Fair-Share Scheduling Queues:</strong> Round-robin work queues that prevent a single high-volume tenant from monopolizing worker pools.</li></ul><pre><code># Redis Token Bucket Rate Limiting in Python (Lua Script):
+# Evaluated atomically in Redis in 0.5ms:
+RATE_LIMIT_LUA = """
+local key = KEYS[1]
+local limit = tonumber(ARGV[1])
+local current = tonumber(redis.call('get', key) or "0")
+if current + 1 > limit then
+    return 0 -- REJECT with HTTP 429!
+else
+    redis.call("incrby", key, 1)
+    if current == 0 then redis.call("expire", key, 60) end
+    return 1 -- ALLOW request!
+end
+"""</code></pre><div class="callout"><p><strong>The Multi-Dimensional Limit:</strong> Never rate limit by request count alone. Always enforce limits on <strong>Tokens-Per-Minute (TPM)</strong> and <strong>Concurrent In-Flight Requests</strong>.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the rate limiting sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to enforce multi-dimensional rate limits and fair-share scheduling across AI platforms.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where rate limiting, throttling, and fair-share scheduling applies.</li>
+    <li>Author a unit test or verification script exercising rate limiting, throttling, and fair-share scheduling.</li>
+    <li>Document team architectural conventions regarding rate limiting, throttling, and fair-share scheduling.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Rate Limiting, Throttling, and Fair-Share Scheduling.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is the 'Token Bucket' algorithm and why is it standard for API rate limiting?",
+    a: ["An algorithm that replenishes access tokens at a fixed rate, allowing short bursts of traffic while enforcing a strict sustained rate ceiling","A bucket that holds physical computer chips","A technique for mining cryptocurrencies","A method for encrypting passwords"],
+    c: 0,
+    why: "The Token Bucket algorithm permits natural short traffic bursts while strictly capping sustained request throughput."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1. RPM (Requests/Min)",
+            "lines": [
+                  "Caps total query count",
+                  "Blocks simple spam attacks"
+            ]
+      },
+      {
+            "title": "2. TPM (Tokens/Min)",
+            "lines": [
+                  "Caps cumulative token volume",
+                  "Protects against massive prompt abuse"
+            ]
+      },
+      {
+            "title": "3. Concurrency Semaphore",
+            "lines": [
+                  "Caps in-flight simultaneous calls",
+                  "Prevents single tenant from monopolizing GPUs"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Rate Limiting, Throttling, and Fair-Share Scheduling",
+      "def execute_flow():",
+      "    # Protecting infrastructure: Token Bucket rate limit...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Rate Limiting, Throttling, and Fair-Share Scheduling"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Tenant A (Spamming 500 jobs)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Tenant B (1 job)"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Production AI platforms protect GPU capacity by enforcing multi-dimensional rate limits across requests-per-minute, tokens-per-minute, and {1} in-flight {2}."
+],
+    blanks: [
+      {
+            "a": [
+                  "concurrent"
+            ],
+            "why": "Simultaneously executing requests"
+      },
+      {
+            "a": [
+                  "requests"
+            ],
+            "why": "Active running queries"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why is rate limiting by Requests-Per-Minute (RPM) alone inadequate for generative AI APIs?",
+      a: ["Because a single request with 80,000 prompt tokens consumes massive GPU memory and compute, while 10 requests with 50 tokens consume almost nothing","RPM cannot be measured","RPM is illegal in Python","Models ignore RPM"],
+      c: 0,
+      why: "Token volume varies wildly per request; TPM rate limits are essential to bound physical compute consumption."
+    },
+    {
+      q: "What is the 'Noisy Neighbor' problem in multi-tenant cloud platforms?",
+      a: ["When one abusive or high-volume tenant consumes all available system capacity, degrading performance for all other tenants on the platform","A loud server fan in a data center","Someone playing music in the office","A broken network router"],
+      c: 0,
+      why: "Unconstrained tenants can monopolize shared resources, degrading service for everyone else."
+    },
+    {
+      q: "Why are rate limiting checks executed in Redis using atomic Lua scripts?",
+      a: ["Lua scripts execute atomically on the Redis server, preventing race conditions between concurrent requests without heavy database locks","Lua runs on quantum hardware","Lua deletes expired keys","Lua makes Python faster"],
+      c: 0,
+      why: "Atomic execution in Redis eliminates race conditions during rapid concurrent requests."
+    },
+    {
+      q: "What HTTP status code and header must be returned when a tenant exceeds their rate limit?",
+      a: ["HTTP 429 Too Many Requests with a 'Retry-After: <seconds>' header indicating when quota replenishes","HTTP 200 OK","HTTP 500 Internal Error","HTTP 404 Not Found"],
+      c: 0,
+      why: "HTTP 429 with Retry-After provides clear, actionable protocol guidance to client retry algorithms."
+    }
+  ]);
+</script>
+</body>
+</html>

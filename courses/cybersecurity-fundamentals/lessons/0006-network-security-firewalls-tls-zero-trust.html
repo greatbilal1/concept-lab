@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 06 — Network Security Fundamentals: Firewalls, TLS, and Zero Trust</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="cybersecurity-fundamentals" data-lesson="6" data-lesson-id="network-security-firewalls-tls-zero-trust">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 06</span> · Network Security</span>
+
+  <h1 class="lesson-title">Network Security Fundamentals: Firewalls, TLS, and Zero Trust</h1>
+  <p class="lesson-lede">
+    Network perimeters and beyond: packet-filtering firewalls, CIDR blocks, TLS 1.3 certificates, and the modern Zero Trust architecture.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You understand the principles of Zero Trust, mTLS, and network micro-segmentation.</span>
+    <span><b>Mission link</b> Mastering network security fundamentals: firewalls, tls, and zero trust across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Network Security Fundamentals: Firewalls, TLS, and Zero Trust</h2>
+  <p>Traditional network security relied on the <strong>Castle-and-Moat Model</strong>: build a thick firewall around the corporate network; anyone inside the office Wi-Fi is trusted, and everyone outside is untrusted. This model collapsed because once an attacker breaches the perimeter (via phishing or a compromised laptop), they can roam freely across internal databases and servers.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Network perimeters and beyond: packet-filtering firewalls, CIDR blocks, TLS 1.3 certificates, and the modern Zero Trust architecture.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Castle-and-Moat vs Zero Trust</h2>
+  <p>Modern architecture is defined by <strong>Zero Trust Network Access (ZTNA)</strong>:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Database Network Isolation</h2>
+  <ul><li><strong>1. 'Never Trust, Always Verify':</strong> Location does not equal trust. An API call originating from an internal server must be authenticated and authorized with the exact same rigor as a call from the public internet.</li><li><strong>2. Transport Layer Security (TLS 1.3):</strong> All internal microservice-to-microservice traffic must be encrypted via mutual TLS (mTLS). Zero plaintext HTTP traffic on internal networks!</li><li><strong>3. Network Segmentation & Firewalls:</strong> Restrict database and cache ports (Postgres 5432, Redis 6379) to specific VPC CIDR blocks. Databases must never have public internet IP addresses!</li><li><strong>4. Micro-Segmentation:</strong> Place services in isolated security groups so a compromised frontend pod cannot open arbitrary socket connections to sensitive billing databases.</li></ul><pre><code># The Zero Trust Rule: Microservice mTLS
+# In Castle-and-Moat (Vulnerable):
+[Frontend Pod] ──(Plaintext HTTP:80)──> [Internal Billing DB] (Attacker taps wire!)
+
+# In Zero Trust (Secure):
+[Frontend Pod] ──(Mutual TLS 1.3 with Client Cert)──> [Internal Billing DB]
+# Database verifies frontend's cryptographic identity before answering!</code></pre><div class="callout"><p><strong>The Database Rule:</strong> Never, under any circumstances, assign a public IP address to a database or cache. Databases belong in private subnets with strict ingress security groups.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the network security sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You understand the principles of Zero Trust, mTLS, and network micro-segmentation.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where network security fundamentals: firewalls, tls, and zero trust applies.</li>
+    <li>Author a unit test or verification script exercising network security fundamentals: firewalls, tls, and zero trust.</li>
+    <li>Document team architectural conventions regarding network security fundamentals: firewalls, tls, and zero trust.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Network Security Fundamentals: Firewalls, TLS, and Zero Trust.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is the foundational principle of the 'Zero Trust' network architecture model?",
+    a: ["Never trust, always verify: assume the network is already compromised and authenticate/authorize every single request regardless of location","Trust everyone inside the corporate office Wi-Fi","Block all outgoing internet connections","Delete all passwords"],
+    c: 0,
+    why: "Zero Trust eliminates perimeter assumptions; every request, service, and user must be authenticated and authorized."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Castle-and-Moat (Obsolete)",
+            "lines": [
+                  "Inside network = 100% Trusted",
+                  "Breach perimeter -> Attacker has full lateral access!"
+            ]
+      },
+      {
+            "title": "Zero Trust (Modern Standard)",
+            "lines": [
+                  "Assume network is already compromised",
+                  "Authenticate & encrypt EVERY microservice call (mTLS)",
+                  "Zero implicit trust based on location"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Network Security Fundamentals: Firewalls, TLS, and Zero Trust",
+      "def execute_flow():",
+      "    # Network perimeters and beyond: packet-filtering fi...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Network Security Fundamentals: Firewalls, TLS, and Zero Trust"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Public Subnet (Internet-Facing)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Private Subnet (Isolated)"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Zero Trust network architecture rejects perimeter-based trust, enforcing continuous authentication, mutual {1}, and strict network {2}."
+],
+    blanks: [
+      {
+            "a": [
+                  "TLS"
+            ],
+            "why": "Transport Layer Security encryption"
+      },
+      {
+            "a": [
+                  "segmentation"
+            ],
+            "why": "Isolating network zones and subnets"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why is the traditional 'Castle-and-Moat' security model no longer effective in modern cloud environments?",
+      a: ["Remote work, mobile devices, and cloud services dissolve physical perimeters, and internal lateral movement allows attackers to roam freely once inside","Firewalls no longer exist","Internet cables are too fast","Computers run without networks"],
+      c: 0,
+      why: "Perimeter models fail when attackers compromise internal devices or when workloads span distributed clouds."
+    },
+    {
+      q: "What is 'Mutual TLS' (mTLS) in microservice architectures?",
+      a: ["A process where both the client and server present and verify cryptographic X.509 certificates to authenticate each other before establishing an encrypted tunnel","Two people sharing a password","A backup network cable","A type of database query"],
+      c: 0,
+      why: "mTLS guarantees bidirectional authentication and encryption between communicating microservices."
+    },
+    {
+      q: "What risk arises if a PostgreSQL database port (5432) is assigned a public IP address and 0.0.0.0/0 ingress?",
+      a: ["Automated internet bots will immediately target the database with continuous credential brute-forcing, exploiting any weak password or unpatched CVE","The database runs out of RAM","The database converts to Excel","It speeds up queries"],
+      c: 0,
+      why: "Publicly exposed database ports are immediately discovered and attacked by automated scanners."
+    },
+    {
+      q: "What is 'Micro-Segmentation' in cloud VPC design?",
+      a: ["Dividing a cloud network into isolated security zones so individual services can only communicate with explicitly approved dependencies","Making network cables shorter","Splitting files into pieces","Reducing screen resolution"],
+      c: 0,
+      why: "Micro-segmentation confines lateral movement if an individual service is compromised."
+    }
+  ]);
+</script>
+</body>
+</html>

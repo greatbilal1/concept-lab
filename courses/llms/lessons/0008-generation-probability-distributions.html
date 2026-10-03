@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 08 — What Happens During Generation: Probability Distributions</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="llms" data-lesson="8" data-lesson-id="generation-probability-distributions">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 08</span> · Generation Mechanics</span>
+
+  <h1 class="lesson-title">What Happens During Generation: Probability Distributions</h1>
+  <p class="lesson-lede">
+    Inside the final milliseconds of generation: logits, Softmax, temperature, top-p filtering, and token emission.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You have completed the How LLMs Work course.</span>
+    <span><b>Mission link</b> Mastering what happens during generation: probability distributions across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of What Happens During Generation: Probability Distributions</h2>
+  <p>We have traced the full life cycle of Large Language Models: from web crawling and pre-training, to subword BPE tokenization, transformer attention blocks, and SFT/RLHF alignment. Now, let us look at the final milliseconds: <strong>What happens when a model generates a single token?</strong></p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Inside the final milliseconds of generation: logits, Softmax, temperature, top-p filtering, and token emission.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Final Milliseconds of Generation</h2>
+  <ol><li><strong>Final Hidden State ($h_{final}$):</strong> The last token passes through all 80 transformer layers, emerging as an enriched 4,096-dimensional vector representing the full context.</li><li><strong>The Language Model Head ($W_{LM}$):</strong> A linear matrix multiplication projects this 4,096D vector across the entire 128,000-word vocabulary: $\text{logits} = h_{final} @ W_{LM}$.</li><li><strong>Temperature Scaling:</strong> Logits are scaled: $\text{logits} / T$. Low temperature sharpens differences; high temperature flattens them.</li><li><strong>Filtering (Top-K / Top-P):</strong> Truncates the long tail of bizarre tokens, keeping only plausible candidates.</li><li><strong>Softmax Normalization:</strong> Exponentiates and normalizes remaining logits into a probability distribution summing to $1.0$.</li><li><strong>Sampling:</strong> A pseudo-random number generator samples the next token according to the distribution!</li></ol>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>The Generation Cycle Completes</h2>
+  <pre><code># The Complete Final Mile of Token Generation in Python:
+def sample_next_token(hidden_state, W_vocab, temperature=0.7, top_p=0.9):
+    # 1. Compute Logits across 128k vocabulary
+    logits = np.dot(hidden_state, W_vocab)
+    # 2. Scale by Temperature
+    scaled_logits = logits / temperature
+    # 3. Softmax to Probabilities
+    probs = np.exp(scaled_logits) / np.sum(np.exp(scaled_logits))
+    # 4. Top-P (Nucleus) filter & sample!
+    sampled_token_id = np.random.choice(len(probs), p=probs)
+    return sampled_token_id</code></pre><div class="callout"><p><strong>The Full Picture:</strong> You now understand how modern LLMs work from the physics of transformers and data pipelines down to the exact math of the final emitted token.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the generation mechanics sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You have completed the How LLMs Work course.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where what happens during generation: probability distributions applies.</li>
+    <li>Author a unit test or verification script exercising what happens during generation: probability distributions.</li>
+    <li>Document team architectural conventions regarding what happens during generation: probability distributions.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for What Happens During Generation: Probability Distributions.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is the final mathematical layer of a transformer decoder before a token is sampled?",
+    a: ["A linear Language Model Head projecting hidden states to vocabulary logits, followed by Softmax normalization","A database query","A regular expression filter","A git commit hook"],
+    c: 0,
+    why: "The LM Head projects the final hidden state across all vocabulary tokens, producing logits normalized by Softmax."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1. Hidden State (4,096D)",
+            "lines": [
+                  "Enriched representation of all context",
+                  "Output of final transformer layer"
+            ]
+      },
+      {
+            "title": "2. LM Head (128k Logits)",
+            "lines": [
+                  "Projects vector across full vocabulary",
+                  "Raw unnormalized scores"
+            ]
+      },
+      {
+            "title": "3. Temperature & Top-P",
+            "lines": [
+                  "Scales and filters the distribution",
+                  "Eliminates low-probability noise"
+            ]
+      },
+      {
+            "title": "4. Sample & Emit",
+            "lines": [
+                  "Random sampling selects Token ID",
+                  "Decoded by BPE into text!"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing What Happens During Generation: Probability Distributions",
+      "def execute_flow():",
+      "    # Inside the final milliseconds of generation: logit...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "What Happens During Generation: Probability Distributions"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Emitted Token ID"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "KV-Cache Acceleration"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The final hidden state is projected by the Language Model Head into vocabulary {1}, scaled by temperature, and normalized by {2} for sampling."
+],
+    blanks: [
+      {
+            "a": [
+                  "logits"
+            ],
+            "why": "Raw unnormalized scores"
+      },
+      {
+            "a": [
+                  "Softmax"
+            ],
+            "why": "Probability normalization function"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What are 'logits' in a language model?",
+      a: ["The unnormalized raw output scores produced by multiplying the final hidden state by the vocabulary projection matrix","Log files written to disk","The mathematical logarithm of numbers","Login session cookies"],
+      c: 0,
+      why: "Logits are raw real numbers that Softmax transforms into probabilities."
+    },
+    {
+      q: "How does KV-Caching optimize subsequent token generation in autoregressive LLMs?",
+      a: ["It caches the Key and Value matrices of all previous tokens in GPU RAM so only the single new token needs to be computed on each step","It caches HTML web pages","It turns off model weights","It eliminates the need for GPUs"],
+      c: 0,
+      why: "KV-caching avoids recomputing QKV projections for existing prompt tokens during generation."
+    },
+    {
+      q: "What happens when temperature is set to 0.0 during sampling?",
+      a: ["Greedy decoding: the model deterministically selects the single token with the highest logit score (argmax)","The model stops generating text","The model outputs random numbers","The computer processor freezes"],
+      c: 0,
+      why: "Temperature 0 collapses the sampling distribution to the argmax maximum probability token."
+    },
+    {
+      q: "What is the role of Top-P (Nucleus) sampling?",
+      a: ["It dynamically limits candidate tokens to the smallest set whose cumulative probability exceeds P (e.g. 0.90), cutting off the long tail of gibberish","It filters words starting with the letter P","It speeds up network latency","It forces models to write Python"],
+      c: 0,
+      why: "Nucleus sampling dynamically truncates low-probability tail tokens based on distribution confidence."
+    }
+  ]);
+</script>
+</body>
+</html>

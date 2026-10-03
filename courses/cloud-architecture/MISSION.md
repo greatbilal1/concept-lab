@@ -1,0 +1,3 @@
+# Mission — Cloud Architecture
+
+Master the mental model of enterprise cloud computing. Internalize the Shared Responsibility Model and on-demand elasticity, architect secure three-tier Virtual Private Clouds with public and private subnets, navigate the compute spectrum across VMs, Serverless, and Kubernetes, evaluate storage hierarchies (EBS, S3, EFS) with automated lifecycle tiering, govern enterprise identity using multi-account AWS Organizations and SCPs, distribute traffic globally with Anycast DNS and CDNs, quantify disaster recovery with RPO/RTO, and architect fault-tolerant multi-AZ infrastructures.

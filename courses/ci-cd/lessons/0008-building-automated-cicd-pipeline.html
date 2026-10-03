@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 08 — Building an End-to-End Automated CI/CD Pipeline</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="ci-cd" data-lesson="8" data-lesson-id="building-automated-cicd-pipeline">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 08</span> · CI/CD Pipeline</span>
+
+  <h1 class="lesson-title">Building an End-to-End Automated CI/CD Pipeline</h1>
+  <p class="lesson-lede">
+    Synthesizing deployment: building a complete GitHub Actions pipeline from commit to test, security scan, container build, and deployment.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You have completed the CI/CD & Automated Deployment course.</span>
+    <span><b>Mission link</b> Mastering building an end-to-end automated ci/cd pipeline across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Building an End-to-End Automated CI/CD Pipeline</h2>
+  <p>We have covered the complete engineering discipline of CI/CD & Automated Deployment: continuous delivery philosophy, GitHub Actions workflows, automated quality gates, matrix testing, dependency caching, Blue-Green deployments, and GitOps IaC.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Synthesizing deployment: building a complete GitHub Actions pipeline from commit to test, security scan, container build, and deployment.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The End-to-End Delivery Pipeline</h2>
+  <p>Now, we synthesize these into a <strong>Complete Production-Grade CI/CD Pipeline</strong>:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Developer Workflow Velocity</h2>
+  <ul><li><strong>Stage 1 (Code Quality Gate - 30s):</strong> Runs Ruff linter and Pyright static type checker concurrently.</li><li><strong>Stage 2 (Automated Test Suite - 45s):</strong> Restores cached pip dependencies; runs pytest with an 85% coverage threshold gate.</li><li><strong>Stage 3 (Security & Container Build - 40s):</strong> Builds a hardened multi-stage Docker image tagged with git commit SHA; scans image with Trivy for Critical CVEs.</li><li><strong>Stage 4 (Deploy to Staging):</strong> Deploys container image to staging Kubernetes cluster; executes automated end-to-end integration tests.</li><li><strong>Stage 5 (Production Release):</strong> On merge to `main`, executes zero-downtime deployment with automated rollback on error rate spikes!</li></ul><pre><code># The Complete Master CI/CD Pipeline (.github/workflows/deploy.yml):
+name: Production Release Pipeline
+on:
+  push:
+    branches: [main]
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12", cache: "pip" }
+      - run: pip install -r requirements.txt
+      - run: ruff check . && pyright src/ && pytest --cov=src
+
+  build-and-deploy:
+    needs: [verify] # Only runs if verification succeeds!
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build & Scan Docker Image
+        run: |
+          docker build -t company/api:${{ github.sha }} .
+          trivy image --exit-code 1 --severity CRITICAL company/api:${{ github.sha }}
+      - name: Deploy to Cloud (Keyless OIDC!)
+        uses: aws-actions/configure-aws-credentials@v4
+        with: { role-to-assume: "arn:aws:iam::123:role/DeployerRole", aws-region: "us-east-1" }
+      - run: aws ecs update-service --cluster prod --service api --force-new-deployment</code></pre><div class="callout"><p><strong>The Final Engineering Victory:</strong> Every commit is tested, scanned, containerized, and deployed automatically. You have built a software delivery machine that turns ideas into production reality with mathematical safety.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the CI/CD pipeline sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You have completed the CI/CD & Automated Deployment course.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where building an end-to-end automated ci/cd pipeline applies.</li>
+    <li>Author a unit test or verification script exercising building an end-to-end automated ci/cd pipeline.</li>
+    <li>Document team architectural conventions regarding building an end-to-end automated ci/cd pipeline.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Building an End-to-End Automated CI/CD Pipeline.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What complete sequence of automated gates defines a production-grade Continuous Delivery pipeline?",
+    a: ["Linting, static typing, automated unit tests, container build, Trivy security scan, and automated deployment with rollback gates","Typing code and uploading via FTP","Saving files to a USB drive","Running tests only on holidays"],
+    c: 0,
+    why: "A production CI/CD pipeline automates verification, security scanning, container packaging, and zero-downtime deployment."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1. Verify Gate (30s)",
+            "lines": [
+                  "Ruff Linter + Pyright Types + Pytest Suite",
+                  "Must pass 100% to proceed"
+            ]
+      },
+      {
+            "title": "2. Security & Build (40s)",
+            "lines": [
+                  "Multi-stage Docker build with Git SHA tag",
+                  "Trivy scans for Critical vulnerabilities"
+            ]
+      },
+      {
+            "title": "3. Keyless Cloud Deploy",
+            "lines": [
+                  "OIDC authentication to AWS / K8s",
+                  "Zero static secrets in GitHub"
+            ]
+      },
+      {
+            "title": "4. Rolling Zero Downtime",
+            "lines": [
+                  "Traffic shifts to healthy new containers",
+                  "Automated instant rollback if errors occur!"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Building an End-to-End Automated CI/CD Pipeline",
+      "def execute_flow():",
+      "    # Synthesizing deployment: building a complete GitHu...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Building an End-to-End Automated CI/CD Pipeline"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Developer Workflow"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "An end-to-end continuous delivery pipeline verifies code quality with automated test gates, scans container images for vulnerabilities, and executes keyless zero-downtime {1} to {2}."
+],
+    blanks: [
+      {
+            "a": [
+                  "deployments"
+            ],
+            "why": "Releasing software to servers"
+      },
+      {
+            "a": [
+                  "production"
+            ],
+            "why": "Live customer environment"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What happens if a developer's code passes linting and unit tests, but the Docker image contains a newly announced Critical security CVE?",
+      a: ["The Trivy security scanning step fails with exit code 1, halting the pipeline and preventing vulnerable code from deploying to production","The image deploys anyway","The pipeline reboots the computer","The CVE is ignored"],
+      c: 0,
+      why: "Automated security gates prevent images containing critical vulnerabilities from reaching production."
+    },
+    {
+      q: "Why is deploying code to a staging environment and running integration tests before production deployment valuable?",
+      a: ["It validates that the application functions correctly against real databases, cloud networks, and external APIs in an environment identical to production","Staging servers are free","It eliminates the need for unit tests","Staging is required by git"],
+      c: 0,
+      why: "Staging testing catches environmental, database, and integration defects before customer exposure."
+    },
+    {
+      q: "What is the primary benefit of using keyless OIDC authentication in GitHub Actions deployment steps?",
+      a: ["Zero permanent cloud access keys are stored in GitHub Secrets, eliminating credential leak risks if repository settings are breached","It speeds up deployment times by 10x","It compiles Python to assembly","It makes cloud storage free"],
+      c: 0,
+      why: "OIDC eliminates static cloud credentials entirely, drastically improving security posture."
+    },
+    {
+      q: "What is the ultimate mark of an expert DevOps and Continuous Delivery engineer?",
+      a: ["Building fully automated, self-defending pipelines that test, scan, package, and deploy software reliably multiple times a day with zero downtime","Deploying code manually via SSH at 2 AM","Refusing to write automated tests","Writing code directly on production servers"],
+      c: 0,
+      why: "Automating safe, reliable, and repeatable continuous delivery defines elite DevOps engineering."
+    }
+  ]);
+</script>
+</body>
+</html>

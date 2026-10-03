@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 03 — The DOM tree representation</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="html-dom" data-lesson="3" data-lesson-id="the-dom-tree-representation">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 03</span> · The Document Object Model</span>
+
+  <h1 class="lesson-title">The DOM tree representation</h1>
+  <p class="lesson-lede">
+    HTML text is just a string of characters; the DOM is a living, breathing tree of memory objects. Explore how browsers parse markup into the Document Object Model.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Explain how browsers tokenize HTML markup and construct the in-memory DOM tree</span>
+    <span><b>Mission link</b> Bridges static text markup and live JavaScript program state</span>
+  </div>
+
+  <h2><span class="n">1</span>From bytes to nodes</h2>
+  <p>A web browser does not execute HTML text directly. When raw HTML bytes arrive over the network, the browser's rendering engine processes them through a four-stage pipeline: <b>Bytes &rarr; Characters &rarr; Tokens &rarr; Nodes &rarr; DOM Tree</b>.</p><p>The resulting <b>Document Object Model (DOM)</b> is a tree of live JavaScript objects in memory. When you modify an element in JavaScript, you are not editing the HTML file — you are mutating live objects in the DOM tree.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    HTML is the source code serialization; the DOM is the live in-memory object model created from it.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The parsing pipeline</h2>
+  <p>Follow the transformation of raw network bytes into an interactive document object tree.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing DOM tree hierarchy</h2>
+  <p>Trace how a snippet of markup is converted into parent, child, and sibling nodes in memory.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of DOM tree concepts.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can conceptualize the browser rendering pipeline and explain the relationship between HTML text and live DOM objects.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Inspect window.document in your browser JavaScript console.</li>
+    <li>Print document.body.children in the console to view top-level element objects.</li>
+    <li>Observe how DevTools updates live when you mutate a node property.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    W3C / WHATWG: *DOM Living Standard* (dom.spec.whatwg.org).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "If an HTML file is missing a closing </p> tag, does the browser crash?",
+    a: ["No, the browser HTML parser follows error-correction rules to repair the tree automatically","Yes, missing tags cause fatal syntax errors in all browsers","The computer screen turns black","The browser stops downloading internet packets"],
+    c: 0,
+    why: "HTML5 parsers are forgiving state machines designed to recover gracefully from imperfect markup."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Bytes & Chars",
+            "lines": [
+                  "hexadecimal bytes over TCP",
+                  "decoded via charset=utf-8"
+            ]
+      },
+      {
+            "title": "Tokenization",
+            "lines": [
+                  "startTag: <html>, <p>",
+                  "characters: 'Hello', endTag: </p>"
+            ]
+      },
+      {
+            "title": "Tree Construction",
+            "lines": [
+                  "Document -> html -> body -> p",
+                  "live mutable DOM in memory"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# HTML: <main><h1>Title</h1><p>Text</p></main>",
+      "document.body.firstElementChild -> <main>",
+      "main.children[0] -> <h1> (firstChild)",
+      "main.children[1] -> <p> (nextElementSibling)"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "input": "<main><h1>Title</h1><p>Text</p></main>"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "parent": "HTMLMainElement"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "child_1": "HTMLHeadingElement (Title)"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "child_2": "HTMLParagraphElement (Text)"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The acronym DOM stands for Document <0> Model.",
+      "The root object representing the web page in JavaScript is <1>.",
+      "The pipeline stage that breaks raw text into start and end tags is <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "Object"
+            ],
+            "why": "DOM stands for Document Object Model."
+      },
+      {
+            "a": [
+                  "document"
+            ],
+            "why": "window.document is the root entry point to the DOM tree."
+      },
+      {
+            "a": [
+                  "tokenization"
+            ],
+            "why": "Tokenization identifies tags, attributes, and text tokens."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the Document Object Model (DOM)?",
+      a: ["An in-memory object tree representing the structure and content of an HTML document","A database management system built into modern web servers","A compression format for transmitting image files over Wi-Fi","A stylesheet language used to position text on computer screens"],
+      c: 0,
+      why: "The DOM provides an object-oriented representation of the web page that programs can modify."
+    },
+    {
+      q: "What happens when JavaScript executes document.createElement('div')?",
+      a: ["A new DOM element object is created in memory, ready to be inserted into the document tree","The browser writes a new line of text to the physical HTML file on the web server","The computer creates a new directory on the hard drive","The browser reloads the current web page from scratch"],
+      c: 0,
+      why: "createElement constructs a live in-memory node detached from the active document tree."
+    },
+    {
+      q: "Why is the DOM tree distinct from the raw HTML text file?",
+      a: ["The DOM reflects live mutations, error-corrected tags, and dynamic script updates in memory","The DOM is written in binary C++ while HTML is written in English","The DOM only exists when the computer is disconnected from the internet","The DOM can only contain three elements at a time"],
+      c: 0,
+      why: "The DOM is dynamic, live state; HTML text is just the static initial blueprint."
+    },
+    {
+      q: "What is the global root object in client-side browser JavaScript that hosts the document?",
+      a: ["window","process","globalThis.database","kernel"],
+      c: 0,
+      why: "window represents the browser execution context and contains the top-level document object."
+    }
+  ]);
+</script>
+</body>
+</html>

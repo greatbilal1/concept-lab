@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 04 — Queues (FIFO)</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="data-structures" data-lesson="4" data-lesson-id="queues">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 04</span> · Ordered access</span>
+
+  <h1 class="lesson-title">Queues (FIFO)</h1>
+  <p class="lesson-lede">
+    A queue is a stack's opposite. Where a stack touches one end, a queue touches
+    two: you add at the back and remove from the front. That gives you
+    <b>first in, first out</b> — the rule of every real line you have ever stood
+    in.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Spot the O(n) trap in a list-based queue</span>
+    <span><b>Mission link</b> The same structure, two different costs</span>
+  </div>
+
+  <h2><span class="n">1</span>Two ends, one order</h2>
+
+  <p>
+    A queue has a <b>front</b> and a <b>back</b>. New items join at the back
+    (<b>enqueue</b>) and leave from the front (<b>dequeue</b>). Nothing is ever
+    inserted or removed in the middle.
+  </p>
+
+  <div id="diagram1"></div>
+
+  <p>
+    The result is <b>FIFO</b> — First In, First Out. Items leave in exactly the
+    order they arrived, which is what makes a queue fair.
+  </p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    A stack reverses order; a queue <b>preserves</b> it. Same underlying list,
+    different rule about which end you touch.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The trap: list.pop(0)</h2>
+
+  <p>
+    The obvious way to build a queue in Python is to append at the end and pop
+    from the front:
+  </p>
+
+  <pre><code>queue = []
+queue.append("a")   # enqueue
+queue.append("b")
+queue.pop(0)        # "a" — dequeue, but O(n)!</code></pre>
+
+  <p>
+    That <code>pop(0)</code> is a trap. Removing the first item of a list leaves a
+    gap, so Python must <b>shift every remaining item one slot to the left</b>.
+    One dequeue costs O(n), and a loop of <em>n</em> dequeues costs O(n²).
+  </p>
+
+  <div id="trace1"></div>
+
+  <div class="note warn">
+    <span class="note-label">Watch out</span>
+    <code>list.pop(0)</code> inside a loop is one of the most common performance
+    bugs in beginner Python. It looks O(1) and is actually O(n).
+  </div>
+
+  <h2><span class="n">3</span>The right tool: deque</h2>
+
+  <p>
+    Python ships a queue-ready structure in the standard library:
+    <code>collections.deque</code> (pronounced "deck"). It is a doubly linked
+    list of blocks, so adding or removing at <b>either</b> end is O(1):
+  </p>
+
+  <pre><code>from collections import deque
+
+queue = deque()
+queue.append("a")       # enqueue at the back
+queue.append("b")
+queue.popleft()         # "a" — dequeue from the front, O(1)</code></pre>
+
+  <p>
+    Same behaviour, different cost. This is the lesson of the whole course in
+    miniature: the <b>structure</b> you choose decides the price you pay.
+  </p>
+
+  <div id="intro1"></div>
+
+  <div id="lab1"></div>
+
+  <div id="fill1"></div>
+
+  <h2><span class="n">4</span>Where queues show up</h2>
+
+  <ul>
+    <li><b>Print spoolers</b> — jobs print in the order they were submitted.</li>
+    <li><b>Task schedulers</b> — workers take the oldest waiting job first.</li>
+    <li><b>Breadth-first search</b> — you visit nodes in the order you discovered them.</li>
+    <li><b>Message queues</b> — a producer enqueues, a consumer dequeues.</li>
+  </ul>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>
+      You can build a queue, explain FIFO, and — most importantly — recognise that
+      <code>list.pop(0)</code> is O(n) while <code>deque.popleft()</code> is O(1).
+      You now choose the structure by its cost, not by habit.
+    </p>
+  </div>
+
+  <h2><span class="n">5</span>Check yourself</h2>
+
+  <p>
+    Answer from memory — do not scroll back up. Each option has the same number of
+    words, so nothing gives the answer away.
+  </p>
+
+  <div id="quiz"></div>
+
+  <h2><span class="n">6</span>Do this next</h2>
+
+  <ol>
+    <li>
+      Enqueue 1, 2 and 3 into a <code>deque</code>, then dequeue them all and
+      confirm the order is 1, 2, 3.
+    </li>
+    <li>
+      Time a loop of 100,000 <code>list.pop(0)</code> calls against the same loop
+      with <code>deque.popleft()</code>. Note the difference.
+    </li>
+    <li>
+      Write one sentence explaining why a queue preserves order but a stack
+      reverses it.
+    </li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Read <a href="https://docs.python.org/3/library/collections.html#collections.deque">Python — collections.deque</a>.
+    The opening paragraph states the O(1) guarantee for both ends, which is the
+    fact this lesson turns on.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher (me) anything — "why is it called a
+    deque?", "can I peek at the front?", "when would I use a priority queue?".
+    There are no bad questions here.
+  </div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  /* the shape of a queue */
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      { title: "front", lines: ["dequeue here"] },
+      { title: "b", lines: ["waiting its turn"] },
+      { title: "c", lines: ["waiting its turn"] },
+      { title: "back", lines: ["enqueue here"] }
+    ]
+  });
+
+  /* predict-then-reveal */
+  TeachWidgets.predict("#predict1", {
+    q: "You enqueue a, then b, then c. What does the first dequeue return?",
+    a: ["a", "c", "b"],
+    c: 0,
+    why: "FIFO means the first item in is the first one out, so a leaves the front."
+  });
+
+  /* step through the O(n) shift */
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "queue = [\"a\", \"b\", \"c\"]",
+      "queue.pop(0)",
+      "# b and c shift left",
+      "queue  # [\"b\", \"c\"]"
+    ],
+    steps: [
+      { line: 0, vars: { queue: "[a, b, c]" } },
+      { line: 1, vars: { returned: "a", cost: "O(n)" } },
+      { line: 2, vars: { b: "index 0", c: "index 1" } },
+      { line: 3, vars: { queue: "[b, c]" } }
+    ]
+  });
+
+  /* three things a queue gives you */
+  TeachWidgets.introCards("#intro1", {
+    cards: [
+      { ico: "📏", title: "Order preserved", body: "Items leave in the order they arrived — the definition of fair." },
+      { ico: "🔗", title: "Two ends", body: "Enqueue at the back, dequeue at the front; the middle is never touched." },
+      { ico: "⚡", title: "Deque is O(1)", body: "collections.deque removes from either end in constant time." }
+    ]
+  });
+
+  /* the tiny interpreter */
+  TeachWidgets.lab("#lab1", {
+    label: "Run it — compare a list queue with a deque",
+    starter: "from collections import deque\n\nqueue = deque()\nqueue.append(\"a\")\nqueue.append(\"b\")\nqueue.append(\"c\")\nprint(queue)\nprint(queue.popleft())\nprint(queue.popleft())\nprint(queue)"
+  });
+
+  /* recall from memory */
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the queue",
+    lines: [
+      "A queue obeys the rule <0>",
+      "Adding at the back is called <1>",
+      "Removing from the front is called <2>"
+    ],
+    blanks: [
+      { a: ["FIFO"], why: "First In, First Out — items leave in arrival order." },
+      { a: ["enqueue"], why: "Enqueue adds an item to the back of the queue." },
+      { a: ["dequeue"], why: "Dequeue removes and returns the item at the front." }
+    ]
+  });
+
+  /* the quiz — every option has equal word count */
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Which item does a queue remove?",
+      a: ["The front of the line", "The back of the line", "The middle of the line", "The tallest of the line"],
+      c: 0,
+      why: "A queue dequeues from the front, so the oldest waiting item leaves first."
+    },
+    {
+      q: "What does FIFO stand for?",
+      a: ["First in, first out", "Last in, first out", "First in, last out", "Last in, last out"],
+      c: 0,
+      why: "FIFO is First In, First Out — arrival order is preserved."
+    },
+    {
+      q: "How does a queue add items?",
+      a: ["Add at the back", "Remove from the front", "Remove from the back", "Add at the front"],
+      c: 0,
+      why: "New items join at the back, keeping the front reserved for the oldest."
+    },
+    {
+      q: "Why is list.pop(0) slow?",
+      a: ["It shifts every item", "It copies every item", "It sorts every item", "It hashes every item"],
+      c: 0,
+      why: "Removing the first item leaves a gap, so every later item must move left."
+    }
+  ]);
+</script>
+</body>
+</html>

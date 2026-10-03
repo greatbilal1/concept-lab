@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 08 — Offline resilience and synchronization</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="frontend-backend" data-lesson="8" data-lesson-id="offline-resilience-and-synchronization">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 08</span> · Real-Time & Offline Resilience</span>
+
+  <h1 class="lesson-title">Offline resilience and synchronization</h1>
+  <p class="lesson-lede">
+    What happens when your user steps into an elevator or subway? Learn how to design offline queues, IndexedDB local persistence, and background sync.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Design offline storage queues that buffer actions and synchronize upon reconnection</span>
+    <span><b>Mission link</b> Ensures web applications remain functional during intermittent network outages</span>
+  </div>
+
+  <h2><span class="n">1</span>The offline-first mindset</h2>
+  <p>Mobile users do not have continuous, perfect 5G connections: they ride in subways, enter parking garages, and suffer packet loss. An application that crashes or loses unsaved forms when offline frustrates users.</p><p>An <b>offline-first architecture</b> stores data locally first (in <b>IndexedDB</b> or <code>localStorage</code>) and treats the local database as the primary source of truth. Mutations made offline are pushed into an <b>offline action queue</b> and synchronized with the backend once connectivity returns.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Write to local persistence first; queue network mutations to sync when connectivity restores.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The offline sync queue pattern</h2>
+  <p>Observe how offline user edits are queued locally and flushed upon detecting 'online' events.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing conflict resolution on sync</h2>
+  <p>Trace how a client detects if a record was modified on the server while the client was offline.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of offline synchronization concepts.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can architect web applications that function seamlessly offline and sync data reliably upon reconnection.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Listen for window.addEventListener('online') and 'offline' in your console.</li>
+    <li>Store and retrieve an object from IndexedDB using an open-source wrapper like idb.</li>
+    <li>Implement a simple localStorage action queue that flushes upon the online event.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Alex Feyerke: *Offline First* (offlinefirst.org).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Which browser storage API is designed for storing large amounts of structured data and binary files offline?",
+    a: ["IndexedDB (transactional, asynchronous NoSQL database)","document.cookie (limited to 4KB)","localStorage (limited to 5MB, synchronous)","The computer system clipboard"],
+    c: 0,
+    why: "IndexedDB provides gigabytes of asynchronous, transactional client-side storage."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "User Action (Offline)",
+            "lines": [
+                  "edit note, tap Save",
+                  "write immediately to IndexedDB"
+            ]
+      },
+      {
+            "title": "Offline Action Queue",
+            "lines": [
+                  "enqueue: { action: 'UPDATE', id: 5 }",
+                  "persisted in IndexedDB"
+            ]
+      },
+      {
+            "title": "Reconnection (Online)",
+            "lines": [
+                  "window.addEventListener('online')",
+                  "flush queue to server in order!"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Local client edited Note #42 (base version: 3)",
+      "# Meanwhile, another user edited Note #42 on the server (now version: 4)",
+      "# Client sends: PUT /notes/42 with header If-Match: 'v3'",
+      "# Server detects conflict -> 412 Precondition Failed!",
+      "# Client prompts user: 'Server has newer version — merge changes?'"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "local_edit": "note 42 modified offline"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "conditional_sync": "sends with expected version v3"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "conflict": "server rejects: version is now v4"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "resolution": "data collision caught safely without silent overwrites"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The browser event firing when network connectivity returns is window on<0>.",
+      "The large-capacity transactional browser database is <1>.",
+      "Preventing stale offline edits from overwriting server data uses <2> resolution."
+],
+    blanks: [
+      {
+            "a": [
+                  "online"
+            ],
+            "why": "The 'online' event fires when connectivity restores."
+      },
+      {
+            "a": [
+                  "IndexedDB"
+            ],
+            "why": "IndexedDB provides large-capacity asynchronous storage."
+      },
+      {
+            "a": [
+                  "conflict"
+            ],
+            "why": "Conflict resolution handles simultaneous edits safely."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the primary advantage of IndexedDB over localStorage for offline web applications?",
+      a: ["IndexedDB is asynchronous, transactional, supports indexes, and can store hundreds of megabytes of structured data","IndexedDB automatically uploads files to social media","localStorage only works when connected to the internet","IndexedDB is written in Python"],
+      c: 0,
+      why: "localStorage is synchronous (blocks the UI) and capped at 5MB; IndexedDB is high-capacity and async."
+    },
+    {
+      q: "What is 'Last-Write-Wins' in conflict resolution, and why is it dangerous?",
+      a: ["The latest arriving timestamp blindly overwrites earlier edits, potentially erasing hours of offline work without warning","It turns off the database server","It requires all users to write code in the terminal","It is the only conflict strategy permitted by law"],
+      c: 0,
+      why: "Blindly overwriting based on arrival timestamp silently destroys conflicting collaborative edits."
+    },
+    {
+      q: "How does the 'navigator.onLine' property behave in web browsers?",
+      a: ["Returns a boolean indicating whether the device is connected to a local network (though internet access might still be blocked)","Measures the exact download speed in gigabits per second","Tests if the user has paid their broadband internet bill","Only returns true on Mondays"],
+      c: 0,
+      why: "navigator.onLine checks local network link status; true does not guarantee the internet is reachable."
+    },
+    {
+      q: "What is the purpose of an offline mutation queue?",
+      a: ["To record user actions in local storage while offline, replaying them in sequence when connectivity returns","To delete all unsaved forms when the internet drops","To play background music while the user waits","To encrypt the user hard drive"],
+      c: 0,
+      why: "An action queue buffers user intentions and guarantees sequential replay upon reconnection."
+    }
+  ]);
+</script>
+</body>
+</html>

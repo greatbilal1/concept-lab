@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 04 — The Service Locator antipattern</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="dependency-injection" data-lesson="4" data-lesson-id="the-service-locator-antipattern">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 04</span> · Wiring & Composition Root</span>
+
+  <h1 class="lesson-title">The Service Locator antipattern</h1>
+  <p class="lesson-lede">
+    The dark twin of Dependency Injection. Discover why the Service Locator pattern obscures class dependencies, creates runtime null crashes, and defeats compiler safety.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Identify and refactor the Service Locator antipattern into explicit constructor injection</span>
+    <span><b>Mission link</b> Prevents hidden dependencies from causing unexpected runtime crashes</span>
+  </div>
+
+  <h2><span class="n">1</span>The disguised global variable</h2>
+  <p>At first glance, a <b>Service Locator</b> looks like dependency injection: you have a central registry (<code>ServiceLocator.get('Database')</code>). Instead of passing dependencies in the constructor, a class reaches out to the global locator to fetch what it needs.</p><p>Mark Seemann and Martin Fowler classify Service Locator as a dangerous <b>Antipattern</b>. Why? <b>Because it hides a class's true dependencies!</b> When you instantiate <code>new OrderService()</code>, the constructor takes zero arguments, lying to you that it has no dependencies. Then at runtime, it suddenly crashes because someone forgot to register the database in the global locator!</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Service Locator hides dependencies and defers missing-dependency errors to runtime crashes.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Constructor Injection versus Service Locator</h2>
+  <p>Contrast honest, explicit constructor signatures with deceptive, hidden Service Locator lookups.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing a Service Locator runtime crash</h2>
+  <p>Trace how a missing registration in a Service Locator leads to an unexpected runtime exception in production.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of Service Locator pitfalls.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can spot the Service Locator antipattern in legacy code and refactor it into honest, explicit constructor injection.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit a class that calls a global ServiceLocator or Container.get() inside its methods.</li>
+    <li>Refactor the class to accept those dependencies as constructor parameters.</li>
+    <li>Observe how the refactored class can be instantiated in tests without setting up global container state.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Mark Seemann: *Service Locator is an Anti-Pattern* (blog.ploeh.dk/2010/02/03/ServiceLocatorIsAnAntiPattern/).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Why is Constructor Injection superior to Service Locator when writing unit tests?",
+    a: ["Constructor injection makes dependencies explicit in the method signature, so the compiler forces you to provide them; Service Locator crashes at runtime","Service Locator uses more hard drive storage space","Constructor injection only works on Fridays","There is no difference between them"],
+    c: 0,
+    why: "Constructors advertise dependencies explicitly; Service Locator hides them behind runtime lookups."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Service Locator (Dishonest)",
+            "lines": [
+                  "class OrderService() {",
+                  "  this.db = Locator.get('DB')",
+                  "constructor lies: claims zero dependencies! Crashes at runtime if Locator is empty!"
+            ]
+      },
+      {
+            "title": "Constructor Injection (Honest)",
+            "lines": [
+                  "class OrderService(db, mailer) {",
+                  "  this.db = db; this.mailer = mailer;",
+                  "signature tells truth: compiler guarantees dependencies are provided!"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Developer writes test: service = OrderService() -> compiles cleanly!",
+      "# Developer calls service.checkout() -> BOOM! Runtime Crash:",
+      "# ServiceLocatorError: 'PaymentGateway' not found in locator!",
+      "# Fix: Use Constructor Injection -> OrderService(payment_gateway)",
+      "# Compiler now demands payment_gateway at test creation time!"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "deceptive_constructor": "OrderService() appears to need zero dependencies"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "runtime_crash": "crashes deep inside execution when querying global locator"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "refactoring": "constructor injection turns runtime crash into compile-time guarantee"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "A global registry where classes reach out to fetch dependencies is a Service <0>.",
+      "Service Locator is classified as an <1> because it hides dependencies.",
+      "Passing dependencies explicitly in the constructor is <2> injection."
+],
+    blanks: [
+      {
+            "a": [
+                  "Locator"
+            ],
+            "why": "Service Locator fetches dependencies globally."
+      },
+      {
+            "a": [
+                  "antipattern"
+            ],
+            "why": "Service Locator obscures dependencies."
+      },
+      {
+            "a": [
+                  "constructor"
+            ],
+            "why": "Constructor injection is honest and explicit."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why is the Service Locator pattern classified as an architectural antipattern?",
+      a: ["It hides class dependencies from consumers, turning compile-time errors into unexpected runtime crashes","It requires purchasing dedicated database servers","It can only be used in C++ programming","It deletes source code files automatically"],
+      c: 0,
+      why: "Service Locator makes constructors lie about dependencies, causing unexpected runtime failures."
+    },
+    {
+      q: "How does the Service Locator pattern violate encapsulation?",
+      a: ["Classes have hidden couplings to a global locator registry, making them impossible to understand or reuse in isolation","It makes all private variables public","It turns off type checking in TypeScript","It requires all classes to be written in a single file"],
+      c: 0,
+      why: "A class that reaches into a global locator is tightly coupled to the locator's existence and contents."
+    },
+    {
+      q: "What happens when you try to unit-test a class that uses the Service Locator pattern?",
+      a: ["You must initialize the global locator with mock dependencies before every test, risking state pollution between tests","Unit tests run twice as fast","Unit tests are impossible to write","The test runner deletes the test files"],
+      c: 0,
+      why: "Global state in locators leaks across tests, causing brittle and order-dependent test suites."
+    },
+    {
+      q: "What is the primary cure for the Service Locator antipattern?",
+      a: ["Replace locator lookups with explicit Constructor Injection: declare all dependencies as parameters in the constructor","Delete the class completely","Use global variables instead","Rename the class to Service"],
+      c: 0,
+      why: "Constructor injection makes dependencies explicit, verifiable by compilers, and easy to inject in tests."
+    }
+  ]);
+</script>
+</body>
+</html>

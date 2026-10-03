@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 01 — Passing collaborators versus hardcoded 'new'</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="dependency-injection" data-lesson="1" data-lesson-id="passing-collaborators-versus-hardcoded-new">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 01</span> · Dependency Injection & IoC</span>
+
+  <h1 class="lesson-title">Passing collaborators versus hardcoded 'new'</h1>
+  <p class="lesson-lede">
+    The root of all coupling: the 'new' keyword. Discover why hardcoding constructor calls inside classes freezes your architecture, and how passing arguments frees it.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Replace hardcoded object instantiations with constructor parameter injection</span>
+    <span><b>Mission link</b> The foundational habit that unlocks all software testability and flexibility</span>
+  </div>
+
+  <h2><span class="n">1</span>The problem with 'new'</h2>
+  <p>Whenever you write <code>this.mailer = new SmtpMailer();</code> inside a class, you have welded that class to a concrete implementation. You cannot test your class without sending real emails! You cannot switch from SMTP to SendGrid without modifying every single class that uses it.</p><p><b>Dependency Injection (DI)</b> is simply the practice of passing that collaborator in from the outside: <code>constructor(mailer) { this.mailer = mailer; }</code>. Your class no longer knows or cares how the mailer was created; it simply uses the collaborator provided to it.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Never construct collaborators with 'new' inside business classes; pass them in from the outside.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Hardcoded construction versus Injection</h2>
+  <p>Contrast the rigid coupling of internal instantiation with the flexibility of injected dependencies.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing dependency injection in action</h2>
+  <p>Trace how a single OrderService works seamlessly with both production and test collaborators.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of dependency injection basics.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can free classes from hardcoded dependencies by injecting collaborators through constructors.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit a class that uses new Database() inside its constructor and refactor it to accept db as a parameter.</li>
+    <li>Pass an in-memory dictionary mock into that class during a unit test.</li>
+    <li>Observe how easy testing becomes when dependencies are injected.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Mark Seemann & Steven van Deursen, *Dependency Injection Principles, Practices, and Patterns*, Chapter 1: 'A gentle introduction to Dependency Injection'.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "How does a class that receives its database connection via constructor parameters differ from one that calls 'new Database()'?",
+    a: ["It is completely decoupled from database construction and can be tested in 1ms with an in-memory test database","It takes twice as much memory in RAM","It cannot execute SQL queries","It is slower to compile"],
+    c: 0,
+    why: "Injected collaborators make classes easily testable and swappable without touching business logic."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Hardcoded 'new' (Rigid)",
+            "lines": [
+                  "class OrderService {",
+                  "  this.db = new PostgresDb()",
+                  "tightly welded to Postgres; untestable!"
+            ]
+      },
+      {
+            "title": "Injected (Pure DI)",
+            "lines": [
+                  "class OrderService(db) {",
+                  "  this.db = db",
+                  "works with Postgres, SQLite, or MockDb!"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Production Wiring:",
+      "real_service = OrderService(db=PostgresDatabase(), mailer=SendGridMailer())",
+      "# Automated Testing Wiring (zero network calls!):",
+      "test_service = OrderService(db=InMemoryFakeDatabase(), mailer=MockMailer())",
+      "test_service.checkout(cart) # runs in 0.002s in CI!"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "prod_wiring": "real database and cloud mailer passed in production"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "test_wiring": "fast in-memory doubles passed in test environment"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "execution": "identical business logic executes across both environments"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Passing collaborators into an object from the outside is Dependency <0>.",
+      "Instantiating dependencies inside a class using the <1> keyword creates tight coupling.",
+      "Practicing DI by hand without third-party frameworks is <2> DI."
+],
+    blanks: [
+      {
+            "a": [
+                  "Injection"
+            ],
+            "why": "Dependency Injection passes collaborators in."
+      },
+      {
+            "a": [
+                  "new"
+            ],
+            "why": "Hardcoded 'new' tightly couples classes."
+      },
+      {
+            "a": [
+                  "Pure"
+            ],
+            "why": "Pure DI uses plain language constructors."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is Dependency Injection in its simplest, most fundamental form?",
+      a: ["Passing an object's collaborators to it as arguments, typically via its constructor, rather than having the object construct them itself","A complex enterprise Java framework that requires XML files","An operating system feature that injects binary code into running processes","A database indexing technique"],
+      c: 0,
+      why: "At its core, DI is simply passing dependencies as parameters rather than constructing them internally."
+    },
+    {
+      q: "Why does hardcoding 'new HttpClient()' inside a service class make unit testing painful?",
+      a: ["Unit tests will attempt to make real external network requests across the internet, making tests slow, flaky, and dependent on network availability","Unit tests cannot run on computers that have network cards","The compiler deletes test files","It turns off the computer"],
+      c: 0,
+      why: "Hardcoded clients force tests to hit real network infrastructure, breaking test isolation."
+    },
+    {
+      q: "What is 'Pure DI' (or Poor Man's DI)?",
+      a: ["Practicing dependency injection using plain language constructors and manual wiring, without any third-party DI container or framework","A low-cost cloud hosting plan","Writing code without any dependencies at all","A deprecated programming technique"],
+      c: 0,
+      why: "Pure DI proves that DI is an architectural design habit, not a library dependency."
+    },
+    {
+      q: "What is a 'collaborator' in object-oriented design?",
+      a: ["Another service or object that a class interacts with to accomplish its work (e.g. a repository or mailer)","Another developer on your team who reviews your pull requests","A compiler that translates code","A database backup script"],
+      c: 0,
+      why: "Collaborators are the peer services and objects that a class relies upon to execute behavior."
+    }
+  ]);
+</script>
+</body>
+</html>

@@ -1,0 +1,3 @@
+# Mission — System Design: From Idea to Production
+
+Master the pinnacle of software engineering: designing planetary-scale distributed systems from scratch. Apply the 4-step system design framework, calculate back-of-the-envelope throughput and storage estimations, construct horizontally scalable stateless application tiers, scale databases using read replicas and horizontal sharding, design high-speed caching architectures with Cache-Aside and TTL invalidation, decouple microservices using asynchronous message queues and Apache Kafka, protect dependencies with Circuit Breakers and the Bulkhead pattern, manage reliability with SRE SLOs and error budgets, and architect planetary-scale systems handling 100 million active users.

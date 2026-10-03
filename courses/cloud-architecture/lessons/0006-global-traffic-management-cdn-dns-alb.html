@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 06 — Global Traffic Management: CDN, Anycast DNS, and Load Balancers</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="cloud-architecture" data-lesson="6" data-lesson-id="global-traffic-management-cdn-dns-alb">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 06</span> · Global Traffic</span>
+
+  <h1 class="lesson-title">Global Traffic Management: CDN, Anycast DNS, and Load Balancers</h1>
+  <p class="lesson-lede">
+    Routing traffic globally: Anycast DNS (Route 53), Content Delivery Networks (CloudFront/Cloudflare), and Application Load Balancers (ALB).
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to architect global traffic distribution using Anycast DNS, CDNs, and load balancers.</span>
+    <span><b>Mission link</b> Mastering global traffic management: cdn, anycast dns, and load balancers across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Global Traffic Management: CDN, Anycast DNS, and Load Balancers</h2>
+  <p>The speed of light in fiber optic cables is a physical limit: a round trip packet from Sydney to Virginia takes <strong>200 milliseconds</strong>. If a user in Australia must wait 200ms for every TLS handshake, CSS file, and API call, your application feels broken.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Routing traffic globally: Anycast DNS (Route 53), Content Delivery Networks (CloudFront/Cloudflare), and Application Load Balancers (ALB).
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Global Traffic Routing Hierarchy</h2>
+  <p><strong>Global Traffic Architecture</strong> solves the speed-of-light problem:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Layer 7 (ALB) vs Layer 4 (NLB)</h2>
+  <ul><li><strong>1. Anycast DNS Routing (Amazon Route 53):</strong> Anycast uses BGP routing to broadcast a single IP address from dozens of data centers worldwide. DNS queries are resolved by the closest physical DNS server in <strong>under 10ms</strong>! Supports latency-based routing and automatic failover!</li><li><strong>2. Content Delivery Networks (CloudFront / Cloudflare):</strong> Terminates the TLS handshake at the local edge Point of Presence (PoP). Static HTML, CSS, images, and cached API responses are served directly from edge RAM.</li><li><strong>3. Application Load Balancers (ALB - Layer 7):</strong> Sits behind the CDN. Inspects HTTP path headers (`/api` $\rightarrow$ API target group, `/images` $\rightarrow$ S3) and distributes traffic across healthy container instances using round-robin or least-outstanding-requests.</li><li><strong>4. Network Load Balancers (NLB - Layer 4):</strong> Operates at the raw TCP/UDP layer. Handles millions of requests per second with ultra-low sub-millisecond latency.</li></ul><pre><code># The Global Traffic Journey:
+[User in Tokyo]
+      │ (Resolves DNS in 8ms via Route 53 Anycast)
+      ▼
+[CloudFront Edge PoP (Tokyo)] ──(Cached Asset? Return in 12ms!)
+      │ (Cache Miss? Fast AWS Private Fiber Backbone transit)
+      ▼
+[AWS Region: us-east-1]
+      │ (Ingress)
+      ▼
+[Application Load Balancer (ALB)] ──(Distributes across healthy pods)
+      ├── Container Pod 1 (AZ-A: Healthy)
+      └── Container Pod 2 (AZ-B: Healthy)</code></pre><div class="callout"><p><strong>The Edge Termination Edge:</strong> Terminating TLS at the CDN edge saves 2 full round trips to the origin server, cutting page load times by half a second globally.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the global traffic sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to architect global traffic distribution using Anycast DNS, CDNs, and load balancers.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where global traffic management: cdn, anycast dns, and load balancers applies.</li>
+    <li>Author a unit test or verification script exercising global traffic management: cdn, anycast dns, and load balancers.</li>
+    <li>Document team architectural conventions regarding global traffic management: cdn, anycast dns, and load balancers.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Global Traffic Management: CDN, Anycast DNS, and Load Balancers.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "How does a Content Delivery Network (CDN like Cloudflare or AWS CloudFront) slash latency for global users?",
+    a: ["By caching static web assets and API responses on hundreds of Edge Point-of-Presence (PoP) servers located geographically close to the user","By running faster fiber optic cables under oceans","By speeding up the user's Wi-Fi router","By compressing the user's hard drive"],
+    c: 0,
+    why: "CDNs terminate TLS and serve cached assets from edge servers located within milliseconds of global users."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1. Anycast DNS (Route 53)",
+            "lines": [
+                  "Resolves domain at nearest physical PoP in 10ms",
+                  "Latency-based routing & healthcheck failover"
+            ]
+      },
+      {
+            "title": "2. CDN Edge Cache (CloudFront)",
+            "lines": [
+                  "Terminates TLS handshake locally",
+                  "Serves cached static & API content in 15ms"
+            ]
+      },
+      {
+            "title": "3. Application Load Balancer (ALB)",
+            "lines": [
+                  "Layer 7 HTTP path routing (/api -> pods)",
+                  "Healthchecks ensure traffic goes to healthy nodes"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Global Traffic Management: CDN, Anycast DNS, and Load Balancers",
+      "def execute_flow():",
+      "    # Routing traffic globally: Anycast DNS (Route 53), ...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Global Traffic Management: CDN, Anycast DNS, and Load Balancers"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Application Load Balancer (L7)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Network Load Balancer (L4)"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Global traffic architecture uses Anycast DNS for fast resolution, Content Delivery Networks to terminate TLS and cache assets at the {1}, and {2} load balancers to distribute traffic across healthy compute nodes."
+],
+    blanks: [
+      {
+            "a": [
+                  "edge"
+            ],
+            "why": "Geographic point-of-presence servers"
+      },
+      {
+            "a": [
+                  "application"
+            ],
+            "why": "Layer 7 HTTP load balancer (ALB)"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is 'Anycast' routing in global DNS networks like AWS Route 53?",
+      a: ["A network addressing technique where the same single IP address is announced from multiple physical data centers worldwide, automatically routing users to the nearest location","Broadcasting video over television","A method for sending emails to everyone","A satellite internet system"],
+      c: 0,
+      why: "Anycast routes DNS traffic to the topologically closest data center via BGP routing."
+    },
+    {
+      q: "What is the primary difference between a Layer 7 Application Load Balancer (ALB) and a Layer 4 Network Load Balancer (NLB)?",
+      a: ["An ALB inspects HTTP/HTTPS headers and URL paths to make intelligent routing decisions; an NLB operates at the raw TCP/UDP layer for ultra-high throughput and sub-ms latency","An ALB is free; an NLB is paid","An NLB only works on Windows","They are identical load balancers"],
+      c: 0,
+      why: "ALBs parse application-level HTTP protocols; NLBs route raw transport-level packets at extreme speed."
+    },
+    {
+      q: "How does an Application Load Balancer know when to stop sending traffic to a crashed container pod?",
+      a: ["It continuously executes automated HTTP healthchecks against the pod; if consecutive healthchecks fail, it removes the pod from the target pool","The pod sends an email to the load balancer","The load balancer checks the clock","The developer must manually remove the pod"],
+      c: 0,
+      why: "Healthchecks continuously monitor backend responsiveness, taking degraded instances out of service."
+    },
+    {
+      q: "Why is caching static assets at CDN edge servers beneficial for origin server capacity?",
+      a: ["Offloading 90% of static asset requests to CDN edge caches drastically reduces load on origin servers, allowing smaller, cheaper origin infrastructure","It makes origin servers free","It turns off origin databases","It deletes old files"],
+      c: 0,
+      why: "Edge caching filters out high-volume static requests before they ever reach origin compute clusters."
+    }
+  ]);
+</script>
+</body>
+</html>

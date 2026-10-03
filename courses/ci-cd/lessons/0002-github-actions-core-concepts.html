@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 02 — GitHub Actions Core Concepts: Workflows, Jobs, and Steps</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="ci-cd" data-lesson="2" data-lesson-id="github-actions-core-concepts">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 02</span> · GitHub Actions</span>
+
+  <h1 class="lesson-title">GitHub Actions Core Concepts: Workflows, Jobs, and Steps</h1>
+  <p class="lesson-lede">
+    Inside GitHub Actions: YAML workflow schemas (`.github/workflows/`), triggers (`on: push, pull_request`), runners, jobs, and steps.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to author and configure GitHub Actions workflows, jobs, steps, and triggers.</span>
+    <span><b>Mission link</b> Mastering github actions core concepts: workflows, jobs, and steps across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of GitHub Actions Core Concepts: Workflows, Jobs, and Steps</h2>
+  <p>GitHub Actions is the premier cloud-native CI/CD automation engine. It allows developers to define automated workflows that trigger on any GitHub event (pull request, push, issue creation, release tag). Workflows are defined declaratively in YAML files placed under <code>.github/workflows/</code>.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Inside GitHub Actions: YAML workflow schemas (`.github/workflows/`), triggers (`on: push, pull_request`), runners, jobs, and steps.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>GitHub Actions Execution Hierarchy</h2>
+  <p>The Anatomy of a GitHub Actions Workflow:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Job Dependency Chaining</h2>
+  <ul><li><strong>1. Workflows:</strong> The top-level automated process defined in a `.yml` file. Governed by <strong>Triggers</strong>: <code>on: [push, pull_request]</code>.</li><li><strong>2. Jobs:</strong> Independent units of work running on separate virtual machines (Runners, e.g. `runs-on: ubuntu-latest`). By default, <strong>Jobs run in parallel!</strong> Use `needs: [job_a]` to define sequential dependencies.</li><li><strong>3. Steps:</strong> Sequential tasks executed inside a single Job's runner. Steps can run shell scripts (`run: pytest`) or invoke pre-built community actions (`uses: actions/checkout@v4`).</li><li><strong>4. Environment & Secrets:</strong> Securely inject API keys and cloud credentials using repository secrets: <code>${{ secrets.PROD_API_KEY }}</code>.</li></ul><pre><code># Complete Production CI Workflow (.github/workflows/ci.yml):
+name: Continuous Integration
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  test-and-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Execute automated test suite
+        run: pytest --maxfail=1 -v</code></pre><div class="callout"><p><strong>The Parallel Job Secret:</strong> Because Jobs run in parallel on separate runners, split your linting, unit tests, and security scans into distinct jobs to execute them concurrently!</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the GitHub Actions sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to author and configure GitHub Actions workflows, jobs, steps, and triggers.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where github actions core concepts: workflows, jobs, and steps applies.</li>
+    <li>Author a unit test or verification script exercising github actions core concepts: workflows, jobs, and steps.</li>
+    <li>Document team architectural conventions regarding github actions core concepts: workflows, jobs, and steps.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for GitHub Actions Core Concepts: Workflows, Jobs, and Steps.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is the hierarchy of execution units in a GitHub Actions workflow?",
+    a: ["A Workflow contains one or more parallel Jobs; each Job runs on an isolated Runner and executes a sequence of sequential Steps","Steps contain Jobs, which contain Workflows","Workflows run on the user's laptop","Jobs only run on Saturdays"],
+    c: 0,
+    why: "Workflows orchestrate Jobs (running on distinct virtual runners), which in turn execute sequential Steps."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1. Workflow (.yml)",
+            "lines": [
+                  "Triggered on: push to main / pull_request",
+                  "Orchestrates top-level pipeline"
+            ]
+      },
+      {
+            "title": "2. Parallel Jobs (ubuntu-latest)",
+            "lines": [
+                  "Job A: Lint & Formatting (Ruff)",
+                  "Job B: Unit Tests (pytest)",
+                  "Run concurrently on separate VMs!"
+            ]
+      },
+      {
+            "title": "3. Sequential Steps",
+            "lines": [
+                  "Step 1: actions/checkout@v4",
+                  "Step 2: setup-python@v5",
+                  "Step 3: run: pytest"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing GitHub Actions Core Concepts: Workflows, Jobs, and Steps",
+      "def execute_flow():",
+      "    # Inside GitHub Actions: YAML workflow schemas (`.gi...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "GitHub Actions Core Concepts: Workflows, Jobs, and Steps"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Job 1: Test & Lint"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Job 2: Deploy to Staging"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "GitHub Actions workflows run on event triggers, executing parallel {1} across isolated virtual machines that execute sequential {2} of code and actions."
+],
+    blanks: [
+      {
+            "a": [
+                  "jobs"
+            ],
+            "why": "Independent computational units running on VMs"
+      },
+      {
+            "a": [
+                  "steps"
+            ],
+            "why": "Sequential commands or actions inside a job"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What directory must GitHub Actions workflow YAML files be stored in within a Git repository?",
+      a: [".github/workflows/",".git/actions/","/etc/github/","/workflows/"],
+      c: 0,
+      why: "GitHub specifically parses workflow configuration files located in the .github/workflows directory."
+    },
+    {
+      q: "By default, do multiple jobs defined inside the same GitHub Actions workflow run sequentially or in parallel?",
+      a: ["In parallel on separate virtual runner instances, unless explicit dependencies are defined using the 'needs' keyword","Sequentially one after another","Only one job can ever run","In alphabetical order"],
+      c: 0,
+      why: "GitHub Actions executes jobs concurrently by default to minimize total pipeline duration."
+    },
+    {
+      q: "What does the action 'actions/checkout@v4' do inside a workflow step?",
+      a: ["It clones the repository code into the runner's workspace so subsequent steps can access and test the project files","It checks out a library book","It logs out of GitHub","It pays for GitHub servers"],
+      c: 0,
+      why: "actions/checkout clones the current Git repository into the runner environment."
+    },
+    {
+      q: "How can you securely pass a third-party API key to a GitHub Actions step without hardcoding it in YAML?",
+      a: ["Store the credential in GitHub Repository Secrets and reference it via '${{ secrets.MY_SECRET_KEY }}'","Type the secret into a public commit message","Save it in a public text file in the repo","Email the secret to GitHub support"],
+      c: 0,
+      why: "Repository secrets encrypt sensitive credentials and inject them securely into ephemeral runner environments."
+    }
+  ]);
+</script>
+</body>
+</html>

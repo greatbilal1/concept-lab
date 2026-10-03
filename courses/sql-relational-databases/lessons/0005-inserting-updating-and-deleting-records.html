@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 05 — Inserting, updating, and deleting records</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="sql-relational-databases" data-lesson="5" data-lesson-id="inserting-updating-and-deleting-records">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 05</span> · Data Manipulation & Constraints</span>
+
+  <h1 class="lesson-title">Inserting, updating, and deleting records</h1>
+  <p class="lesson-lede">
+    Mutating data safely is a craft. Master INSERT, the disaster of UPDATE without WHERE, soft deletes versus hard deletes, and the RETURNING clause.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Execute data mutations safely using parameterized DML statements and RETURNING clauses</span>
+    <span><b>Mission link</b> The core statements for modifying persistent data in relational databases</span>
+  </div>
+
+  <h2><span class="n">1</span>The three mutation verbs: INSERT, UPDATE, DELETE</h2>
+  <p>Data Manipulation Language (DML) provides three verbs to alter rows: <code>INSERT INTO</code> adds new rows, <code>UPDATE ... SET</code> modifies existing rows, and <code>DELETE FROM</code> removes rows.</p><p>A terrifying danger: <b>If you run UPDATE or DELETE without a WHERE clause, you update or delete EVERY SINGLE ROW in the entire table!</b> Always test your WHERE clause with a SELECT query first before executing destructive mutations.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    An UPDATE or DELETE statement without a WHERE clause mutates every row in the entire table.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The RETURNING clause superpower</h2>
+  <p>Modern databases (PostgreSQL, SQLite) let you return the newly generated ID or mutated values in one round-trip.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing an atomic transaction mutation</h2>
+  <p>Trace how wrapping an UPDATE inside a transaction protects against accidental data loss.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of DML mutation statements.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can perform data mutations safely with parameterized SQL and verify outcomes using RETURNING clauses.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Insert a row and retrieve its generated primary key using INSERT ... RETURNING id.</li>
+    <li>Perform a multi-row INSERT with a single SQL statement.</li>
+    <li>Implement a soft-delete column (deleted_at TIMESTAMP) instead of destructive DELETE.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Alan Beaulieu, *Learning SQL*, Chapter 15: 'Metadata and Transactions'.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What happens if you run 'DELETE FROM users;' without a WHERE clause in a database shell?",
+    a: ["Every single row in the users table is permanently deleted","The database asks for confirmation before deleting anything","Only the first row is deleted","A syntax error is thrown"],
+    c: 0,
+    why: "Standard SQL executes DELETE on the entire table unless constrained by a WHERE filter."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Standard INSERT",
+            "lines": [
+                  "INSERT INTO users (name)...",
+                  "requires separate query to get generated ID"
+            ]
+      },
+      {
+            "title": "INSERT ... RETURNING id",
+            "lines": [
+                  "delivers generated SERIAL / UUID id",
+                  "one round-trip; eliminates race conditions!"
+            ]
+      },
+      {
+            "title": "Soft Delete (Alternative)",
+            "lines": [
+                  "UPDATE users SET deleted_at = NOW()",
+                  "preserves row history; hides from UI"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "BEGIN TRANSACTION;",
+      "UPDATE users SET active = false WHERE last_login < '2025-01-01';",
+      "# Check modified row count: 'UPDATE 42'",
+      "COMMIT; # or ROLLBACK if count looks incorrect!"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "transaction": "active; lock held"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "execution": "updates 42 inactive accounts"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "check": "row count verified as expected"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "commit": "changes written permanently to disk"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The SQL statement used to add new rows to a table is <0> INTO.",
+      "The SQL statement used to modify existing row values is <1>.",
+      "The clause returning generated values from an INSERT or UPDATE is <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "INSERT"
+            ],
+            "why": "INSERT INTO creates new table rows."
+      },
+      {
+            "a": [
+                  "UPDATE"
+            ],
+            "why": "UPDATE sets new values for existing rows."
+      },
+      {
+            "a": [
+                  "RETURNING"
+            ],
+            "why": "RETURNING delivers mutated rows in the response."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is a 'soft delete' in database architecture?",
+      a: ["Setting a 'deleted_at' timestamp on the row instead of physically removing it from the database table","Deleting a row from memory but leaving it on disk","Deleting a row with lowercase letters","Deleting only the primary key column"],
+      c: 0,
+      why: "Soft deletes preserve historical records for audits while filtering them from normal user queries."
+    },
+    {
+      q: "Why is the RETURNING clause (e.g. INSERT INTO users ... RETURNING id) valuable?",
+      a: ["It returns the generated primary key or calculated columns in a single round-trip without race conditions","It runs fifty percent faster than regular SQL","It automatically formats output as HTML","It prevents the server from needing a CPU"],
+      c: 0,
+      why: "RETURNING eliminates the race condition of querying SELECT MAX(id) after an insert."
+    },
+    {
+      q: "What should you always do before running an UPDATE or DELETE statement on a production database?",
+      a: ["Run a SELECT query with the exact same WHERE clause to verify which rows will be affected, and wrap in a transaction","Reboot the production server","Delete all indexes to speed up the write","Email all users that the database is updating"],
+      c: 0,
+      why: "Checking with SELECT and wrapping in a transaction allows rolling back if the row count is wrong."
+    },
+    {
+      q: "How can you insert multiple rows in a single SQL statement?",
+      a: ["INSERT INTO items (name, price) VALUES ('Book', 10), ('Pen', 2), ('Pad', 5);","Type the word INSERT three times in a row","Multiple rows can only be inserted using CSV files","Separate each INSERT statement with a comma"],
+      c: 0,
+      why: "Batch inserts use comma-separated tuple values to minimize network round-trips."
+    }
+  ]);
+</script>
+</body>
+</html>

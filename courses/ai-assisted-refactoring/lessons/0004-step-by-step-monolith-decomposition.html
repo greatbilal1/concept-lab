@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 04 — Step-by-Step Monolith Decomposition</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="ai-assisted-refactoring" data-lesson="4" data-lesson-id="step-by-step-monolith-decomposition">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 04</span> · Monolith Decomposition</span>
+
+  <h1 class="lesson-title">Step-by-Step Monolith Decomposition</h1>
+  <p class="lesson-lede">
+    Decomposing 2,000-line god classes and monolithic files using safe, incremental slicing.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to safely decompose monolithic files without breaking callers.</span>
+    <span><b>Mission link</b> Mastering step-by-step monolith decomposition across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Step-by-Step Monolith Decomposition</h2>
+  <p>Every legacy project has one: the 3,000-line `god_service.py` file that handles billing, user onboarding, email dispatch, and database queries. Trying to prompt an agent with: <em>'Split this 3,000-line file into clean micro-modules'</em> is a guaranteed recipe for disaster.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Decomposing 2,000-line god classes and monolithic files using safe, incremental slicing.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Incremental Slicing vs Big Bang</h2>
+  <p>The only safe way to decompose a monolith with AI is <strong>Step-by-Step Slicing</strong>:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>The Re-Export Migration Seam</h2>
+  <ul><li><strong>Step 1: Identify One Cohesive Cluster:</strong> Find a self-contained group of helper functions (e.g. email notifications) with minimal external dependencies.</li><li><strong>Step 2: Extract to New Module:</strong> Create `src/services/notifications.py` and move the functions there.</li><li><strong>Step 3: Re-export from Monolith:</strong> In the monolith, import the functions from the new module (`from .notifications import send_email`). This preserves backward compatibility for all existing callers!</li><li><strong>Step 4: Verify Tests Pass:</strong> Run the test suite. If green, commit!</li><li><strong>Step 5: Repeat:</strong> Move on to the next cluster until the monolith is an empty shell.</li></ul><pre><code># The Backward-Compatible Re-Export Seam in god_service.py:
+# Instead of updating 50 caller files at once:
+from src.services.notifications import send_receipt_email # Re-exported!
+# Existing callers continue working seamlessly without breaking changes!</code></pre><div class="callout"><p><strong>The Golden Seam:</strong> Re-exporting extracted symbols from the original file allows you to decompose a monolith without modifying 50 caller files simultaneously!</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the monolith decomposition sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to safely decompose monolithic files without breaking callers.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where step-by-step monolith decomposition applies.</li>
+    <li>Author a unit test or verification script exercising step-by-step monolith decomposition.</li>
+    <li>Document team architectural conventions regarding step-by-step monolith decomposition.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Step-by-Step Monolith Decomposition.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is the biggest risk when attempting to break up a 2,000-line monolithic file with an AI agent?",
+    a: ["Attempting a big-bang rewrite in one turn, resulting in dropped methods, missing imports, and broken references","The agent's computer battery dying","The file being locked by git","Python running out of memory"],
+    c: 0,
+    why: "Big-bang refactoring of massive files overwhelms context and drops critical logic."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Big-Bang Extraction (Fails)",
+            "lines": [
+                  "Move 20 functions across 8 files",
+                  "50 broken imports & syntax errors",
+                  "Impossible to debug"
+            ]
+      },
+      {
+            "title": "Incremental Slicing (Succeeds)",
+            "lines": [
+                  "Extract 1 cohesive cluster",
+                  "Re-export from original file",
+                  "Tests pass green on every step"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Step-by-Step Monolith Decomposition",
+      "def execute_flow():",
+      "    # Decomposing 2,000-line god classes and monolithic ...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Step-by-Step Monolith Decomposition"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "New Clean Module"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Monolith Re-Export"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "step": "Safe Call Site Migration"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Safely decompose monolithic files by extracting one {1} cluster at a time and re-exporting symbols to maintain backward {2}."
+],
+    blanks: [
+      {
+            "a": [
+                  "cohesive"
+            ],
+            "why": "Closely related group of functions"
+      },
+      {
+            "a": [
+                  "compatibility"
+            ],
+            "why": "Ensuring existing callers don't break"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why is re-exporting extracted functions from the original monolithic file so powerful during refactoring?",
+      a: ["Existing external callers continue to work without modification while internals are cleanly relocated","It makes the file size zero bytes","It speeds up Python imports by 10x","It disables type checking"],
+      c: 0,
+      why: "Re-exporting preserves caller compatibility, allowing extraction without massive multi-file ripple effects."
+    },
+    {
+      q: "How many functions should an agent extract in a single refactoring turn?",
+      a: ["A single cohesive cluster or class at a time, followed by immediate test verification","All 200 functions at once","Zero functions","As many as can fit in RAM"],
+      c: 0,
+      why: "Small, incremental steps keep changes manageable and verifiable."
+    },
+    {
+      q: "What should you do after each extraction step succeeds?",
+      a: ["Run tests and make an atomic git commit before proceeding to the next extraction","Push immediately to production without tests","Delete the git history","Shut down the computer"],
+      c: 0,
+      why: "Atomic commits create savepoints that can be reverted to if subsequent extractions encounter friction."
+    },
+    {
+      q: "When is a monolithic file officially considered decomposed?",
+      a: ["When its responsibilities have been cleanly relocated to cohesive domain modules and the original file is either deprecated or an orchestrator","After 2 hours of editing","When the file is renamed","When it is converted to JSON"],
+      c: 0,
+      why: "Decomposition is complete when domain responsibilities live in dedicated, cohesive modules."
+    }
+  ]);
+</script>
+</body>
+</html>

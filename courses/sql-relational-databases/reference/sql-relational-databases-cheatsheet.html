@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SQL & Relational Databases — Cheat Sheet</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+<style>
+  .ref-toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0 8px; }
+  .ref-toc a { font-size: .8rem; border: 1px solid var(--border); background: #111a30; padding: 5px 11px; border-radius: 999px; color: var(--muted); text-decoration: none; border-bottom: 1px solid var(--border); }
+  .ref-toc a:hover { color: #fff; border-color: #3d5488; }
+  .lesson-wrap h2 { scroll-margin-top: 20px; }
+  .snippet { margin: 14px 0 22px; }
+  .snippet .lbl { font-size: .72rem; font-weight: 800; letter-spacing: .7px; text-transform: uppercase; color: var(--accent2); margin-bottom: 6px; }
+  .see { font-size: .82rem; color: var(--muted); margin: -6px 0 12px; }
+  .see a { color: var(--accent2); border-bottom: 0; }
+  .see a:hover { color: #fff; }
+  .snippet pre { padding-top: 34px; }
+  @media print { .snippet pre { padding-top: 18px; } }
+</style>
+</head>
+<body class="lesson-body" data-course="sql-relational-databases">
+
+<div class="lesson-wrap">
+
+  <span class="lesson-kicker">Reference · Cheat sheet</span>
+  <h1 class="lesson-title">SQL & Relational Databases — Cheat Sheet</h1>
+  <p class="lesson-lede">
+    The whole course on one page. Every snippet links back to the lesson that
+    teaches it.
+  </p>
+
+  <div class="ref-toc">
+    <a href="#sec-1">Table Creation & Constraints</a>
+    <a href="#sec-2">Declarative Queries</a>
+    <a href="#sec-3">Data Manipulation (DML)</a>
+    <a href="#sec-4">Aggregations & Grouping</a>
+  </div>
+
+  <h2 id="sec-1"><span class="n">1</span>Table Creation & Constraints</h2>
+  <div class="snippet">
+    <div class="lbl">Schema definition DDL</div>
+    <pre><code>CREATE TABLE users (
+  id SERIAL PRIMARY KEY,
+  email VARCHAR(255) UNIQUE NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE TABLE orders (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  total_cents INTEGER NOT NULL CHECK (total_cents &gt;= 0)
+);</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0002-tables-data-types-and-constraints.html">Lesson 02 — Tables, data types, and constraints</a>.</p>
+
+  <h2 id="sec-2"><span class="n">2</span>Declarative Queries</h2>
+  <div class="snippet">
+    <div class="lbl">SELECT, WHERE, and sorting</div>
+    <pre><code>SELECT id, email, created_at
+FROM users
+WHERE email LIKE '%@gmail.com'
+  AND created_at &gt;= '2026-01-01'
+ORDER BY created_at DESC
+LIMIT 10 OFFSET 0;</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0003-querying-data-with-select-and-where.html">Lesson 03 — Querying data with SELECT and WHERE</a>.</p>
+
+  <h2 id="sec-3"><span class="n">3</span>Data Manipulation (DML)</h2>
+  <div class="snippet">
+    <div class="lbl">Insert, update, delete</div>
+    <pre><code>-- Insert single or multiple rows
+INSERT INTO users (email) VALUES ('ada@example.com') RETURNING id;
+
+-- Safe update with WHERE filter
+UPDATE users SET email = 'new@example.com' WHERE id = 42;
+
+-- Delete record
+DELETE FROM users WHERE id = 42;</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0005-inserting-updating-and-deleting-records.html">Lesson 05 — Inserting, updating, and deleting records</a>.</p>
+
+  <h2 id="sec-4"><span class="n">4</span>Aggregations & Grouping</h2>
+  <div class="snippet">
+    <div class="lbl">GROUP BY and HAVING</div>
+    <pre><code>SELECT user_id, COUNT(*) AS order_count, SUM(total_cents) AS total_spent
+FROM orders
+GROUP BY user_id
+HAVING COUNT(*) &gt; 5
+ORDER BY total_spent DESC;</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0007-aggregations-count-sum-and-group-by.html">Lesson 07 — Aggregations: COUNT, SUM, and GROUP BY</a>.</p>
+
+  <div class="lesson-foot">
+    <div class="links">
+      <a href="sql-relational-databases-glossary.html">📖 Glossary</a>
+      <a href="../course.html">← Course map</a>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

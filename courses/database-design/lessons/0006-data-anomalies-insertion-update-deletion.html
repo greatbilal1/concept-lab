@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 06 — Data anomalies: insertion, update, deletion</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="database-design" data-lesson="6" data-lesson-id="data-anomalies-insertion-update-deletion">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 06</span> · Normalization Forms & Anomalies</span>
+
+  <h1 class="lesson-title">Data anomalies: insertion, update, deletion</h1>
+  <p class="lesson-lede">
+    What happens when bad design corrupts your business records? Discover the three classic database anomalies and how normalized schemas protect data integrity.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Identify and eliminate insertion, update, and deletion anomalies in unnormalized tables</span>
+    <span><b>Mission link</b> Explains the concrete catastrophic consequences that normalization prevents</span>
+  </div>
+
+  <h2><span class="n">1</span>The three classic anomalies</h2>
+  <p>When a database schema is not normalized, it falls victim to three classic data anomalies: <b>Update Anomaly</b> (changing a customer address requires updating 50 rows; if one update fails, the database has contradictory addresses).</p><p><b>Insertion Anomaly</b> (you cannot add a new course unless at least one student is enrolled). <b>Deletion Anomaly</b> (deleting the last student enrolled in a course accidentally erases the entire course from the database!).</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Unnormalized schemas cause update contradictions, insertion blocks, and accidental data loss.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The anomaly trio</h2>
+  <p>Understand how conflating two entities into one table triggers all three anomalies.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing an update anomaly</h2>
+  <p>Trace how updating a customer's address in an unnormalized table produces inconsistent data.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your recall of database anomalies.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can spot data anomalies in flawed schemas and refactor them into safe, normalized architectures.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit a spreadsheet and identify an update anomaly where data is repeated.</li>
+    <li>Demonstrate a deletion anomaly by deleting a parent row in an unnormalized table.</li>
+    <li>Refactor the table into two separate entities to eliminate all three anomalies.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    C.J. Date, *Database in Depth: Relational Theory for Practitioners*, Chapter 6: 'Redundancy and Anomalies'.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "In an unnormalized table holding students and courses, what happens if the only student in 'Physics 101' drops the class?",
+    a: ["Deleting the student's row deletes the entire existence of Physics 101 from the database (Deletion Anomaly)","The database assigns a ghost student automatically","The course is archived into a separate table","A warning is printed in the server logs"],
+    c: 0,
+    why: "When course details only exist on student enrollment rows, deleting the student deletes the course."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Update Anomaly",
+            "lines": [
+                  "data stored in multiple rows",
+                  "inconsistent updates cause contradictions"
+            ]
+      },
+      {
+            "title": "Insertion Anomaly",
+            "lines": [
+                  "cannot insert course without student",
+                  "forces fake dummy data"
+            ]
+      },
+      {
+            "title": "Deletion Anomaly",
+            "lines": [
+                  "deleting one entity accidentally",
+                  "destroys unrelated entity data"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Row 1: Order #1, User: Ada, Address: London",
+      "# Row 2: Order #2, User: Ada, Address: London",
+      "# UPDATE orders SET address = 'Paris' WHERE id = 1; # row 2 forgotten!",
+      "# Inconsistent state: Where does Ada live? London or Paris? Contradiction!"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "initial": "address duplicated on every order"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "partial_update": "order 1 updated to Paris; order 2 remains London"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "corruption": "database contains conflicting truth for same user"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Contradictory data resulting from partial edits is an <0> anomaly.",
+      "Being unable to record a fact without creating dummy data is an <1> anomaly.",
+      "Losing unrelated facts when removing a row is a <2> anomaly."
+],
+    blanks: [
+      {
+            "a": [
+                  "update"
+            ],
+            "why": "Update anomalies cause contradictory records."
+      },
+      {
+            "a": [
+                  "insertion"
+            ],
+            "why": "Insertion anomalies block recording independent facts."
+      },
+      {
+            "a": [
+                  "deletion"
+            ],
+            "why": "Deletion anomalies cause accidental data destruction."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What causes an update anomaly in a database table?",
+      a: ["Data redundancy: the same fact is stored in multiple rows, so partial updates leave contradictory values","The database server clock is out of sync","The table contains more than 10,000 rows","The user did not include a semicolon at the end of the query"],
+      c: 0,
+      why: "When duplicate copies of data exist, updating some but not all creates conflicting records."
+    },
+    {
+      q: "What is an insertion anomaly?",
+      a: ["Being unable to insert an independent fact into a table without artificially inventing dummy data for an unrelated entity","Inserting data into a table on a Saturday","Inserting numbers into a text column","A hardware write failure on an SSD drive"],
+      c: 0,
+      why: "Conflating two entities forces developers to insert fake records to satisfy primary keys."
+    },
+    {
+      q: "How does normalizing a schema into Third Normal Form resolve deletion anomalies?",
+      a: ["Each entity lives in its own table, so deleting a child record does not delete the parent entity's definition","It makes all DELETE queries illegal in the database","It turns off the hard drive's ability to delete data","It converts deleted rows into encrypted archives"],
+      c: 0,
+      why: "Independent tables decouple entity lifecycles, ensuring deleting an enrollment preserves the course."
+    },
+    {
+      q: "Which principle is the ultimate defense against all three data anomalies?",
+      a: ["The Single Source of Truth: every fact is stored in exactly one place in the database","Duplicating data across three backup tables in real time","Writing all queries in Python instead of SQL","Disabling foreign key constraints"],
+      c: 0,
+      why: "When every fact lives in exactly one place, contradictions and accidental deletions become impossible."
+    }
+  ]);
+</script>
+</body>
+</html>

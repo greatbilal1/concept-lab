@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 07 — Context API and global state boundaries</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="react-architecture" data-lesson="7" data-lesson-id="context-api-and-global-state-boundaries">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 07</span> · Architecture & Performance</span>
+
+  <h1 class="lesson-title">Context API and global state boundaries</h1>
+  <p class="lesson-lede">
+    Stop passing props down through ten intermediate components. Master the React Context API: dependency injection for UI trees, custom providers, and re-render pitfalls.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Implement Context API providers for shared app concerns without performance degradation</span>
+    <span><b>Mission link</b> Eliminates prop drilling across deep component hierarchies</span>
+  </div>
+
+  <h2><span class="n">1</span>Solving prop drilling</h2>
+  <p>When data is needed by a component 7 levels deep in the tree (like current user authentication or theme), passing props through every intermediate component is painful: <code>App &rarr; Shell &rarr; Header &rarr; Nav &rarr; UserProfile &rarr; Avatar</code>. This is <b>Prop Drilling</b>.</p><p>React's <b>Context API</b> provides a teleportation mechanism (Dependency Injection). A <code>ThemeContext.Provider</code> wraps an ancestor tree, and <i>any child component at any depth</i> can consume the data directly via <code>useContext(ThemeContext)</code>.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Context teleports data down the component tree without passing props through intermediate layers.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Context Provider pattern</h2>
+  <p>Learn the standard pattern: pair a Context with a dedicated Provider and custom consumer hook.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing the custom hook guard pattern</h2>
+  <p>Trace how a custom consumer hook guards against being called outside of its Provider.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of Context API mechanics.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can implement clean, encapsulated Context Providers that eliminate prop drilling while preventing unneeded re-renders.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Create a ThemeContext with a custom useTheme() hook that throws if used outside its Provider.</li>
+    <li>Split a bloated context into separate State and Dispatch contexts to avoid re-render cascades.</li>
+    <li>Refactor an application to eliminate a 4-level prop drilling chain.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    React Official Documentation: *Passing Data Deeply with Context* (react.dev/learn/passing-data-deeply-with-context).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What happens to components that consume a Context (via useContext) when the Provider's value changes?",
+    a: ["Every component consuming that Context will automatically re-render with the new value","Only the top-level Provider re-renders","The browser page reloads","The components ignore the change until the user clicks"],
+    c: 0,
+    why: "Any component subscribed to a Context re-renders automatically when the context value updates."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "ThemeContext.Provider",
+            "lines": [
+                  "wraps app or subtree",
+                  "supplies value={{ theme, setTheme }}"
+            ]
+      },
+      {
+            "title": "Intermediate Components",
+            "lines": [
+                  "Nav, Header, Sidebar",
+                  "zero theme props passed! completely clean!"
+            ]
+      },
+      {
+            "title": "Consumer (useTheme())",
+            "lines": [
+                  "reads theme directly from Context",
+                  "calls setTheme('dark')"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "function useAuth() {",
+      "    const context = useContext(AuthContext);",
+      "    if (!context) {",
+      "        throw new Error('useAuth must be used within an AuthProvider');",
+      "    }",
+      "    return context;",
+      "}"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "lookup": "reads AuthContext from nearest ancestor provider"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "guard": "checks if provider is missing (returns undefined/null)"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "fail_fast": "throws descriptive developer error rather than cryptic null crash!"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Passing props through intermediate layers that do not need them is prop <0>.",
+      "The component that supplies context data to children is the Context.<1>.",
+      "The hook consumed by children to access context is use<2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "drilling"
+            ],
+            "why": "Prop drilling clutters intermediate component signatures."
+      },
+      {
+            "a": [
+                  "Provider"
+            ],
+            "why": "Context.Provider wraps the subtree."
+      },
+      {
+            "a": [
+                  "Context"
+            ],
+            "why": "useContext(Context) reads the provided value."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is 'Prop Drilling' in React?",
+      a: ["Passing props down through multiple layers of intermediate components that have no use for the data other than forwarding it","A technique for drilling holes in computer hardware","Writing CSS styles in separate files","A tool that benchmarks component speeds"],
+      c: 0,
+      why: "Prop drilling creates tight coupling and tedious maintenance across intermediate components."
+    },
+    {
+      q: "Why shouldn't you put high-frequency updating data (like mouse cursor coordinates) in a global React Context?",
+      a: ["Every update to the context value forces every single subscriber component to re-render, causing severe performance collapse","Context cannot store numbers","Context is limited to 10 bytes of data","Mouse coordinates are illegal in React"],
+      c: 0,
+      why: "Context re-renders all consumers on every value update; rapid changes freeze the UI."
+    },
+    {
+      q: "How can you prevent consumer re-render cascades when using Context?",
+      a: ["Split context into separate state and dispatch contexts (e.g. UserContext and UserDispatchContext)","Wrap the entire application in a while loop","Delete all child components","Use localStorage instead"],
+      c: 0,
+      why: "Separating state from dispatch ensures components that only trigger actions don't re-render on state changes."
+    },
+    {
+      q: "Can a component consume multiple different Contexts simultaneously?",
+      a: ["Yes, a component can call useContext() for as many different contexts as needed (e.g. useAuth, useTheme, useI18n)","No, a component is strictly limited to one context only","Only on mobile Safari","Only if all contexts share the same name"],
+      c: 0,
+      why: "Components can consume multiple independent contexts without restriction."
+    }
+  ]);
+</script>
+</body>
+</html>

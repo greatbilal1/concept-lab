@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 06 — Inside-Out vs Outside-In TDD</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="tdd" data-lesson="6" data-lesson-id="inside-out-vs-outside-in">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 06</span> · TDD Styles</span>
+
+  <h1 class="lesson-title">Inside-Out vs Outside-In TDD</h1>
+  <p class="lesson-lede">
+    Exploring the two primary flavors of TDD: Chicago School (Inside-Out) and London School (Outside-In).
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know when and how to apply both Inside-Out and Outside-In TDD.</span>
+    <span><b>Mission link</b> Mastering inside-out vs outside-in tdd across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Inside-Out vs Outside-In TDD</h2>
+  <p>Over the years, two distinct schools of TDD thought emerged, each with different philosophies regarding design direction and mocking:</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Exploring the two primary flavors of TDD: Chicago School (Inside-Out) and London School (Outside-In).
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>TDD Schools Compared</h2>
+  <ul><li><strong>Chicago School (Classicist / Inside-Out):</strong> You start by building the core domain logic first (e.g. `Money`, `OrderItem`, `TaxCalculator`) using real objects and state verification. Once core domain units work, you build outward toward controllers and APIs. Mocks are used sparingly.</li><li><strong>London School (Mockist / Outside-In):</strong> You start at the outermost boundary (e.g. HTTP controller or CLI command) and work inward. You mock immediate collaborators, discovering the interfaces you need as you go, and then implement the collaborators in subsequent steps.</li></ul>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Design Flow Direction</h2>
+  <pre><code># Chicago School (Inside-Out): State-based, real collaborators
+def test_cart_total():
+    item = Item(price=10)
+    cart = Cart([item])
+    assert cart.total() == 10  # Verifies real object state
+
+# London School (Outside-In): Interaction-based, mock collaborators
+def test_order_controller():
+    mock_order_service = Mock()
+    controller = OrderController(order_service=mock_order_service)
+    controller.post({"item": "Widget"})
+    mock_order_service.create.assert_called_once()  # Verifies protocol</code></pre><p>Experienced engineers use both styles: Outside-In to discover system seams and user workflows, and Inside-Out for intricate mathematical algorithms and domain state machines.</p><div class="callout"><p><strong>Pragmatic Hybrid:</strong> Use Outside-In acceptance tests to drive the overall feature, then drop into Inside-Out unit tests to flesh out complex business logic.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Fill in the TDD schools comparison</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know when and how to apply both Inside-Out and Outside-In TDD.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where inside-out vs outside-in tdd applies.</li>
+    <li>Author a unit test or verification script exercising inside-out vs outside-in tdd.</li>
+    <li>Document team architectural conventions regarding inside-out vs outside-in tdd.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Inside-Out vs Outside-In TDD.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What distinguishes London School (Outside-In) TDD from Chicago School (Inside-Out) TDD?",
+    a: ["London School starts at user-facing boundaries and mocks collaborators downwards; Chicago School starts at core domain models and builds outwards","London School is only used in the UK","Chicago School does not use assertions","London School does not allow refactoring"],
+    c: 0,
+    why: "London school drives design top-down using mocks; Chicago school builds bottom-up using real collaborator state."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "London (Outside-In)",
+            "lines": [
+                  "Start at UI / Controller",
+                  "Mock collaborators downwards",
+                  "Interaction & protocol focus"
+            ]
+      },
+      {
+            "title": "Chicago (Inside-Out)",
+            "lines": [
+                  "Start at Core Domain / Model",
+                  "Use real objects & state",
+                  "Algorithmic & state focus"
+            ]
+      },
+      {
+            "title": "Synthesis",
+            "lines": [
+                  "Outside-In for seams & flows",
+                  "Inside-Out for domain rules"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Inside-Out vs Outside-In TDD",
+      "def execute_flow():",
+      "    # Exploring the two primary flavors of TDD: Chicago ...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Inside-Out vs Outside-In TDD"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Top-Down (London)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Bottom-Up (Chicago)"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The {1} school builds top-down using mocks, while the {2} school builds bottom-up using real domain objects."
+],
+    blanks: [
+      {
+            "a": [
+                  "London"
+            ],
+            "why": "Mockist outside-in style"
+      },
+      {
+            "a": [
+                  "Chicago"
+            ],
+            "why": "Classicist inside-out style"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the primary strength of London School (Outside-In) TDD?",
+      a: ["It prevents building functionality that is never actually needed by the outer application or user","It completely eliminates the need for test assertions","It makes tests run in parallel automatically","It guarantees zero memory allocations"],
+      c: 0,
+      why: "Starting at the entry point ensures every lower-level collaborator is built to satisfy a real consumer requirement."
+    },
+    {
+      q: "What is the primary danger of dogmatic London School TDD?",
+      a: ["Heavy mocking can couple tests to exact method call sequences, making tests brittle when internals change","Tests become too fast to measure","Code coverage is capped at 50%","Mocks cannot be run on Linux"],
+      c: 0,
+      why: "Verifying interactions rather than outcomes can make tests sensitive to trivial internal implementation details."
+    },
+    {
+      q: "Why do many teams prefer Chicago School for core domain logic?",
+      a: ["Domain models are rich in state and calculations; verifying real outputs without mocks is straightforward and resilient","Chicago School is required by Python","Domain models cannot be mocked","It requires no knowledge of testing"],
+      c: 0,
+      why: "State-based testing of real domain models produces robust tests that survive refactoring."
+    },
+    {
+      q: "How does a pragmatic team combine both schools?",
+      a: ["Use Outside-In tests for top-level user journeys, and Inside-Out tests for core domain algorithms","Alternate schools on odd and even days of the week","Assign London to junior developers and Chicago to seniors","Use London for CSS and Chicago for HTML"],
+      c: 0,
+      why: "A hybrid approach leverages the interface discovery of Outside-In with the resilience of Inside-Out."
+    }
+  ]);
+</script>
+</body>
+</html>

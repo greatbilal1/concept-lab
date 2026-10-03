@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 06 — Event Sourcing and immutable logs</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="software-architecture-patterns" data-lesson="6" data-lesson-id="event-sourcing-and-immutable-logs">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 06</span> · CQRS & Event Sourcing</span>
+
+  <h1 class="lesson-title">Event Sourcing and immutable logs</h1>
+  <p class="lesson-lede">
+    Don't store the current state; store the events that led to it. Discover Event Sourcing: how accounting ledgers, git commits, and append-only event logs provide complete auditability.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Design Event-Sourced systems using append-only immutable event streams and snapshots</span>
+    <span><b>Mission link</b> The architectural pattern that provides perfect auditability and temporal queries</span>
+  </div>
+
+  <h2><span class="n">1</span>The ledger of facts</h2>
+  <p>In a traditional CRUD database, when a user changes their address, you run <code>UPDATE users SET address = 'Paris'</code>. The past is erased: you no longer know they lived in London, when they moved, or why.</p><p>Accountants never erase the past: they use double-entry ledgers. <b>Event Sourcing</b> applies this to software: <b>you never update or delete state; you append immutable events to an event stream</b>: <code>UserRegistered</code> &rarr; <code>AddressChanged</code> &rarr; <code>PlanUpgraded</code>. The current state is simply computed by replaying all historical events from the beginning of time!</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Event Sourcing stores state as an append-only stream of immutable past events.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Event Sourcing architecture</h2>
+  <p>Observe how state is reconstructed by replaying immutable domain events.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing state hydration and snapshotting</h2>
+  <p>Trace how a bank account entity reconstructs its current balance from an event stream.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of Event Sourcing.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can design Event-Sourced systems providing complete historical auditability, temporal time travel, and rollback capabilities.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Model a shopping cart as a sequence of events (ItemAdded, ItemRemoved, CouponApplied).</li>
+    <li>Implement an apply(event) method that reconstructs cart state from the event list.</li>
+    <li>Add a snapshot mechanism that caches state every 100 events.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Martin Fowler: *Event Sourcing* (martinfowler.com/eaaDev/EventSourcing.html, 2005).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What common developer tool that you use every day is a real-world example of Event Sourcing?",
+    a: ["Git (stores an append-only log of commits; current code is reconstructed by replaying commits)","The Google Chrome browser","The computer mouse","The visual studio code editor color theme"],
+    c: 0,
+    why: "Git commits are immutable events; current files are reconstructed by replaying the commit log."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Append-Only Event Store",
+            "lines": [
+                  "1. AccountCreated ($0)",
+                  "2. Deposited ($100)",
+                  "3. Withdrawn ($30)",
+                  "never updated, never deleted!"
+            ]
+      },
+      {
+            "title": "Event Replay (Hydration)",
+            "lines": [
+                  "0 + 100 - 30 = $70",
+                  "current state derived by replaying events!"
+            ]
+      },
+      {
+            "title": "Snapshots (Optimization)",
+            "lines": [
+                  "stores state at event #10,000",
+                  "avoids replaying from event #1 every time"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "events = [",
+      "    AccountOpened(id=1, owner='Ada'),",
+      "    MoneyDeposited(amount=100),",
+      "    MoneyWithdrawn(amount=40)",
+      "]",
+      "account = Account()",
+      "for event in events: account.apply(event)",
+      "print(account.balance) # $60 (reconstructed from historical events!)"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "stream": "immutable event sequence recorded on disk"
+            }
+      },
+      {
+            "line": 5,
+            "vars": {
+                  "replay": "account entity applies events sequentially"
+            }
+      },
+      {
+            "line": 6,
+            "vars": {
+                  "current_state": "current balance $60 derived with complete mathematical audit trail"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Storing state as an immutable sequence of events is Event <0>.",
+      "Rebuilding current state by processing events is event <1>.",
+      "A periodic checkpoint saved to optimize replay performance is a <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "Sourcing"
+            ],
+            "why": "Event Sourcing stores historical events."
+      },
+      {
+            "a": [
+                  "replay",
+                  "hydration"
+            ],
+            "why": "Hydration replays events to build state."
+      },
+      {
+            "a": [
+                  "snapshot"
+            ],
+            "why": "Snapshots bound the number of events to replay."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the primary architectural advantage of Event Sourcing over traditional CRUD?",
+      a: ["Complete auditability: you never lose historical data, and can reconstruct the exact state of the system at any second in the past (time travel)","It eliminates the need for hard drives","It speeds up internet connection bandwidth","It translates Python into Java"],
+      c: 0,
+      why: "Because events are immutable history, you have an unalterable audit log and can replay past state."
+    },
+    {
+      q: "Why are 'Snapshots' necessary in Event-Sourced systems on long-lived entities?",
+      a: ["If an entity has 500,000 events, replaying from event #1 on every request would take seconds; snapshots cache state at checkpoints","Snapshots take photos of the developer","Snapshots delete all event history","Snapshots are required by law"],
+      c: 0,
+      why: "Snapshots let you load the latest checkpoint and replay only the few events since the snapshot."
+    },
+    {
+      q: "Can an event in an Event-Sourced system ever be updated or deleted in place?",
+      a: ["No, events are immutable historical facts; to reverse an event, you must append a new compensating event to the stream","Yes, events can be edited with SQL UPDATE","Only on Friday nights","Only with administrator passwords"],
+      c: 0,
+      why: "History cannot change; correcting a mistake requires appending a new compensating event."
+    },
+    {
+      q: "What architectural pattern is almost always paired with Event Sourcing to provide fast read queries?",
+      a: ["CQRS (using projected read models built from the event stream)","The Singleton pattern","Active Record","Model-View-Controller"],
+      c: 0,
+      why: "Querying an append-only event log is slow; CQRS projects the event stream into fast read tables."
+    }
+  ]);
+</script>
+</body>
+</html>

@@ -1,0 +1,3 @@
+# Mission — Transformers & Attention
+
+Deconstruct the revolutionary architecture powering the modern generative AI era. Trace why sequential RNNs stalled, examine how self-attention unlocked O(1) path lengths and parallel GPU scaling, master the Query-Key-Value retrieval metaphor, derive the scaled dot-product formula, split representation spaces with multi-head attention, inject order with Rotary Position Embeddings (RoPE), compare BERT vs GPT, and assemble complete Transformer blocks.

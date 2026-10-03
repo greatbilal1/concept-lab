@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 04 — Emergent Capabilities and Scaling Laws</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="llms" data-lesson="4" data-lesson-id="emergent-capabilities-scaling-laws">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 04</span> · Scaling Laws</span>
+
+  <h1 class="lesson-title">Emergent Capabilities and Scaling Laws</h1>
+  <p class="lesson-lede">
+    The science of scale: Kaplan & Chinchilla scaling laws, compute-optimal training, and emergent capabilities.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You understand the mathematics of scaling laws and emergent capabilities in foundation models.</span>
+    <span><b>Mission link</b> Mastering emergent capabilities and scaling laws across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Emergent Capabilities and Scaling Laws</h2>
+  <p>For decades, machine learning was treated as an ad-hoc craft. In 2020, researchers at OpenAI published <strong>'Scaling Laws for Neural Language Models'</strong> (Kaplan et al.), proving that LLM performance follows precise mathematical <strong>power laws</strong> across six orders of magnitude.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    The science of scale: Kaplan & Chinchilla scaling laws, compute-optimal training, and emergent capabilities.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Power Law Curves</h2>
+  <p>Test loss decreases predictably as a power-law function of three variables:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Emergence as a Threshold Effect</h2>
+  <ul><li><strong>$N$:</strong> Number of model parameters (excluding embeddings).</li><li><strong>$D$:</strong> Dataset size in tokens.</li><li><strong>$C$:</strong> Total floating-point compute budget (FLOPs).</li></ul><p>In 2022, DeepMind refined this with the <strong>Chinchilla Scaling Laws</strong>: they proved that earlier models (like GPT-3 with 175B parameters on 300B tokens) were severely <em>undertrained</em>. For compute-optimal performance, for every doubling of parameters, you must also double the training tokens ($pprox 20$ tokens per parameter).</p><pre><code># The Chinchilla Optimal Ratio:
+# For optimal compute efficiency: Tokens / Parameters ≈ 20
+# - 7B parameter model   -> Train on at least 140 Billion tokens
+# - 70B parameter model  -> Train on at least 1.4 Trillion tokens
+# Llama 3 scaled this further: 8B parameters trained on 15 TRILLION tokens!</code></pre><p>As models scale along these curves, they exhibit <strong>Emergent Capabilities</strong>: abilities not explicitly present in smaller models (multi-step arithmetic, translation, symbol manipulation) that suddenly appear as smooth continuous improvements in cross-entropy loss cross critical performance thresholds.</p><div class="callout"><p><strong>Over-Training for Inference:</strong> Llama 3 intentionally trained on 15T tokens (far past Chinchilla optimality) to produce small 8B/70B models that are lightning fast and cheap to serve in production!</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the scaling laws sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You understand the mathematics of scaling laws and emergent capabilities in foundation models.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where emergent capabilities and scaling laws applies.</li>
+    <li>Author a unit test or verification script exercising emergent capabilities and scaling laws.</li>
+    <li>Document team architectural conventions regarding emergent capabilities and scaling laws.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Emergent Capabilities and Scaling Laws.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What do the Chinchilla Scaling Laws (Hoffmann et al., 2022) state about compute-optimal training?",
+    a: ["Model parameter size and training token volume should be scaled in equal proportion: doubling model size requires doubling training tokens","Models should be as large as possible with minimal data","Data does not matter; only GPU clock speed matters","Training should stop after 100 steps"],
+    c: 0,
+    why: "Chinchilla proved that scaling model parameters and training tokens equally (1:1) achieves optimal compute efficiency."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Compute Scaling (FLOPs)",
+            "lines": [
+                  "Loss drops smoothly as C increases",
+                  "Predictable across 6 orders of magnitude"
+            ]
+      },
+      {
+            "title": "Chinchilla Balance",
+            "lines": [
+                  "Scale Parameters and Tokens 1:1",
+                  "Eliminated undertrained model waste"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Emergent Capabilities and Scaling Laws",
+      "def execute_flow():",
+      "    # The science of scale: Kaplan & Chinchilla scaling ...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Emergent Capabilities and Scaling Laws"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Continuous Cross-Entropy Loss"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Discrete Benchmark Score"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Chinchilla scaling laws proven that compute-optimal training requires scaling model {1} and training {2} in equal proportion."
+],
+    blanks: [
+      {
+            "a": [
+                  "parameters"
+            ],
+            "why": "Model size N"
+      },
+      {
+            "a": [
+                  "tokens"
+            ],
+            "why": "Dataset volume D"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What does a Power Law relationship mean in the context of LLM scaling?",
+      a: ["Performance improves predictably as a straight line when plotted on a log-log scale against compute or data","Performance doubles every Tuesday","Performance reaches 100% instantly","Performance stops improving after 1B parameters"],
+      c: 0,
+      why: "Power laws appear as linear relationships on logarithmic scales, making scaling predictable."
+    },
+    {
+      q: "Why did Meta train Llama 3 8B on 15 trillion tokens (far beyond Chinchilla optimality)?",
+      a: ["To create an exceptionally capable small model that is cheap and fast to run during inference in production","Because they forgot to stop the training run","Because hard drives were too cheap","To test if GPUs would melt"],
+      c: 0,
+      why: "Over-training small models shifts compute cost to training, drastically lowering inference cost forever."
+    },
+    {
+      q: "What is an 'Emergent Capability' in large language models?",
+      a: ["A qualitative capability (like multi-step coding or translation) that is near-zero in small models but emerges strongly in large models","A model becoming self-aware","A bug in the tokenizer","A new hardware feature"],
+      c: 0,
+      why: "Emergent abilities arise when smooth statistical loss crosses task accuracy thresholds."
+    },
+    {
+      q: "According to Chinchilla, what was the primary inefficiency of the original 175B-parameter GPT-3?",
+      a: ["It had too many parameters for the small amount of data it was trained on (300B tokens); it was severely undertrained","It was trained in Python","It used too many GPUs","It was too small"],
+      c: 0,
+      why: "DeepMind proved GPT-3 was parameter-heavy and data-starved for its compute budget."
+    }
+  ]);
+</script>
+</body>
+</html>

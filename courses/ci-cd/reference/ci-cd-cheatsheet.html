@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CI/CD & Automated Deployment — Cheat Sheet</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+<style>
+  .ref-toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0 8px; }
+  .ref-toc a { font-size: .8rem; border: 1px solid var(--border); background: #111a30; padding: 5px 11px; border-radius: 999px; color: var(--muted); text-decoration: none; border-bottom: 1px solid var(--border); }
+  .ref-toc a:hover { color: #fff; border-color: #3d5488; }
+  .lesson-wrap h2 { scroll-margin-top: 20px; }
+  .snippet { margin: 14px 0 22px; }
+  .snippet .lbl { font-size: .72rem; font-weight: 800; letter-spacing: .7px; text-transform: uppercase; color: var(--accent2); margin-bottom: 6px; }
+  .see { font-size: .82rem; color: var(--muted); margin: -6px 0 12px; }
+  .see a { color: var(--accent2); border-bottom: 0; }
+  .see a:hover { color: #fff; }
+  .snippet pre { padding-top: 34px; }
+  @media print { .snippet pre { padding-top: 18px; } }
+</style>
+</head>
+<body class="lesson-body" data-course="ci-cd">
+
+<div class="lesson-wrap">
+
+  <span class="lesson-kicker">Reference · Cheat sheet</span>
+  <h1 class="lesson-title">CI/CD & Automated Deployment — Cheat Sheet</h1>
+  <p class="lesson-lede">
+    The whole course on one page. Every snippet links back to the lesson that
+    teaches it.
+  </p>
+
+  <div class="ref-toc">
+    <a href="#sec-1">Complete GitHub Actions CI Workflow</a>
+    <a href="#sec-2">Concurrency Cancel-in-Progress Configuration</a>
+    <a href="#sec-3">Cross-Platform Matrix Test Configuration</a>
+    <a href="#sec-4">Trivy Security Scanning in GitHub Actions</a>
+  </div>
+
+  <h2 id="sec-1"><span class="n">1</span>Complete GitHub Actions CI Workflow</h2>
+  <div class="snippet">
+    <div class="lbl">Linting, typing, and testing pipeline</div>
+    <pre><code>name: CI
+on: [pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12", cache: "pip" }
+      - run: pip install -r requirements.txt
+      - run: ruff check . && pyright src/ && pytest</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0002-github-actions-core-concepts.html">Lesson 02 — GitHub Actions Core Concepts: Workflows, Jobs, and Steps</a>.</p>
+
+  <h2 id="sec-2"><span class="n">2</span>Concurrency Cancel-in-Progress Configuration</h2>
+  <div class="snippet">
+    <div class="lbl">Terminating obsolete PR runs</div>
+    <pre><code>concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0005-artifacts-dependency-caching-acceleration.html">Lesson 05 — Artifacts, Dependency Caching, and Pipeline Acceleration</a>.</p>
+
+  <h2 id="sec-3"><span class="n">3</span>Cross-Platform Matrix Test Configuration</h2>
+  <div class="snippet">
+    <div class="lbl">Multi-OS and multi-version grid</div>
+    <pre><code>strategy:
+  fail-fast: false
+  matrix:
+    os: [ubuntu-latest, macos-latest, windows-latest]
+    python: ["3.11", "3.12"]
+runs-on: ${{ matrix.os }}
+steps:
+  - uses: actions/setup-python@v5
+    with: { python-version: ${{ matrix.python }} }</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0004-matrix-builds-cross-platform-testing.html">Lesson 04 — Matrix Builds and Cross-Platform Testing</a>.</p>
+
+  <h2 id="sec-4"><span class="n">4</span>Trivy Security Scanning in GitHub Actions</h2>
+  <div class="snippet">
+    <div class="lbl">Failing CI on Critical vulnerabilities</div>
+    <pre><code>- name: Scan Docker Image for Vulnerabilities
+  uses: aquasecurity/trivy-action@master
+  with:
+    image-ref: 'company/api:${{ github.sha }}'
+    exit-code: '1'
+    severity: 'CRITICAL,HIGH'</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0008-building-automated-cicd-pipeline.html">Lesson 08 — Building an End-to-End Automated CI/CD Pipeline</a>.</p>
+
+  <div class="lesson-foot">
+    <div class="links">
+      <a href="ci-cd-glossary.html">📖 Glossary</a>
+      <a href="../course.html">← Course map</a>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

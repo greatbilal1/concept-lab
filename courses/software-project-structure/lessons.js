@@ -1,0 +1,61 @@
+/* ============================================================
+   How Software Projects Are Structured — lesson manifest
+   ------------------------------------------------------------
+   The single source of truth for this course's order. Every
+   lesson page, the course map, the gating logic and the lesson
+   hub all read from this list.
+   ============================================================ */
+window.TeachLessons = [
+  { n: 1, id: "anatomy-of-a-repository", file: "lessons/0001-anatomy-of-a-repository.html", title: "Anatomy of a repository", topic: "Anatomy of a Repository", anim: "LayersOrbit" },
+  { n: 2, id: "source-layouts-and-packages", file: "lessons/0002-source-layouts-and-packages.html", title: "Source layouts and packages", topic: "Anatomy of a Repository", anim: "LayersOrbit" },
+  { n: 3, id: "configuration-and-environment-files", file: "lessons/0003-configuration-and-environment-files.html", title: "Configuration and environment files", topic: "Configuration & Secrets", anim: "LayersOrbit" },
+  { n: 4, id: "managing-project-dependencies", file: "lessons/0004-managing-project-dependencies.html", title: "Managing project dependencies", topic: "Configuration & Secrets", anim: "LayersOrbit" },
+  { n: 5, id: "entry-points-and-executables", file: "lessons/0005-entry-points-and-executables.html", title: "Entry points and executables", topic: "Entry Points & Testing", anim: "LayersOrbit" },
+  { n: 6, id: "testing-and-fixtures-directory-patterns", file: "lessons/0006-testing-and-fixtures-directory-patterns.html", title: "Testing and fixture directories", topic: "Entry Points & Testing", anim: "LayersOrbit" },
+  { n: 7, id: "documentation-and-meta-files", file: "lessons/0007-documentation-and-meta-files.html", title: "Documentation and meta files", topic: "Builds, Tests & Hygiene", anim: "LayersOrbit" },
+  { n: 8, id: "build-artifacts-and-git-ignore-hygiene", file: "lessons/0008-build-artifacts-and-git-ignore-hygiene.html", title: "Build artifacts and gitignore hygiene", topic: "Builds, Tests & Hygiene", anim: "LayersOrbit" }
+];
+
+/* ============================================================
+   How Software Projects Are Structured — glossary
+   ------------------------------------------------------------
+   The vocabulary of this course, grouped into sections.
+   ============================================================ */
+window.TeachGlossary = [
+  {
+    id: "anatomy", title: "Anatomy of a Repository",
+    terms: [
+      { term: "Root directory", def: "The top-level folder of a repository containing project metadata, configuration, and source directories.", lesson: 1, tags: ["structure"] },
+      { term: "Src layout", def: "A directory structure where application code is nested inside a dedicated src/ folder to avoid import pollution.", lesson: 2, tags: ["packaging"] },
+      { term: "Package", def: "A directory containing an __init__.py file or namespace configuration that allows its modules to be imported.", lesson: 2, tags: ["architecture"] },
+      { term: "Manifest", def: "A metadata file defining project name, author, dependencies, and build requirements.", lesson: 1, tags: ["config"] }
+    ]
+  },
+  {
+    id: "configuration", title: "Configuration & Secrets",
+    terms: [
+      { term: "Twelve-Factor App", def: "A methodology for building modern cloud applications that emphasizes strict separation of config from code.", lesson: 3, tags: ["architecture"] },
+      { term: "Environment file", def: "A plain-text file (.env) containing key-value pairs loaded into environment variables during local development.", lesson: 3, tags: ["security"] },
+      { term: "Lockfile", def: "A machine-generated file recording exact dependency versions and cryptographic hashes for reproducible builds.", lesson: 4, tags: ["dependencies"] },
+      { term: "Virtual environment", def: "An isolated directory tree containing a specific interpreter and independent package dependencies.", lesson: 4, tags: ["environment"] }
+    ]
+  },
+  {
+    id: "entry-points", title: "Entry Points & Testing",
+    terms: [
+      { term: "Entry point", def: "The script or callable function configured as the starting execution point of an application or CLI.", lesson: 5, tags: ["runtime"] },
+      { term: "Test fixture", def: "A fixed baseline of data or mock objects used to execute automated tests consistently.", lesson: 6, tags: ["testing"] },
+      { term: "Integration test", def: "A test verifying that multiple modules, database queries, or external services interact correctly together.", lesson: 6, tags: ["testing"] },
+      { term: "Mock", def: "A simulated object that mimics the behavior of a real external dependency in controlled ways.", lesson: 6, tags: ["testing"] }
+    ]
+  },
+  {
+    id: "hygiene", title: "Builds, Tests & Hygiene",
+    terms: [
+      { term: "Build artifact", def: "Compiled binaries, bundled assets, or distribution archives generated by build processes.", lesson: 8, tags: ["build"] },
+      { term: "Gitignore", def: "A configuration file instructing git to untrack and ignore specified build artifacts, caches, and secrets.", lesson: 8, tags: ["git"] },
+      { term: "Changelog", def: "A curated, chronologically ordered record of notable changes made in each release of a project.", lesson: 7, tags: ["documentation"] },
+      { term: "Onboarding doc", def: "A guide (typically README.md) providing exact prerequisites and commands to run the project from scratch.", lesson: 7, tags: ["documentation"] }
+    ]
+  }
+];

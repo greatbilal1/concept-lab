@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 04 — Nodes, elements, and relationships</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="html-dom" data-lesson="4" data-lesson-id="nodes-elements-and-relationships">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 04</span> · The Document Object Model</span>
+
+  <h1 class="lesson-title">Nodes, elements, and relationships</h1>
+  <p class="lesson-lede">
+    Not every node in the DOM is an element. Understand the difference between Nodes and Elements, and navigate parent, child, and sibling relationships.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Traverse the DOM tree accurately using element navigation properties</span>
+    <span><b>Mission link</b> Prevents subtle whitespace bugs when navigating tree structures</span>
+  </div>
+
+  <h2><span class="n">1</span>Nodes versus Elements</h2>
+  <p>In the DOM, everything is a <b>Node</b>: text chunks, comments, and tags. An <b>Element</b> is a specific subtype of Node (nodeType === 1) that represents an actual HTML tag.</p><p>This distinction matters when traversing: <code>childNodes</code> includes invisible whitespace text nodes between tags, whereas <code>children</code> returns <i>only element tags</i>. Always use element-specific traversal properties (<code>children</code>, <code>nextElementSibling</code>) unless you specifically need raw text nodes.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Use element-specific properties (children, parentElement) to avoid traversing invisible whitespace text nodes.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The element navigation family</h2>
+  <p>Master the standard JavaScript properties for navigating tree relationships cleanly.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing sibling traversal</h2>
+  <p>Trace how a script walks through a list of list-item elements sequentially.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your recall of DOM navigation properties.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can traverse complex DOM structures without falling into whitespace text node traps.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Compare element.childNodes.length with element.children.length on an element with nested markup.</li>
+    <li>Find an element's closest parent container using element.closest('.container').</li>
+    <li>Traverse through all sibling elements in a list using nextElementSibling.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    MDN Web Docs: *Node vs Element in the DOM* (developer.mozilla.org).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "<div> <p>Hello</p> </div>: How many childNodes does the div have versus children?",
+    a: ["3 childNodes (whitespace, p, whitespace) but only 1 element in children (<p>)","1 childNode and 1 element in children","0 childNodes and 10 children","10 childNodes and 0 children"],
+    c: 0,
+    why: "Whitespace indentation between tags becomes Text nodes in childNodes, but is excluded from children."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Parent",
+            "lines": [
+                  "el.parentElement",
+                  "ascends one level up"
+            ]
+      },
+      {
+            "title": "Children",
+            "lines": [
+                  "el.children",
+                  "el.firstElementChild, el.lastElementChild"
+            ]
+      },
+      {
+            "title": "Siblings",
+            "lines": [
+                  "el.previousElementSibling",
+                  "el.nextElementSibling"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "let item = document.querySelector('li.first')",
+      "while (item) {",
+      "    console.log(item.textContent)",
+      "    item = item.nextElementSibling",
+      "}"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "current": "<li>Item 1</li>"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "printed": "'Item 1'"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "current": "<li>Item 2</li> (traversed via nextElementSibling)"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "current": "null (end of list reached; loop terminates)"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The property returning an element's immediate parent element is parent<0>.",
+      "The property returning only element child tags without text nodes is <1>.",
+      "The property returning the adjacent sibling element to the right is next<2>Sibling."
+],
+    blanks: [
+      {
+            "a": [
+                  "Element"
+            ],
+            "why": "parentElement returns the parent HTML element."
+      },
+      {
+            "a": [
+                  "children"
+            ],
+            "why": "children filters out comment and whitespace text nodes."
+      },
+      {
+            "a": [
+                  "Element"
+            ],
+            "why": "nextElementSibling skips whitespace text to the next tag."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why is 'el.children' usually preferred over 'el.childNodes' when navigating HTML?",
+      a: ["children contains only element tags, ignoring invisible whitespace text nodes created by formatting indentation","children is an encrypted array supported only by secure browsers","childNodes causes severe memory leaks in the browser engine","children automatically deletes duplicate HTML elements"],
+      c: 0,
+      why: "childNodes includes whitespace text nodes between tags, leading to off-by-one traversal bugs."
+    },
+    {
+      q: "What does 'element.closest(selector)' do?",
+      a: ["Traverses upwards through parents to find the nearest ancestor matching the selector","Finds the closest physical pixel neighbor on the computer screen","Measures the network latency to the closest CDN data center","Selects all child nodes matching the selector"],
+      c: 0,
+      why: "closest() ascends the ancestor chain until it finds a matching CSS selector."
+    },
+    {
+      q: "What nodeType value corresponds to an HTML Element node?",
+      a: ["1 (Node.ELEMENT_NODE)","3 (Node.TEXT_NODE)","8 (Node.COMMENT_NODE)","9 (Node.DOCUMENT_NODE)"],
+      c: 0,
+      why: "In the W3C DOM specification, nodeType 1 indicates an Element."
+    },
+    {
+      q: "What happens when 'el.nextElementSibling' is called on the last child element in a container?",
+      a: ["It returns null","It throws an unhandled NullPointerException error","It wraps around to the first child element","It deletes the parent container element"],
+      c: 0,
+      why: "When no subsequent sibling element exists, nextElementSibling safely returns null."
+    }
+  ]);
+</script>
+</body>
+</html>

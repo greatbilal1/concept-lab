@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 06 — Pagination, filtering, and sorting</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="rest-apis-json" data-lesson="6" data-lesson-id="pagination-filtering-and-sorting">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 06</span> · API Design Patterns & Errors</span>
+
+  <h1 class="lesson-title">Pagination, filtering, and sorting</h1>
+  <p class="lesson-lede">
+    Never return 100,000 records in one response. Master offset versus cursor pagination, query parameter filtering, and API rate limiting.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Design scalable collection endpoints with cursor pagination, filtering, and rate limits</span>
+    <span><b>Mission link</b> Protects databases from query exhaustion and keeps API responses fast</span>
+  </div>
+
+  <h2><span class="n">1</span>Offset versus cursor pagination</h2>
+  <p>Returning unpaginated database collections is an invitation to server failure. APIs paginate collections using one of two strategies: <b>Offset pagination</b> (<code>?offset=20&limit=10</code>) or <b>Cursor pagination</b> (<code>?cursor=eyJpZCI6NDJ9&limit=10</code>).</p><p>Offset pagination is simple but suffers from two flaws: it becomes slow on large datasets (<code>OFFSET 100000</code> forces the database to scan 100,000 rows), and records can be skipped or duplicated if rows are inserted while paginating. Cursor pagination solves both by indexing from the last seen record.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Cursor pagination provides stable, high-performance querying on high-volume datasets.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Query parameter conventions</h2>
+  <p>Learn the standard URL query parameter conventions for filtering, sorting, and pagination.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing cursor pagination response</h2>
+  <p>Trace how a cursor-paginated response returns an opaque cursor token to fetch the next batch.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of pagination and filtering patterns.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can implement performant collection endpoints featuring cursor pagination, expressive filtering, and rate limiting.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Inspect the Link or next_cursor headers returned by GitHub or Stripe APIs.</li>
+    <li>Implement a cursor pagination query using a WHERE id < cursor condition in SQL.</li>
+    <li>Return RateLimit-Remaining headers from an API endpoint.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    IETF RFC 6585: *Additional HTTP Status Codes* (Section 4: '429 Too Many Requests').
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What happens in offset pagination if a new item is inserted at the top while a user is reading page 1?",
+    a: ["When the user requests page 2, the last item from page 1 is shifted down and appears a second time","The database throws a concurrent modification error","The user session is immediately logged out","Page 2 loads with zero items"],
+    c: 0,
+    why: "Offset shifts by row count; prepending a row causes duplicate records across page boundaries."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Filtering",
+            "lines": [
+                  "GET /items?status=active",
+                  "GET /items?category=books"
+            ]
+      },
+      {
+            "title": "Sorting",
+            "lines": [
+                  "GET /items?sort=-created_at",
+                  "minus prefix denotes descending"
+            ]
+      },
+      {
+            "title": "Rate Limit Headers",
+            "lines": [
+                  "RateLimit-Limit: 100",
+                  "RateLimit-Remaining: 42",
+                  "RateLimit-Reset: 15"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "GET /api/v1/posts?limit=2 -> returns posts [id: 100, id: 99]",
+      "# Response contains next_cursor token encoding id=99",
+      "GET /api/v1/posts?cursor=eyJpZCI6OTl9&limit=2",
+      "# Database queries WHERE id < 99 ORDER BY id DESC LIMIT 2"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "initial_page": "fetched items 100 and 99"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "cursor": "token encodes reference to item 99"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "next_query": "fast indexed seek: WHERE id < 99"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "result": "delivers items 98 and 97 with zero row skipping"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The pagination method using an opaque record pointer is <0> pagination.",
+      "Sorting in descending order in REST query params often uses a <1> prefix (e.g. -date).",
+      "The HTTP status code returned when a client exceeds its rate limit is <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "cursor"
+            ],
+            "why": "Cursor pagination uses a stable record pointer."
+      },
+      {
+            "a": [
+                  "-",
+                  "minus"
+            ],
+            "why": "Minus prefix denotes descending sort order."
+      },
+      {
+            "a": [
+                  "429"
+            ],
+            "why": "429 Too Many Requests indicates rate limit exhaustion."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why is cursor pagination faster than offset pagination on large database tables?",
+      a: ["It uses indexed WHERE clauses (e.g. id < 1000) instead of scanning and discarding thousands of offset rows","It compresses SQL query text by fifty percent","It runs entirely inside the client web browser","It deletes old records from the database table"],
+      c: 0,
+      why: "OFFSET N requires scanning N rows; cursor pagination seeks directly via B-tree index."
+    },
+    {
+      q: "What status code should an API return when a client makes more requests than allowed by the rate limit?",
+      a: ["429 Too Many Requests","400 Bad Request","503 Service Unavailable","403 Forbidden"],
+      c: 0,
+      why: "429 Too Many Requests is the standard status code for rate limit throttling."
+    },
+    {
+      q: "What header informs the client how many seconds to wait before retrying after a 429 response?",
+      a: ["Retry-After: 30","RateLimit-Wait: 30","Timeout: 30","Connection: Keep-Alive"],
+      c: 0,
+      why: "The Retry-After header indicates the duration to wait before issuing new requests."
+    },
+    {
+      q: "What is an opaque cursor token in API pagination?",
+      a: ["An encoded string (often Base64) containing internal query pointers that clients treat as a black box","A visual mouse cursor icon displayed on the screen","A cryptographic key that decrypts database passwords","A cookie that expires after 1 second"],
+      c: 0,
+      why: "Opaque cursors hide internal database columns while allowing clients to request the next page."
+    }
+  ]);
+</script>
+</body>
+</html>

@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 02 — Defining Tool Schemas: Names, Descriptions, and Parameters</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="function-calling" data-lesson="2" data-lesson-id="defining-tool-schemas">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 02</span> · Tool Schemas</span>
+
+  <h1 class="lesson-title">Defining Tool Schemas: Names, Descriptions, and Parameters</h1>
+  <p class="lesson-lede">
+    Authoring production tool schemas: function names, detailed descriptions, parameter typing, and JSON Schema definitions.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to author expressive, bulletproof tool schemas for LLMs.</span>
+    <span><b>Mission link</b> Mastering defining tool schemas: names, descriptions, and parameters across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Defining Tool Schemas: Names, Descriptions, and Parameters</h2>
+  <p>A language model chooses which tool to invoke based on one thing: <strong>The Tool Schema</strong>. If your function name is cryptic (e.g. <code>tool_7()</code>) and lacks a description, the model will never know when to call it.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Authoring production tool schemas: function names, detailed descriptions, parameter typing, and JSON Schema definitions.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The 4 Elements of a Tool Schema</h2>
+  <p>A production tool definition follows the OpenAI/Anthropic standard format:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Pydantic Tool Compilation</h2>
+  <ul><li><strong>1. Function Name:</strong> Clear, snake_case, action-oriented name (e.g. `get_weather`, `search_knowledge_base`, `create_github_issue`).</li><li><strong>2. Function Description:</strong> Detailed explanation of the tool's purpose and trigger conditions: <em>'Retrieve the current real-time stock quote for a public company ticker symbol.'</em></li><li><strong>3. Parameters (JSON Schema):</strong> The parameters object defining every argument, its type (`string`, `integer`), constraints, and <code>required</code> list.</li><li><strong>4. Parameter Descriptions:</strong> Micro-prompts explaining each parameter: <em>'The 1-5 character stock ticker symbol (e.g. AAPL, MSFT).'</em></li></ul><pre><code># Defining a Tool Schema in Python (OpenAI Tools Format):
+tools = [{
+    "type": "function",
+    "function": {
+        "name": "get_product_inventory",
+        "description": "Lookup available warehouse stock and pricing for a product by SKU.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "sku": {"type": "string", "description": "Product SKU like PROD-8492"},
+                "warehouse_id": {"type": "string", "description": "Optional warehouse code (e.g. US-EAST)"}
+            },
+            "required": ["sku"]
+        }
+    }
+}]</code></pre><div class="callout"><p><strong>The Pydantic Shortcut:</strong> In modern Python, you don't write raw JSON Schema dictionaries by hand. Decorate a standard Python function, and let Pydantic extract the schema automatically!</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the tool schema sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to author expressive, bulletproof tool schemas for LLMs.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where defining tool schemas: names, descriptions, and parameters applies.</li>
+    <li>Author a unit test or verification script exercising defining tool schemas: names, descriptions, and parameters.</li>
+    <li>Document team architectural conventions regarding defining tool schemas: names, descriptions, and parameters.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Defining Tool Schemas: Names, Descriptions, and Parameters.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What part of a tool schema is most critical for helping the model understand WHEN to invoke that specific tool?",
+    a: ["The tool description: a clear explanation of what the tool does and in what situations it should be used","The length of the function name","The number of parameters","The author's email address"],
+    c: 0,
+    why: "The description acts as the primary instruction telling the model when and why to select that tool."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1. Name (Action)",
+            "lines": [
+                  "'get_product_inventory'",
+                  "Descriptive, snake_case identifier"
+            ]
+      },
+      {
+            "title": "2. Description (When)",
+            "lines": [
+                  "'Lookup available stock for SKU'",
+                  "Model reads to determine intent"
+            ]
+      },
+      {
+            "title": "3. Parameters (What)",
+            "lines": [
+                  "sku: string, warehouse: string",
+                  "Types and required property list"
+            ]
+      },
+      {
+            "title": "4. Field Details (How)",
+            "lines": [
+                  "'Format: PROD-1234'",
+                  "Micro-prompt guiding argument generation"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Defining Tool Schemas: Names, Descriptions, and Parameters",
+      "def execute_flow():",
+      "    # Authoring production tool schemas: function names,...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Defining Tool Schemas: Names, Descriptions, and Parameters"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Python Function"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Compiled JSON Schema"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "A tool definition provides a descriptive {1} explaining when to use the tool, and a {2} schema specifying required arguments and types."
+],
+    blanks: [
+      {
+            "a": [
+                  "description"
+            ],
+            "why": "Explanation of tool purpose"
+      },
+      {
+            "a": [
+                  "parameters"
+            ],
+            "why": "Arguments and JSON schema properties"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What happens if a tool schema omits field descriptions on its parameters?",
+      a: ["The model must guess what values to provide, leading to formatted arguments that may violate expected formats","The model crashes","The tool is deleted","The parameters become negative"],
+      c: 0,
+      why: "Parameter descriptions inform the model of the expected format, units, and valid examples."
+    },
+    {
+      q: "How does the 'required' list in a tool schema constrain the model?",
+      a: ["It specifies which parameters must be present in the generated arguments object for the call to be valid","It requires the user to pay fees","It forces the tool to run 10 times","It requires Python 3"],
+      c: 0,
+      why: "The required array defines non-optional parameters that the model must supply."
+    },
+    {
+      q: "Why is using enums inside parameter schemas beneficial for tools?",
+      a: ["It restricts parameter values to a fixed set of approved options (e.g. units: ('celsius', 'fahrenheit'))","It makes the network faster","It converts text to numbers","It is required by git"],
+      c: 0,
+      why: "Enums prevent the model from passing invalid synonyms for categorical settings."
+    },
+    {
+      q: "Can you provide multiple tools (e.g. 10 tools) in a single API call?",
+      a: ["Yes; modern models accept lists of dozens of tools and intelligently select the right one based on the prompt","No; models can only have 1 tool","Only on Linux","Only if all tools have the same name"],
+      c: 0,
+      why: "Models evaluate tool lists in parallel, choosing the most relevant tool for the active prompt."
+    }
+  ]);
+</script>
+</body>
+</html>

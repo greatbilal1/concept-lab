@@ -1,0 +1,3 @@
+# Mission — AI Memory & Context Management
+
+Master the art and science of memory engineering for artificial intelligence. Understand the stateless physics of foundation models, architect dual short-term and long-term memory systems, implement token-bounded sliding windows with system prompt pinning, eliminate conversational amnesia with rolling summarization, extract and retrieve long-term entity facts with vector stores, anchor multi-step execution with working memory scratchpads, and enforce GDPR-compliant memory hygiene.

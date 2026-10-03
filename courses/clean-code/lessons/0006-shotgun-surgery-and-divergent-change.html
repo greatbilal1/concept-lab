@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 06 — Shotgun surgery and divergent change</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="clean-code" data-lesson="6" data-lesson-id="shotgun-surgery-and-divergent-change">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 06</span> · Recognizing Code Smells</span>
+
+  <h1 class="lesson-title">Shotgun surgery and divergent change</h1>
+  <p class="lesson-lede">
+    One change, twenty files. Master the twin architectural smells: Shotgun Surgery (one change forces edits across many files) and Divergent Change (one file changes for many reasons).
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Differentiate Shotgun Surgery from Divergent Change and consolidate fragmented responsibilities</span>
+    <span><b>Mission link</b> Prevents high coupling and fragmented domain logic across backend modules</span>
+  </div>
+
+  <h2><span class="n">1</span>The twin coupling smells</h2>
+  <p>Two classic smells represent opposite sides of the same coupling coin: <b>Divergent Change</b> happens when <i>one file suffers many different kinds of edits</i>. You edit <code>User.py</code> when database schemas change, when HTTP JSON formatting changes, AND when tax calculation rules change.</p><p><b>Shotgun Surgery</b> is the opposite: <i>one single business change forces you to make tiny edits across twenty different files</i>! Add a new user role, and you must edit the controller, the database model, the view template, the permission check, and the billing service.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Divergent Change: one class has many reasons to change. Shotgun Surgery: one change touches many classes.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Twin smells compared</h2>
+  <p>Contrast the one-to-many relationship of changes to classes in both smells.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing Shotgun Surgery consolidation</h2>
+  <p>Trace how consolidating payment logic into a single Strategy module eliminates shotgun surgery.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of coupling smells.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can identify fragmented responsibilities and consolidate related logic so changes are localized to a single file.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Identify an area in your project where a single change previously required editing multiple files.</li>
+    <li>Consolidate scattered conditional switch statements into a single polymorphic strategy module.</li>
+    <li>Split a class suffering from Divergent Change into two single-responsibility classes.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Martin Fowler, *Refactoring*, Chapter 3: 'Divergent Change' & 'Shotgun Surgery'.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "If adding a new payment method forces you to edit 14 different files across the codebase, which smell is present?",
+    a: ["Shotgun Surgery (the responsibility is fragmented across too many files)","Divergent Change","Dead Code","There is no code smell"],
+    c: 0,
+    why: "Shotgun Surgery: making one logical change fires like a shotgun across dozens of files."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Divergent Change (1 Class, Many Reasons)",
+            "lines": [
+                  "One class suffers multiple types of edits",
+                  "violates Single Responsibility",
+                  "Fix: Split class by responsibility"
+            ]
+      },
+      {
+            "title": "Shotgun Surgery (Many Classes, 1 Reason)",
+            "lines": [
+                  "One business edit touches 15 files",
+                  "responsibility fragmented everywhere",
+                  "Fix: Move and consolidate into one module"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Before: Payment checks scattered across 10 files (if payment_type == 'paypal' everywhere)",
+      "# Adding 'apple_pay' requires editing all 10 files!",
+      "# After: Consolidate into PaymentStrategy registry:",
+      "class PaymentStrategyRegistry:",
+      "    # New payment methods are registered here in ONE file, with ZERO edits to caller files!"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "smell": "fragmented switch statements scattered across codebase"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "refactoring": "consolidate logic into polymorphic strategy pattern"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "outcome": "adding payment methods now touches exactly one isolated file"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "When one change forces edits across many files, it is <0> Surgery.",
+      "When one class is modified for many unrelated reasons, it is <1> Change.",
+      "Both smells are cured by aligning code with the Single <2> Principle."
+],
+    blanks: [
+      {
+            "a": [
+                  "Shotgun"
+            ],
+            "why": "Shotgun Surgery fragments responsibilities."
+      },
+      {
+            "a": [
+                  "Divergent"
+            ],
+            "why": "Divergent Change overburdens a single class."
+      },
+      {
+            "a": [
+                  "Responsibility"
+            ],
+            "why": "SRP ensures one reason to change per class."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is 'Shotgun Surgery' in software architecture?",
+      a: ["Every time you make a modification, you have to make a lot of little changes across many different classes","Shooting a server computer with a firearm","A database backup script that runs in parallel","A compiler optimization for game development"],
+      c: 0,
+      why: "When responsibilities are fragmented, a single conceptual update scatters edits everywhere."
+    },
+    {
+      q: "What is 'Divergent Change'?",
+      a: ["When one single class is commonly changed in different ways for different reasons (e.g. changed for DB reasons AND financial reasons)","When two branches in git are merged","When an API changes its domain name","When a variable changes from an integer to a float"],
+      c: 0,
+      why: "Divergent Change violates SRP by forcing one class to serve multiple distinct business masters."
+    },
+    {
+      q: "How does the Open-Closed Principle (OCP) help cure Shotgun Surgery?",
+      a: ["By using polymorphism or plugins so new features are added by writing a new class, rather than editing 10 existing switch statements","By locking files so other developers cannot edit them","By closing the office on weekends","By making all variables global"],
+      c: 0,
+      why: "Polymorphism allows extending behavior through new classes rather than modifying existing files."
+    },
+    {
+      q: "What is the primary danger of Shotgun Surgery for engineering teams?",
+      a: ["Developers easily miss one of the 15 required edits, causing silent regressions and bugs in edge cases","It deletes git commit history","It slows down internet download bandwidth","It causes text editors to crash"],
+      c: 0,
+      why: "When changes must be made across dozens of files, human oversight guarantees missed edits."
+    }
+  ]);
+</script>
+</body>
+</html>

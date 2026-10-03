@@ -1,0 +1,3 @@
+# Mission — AI Agents & Agent Loops
+
+Master the architecture, planning, and operational engineering of autonomous AI agents. Navigate the spectrum of software autonomy, implement the Goal-Plan-Act-Observe loop, apply ReAct and Plan-and-Solve task decomposition, construct secure tool registries with timeout guards, manage stateful agent graphs with checkpoints, deploy multi-layered circuit breakers against thrashing, incorporate human approval gates, and assemble a production-grade autonomous agent.

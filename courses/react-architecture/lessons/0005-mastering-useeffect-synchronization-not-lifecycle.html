@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 05 — Mastering useEffect: synchronization, not lifecycle</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="react-architecture" data-lesson="5" data-lesson-id="mastering-useeffect-synchronization-not-lifecycle">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 05</span> · Hooks & Side Effects</span>
+
+  <h1 class="lesson-title">Mastering useEffect: synchronization, not lifecycle</h1>
+  <p class="lesson-lede">
+    Stop thinking in componentDidMount. Master useEffect as a synchronization engine: connecting your component to external systems, cleanup functions, and dependency rules.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Write correct useEffect synchronization logic with proper dependency arrays and cleanup functions</span>
+    <span><b>Mission link</b> Eliminates infinite loops and memory leaks in React side effect handling</span>
+  </div>
+
+  <h2><span class="n">1</span>Synchronization, not lifecycle</h2>
+  <p>Thinking of <code>useEffect</code> as 'lifecycle methods' (componentDidMount, componentDidUpdate) causes endless bugs. <code>useEffect</code> is not a lifecycle tool: <b>it is a Synchronization Engine</b>.</p><p>Its purpose is to <b>synchronize your component with an external system outside of React</b> (a browser window listener, a WebSocket connection, a canvas element, or an external API). The dependency array tells React: <i>'Re-run this synchronization whenever these external values change.'</i></p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    useEffect synchronizes your component with an external system; it is not a lifecycle method.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The anatomy of an effect</h2>
+  <p>Understand the three components: effect logic, cleanup function, and dependency array.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing the cleanup lifecycle</h2>
+  <p>Trace how React cleans up the previous effect before re-running when a prop changes.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of useEffect fundamentals.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can author clean useEffect hooks that synchronize with external systems and clean up resources reliably.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Attach a window scroll or resize listener in useEffect with a clean return function.</li>
+    <li>Examine why setting state inside useEffect without dependencies causes infinite render loops.</li>
+    <li>Read Dan Abramov's *A Complete Guide to useEffect*.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Dan Abramov: *A Complete Guide to useEffect* (overreacted.io/a-complete-guide-to-useeffect/).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What happens if you omit the dependency array entirely in 'useEffect(() => { ... })'?",
+    a: ["The effect executes after EVERY single render of the component","The effect only runs once on initial mount","The effect never runs","A syntax error is thrown"],
+    c: 0,
+    why: "No dependency array means no comparison; the effect runs after every render."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Effect Callback",
+            "lines": [
+                  "runs AFTER render & paint",
+                  "connects to external system (e.g. WebSocket)"
+            ]
+      },
+      {
+            "title": "Cleanup Function (return () => ...)",
+            "lines": [
+                  "runs BEFORE effect re-runs & on unmount",
+                  "disconnects socket, removes listeners!"
+            ]
+      },
+      {
+            "title": "Dependency Array ([id, url])",
+            "lines": [
+                  "values effect depends on",
+                  "skips run if dependencies are identical"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "useEffect(() => {",
+      "    const conn = connectChat(roomId);",
+      "    return () => conn.disconnect(); # cleanup function!",
+      "}, [roomId]);",
+      "# User switches from room 'general' to 'travel':",
+      "# 1. React runs cleanup: conn.disconnect() for 'general'",
+      "# 2. React runs effect: connectChat('travel')"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "initial_mount": "connected to room 'general'"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "prop_change": "roomId changes from 'general' to 'travel'"
+            }
+      },
+      {
+            "line": 5,
+            "vars": {
+                  "cleanup_fired": "cleanup disconnects old room first"
+            }
+      },
+      {
+            "line": 6,
+            "vars": {
+                  "new_connection": "effect connects fresh room cleanly"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The hook that synchronizes components with external systems is use<0>.",
+      "The function returned by an effect to tear down subscriptions is the <1> function.",
+      "An empty dependency array [] runs the effect only on initial <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "Effect"
+            ],
+            "why": "useEffect handles external synchronization."
+      },
+      {
+            "a": [
+                  "cleanup"
+            ],
+            "why": "Cleanup functions prevent memory leaks."
+      },
+      {
+            "a": [
+                  "mount"
+            ],
+            "why": "Empty array [] means dependencies never change."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the primary role of the cleanup function returned by useEffect?",
+      a: ["To clean up external subscriptions, timers, or event listeners before the effect re-runs or when the component unmounts","To delete all component state variables","To close the web browser window","To reset the computer clock"],
+      c: 0,
+      why: "Cleanup functions prevent memory leaks and duplicate connections when components re-render or unmount."
+    },
+    {
+      q: "Why is putting data fetching directly inside raw useEffect often discouraged in modern production React?",
+      a: ["It lacks caching, deduping, server-rendering support, and easily triggers race conditions; use libraries like TanStack Query instead","useEffect cannot make HTTP requests","Fetch requests in useEffect are blocked by the browser","It turns off database security"],
+      c: 0,
+      why: "Raw useEffect data fetching suffers from race conditions and lack of caching; dedicated libraries solve this."
+    },
+    {
+      q: "What causes an infinite loop when using useEffect in React?",
+      a: ["Updating state inside useEffect when that same state (or an object derived from it) is in the dependency array","Using numbers inside the component","Running React on a mobile phone","Writing comments inside the effect"],
+      c: 0,
+      why: "Updating state triggers a re-render, which re-runs the effect, which updates state again (infinite loop)."
+    },
+    {
+      q: "What rule governs the items that must be included in the useEffect dependency array?",
+      a: ["Every reactive value (props, state, and variables calculated from them) used inside the effect must be included","Only numbers should be included","Include only the component name","Leave it empty in all cases"],
+      c: 0,
+      why: "Omitting reactive values causes the effect to read stale closures from prior renders."
+    }
+  ]);
+</script>
+</body>
+</html>

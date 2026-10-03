@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 01 — The Economics of Tokens: Cost vs Latency Trade-Offs</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="ai-cost-latency" data-lesson="1" data-lesson-id="token-economics-cost-latency-tradeoffs">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 01</span> · Token Economics</span>
+
+  <h1 class="lesson-title">The Economics of Tokens: Cost vs Latency Trade-Offs</h1>
+  <p class="lesson-lede">
+    The physical laws of inference: pre-fill compute, decoding memory bandwidth, token pricing, and the latency-cost frontier.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You understand the physical mechanics of token economics and latency trade-offs.</span>
+    <span><b>Mission link</b> Mastering the economics of tokens: cost vs latency trade-offs across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of The Economics of Tokens: Cost vs Latency Trade-Offs</h2>
+  <p>To optimize cost and latency, an engineer must understand the physical constraints of GPU inference. Inference consists of two completely different computational regimes:</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    The physical laws of inference: pre-fill compute, decoding memory bandwidth, token pricing, and the latency-cost frontier.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Pre-Fill vs Decoding Regimes</h2>
+  <ul><li><strong>1. The Pre-Fill Phase (Compute Bound):</strong> All input prompt tokens are ingested simultaneously in parallel matrix multiplications across thousands of GPU cores. Fast and computationally dense.</li><li><strong>2. The Decoding Phase (Memory-Bandwidth Bound):</strong> Every output token must be predicted one by one. For each single token, the entire model weights (tens of gigabytes) must be transferred from GPU VRAM to the tensor cores! This is why output tokens cost <strong>3x to 5x more</strong> and take 95% of total request duration.</li></ul>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>The Cost & Latency Frontier</h2>
+  <pre><code># The Latency & Cost Trade-Off Curve:
+# Model A (Frontier): 1,000 in / 500 out -> Cost: $0.0150 | Latency: 4.8s (Deep Reasoning)
+# Model B (Mini/Flash): 1,000 in / 500 out -> Cost: $0.0004 | Latency: 0.6s (37x Cheaper, 8x Faster!)
+#
+# Architectural Golden Rule:
+# Minimize generated output tokens whenever possible! Output is the cost and latency bottleneck.</code></pre><div class="callout"><p><strong>The Output Concision Law:</strong> Instructing a model to answer in 50 words rather than 500 words cuts latency by 80% and slashes output API costs by 90% instantly.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the token economics sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You understand the physical mechanics of token economics and latency trade-offs.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where the economics of tokens: cost vs latency trade-offs applies.</li>
+    <li>Author a unit test or verification script exercising the economics of tokens: cost vs latency trade-offs.</li>
+    <li>Document team architectural conventions regarding the economics of tokens: cost vs latency trade-offs.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for The Economics of Tokens: Cost vs Latency Trade-Offs.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Why do LLM providers charge significantly more for output (completion) tokens than input (prompt) tokens?",
+    a: ["Output generation is memory-bandwidth bound and generated autoregressively one token at a time, keeping GPU hardware engaged far longer than parallelized prompt ingestion","Output tokens have more letters","Providers lose money on input tokens","It is required by tax laws"],
+    c: 0,
+    why: "Output tokens require sequential autoregressive GPU passes, making them far more expensive to serve than parallel input pre-fill."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Pre-Fill Phase (Inputs)",
+            "lines": [
+                  "Parallel processing of all prompt tokens",
+                  "High GPU compute utilization",
+                  "Lower cost per token"
+            ]
+      },
+      {
+            "title": "Decoding Phase (Outputs)",
+            "lines": [
+                  "Sequential token-by-token generation",
+                  "Memory-bandwidth bottleneck",
+                  "3x to 5x higher cost per token!"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing The Economics of Tokens: Cost vs Latency Trade-Offs",
+      "def execute_flow():",
+      "    # The physical laws of inference: pre-fill compute, ...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "The Economics of Tokens: Cost vs Latency Trade-Offs"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Frontier Tier (GPT-4o, Sonnet)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Mini Tier (GPT-4o-mini, Flash)"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Output token generation is memory-bandwidth bound and sequential, making completion tokens the primary bottleneck for both latency and financial {1} in AI {2}."
+],
+    blanks: [
+      {
+            "a": [
+                  "cost"
+            ],
+            "why": "Financial expenditure per request"
+      },
+      {
+            "a": [
+                  "systems"
+            ],
+            "why": "Software applications and architectures"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why does a 500-token output take substantially longer to generate than a 5,000-token input takes to process?",
+      a: ["Input tokens are processed in parallel during pre-fill; output tokens are generated sequentially one by one in memory-bound autoregressive passes","Input tokens use fewer bytes","Output tokens travel slower across the internet","Output tokens require human approval"],
+      c: 0,
+      why: "Autoregressive generation requires a full forward memory pass for every emitted token."
+    },
+    {
+      q: "What is the single most effective prompt engineering tactic for slashing response latency in customer chat?",
+      a: ["Constraining output length: 'Be concise. Answer in 2-3 direct sentences without preamble.'","Telling the model to run faster","Typing in all capital letters","Deleting the system prompt"],
+      c: 0,
+      why: "Fewer output tokens directly translates to fewer sequential GPU decoding cycles."
+    },
+    {
+      q: "What ratio describes the typical cost difference between input and output tokens across cloud LLM providers?",
+      a: ["Output tokens cost approximately 3x to 5x more than input tokens","Output tokens are free","Input tokens cost 10x more than output tokens","Both cost exactly the same"],
+      c: 0,
+      why: "Providers price output tokens higher to reflect the higher memory-bandwidth hardware cost of sequential decoding."
+    },
+    {
+      q: "When is using a $15/1M token frontier model justified over a $0.30/1M mini model?",
+      a: ["On high-consequence reasoning tasks where errors cause business failure (legal, architectural synthesis, complex coding)","On simple sentiment classification","On extracting dates from text","On translating hello into Spanish"],
+      c: 0,
+      why: "Frontier models are justified when task complexity demands advanced reasoning capabilities."
+    }
+  ]);
+</script>
+</body>
+</html>

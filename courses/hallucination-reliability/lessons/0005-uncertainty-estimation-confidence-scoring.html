@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 05 — Uncertainty Estimation and Confidence Scoring</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="hallucination-reliability" data-lesson="5" data-lesson-id="uncertainty-estimation-confidence-scoring">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 05</span> · Uncertainty</span>
+
+  <h1 class="lesson-title">Uncertainty Estimation and Confidence Scoring</h1>
+  <p class="lesson-lede">
+    Quantifying doubt: token log-probability entropy, verbalized confidence, semantic entropy, and conformal prediction.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to estimate model uncertainty and calculate empirical confidence scores.</span>
+    <span><b>Mission link</b> Mastering uncertainty estimation and confidence scoring across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Uncertainty Estimation and Confidence Scoring</h2>
+  <p>In traditional statistics, models output explicit confidence bounds (e.g. $p < 0.05$). In generative AI, however, asking a model how confident it feels produces <strong>sycophantic overconfidence</strong>. An agent will declare: <em>'I am 100% certain that Abraham Lincoln invented the microwave in 1863.'</em></p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Quantifying doubt: token log-probability entropy, verbalized confidence, semantic entropy, and conformal prediction.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Uncertainty Estimation Methods</h2>
+  <p>To estimate true mathematical uncertainty, AI engineers use <strong>Empirical Confidence Scoring</strong>:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Confidence Routing Gate</h2>
+  <ul><li><strong>1. Average Token Log-Probability:</strong> Inspect the model's output logprobs: $\frac{1}{N} \sum \log P(w_t)$. Low average log-probability indicates the model was statistically uncertain during generation.</li><li><strong>2. Semantic Entropy (Kuhn et al., 2023):</strong> Sample 5 responses at temperature 0.7. Group responses into semantic meaning clusters. If all 5 samples mean the exact same thing, entropy is near zero (High Confidence!). If samples diverge into multiple contradictory meanings, entropy is high (Doubt!).</li><li><strong>3. Conformal Prediction:</strong> A statistical framework that guarantees with $1 - \alpha$ certainty that the true answer lies within a predicted set of candidates.</li></ul><pre><code># Semantic Entropy Calculation Flow:
+Prompt: "Who won the 1928 World Series?"
+Sample 1: "New York Yankees"  (Cluster A)
+Sample 2: "The Yankees"        (Cluster A - Semantically identical)
+Sample 3: "St. Louis Cardinals"(Cluster B - Divergence!)
+Sample 4: "New York Yankees"  (Cluster A)
+# Entropy calculation reveals uncertainty between Cluster A and Cluster B!
+# Action: Confidence score drops below threshold -> Route to human review!</code></pre><div class="callout"><p><strong>The Operational Threshold:</strong> Compute semantic entropy on high-risk responses. If entropy is high, flag the response with a disclaimer or route it to a human supervisor.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the uncertainty estimation sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to estimate model uncertainty and calculate empirical confidence scores.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where uncertainty estimation and confidence scoring applies.</li>
+    <li>Author a unit test or verification script exercising uncertainty estimation and confidence scoring.</li>
+    <li>Document team architectural conventions regarding uncertainty estimation and confidence scoring.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Uncertainty Estimation and Confidence Scoring.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Why is asking an LLM 'How confident are you on a scale of 1-10?' often an unreliable measure of factual accuracy?",
+    a: ["Models are trained to sound polite and authoritative, frequently verbalizing '10/10 confidence' even when completely hallucinating","Models cannot count to 10","Confidence is illegal in statistics","Models only understand percentages"],
+    c: 0,
+    why: "Verbalized confidence is poorly calibrated; models frequently express high verbal confidence on false statements."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Token Logprob Average",
+            "lines": [
+                  "Fast, single-turn calculation",
+                  "Measures syntactic token confidence",
+                  "Can be distorted by common filler words"
+            ]
+      },
+      {
+            "title": "Semantic Entropy (Sampling)",
+            "lines": [
+                  "Clusters meanings across 5 samples",
+                  "Measures true semantic divergence",
+                  "Highly predictive of factual correctness"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Uncertainty Estimation and Confidence Scoring",
+      "def execute_flow():",
+      "    # Quantifying doubt: token log-probability entropy, ...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Uncertainty Estimation and Confidence Scoring"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Low Entropy (< 0.15)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "High Entropy (> 0.50)"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Semantic entropy measures true model uncertainty by sampling multiple answers and calculating the divergence of {1} meaning across the {2}."
+],
+    blanks: [
+      {
+            "a": [
+                  "semantic"
+            ],
+            "why": "Conceptual meaning rather than surface words"
+      },
+      {
+            "a": [
+                  "samples"
+            ],
+            "why": "Independently generated candidate outputs"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the primary difference between syntactic token entropy and semantic entropy?",
+      a: ["Syntactic entropy measures variance in surface word choices; semantic entropy measures whether the underlying factual meaning differs","Syntactic entropy uses Python; semantic uses C","Semantic entropy measures file size","There is no difference"],
+      c: 0,
+      why: "Semantic entropy clusters paraphrased sentences, focusing strictly on whether facts agree."
+    },
+    {
+      q: "Why is token log-probability sometimes misleading when measuring factual confidence?",
+      a: ["A model might be 100% confident in the grammatical filler words ('The', 'is', 'a') while being uncertain on the specific factual noun","Logprobs are deleted by the API","Logprobs are always positive numbers","Logprobs require GPU overclocking"],
+      c: 0,
+      why: "Common connective tokens have high logprobs, artificially inflating the average score."
+    },
+    {
+      q: "What is 'Model Calibration' in probability theory?",
+      a: ["The property where a model's assigned confidence score matches its real-world empirical accuracy (e.g. predictions with 80% confidence are correct 80% of the time)","Tuning the monitor colors","Measuring the weight of the computer","Formatting Python files"],
+      c: 0,
+      why: "A calibrated model's predicted probabilities accurately reflect actual empirical success rates."
+    },
+    {
+      q: "How does Conformal Prediction protect enterprise decision-making with AI?",
+      a: ["It provides mathematically rigorous, statistically proven coverage guarantees on prediction intervals without model retraining","It makes models run without electricity","It eliminates the need for data","It turns off the internet"],
+      c: 0,
+      why: "Conformal prediction guarantees that correct answers fall within prediction sets at specified confidence levels."
+    }
+  ]);
+</script>
+</body>
+</html>

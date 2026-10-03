@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 04 — Rolling Summarization and Checkpoint Memory</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="ai-memory-context" data-lesson="4" data-lesson-id="rolling-summarization-checkpoints">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 04</span> · Summarization</span>
+
+  <h1 class="lesson-title">Rolling Summarization and Checkpoint Memory</h1>
+  <p class="lesson-lede">
+    Eliminating amnesia: compressing evicted turns into rolling summaries and checkpoint state files.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to build rolling summarization buffers that eliminate conversational amnesia.</span>
+    <span><b>Mission link</b> Mastering rolling summarization and checkpoint memory across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Rolling Summarization and Checkpoint Memory</h2>
+  <p>Sliding windows prevent crashes, but create amnesia. <strong>Rolling Summarization</strong> (also called Summary Buffer Memory) gives you the best of both worlds: bounded token consumption with zero memory loss.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Eliminating amnesia: compressing evicted turns into rolling summaries and checkpoint state files.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Rolling Summarization Loop</h2>
+  <p>The Rolling Summarization Workflow:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Lossy vs Lossless Memory</h2>
+  <ul><li><strong>1. The Threshold Trigger:</strong> When conversation history exceeds a threshold (e.g. 15 turns or 8,000 tokens), split history into two segments: <em>Ancient Turns (1-10)</em> and <em>Recent Turns (11-15)</em>.</li><li><strong>2. Condensation Pass:</strong> An asynchronous LLM call reads the existing summary plus the Ancient Turns, producing an updated <strong>Distilled Summary</strong>: <em>'User is Alice, building a billing module in FastAPI. Chose PostgreSQL. Implemented Invoice entity.'</em></li><li><strong>3. Evict & Pin:</strong> The Ancient Turns are purged from the prompt array. The Distilled Summary is pinned directly below the System Prompt!</li></ul><pre><code># The Summary Buffer Prompt Structure:
+[SYSTEM PROMPT]       -> "You are a coding assistant."
+[ROLLING SUMMARY]     -> "Summary of earlier conversation:
+                         - Customer requested Stripe subscription integration.
+                         - Decided to use webhook events for invoice updates.
+                         - Finished Task 1.1 (Customer schema)."
+[ACTIVE RECENT TURNS] -> Last 5 detailed turns (Uncompressed verbatim dialog)</code></pre><div class="callout"><p><strong>The Distillation Miracle:</strong> 40 turns of trial-and-error debugging (30,000 tokens) condense into a 300-token summary, freeing up 99% of your context budget!</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the rolling summarization sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to build rolling summarization buffers that eliminate conversational amnesia.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where rolling summarization and checkpoint memory applies.</li>
+    <li>Author a unit test or verification script exercising rolling summarization and checkpoint memory.</li>
+    <li>Document team architectural conventions regarding rolling summarization and checkpoint memory.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Rolling Summarization and Checkpoint Memory.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "How does 'Rolling Summarization' solve the amnesia problem of simple sliding windows?",
+    a: ["When older messages are evicted, an LLM summarizes key facts and decisions into a compact summary block that stays in the prompt","By recording audio files of the conversation","By saving screenshots of the chat window","By forcing the user to repeat themselves"],
+    c: 0,
+    why: "Rolling summaries distill dozens of evicted turns into a dense paragraph of persistent facts and decisions."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1. History Reaches 20 Turns",
+            "lines": [
+                  "Context budget nearing threshold",
+                  "Ancient turns 1-14 ready for eviction"
+            ]
+      },
+      {
+            "title": "2. Async Summarizer Pass",
+            "lines": [
+                  "Extracts key decisions & entities",
+                  "Emits 200-token distilled summary"
+            ]
+      },
+      {
+            "title": "3. Consolidated Prompt",
+            "lines": [
+                  "System Prompt + Distilled Summary + Recent Turns 15-20",
+                  "Zero amnesia, 85% token reduction!"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Rolling Summarization and Checkpoint Memory",
+      "def execute_flow():",
+      "    # Eliminating amnesia: compressing evicted turns int...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Rolling Summarization and Checkpoint Memory"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Noisy Turn History (30k tokens)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Distilled Summary (300 tokens)"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Rolling summarization prevents conversational amnesia by using an LLM to condense evicted turns into a {1} summary pinned below the {2} prompt."
+],
+    blanks: [
+      {
+            "a": [
+                  "distilled"
+            ],
+            "why": "Concentrated factual overview"
+      },
+      {
+            "a": [
+                  "system"
+            ],
+            "why": "Foundational behavioral instruction"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What should the prompt to the summarizer LLM specifically instruct it to preserve?",
+      a: ["Key technical decisions, user preferences, agreed architecture, file paths, and current uncompleted tasks","Every single greeting and apology","Random numbers","The time of day"],
+      c: 0,
+      why: "The summarizer must extract durable facts and active goals while dropping conversational noise."
+    },
+    {
+      q: "Why is running the summarization pass asynchronously in the background recommended?",
+      a: ["It prevents the user from experiencing a 5-second delay while the summary is being generated","It makes the summary free","It turns off the database","It runs on the user's phone"],
+      c: 0,
+      why: "Async background summarization avoids adding latency to the active user chat turn."
+    },
+    {
+      q: "What is an 'Executive Checkpoint File' in long-running coding agents?",
+      a: ["A markdown file (like PROJECT_PLAN.md or STATE.md) committed to the repo that records completed milestones and open bugs","A bank statement","A git commit hash only","A license file"],
+      c: 0,
+      why: "Checkpoint files serve as persistent repository memory that survives across independent agent sessions."
+    },
+    {
+      q: "What happens if a summarizer model hallucinates a fact during the condensation pass?",
+      a: ["The hallucinated fact enters the pinned summary and will persist across future turns; prompt the summarizer to be strictly conservative","The computer restarts","The database deletes itself","The user is notified by email"],
+      c: 0,
+      why: "Summaries compound over time; summarization prompts must instruct models to capture only verified facts."
+    }
+  ]);
+</script>
+</body>
+</html>

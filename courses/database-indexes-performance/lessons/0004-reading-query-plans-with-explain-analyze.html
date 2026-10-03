@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 04 — Reading query plans with EXPLAIN ANALYZE</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="database-indexes-performance" data-lesson="4" data-lesson-id="reading-query-plans-with-explain-analyze">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 04</span> · Query Plans & Execution</span>
+
+  <h1 class="lesson-title">Reading query plans with EXPLAIN ANALYZE</h1>
+  <p class="lesson-lede">
+    Stop guessing why queries are slow. Learn how to run EXPLAIN (ANALYZE, BUFFERS) to see actual execution times, memory usage, and the exact node where time is lost.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Diagnose query performance bottlenecks using EXPLAIN (ANALYZE, BUFFERS)</span>
+    <span><b>Mission link</b> The primary diagnostic tool for optimizing slow database queries</span>
+  </div>
+
+  <h2><span class="n">1</span>From estimates to ground truth</h2>
+  <p><code>EXPLAIN</code> shows what the planner <i>thinks</i> will happen. But to see what <i>actually</i> happened, you must run <b>EXPLAIN (ANALYZE, BUFFERS)</b>. This command executes the query in real time and reports actual elapsed time (in milliseconds) and actual row counts.</p><p>WARNING: <b>EXPLAIN ANALYZE actually executes the statement!</b> If you run <code>EXPLAIN ANALYZE DELETE FROM users;</code>, you will actually delete all your users! Always wrap mutations in a transaction and rollback when testing.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    EXPLAIN ANALYZE actually runs the query and reports true execution times and buffer hits.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The three primary scan nodes</h2>
+  <p>Recognize the three fundamental scan strategies in execution plan outputs.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing EXPLAIN ANALYZE output</h2>
+  <p>Trace the diagnostic lines comparing estimated rows with actual rows and execution time.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of EXPLAIN ANALYZE metrics.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can run EXPLAIN ANALYZE, pinpoint slow sequential scans, and diagnose disk buffer bottlenecks.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Run EXPLAIN (ANALYZE, BUFFERS) on a query in PostgreSQL and inspect Execution Time.</li>
+    <li>Observe 'Buffers: shared hit=X read=Y' to distinguish RAM hits from disk I/O.</li>
+    <li>Compare query time before and after adding a targeted B-tree index.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    PostgreSQL Documentation: *EXPLAIN* (postgresql.org/docs/current/sql-explain.html).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What happens if you run 'EXPLAIN ANALYZE UPDATE accounts SET balance = 0;'?",
+    a: ["It executes the UPDATE statement, modifies the rows on disk, and prints execution times","It simulates the update without touching real data","It prints an error because UPDATE cannot be analyzed","It exports the query to an Excel spreadsheet"],
+    c: 0,
+    why: "ANALYZE executes the statement; always wrap in BEGIN; ... ROLLBACK; when testing mutations."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Seq Scan (Slow)",
+            "lines": [
+                  "reads every page in heap",
+                  "filter evaluated row by row"
+            ]
+      },
+      {
+            "title": "Index Scan (Fast)",
+            "lines": [
+                  "traverses B-tree for pointers",
+                  "fetches corresponding heap rows"
+            ]
+      },
+      {
+            "title": "Index Only Scan (Fastest)",
+            "lines": [
+                  "all requested columns in index",
+                  "zero heap page reads!"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# EXPLAIN (ANALYZE, BUFFERS) SELECT * FROM users WHERE email = 'ada@example.com';",
+      "Index Scan using idx_email on users (cost=0.29..8.30 rows=1) (actual time=0.042..0.043 rows=1 loops=1)",
+      "  Index Cond: (email = 'ada@example.com')",
+      "  Buffers: shared hit=3",
+      "Planning Time: 0.120 ms",
+      "Execution Time: 0.065 ms"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "scan_type": "Index Scan used; completed in 0.043ms"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "memory": "shared hit=3 (all 3 pages found in RAM cache; zero disk reads!)"
+            }
+      },
+      {
+            "line": 5,
+            "vars": {
+                  "duration": "total query execution completed in 65 microseconds"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The flag that actually executes a query to measure runtime is <0>.",
+      "The flag reporting buffer cache hits and disk reads is <1>.",
+      "The fastest scan node that avoids reading table heap pages is Index <2> Scan."
+],
+    blanks: [
+      {
+            "a": [
+                  "ANALYZE"
+            ],
+            "why": "ANALYZE executes the statement and captures real metrics."
+      },
+      {
+            "a": [
+                  "BUFFERS"
+            ],
+            "why": "BUFFERS reveals whether pages came from RAM (hit) or disk (read)."
+      },
+      {
+            "a": [
+                  "Only"
+            ],
+            "why": "Index Only Scans read entirely from index leaf pages."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What does 'Buffers: shared hit=4 read=0' mean in an EXPLAIN (ANALYZE, BUFFERS) report?",
+      a: ["All 4 required 8KB pages were already cached in server RAM (hit), requiring zero physical disk reads","The query failed 4 times before succeeding","The database deleted 4 buffer files","The query returned 4 rows"],
+      c: 0,
+      why: "shared hit means the page was found in PostgreSQL's shared_buffers RAM cache."
+    },
+    {
+      q: "What is an 'Index Only Scan'?",
+      a: ["A scan where all columns requested by SELECT and WHERE are present in the index leaf pages, avoiding heap reads entirely","A scan that only runs on index creation","A scan that deletes the table heap","A query that cannot use WHERE clauses"],
+      c: 0,
+      why: "If all required data lives in the index, the engine never touches the table heap file."
+    },
+    {
+      q: "What red flag in EXPLAIN ANALYZE indicates that table statistics are severely out of date?",
+      a: ["A massive difference between estimated rows (e.g. rows=1) and actual rows (e.g. actual rows=500000)","The query plan is printed in red font","Execution time is measured in seconds","The query plan contains more than three lines"],
+      c: 0,
+      why: "When estimated rows diverges radically from actual rows, the planner is operating on blind statistics."
+    },
+    {
+      q: "Why should you be extremely cautious running EXPLAIN ANALYZE on a production server?",
+      a: ["Because ANALYZE actually executes the query, which can lock tables, consume resources, or mutate data","Because EXPLAIN ANALYZE automatically restarts the database server","Because it deletes all stored procedures","Because it resets user passwords"],
+      c: 0,
+      why: "ANALYZE executes the query; running it on an unindexed slow query on production will run that slow query live."
+    }
+  ]);
+</script>
+</body>
+</html>

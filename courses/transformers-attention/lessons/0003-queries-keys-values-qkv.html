@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 03 — Queries, Keys, and Values: The Information Retrieval Metaphor</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="transformers-attention" data-lesson="3" data-lesson-id="queries-keys-values-qkv">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 03</span> · QKV Intuition</span>
+
+  <h1 class="lesson-title">Queries, Keys, and Values: The Information Retrieval Metaphor</h1>
+  <p class="lesson-lede">
+    The foundational intuition of self-attention: Queries (what I seek), Keys (what I offer), and Values (what I contain).
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You understand the Query, Key, Value information retrieval intuition behind self-attention.</span>
+    <span><b>Mission link</b> Mastering queries, keys, and values: the information retrieval metaphor across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Queries, Keys, and Values: The Information Retrieval Metaphor</h2>
+  <p>The core mechanism of self-attention is inspired by classical <strong>Information Retrieval and Databases</strong>. Imagine searching YouTube: you type a <strong>Query</strong> (<em>'guitar tutorial'</em>). The database matches your query against the <strong>Keys</strong> (tags and video titles) of millions of videos. For each matching key, it retrieves the video's content: the <strong>Value</strong>.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    The foundational intuition of self-attention: Queries (what I seek), Keys (what I offer), and Values (what I contain).
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The QKV Retrieval Metaphor</h2>
+  <p>In a Transformer, every single token computes its own Query, Key, and Value vectors by multiplying its input embedding $x$ by three learned projection weight matrices ($W_Q, W_K, W_V$):</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Three Projections from One Token</h2>
+  <ul><li><strong>Query ($Q = X W_Q$):</strong> <em>'What kind of information am I looking for?'</em> (e.g. A pronoun 'it' is searching for the noun it refers to).</li><li><strong>Key ($K = X W_K$):</strong> <em>'What kind of information do I offer to others?'</em> (e.g. A noun 'robot' advertises itself as a singular mechanical noun).</li><li><strong>Value ($V = X W_V$):</strong> <em>'What is my actual semantic content if selected?'</em> (e.g. The rich representation of the robot).</li></ul><pre><code># The QKV Projections in Python:
+# Input matrix X: (sequence_length x embedding_dim)
+Q = np.dot(X, W_Q)  # What each token is seeking
+K = np.dot(X, W_K)  # What each token advertises
+V = np.dot(X, W_V)  # What each token provides
+
+# Match Query with Key via Dot Product:
+# scores = Q @ K.T (Pairwise compatibility matrix!)</code></pre><p>Unlike a rigid database that returns one binary match, self-attention computes a <strong>soft, weighted blend</strong>: the Query takes 85% of its Value from the matching noun and 15% from the verb!</p><div class="callout"><p><strong>The Core Dynamic:</strong> Queries and Keys determine <em>where to look</em> (the attention weights). Values determine <em>what information to extract</em>.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the QKV sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You understand the Query, Key, Value information retrieval intuition behind self-attention.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where queries, keys, and values: the information retrieval metaphor applies.</li>
+    <li>Author a unit test or verification script exercising queries, keys, and values: the information retrieval metaphor.</li>
+    <li>Document team architectural conventions regarding queries, keys, and values: the information retrieval metaphor.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Queries, Keys, and Values: The Information Retrieval Metaphor.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "In the database search metaphor for self-attention, what do Queries, Keys, and Values represent?",
+    a: ["Query is what a token is searching for; Key is the label or index each token presents; Value is the actual content payload retrieved","Query is an SQL query; Key is a primary key; Value is the column name","Query is a user prompt; Key is a password; Value is money","They are random variable names with no meaning"],
+    c: 0,
+    why: "Self-attention operates as soft, differentiable retrieval: Queries match against Keys to compute attention weights over Values."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Query (Q)",
+            "lines": [
+                  "'I am a pronoun looking for my antecedent'",
+                  "Computed via Q = X @ W_Q"
+            ]
+      },
+      {
+            "title": "Key (K)",
+            "lines": [
+                  "'I am a singular noun (The robot)'",
+                  "Computed via K = X @ W_K"
+            ]
+      },
+      {
+            "title": "Attention Match (Q . K)",
+            "lines": [
+                  "High dot product score between 'it' and 'robot'",
+                  "Softmax computes 85% attention weight"
+            ]
+      },
+      {
+            "title": "Value Blend (V)",
+            "lines": [
+                  "'it' pulls 85% of its updated meaning from 'robot'",
+                  "Disambiguates coreference in 1 tick!"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Queries, Keys, and Values: The Information Retrieval Metaphor",
+      "def execute_flow():",
+      "    # The foundational intuition of self-attention: Quer...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Queries, Keys, and Values: The Information Retrieval Metaphor"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Token Embedding (x)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Three Linear Projections"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "In self-attention, a token's {1} matches against other tokens' {2} to compute attention weights over their {3}."
+],
+    blanks: [
+      {
+            "a": [
+                  "Query"
+            ],
+            "why": "What the token is looking for"
+      },
+      {
+            "a": [
+                  "Keys"
+            ],
+            "why": "What other tokens advertise"
+      },
+      {
+            "a": [
+                  "Values"
+            ],
+            "why": "Content payload retrieved"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What happens when the dot product between a Query vector and a Key vector is very high?",
+      a: ["The model assigns a high attention weight to that pair, transferring a large portion of that token's Value vector","The computer restarts","The weights are deleted","The token is dropped"],
+      c: 0,
+      why: "High dot products between Q and K indicate high semantic relevance, yielding high attention weights."
+    },
+    {
+      q: "How does self-attention resolve ambiguous pronoun coreference (e.g. 'The animal didn't cross the street because it was too tired')?",
+      a: ["The Query for 'it' matches strongly with the Key for 'animal' (due to 'tired'), pulling the Value of 'animal' into 'it'","By rolling random dice","By asking a human user","By deleting the word 'it'"],
+      c: 0,
+      why: "Q-K attention scores align 'it' with 'animal', enriching 'it' with the semantic properties of animal."
+    },
+    {
+      q: "Are the weight matrices W_Q, W_K, and W_V shared across all token positions in a layer?",
+      a: ["Yes; the same projection matrices are applied to every token position, enabling flexible sequence length processing","No; each token position has its own unique weights","They change randomly every step","They only exist in the first layer"],
+      c: 0,
+      why: "Shared projection weights make self-attention position-invariant and capable of handling arbitrary sequence lengths."
+    },
+    {
+      q: "What is the dimensional shape of the attention score matrix computed by Q @ K.T for a sequence of N tokens?",
+      a: ["An N x N square matrix containing pairwise compatibility scores for every token against every other token","A 1D vector of length N","A single scalar number","An N x 1,536 matrix"],
+      c: 0,
+      why: "Multiplying (N x D) by (D x N) produces an (N x N) pairwise compatibility matrix."
+    }
+  ]);
+</script>
+</body>
+</html>

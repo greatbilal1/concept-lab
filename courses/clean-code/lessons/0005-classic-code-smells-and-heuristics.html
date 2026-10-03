@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 05 — Classic code smells and heuristics</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="clean-code" data-lesson="5" data-lesson-id="classic-code-smells-and-heuristics">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 05</span> · Recognizing Code Smells</span>
+
+  <h1 class="lesson-title">Classic code smells and heuristics</h1>
+  <p class="lesson-lede">
+    Code doesn't stink; it smells. Learn Martin Fowler's classic code smells: Long Method, Large Class, Primitive Obsession, Feature Envy, and Data Clumps.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Detect classic code smells in code reviews and identify the refactorings that fix them</span>
+    <span><b>Mission link</b> The diagnostic vocabulary for identifying architectural rot before bugs appear</span>
+  </div>
+
+  <h2><span class="n">1</span>Smells are symptoms, not bugs</h2>
+  <p>Kent Beck coined the term <b>Code Smell</b>: a surface indication that usually corresponds to a deeper problem in the system. A code smell is not an error (the code still runs and passes tests), but it indicates an architectural weakness that will slow down development or breed future bugs.</p><p>Learning to recognize smells gives your team a shared diagnostic vocabulary: <b>Feature Envy</b> (a class calling methods on another object more than its own), <b>Data Clumps</b> (three variables that always travel together), and <b>Primitive Obsession</b>.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    A code smell is a surface symptom that signals underlying architectural rot.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The code smell diagnostic index</h2>
+  <p>Learn the symptoms and remedies for the classic Martin Fowler code smells.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing Feature Envy refactoring</h2>
+  <p>Trace how moving an envious method to the class that owns the data fixes the smell.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of code smells.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can spot classic code smells during code reviews and prescribe the exact refactoring patterns to resolve them.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit a class in your project and check if any method exhibits Feature Envy.</li>
+    <li>Bundle a set of 3 repeating parameters into a clean Data Clump object.</li>
+    <li>Read Chapter 3 ('Bad Smells in Code') of Martin Fowler's *Refactoring*.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Martin Fowler, *Refactoring: Improving the Design of Existing Code*, Chapter 3: 'Bad Smells in Code'.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What code smell is present when 'city, state, zipcode' are passed together as separate arguments across 10 functions?",
+    a: ["Data Clumps (they should be packaged into an Address object or class)","Shotgun Surgery","Dead Code","There is no code smell"],
+    c: 0,
+    why: "Data Clumps: values that always travel together should be bundled into a cohesive domain object."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Long Method",
+            "lines": [
+                  "functions > 25 lines",
+                  "does multiple things",
+                  "Fix: Extract Method"
+            ]
+      },
+      {
+            "title": "Feature Envy",
+            "lines": [
+                  "method accesses another class's fields more than its own",
+                  "Fix: Move Method to owner"
+            ]
+      },
+      {
+            "title": "Data Clumps",
+            "lines": [
+                  "same 3 params travel together",
+                  "Fix: Extract Class (e.g. Address)"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Bad (Feature Envy): OrderService reaches into User for every detail",
+      "# def get_user_label(user): return f'{user.first_name} {user.last_name} ({user.email})'",
+      "# Good (Move Method to the data owner):",
+      "class User:",
+      "    def full_label(self): return f'{self.first_name} {self.last_name} ({self.email})'"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "smell": "OrderService envies User's internal properties"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "refactoring": "method moved directly onto User class"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "result": "encapsulation restored; external envy eliminated"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "A surface symptom indicating deeper design rot is a code <0>.",
+      "A method that obsessively queries another object's data has Feature <1>.",
+      "Variables that always travel together in parameter lists are Data <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "smell"
+            ],
+            "why": "Code smells identify design weaknesses."
+      },
+      {
+            "a": [
+                  "Envy"
+            ],
+            "why": "Feature Envy indicates mislocated logic."
+      },
+      {
+            "a": [
+                  "Clumps"
+            ],
+            "why": "Data Clumps should be encapsulated into classes."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is 'Feature Envy' in object-oriented code design?",
+      a: ["A method in Class A that calls getters and inspects data on Class B more than its own data","A software engineer wanting to work on a competitor's features","A feature that takes more than a month to build","A bug that crashes the compiler"],
+      c: 0,
+      why: "Feature Envy indicates that the method is on the wrong class and should be moved to the data owner."
+    },
+    {
+      q: "What is 'Primitive Obsession'?",
+      a: ["Using raw primitive types (strings, numbers) for rich domain concepts (like currencies, phone numbers, or zip codes) instead of dedicated objects","Writing code in ancient programming languages","Refusing to use cloud servers","Writing code using only lowercase letters"],
+      c: 0,
+      why: "Primitive obsession spreads validation logic across the codebase instead of encapsulating it in a value object."
+    },
+    {
+      q: "What refactoring technique is the primary cure for a 'Long Method' code smell?",
+      a: ["Extract Method (extracting cohesive sub-sections into small, intention-revealing helper functions)","Deleting the code completely","Making the font size smaller in the editor","Renaming the file"],
+      c: 0,
+      why: "Extract Method isolates sub-tasks into small, descriptive, self-documenting functions."
+    },
+    {
+      q: "Does the presence of a code smell mean the software contains a bug?",
+      a: ["No, the code may run correctly and pass all tests; a smell indicates poor design that increases future maintenance risk","Yes, a code smell is a fatal syntax error","Yes, code smells cause physical hard drive damage","Code smells only exist in Python"],
+      c: 0,
+      why: "Smells are architectural warnings about design quality, not immediate functional bugs."
+    }
+  ]);
+</script>
+</body>
+</html>

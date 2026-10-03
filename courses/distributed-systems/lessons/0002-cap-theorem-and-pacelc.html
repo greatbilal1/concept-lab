@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 02 — The CAP Theorem and PACELC: Consistency vs Availability</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="distributed-systems" data-lesson="2" data-lesson-id="cap-theorem-and-pacelc">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 02</span> · CAP & PACELC</span>
+
+  <h1 class="lesson-title">The CAP Theorem and PACELC: Consistency vs Availability</h1>
+  <p class="lesson-lede">
+    Fundamental trade-offs: the CAP Theorem (Consistency, Availability, Partition Tolerance) and the PACELC extension (Latency vs Consistency).
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to evaluate distributed storage trade-offs using the CAP and PACELC theorems.</span>
+    <span><b>Mission link</b> Mastering the cap theorem and pacelc: consistency vs availability across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of The CAP Theorem and PACELC: Consistency vs Availability</h2>
+  <p>In 2000, Eric Brewer formulated the most famous theorem in distributed systems: the <strong>CAP Theorem</strong>. It proves that any distributed data store can guarantee at most two out of three properties:</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Fundamental trade-offs: the CAP Theorem (Consistency, Availability, Partition Tolerance) and the PACELC extension (Latency vs Consistency).
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The CAP Theorem Choice</h2>
+  <ul><li><strong>C — Consistency (Linearizability):</strong> Every read receives the most recent write or an error. All nodes see the exact same data at the same instant.</li><li><strong>A — Availability:</strong> Every non-failing node returns a non-error response for every request (no timeouts or rejections).</li><li><strong>P — Partition Tolerance:</strong> The system continues to operate despite arbitrary dropped packets or network splits between nodes.</li></ul>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>The PACELC Theorem</h2>
+  <p><strong>Why 'Pick 2' is a Misunderstanding:</strong> You <strong>cannot choose CA</strong>! In the real physical world, networks <em>will</em> partition (P is non-negotiable). Therefore, when a partition occurs, your true choice is binary: <strong>CP or AP</strong>:</p><ul><li><strong>CP Systems (Consistency over Availability):</strong> When a network partition divides the cluster, reject writes or block reads on isolated nodes to prevent reading stale data. E.g. <strong>PostgreSQL with synchronous replication, ZooKeeper, etcd, MongoDB (strict)</strong>.</li><li><strong>AP Systems (Availability over Consistency):</strong> Keep accepting writes on both sides of the partition! Nodes will temporarily diverge, and resolve conflicts later (Eventual Consistency). E.g. <strong>Amazon DynamoDB, Apache Cassandra, Couchbase</strong>.</li><li><strong>The PACELC Extension (Abadi):</strong> <em>If there is a Partition (P), trade off Availability (A) vs Consistency (C); Else (E), trade off Latency (L) vs Consistency (C).</em></li></ul><pre><code># The CAP Partition Dilemma:
+# Node 1 (US-East) <── [NETWORK PARTITION CUTS FIBER!] ──> Node 2 (EU-West)
+# User writes X=5 to Node 1.
+# User reads X from Node 2.
+#
+# If CP: Node 2 returns ERROR ("Partition active, cannot verify latest write!") -> CONSISTENT, BUT UNAVAILABLE!
+# If AP: Node 2 returns X=4 (Stale data, but answers immediately!)              -> AVAILABLE, BUT INCONSISTENT!</code></pre><div class="callout"><p><strong>The Business Decision:</strong> Banks and financial ledgers choose <strong>CP</strong> (never show an incorrect balance). Social media feeds and shopping carts choose <strong>AP</strong> (always allow the user to like a post or add to cart).</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the CAP theorem sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to evaluate distributed storage trade-offs using the CAP and PACELC theorems.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where the cap theorem and pacelc: consistency vs availability applies.</li>
+    <li>Author a unit test or verification script exercising the cap theorem and pacelc: consistency vs availability.</li>
+    <li>Document team architectural conventions regarding the cap theorem and pacelc: consistency vs availability.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for The CAP Theorem and PACELC: Consistency vs Availability.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What does the CAP Theorem mathematically prove about distributed data stores?",
+    a: ["In the presence of a network Partition (P), a distributed system must choose between Consistency (C) and Availability (A); it cannot have both","A system can have Consistency, Availability, and Partition tolerance all at 100%","Computers can only do three things","Databases cannot be distributed"],
+    c: 0,
+    why: "The CAP Theorem proves that during a network partition, a system must trade off between strong consistency and availability."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "CP Systems (Consistency)",
+            "lines": [
+                  "Rejects writes on partitioned nodes",
+                  "Guarantees zero stale reads",
+                  "Used for: Banking, ledgers, etcd"
+            ]
+      },
+      {
+            "title": "AP Systems (Availability)",
+            "lines": [
+                  "Answers requests on all nodes",
+                  "Accepts eventual consistency / stale reads",
+                  "Used for: Social feeds, shopping carts, DNS"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing The CAP Theorem and PACELC: Consistency vs Availability",
+      "def execute_flow():",
+      "    # Fundamental trade-offs: the CAP Theorem (Consisten...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "The CAP Theorem and PACELC: Consistency vs Availability"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "If Partition (P)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Else (E) Normal Operation"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The CAP theorem proves that when network partitions occur, distributed systems must choose between strong {1} and high {2}."
+],
+    blanks: [
+      {
+            "a": [
+                  "consistency"
+            ],
+            "why": "All nodes seeing identical latest state"
+      },
+      {
+            "a": [
+                  "availability"
+            ],
+            "why": "Every request receiving a successful non-error response"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why is 'CA' (Consistency + Availability without Partition Tolerance) impossible in distributed systems?",
+      a: ["Physical networks inevitably experience latency, packet drops, and partitions; a distributed system cannot opt out of network partitions","CA is illegal in computer science","Computers only have 2 network cards","CA requires quantum computing"],
+      c: 0,
+      why: "Network partitions are unavoidable physical realities, forcing a choice between C and A during partitions."
+    },
+    {
+      q: "What type of system is Apache Cassandra according to the CAP theorem?",
+      a: ["An AP system designed for high availability and partition tolerance, using tunable eventual consistency","A CP system","A single-node database","A relational database"],
+      c: 0,
+      why: "Cassandra prioritizes availability and partition tolerance, replicating data eventually across nodes."
+    },
+    {
+      q: "Why do consensus engines like etcd and ZooKeeper choose CP (Consistency)?",
+      a: ["They manage critical cluster state (Kubernetes leader election, configuration) where split-brain or stale data causes catastrophic corruption","CP is faster than AP","They have no network interface","They only run on Linux"],
+      c: 0,
+      why: "Cluster coordination requires absolute linearizable consistency to avoid split-brain states."
+    },
+    {
+      q: "What does the 'PACELC' theorem add to Brewer's original CAP theorem?",
+      a: ["It explains that even when the network is healthy (no partition), a system must still trade off between Latency (L) and Consistency (C)","It adds security to CAP","It proves CAP is wrong","It is an encryption algorithm"],
+      c: 0,
+      why: "PACELC models the trade-off between latency and consistency during normal non-partitioned operation."
+    }
+  ]);
+</script>
+</body>
+</html>

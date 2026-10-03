@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Frontend ↔ Backend Communication — Cheat Sheet</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+<style>
+  .ref-toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0 8px; }
+  .ref-toc a { font-size: .8rem; border: 1px solid var(--border); background: #111a30; padding: 5px 11px; border-radius: 999px; color: var(--muted); text-decoration: none; border-bottom: 1px solid var(--border); }
+  .ref-toc a:hover { color: #fff; border-color: #3d5488; }
+  .lesson-wrap h2 { scroll-margin-top: 20px; }
+  .snippet { margin: 14px 0 22px; }
+  .snippet .lbl { font-size: .72rem; font-weight: 800; letter-spacing: .7px; text-transform: uppercase; color: var(--accent2); margin-bottom: 6px; }
+  .see { font-size: .82rem; color: var(--muted); margin: -6px 0 12px; }
+  .see a { color: var(--accent2); border-bottom: 0; }
+  .see a:hover { color: #fff; }
+  .snippet pre { padding-top: 34px; }
+  @media print { .snippet pre { padding-top: 18px; } }
+</style>
+</head>
+<body class="lesson-body" data-course="frontend-backend">
+
+<div class="lesson-wrap">
+
+  <span class="lesson-kicker">Reference · Cheat sheet</span>
+  <h1 class="lesson-title">Frontend ↔ Backend Communication — Cheat Sheet</h1>
+  <p class="lesson-lede">
+    The whole course on one page. Every snippet links back to the lesson that
+    teaches it.
+  </p>
+
+  <div class="ref-toc">
+    <a href="#sec-1">CORS Header Matrix</a>
+    <a href="#sec-2">The 4-State UI Machine</a>
+    <a href="#sec-3">Optimistic UI Update</a>
+    <a href="#sec-4">Real-Time Protocols</a>
+  </div>
+
+  <h2 id="sec-1"><span class="n">1</span>CORS Header Matrix</h2>
+  <div class="snippet">
+    <div class="lbl">Cross-Origin configuration</div>
+    <pre><code>// Simple Requests vs Preflight (OPTIONS)
+Access-Control-Allow-Origin: https://app.example.com
+Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS
+Access-Control-Allow-Headers: Content-Type, Authorization
+Access-Control-Allow-Credentials: true
+Access-Control-Max-Age: 86400  # cache preflight for 24h</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0002-cors-preflight-and-security-boundaries.html">Lesson 02 — CORS, preflight, and security boundaries</a>.</p>
+
+  <h2 id="sec-2"><span class="n">2</span>The 4-State UI Machine</h2>
+  <div class="snippet">
+    <div class="lbl">Component lifecycle states</div>
+    <pre><code>type AsyncState&lt;T&gt; =
+  | { status: 'idle' }
+  | { status: 'loading' }
+  | { status: 'success', data: T }
+  | { status: 'error', error: Error };</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0003-loading-states-empty-states-and-errors.html">Lesson 03 — Loading states, empty states, and errors</a>.</p>
+
+  <h2 id="sec-3"><span class="n">3</span>Optimistic UI Update</h2>
+  <div class="snippet">
+    <div class="lbl">Update visually first, rollback on error</div>
+    <pre><code>const previousList = currentList;
+setList(list =&gt; [...list, newItem]); // optimistic update
+try {
+  await api.addItem(newItem);
+} catch (err) {
+  setList(previousList); // rollback on error!
+  showErrorBanner("Could not save item.");
+}</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0004-optimistic-updates-and-rollback-patterns.html">Lesson 04 — Optimistic updates and rollback patterns</a>.</p>
+
+  <h2 id="sec-4"><span class="n">4</span>Real-Time Protocols</h2>
+  <div class="snippet">
+    <div class="lbl">Polling vs SSE vs WebSockets</div>
+    <pre><code>Short Polling: setInterval(() =&gt; fetch('/updates'), 5000)
+Server-Sent Events: const es = new EventSource('/stream') (1-way server-&gt;client)
+WebSockets: const ws = new WebSocket('wss://api/ws') (full duplex 2-way)</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0007-real-time-sse-and-websockets.html">Lesson 07 — Real-time communication: SSE and WebSockets</a>.</p>
+
+  <div class="lesson-foot">
+    <div class="links">
+      <a href="frontend-backend-glossary.html">📖 Glossary</a>
+      <a href="../course.html">← Course map</a>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

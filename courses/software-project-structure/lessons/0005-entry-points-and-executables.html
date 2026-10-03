@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 05 — Entry points and executables</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="software-project-structure" data-lesson="5" data-lesson-id="entry-points-and-executables">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 05</span> · Entry Points & Testing</span>
+
+  <h1 class="lesson-title">Entry points and executables</h1>
+  <p class="lesson-lede">
+    How does a package become a runnable command? Learn how executable entry points, shebangs, and package manifests expose CLI tools and daemon runners.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Configure executable entry points and CLI binaries in package manifests</span>
+    <span><b>Mission link</b> Exposes application capabilities cleanly to users and operators</span>
+  </div>
+
+  <h2><span class="n">1</span>Exposing runnable commands</h2>
+  <p>A library is imported by other code; an application is executed by humans or operating systems. To turn a module into an executable command, package managers provide <b>entry point bindings</b>.</p><p>In Python, <code>project.scripts</code> in <code>pyproject.toml</code> maps a command name to a specific Python function. When installed, pip generates an executable script wrapper in your virtualenv's <code>bin/</code> directory that launches your code seamlessly.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Entry point specifications allow package managers to generate portable CLI executable wrappers automatically.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>CLI mapping architecture</h2>
+  <p>Understand how package manifests bridge terminal shell commands to internal module functions.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing CLI execution</h2>
+  <p>Trace how command-line arguments are parsed and routed to application logic.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your knowledge of executable entry point mechanics.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can expose command-line utilities and server runners through clean package entry point manifests.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Register a simple CLI entry point in your package manifest.</li>
+    <li>Install the package in editable mode and run the command from your terminal.</li>
+    <li>Inspect the wrapper script generated inside your virtual environment's bin/ folder.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Python Packaging User Guide: *Entry Points and Console Scripts* (packaging.python.org).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What happens when you specify 'my-tool = my_package.cli:main' in pyproject.toml and install the package?",
+    a: ["The package installer generates an executable binary script named 'my-tool' in bin/","The compiler deletes all other executable files from your system","Your code is translated into compiled C programming code","The command my-tool is registered directly in the computer BIOS"],
+    c: 0,
+    why: "Package managers automatically generate shim executables that invoke the specified function."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "User runs 'app-cli'",
+            "lines": [
+                  "shell finds wrapper in bin/",
+                  "invokes Python interpreter"
+            ]
+      },
+      {
+            "title": "Shim Wrapper",
+            "lines": [
+                  "imports package namespace",
+                  "executes registered callable"
+            ]
+      },
+      {
+            "title": "my_app.cli:main()",
+            "lines": [
+                  "parses arguments (argparse/click)",
+                  "executes business command"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Command: app-cli --format=json users",
+      "args = parser.parse_args()",
+      "if args.command == 'users':",
+      "    data = fetch_users()",
+      "    print(json_dumps(data))"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "input": "['--format=json', 'users']"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "parsed": "{format: 'json', command: 'users'}"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "route": "match command 'users'"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "output": "[{\"id\": 1, \"name\": \"Ada\"}]"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "In pyproject.toml, CLI commands are defined under [project.<0>].",
+      "In package.json, CLI binary commands are declared under the <1> field.",
+      "The directory where virtualenv binary wrappers live is <2>/."
+],
+    blanks: [
+      {
+            "a": [
+                  "scripts"
+            ],
+            "why": "[project.scripts] maps console command names to callable functions."
+      },
+      {
+            "a": [
+                  "bin"
+            ],
+            "why": "The 'bin' field in package.json registers executable command names."
+      },
+      {
+            "a": [
+                  "bin"
+            ],
+            "why": "The bin/ folder holds executable wrapper scripts."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the primary advantage of console_scripts entry points over manual shell scripts?",
+      a: ["They automatically generate platform-appropriate executables for Windows, macOS, and Linux","They run without needing any CPU processor instructions","They bypass operating system file permission checks","They encrypt the python code so it cannot be inspected"],
+      c: 0,
+      why: "Package managers build correct executable shims for the host operating system automatically."
+    },
+    {
+      q: "What signature must a function have to serve as a console entry point?",
+      a: ["It should take no required arguments and return an integer exit code or None","It must accept exactly twenty string parameters","It must be written in assembly machine code","It must return an active database connection object"],
+      c: 0,
+      why: "Entry points are called with no arguments; sys.argv is inspected internally."
+    },
+    {
+      q: "Where does Node.js place symlinks for executables declared in package.json bin?",
+      a: ["node_modules/.bin/","/usr/local/system32/","/tmp/binaries/","src/executables/"],
+      c: 0,
+      why: "npm creates symlinks in node_modules/.bin so commands can be executed via npx or npm scripts."
+    },
+    {
+      q: "What happens if an entry point function raises an unhandled exception?",
+      a: ["The interpreter prints a traceback and exits with a non-zero exit code","The computer hardware reboots immediately","The operating system deletes the package permanently","The function silently restarts in an infinite loop"],
+      c: 0,
+      why: "Unhandled exceptions terminate the process with non-zero exit status, signaling failure."
+    }
+  ]);
+</script>
+</body>
+</html>

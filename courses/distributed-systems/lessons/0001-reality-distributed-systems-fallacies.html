@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 01 — The Reality of Distributed Systems: Network Fallacies and Partial Failure</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="distributed-systems" data-lesson="1" data-lesson-id="reality-distributed-systems-fallacies">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 01</span> · Network Fallacies</span>
+
+  <h1 class="lesson-title">The Reality of Distributed Systems: Network Fallacies and Partial Failure</h1>
+  <p class="lesson-lede">
+    The harsh physics of distributed computing: the 8 Fallacies of Distributed Computing, partial failure, and why networks are unreliable.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You understand the physical reality of distributed systems, partial failure, and network fallacies.</span>
+    <span><b>Mission link</b> Mastering the reality of distributed systems: network fallacies and partial failure across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of The Reality of Distributed Systems: Network Fallacies and Partial Failure</h2>
+  <p>Writing software on a single computer is predictable: if the CPU executes a function, the memory is right there on the motherboard. If the computer crashes, everything crashes together. But in a <strong>Distributed System</strong>—where dozens of servers cooperate over a network—<strong>partial failure is the norm</strong>.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    The harsh physics of distributed computing: the 8 Fallacies of Distributed Computing, partial failure, and why networks are unreliable.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Single Machine vs Distributed System</h2>
+  <p>The Classic <strong>Fallacies of Distributed Computing</strong> (Peter Deutsch et al.):</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>The Three States of an RPC Call</h2>
+  <ul><li><strong>1. 'The network is reliable':</strong> False! Packets drop, Wi-Fi fluctuates, and undersea cables get cut. Networks will partition without warning.</li><li><strong>2. 'Latency is zero':</strong> False! Every cross-network RPC adds milliseconds of latency that compound across service chains.</li><li><strong>3. 'Bandwidth is infinite':</strong> False! Saturating network switches creates packet queues, bufferbloat, and dropped connections.</li><li><strong>4. 'The network is secure':</strong> False! Anyone on the network wire can inspect or inject packets unless encrypted via TLS.</li><li><strong>5. 'Topology doesn't change':</strong> False! Cloud nodes autoscale, IPs get reassigned, and routers fail over.</li></ul><pre><code># The Distributed Asymmetry: 
+# When Service A calls Service B over the network and receives NO response:
+# Did Service B fail to receive the request?
+# Did Service B execute the request, but the response packet got lost on the way back?
+# Is Service B running slowly and still processing?
+# In a distributed system, A DOES NOT KNOW! This is the fundamental challenge.</code></pre><div class="callout"><p><strong>The Golden Rule of Distribution:</strong> You cannot assume state across a network. Build systems designed for timeout, retry, and non-blocking asynchronous communication.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the distributed fallacies sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You understand the physical reality of distributed systems, partial failure, and network fallacies.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where the reality of distributed systems: network fallacies and partial failure applies.</li>
+    <li>Author a unit test or verification script exercising the reality of distributed systems: network fallacies and partial failure.</li>
+    <li>Document team architectural conventions regarding the reality of distributed systems: network fallacies and partial failure.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for The Reality of Distributed Systems: Network Fallacies and Partial Failure.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is the single most defining characteristic of a Distributed System compared to a single machine?",
+    a: ["Partial failure: individual components, nodes, or network links can fail independently while the rest of the system continues executing in an uncertain state","Distributed systems run without power","Distributed systems have zero latency","Distributed systems use only one computer"],
+    c: 0,
+    why: "Partial failure is the core reality: nodes fail unpredictably and networks experience arbitrary delays and partitions."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Single Machine (Predictable)",
+            "lines": [
+                  "Shared motherboard bus & memory",
+                  "Deterministic: either whole app runs or whole app dies",
+                  "Zero network packet drops internally"
+            ]
+      },
+      {
+            "title": "Distributed System (Uncertain)",
+            "lines": [
+                  "Nodes communicate across untrusted networks",
+                  "Partial failure: Node 3 dies, Node 4 times out",
+                  "System must reach consensus despite partitions!"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing The Reality of Distributed Systems: Network Fallacies and Partial Failure",
+      "def execute_flow():",
+      "    # The harsh physics of distributed computing: the 8 ...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "The Reality of Distributed Systems: Network Fallacies and Partial Failure"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "State 1: SUCCESS"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "State 2: FAILURE"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "step": "State 3: TIMEOUT (UNKNOWN)"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The defining reality of distributed systems is {1} failure, where individual network links or servers fail unpredictably, shattering the fallacy that networks are {2}."
+],
+    blanks: [
+      {
+            "a": [
+                  "partial"
+            ],
+            "why": "Incomplete component failure"
+      },
+      {
+            "a": [
+                  "reliable"
+            ],
+            "why": "Dependable without failure"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is 'Partial Failure' in distributed systems engineering?",
+      a: ["A condition where some nodes or network links fail while other parts of the system continue running, creating an uncertain global state","When a computer screen breaks in half","When half the code is deleted","When electricity is turned off halfway"],
+      c: 0,
+      why: "Partial failure is the defining challenge of distributed computing where components fail independently."
+    },
+    {
+      q: "Why is 'The network is reliable' considered a fallacy in modern software engineering?",
+      a: ["Physical networks experience transient packet loss, congestion, cable cuts, and routing flaps that cause unexpected communication drops","Networks never work","Networks are illegal","Cables are too slow"],
+      c: 0,
+      why: "Physical and logical networks are inherently prone to transient partitions and dropped packets."
+    },
+    {
+      q: "If Service A calls Service B to transfer funds and times out after 5 seconds, what must Service A assume?",
+      a: ["Service A must assume the state is UNKNOWN: the transfer may have succeeded, failed, or be mid-execution, requiring idempotent inquiry","Service A assumes it definitely succeeded","Service A assumes it definitely failed","Service A shuts down"],
+      c: 0,
+      why: "Timeouts are ambiguous; the request may have completed before the response was lost in transit."
+    },
+    {
+      q: "How does designing for partial failure improve enterprise system resilience?",
+      a: ["Services use circuit breakers, timeouts, and fallbacks so that the failure of one downstream microservice does not collapse the entire application","It makes systems run without memory","It eliminates the need for testing","It reduces server costs to zero"],
+      c: 0,
+      why: "Fault-tolerant architectures isolate component failures, preventing systemic cascading crashes."
+    }
+  ]);
+</script>
+</body>
+</html>

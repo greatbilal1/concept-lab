@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 05 — Sentence and Document Embeddings</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="embeddings" data-lesson="5" data-lesson-id="sentence-document-embeddings">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 05</span> · Text Embeddings</span>
+
+  <h1 class="lesson-title">Sentence and Document Embeddings</h1>
+  <p class="lesson-lede">
+    Scaling embeddings: why averaging word vectors fails, and how Sentence-BERT and modern dense encoders embed full documents.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how sentence and document embeddings power modern semantic retrieval.</span>
+    <span><b>Mission link</b> Mastering sentence and document embeddings across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Sentence and Document Embeddings</h2>
+  <p>Word embeddings give you coordinates for single words: <code>'dog'</code>, <code>'apple'</code>, <code>'run'</code>. But real applications need embeddings for entire queries, sentences, and 500-word document chunks. How do you embed a full sentence?</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Scaling embeddings: why averaging word vectors fails, and how Sentence-BERT and modern dense encoders embed full documents.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Word Averaging vs Sentence Transformers</h2>
+  <p>Early naive approaches tried <strong>Mean Pooling</strong>: averaging all word vectors in the sentence. This failed because it destroys syntax and negation:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Bi-Encoder Embedding Architecture</h2>
+  <ul><li><em>'The movie was not good, it was terrible.'</em></li><li><em>'The movie was not terrible, it was good.'</em></li><li>Both sentences have identical words! Mean pooling produces the exact same vector, yet their meanings are completely opposite!</li></ul><p>Modern AI uses <strong>Bi-Encoder Sentence Transformers (Sentence-BERT / Modern Embedding Models)</strong>:</p><pre><code># Generating Document Embeddings with sentence-transformers:
+from sentence_transformers import SentenceTransformer
+
+model = SentenceTransformer("all-MiniLM-L6-v2")
+
+sentences = [
+    "The cat sat on the mat.",
+    "A feline is resting on the rug.",
+    "The stock market crashed today."
+]
+
+# Produces a single 384-dimensional vector per sentence!
+embeddings = model.encode(sentences)
+# Cosine Similarity between sentence 0 and 1: 0.89! (Semantic match!)
+# Cosine Similarity between sentence 0 and 2: 0.04! (Unrelated!)</code></pre><p>Sentence transformers pass the entire sequence through self-attention layers, allowing every word to contextualize every other word (understanding that 'not' modifies 'good') before pooling into a single document vector.</p><div class="callout"><p><strong>The Foundation of RAG:</strong> High-quality sentence and chunk embeddings are the indispensable engine powering modern Semantic Search and Retrieval-Augmented Generation (RAG).</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the sentence embedding sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how sentence and document embeddings power modern semantic retrieval.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where sentence and document embeddings applies.</li>
+    <li>Author a unit test or verification script exercising sentence and document embeddings.</li>
+    <li>Document team architectural conventions regarding sentence and document embeddings.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Sentence and Document Embeddings.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Why is simply calculating the average of all word vectors in a sentence inadequate for capturing sentence meaning?",
+    a: ["Averaging ignores word order, grammar, and negation (e.g. 'dog bites man' produces the exact same average as 'man bites dog')","Averaging numbers takes too much CPU power","Word vectors cannot be added together","Averaging causes division by zero"],
+    c: 0,
+    why: "Bag-of-words averaging is blind to syntax, negation, and word order, distorting sentence semantics."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Word Averaging (Blind)",
+            "lines": [
+                  "'Not good, was terrible' == 'Not terrible, was good'",
+                  "Identical word bag -> Identical vector (Fails!)"
+            ]
+      },
+      {
+            "title": "Sentence-BERT (Contextual)",
+            "lines": [
+                  "Self-attention models syntax & negation",
+                  "Accurate, distinct semantic embeddings"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Sentence and Document Embeddings",
+      "def execute_flow():",
+      "    # Scaling embeddings: why averaging word vectors fai...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Sentence and Document Embeddings"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Input Chunk (300 words)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Mean-Pooled Context"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Sentence transformers use self-attention to capture word {1} and negation, embedding entire paragraphs into a single dense {2}."
+],
+    blanks: [
+      {
+            "a": [
+                  "order"
+            ],
+            "why": "Sequential syntax and grammar"
+      },
+      {
+            "a": [
+                  "vector"
+            ],
+            "why": "Dense coordinate embedding"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the primary difference between a Cross-Encoder and a Bi-Encoder?",
+      a: ["Bi-Encoders embed text into standalone vectors that can be pre-indexed for fast search; Cross-Encoders evaluate pairs together with higher accuracy but slow speed","Bi-Encoders use two computers","Cross-Encoders only run on images","Bi-Encoders do not use neural networks"],
+      c: 0,
+      why: "Bi-encoders produce independent vectors for million-scale search; cross-encoders re-rank candidate pairs."
+    },
+    {
+      q: "Why is chunk size critical when embedding documents for RAG systems?",
+      a: ["If chunks are too large, distinct topics blend and dilute the vector; if chunks are too small, critical context is severed","Chunk size determines computer monitor resolution","Chunk size is fixed at 1 word","Chunk size determines internet speed"],
+      c: 0,
+      why: "Optimal chunk sizing (250-500 tokens) balances semantic specificity with sufficient context."
+    },
+    {
+      q: "What popular open-source Python library provides easy-to-use pre-trained sentence embedding models?",
+      a: ["sentence-transformers","requests","django","pytest"],
+      c: 0,
+      why: "The sentence-transformers library provides state-of-the-art embedding models for Python."
+    },
+    {
+      q: "What does 'Mean Pooling' over transformer token outputs mean?",
+      a: ["Averaging the contextualized output vectors of all tokens in the sequence to produce a single sentence vector","Deleting all negative numbers","Finding the median word in the dictionary","Calculating the mean square error"],
+      c: 0,
+      why: "Mean pooling averages the token embeddings across the sequence length dimension."
+    }
+  ]);
+</script>
+</body>
+</html>

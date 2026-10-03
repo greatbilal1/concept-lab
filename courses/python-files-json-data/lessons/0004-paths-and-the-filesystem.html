@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 04 — Paths and the filesystem</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="python-files-json-data" data-lesson="4" data-lesson-id="paths-and-the-filesystem">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 04</span> · Files</span>
+
+  <h1 class="lesson-title">Paths and the filesystem</h1>
+  <p class="lesson-lede">
+    "It works when I run it here" is almost always a path problem. This lesson is
+    about naming files in a way that survives being run from somewhere else.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Build paths that always resolve</span>
+    <span><b>Mission link</b> Code that runs anywhere</span>
+  </div>
+
+  <h2><span class="n">1</span>Absolute vs relative</h2>
+
+  <p>
+    An <b>absolute</b> path starts from the root of the filesystem and means the
+    same thing everywhere. A <b>relative</b> path is resolved against the current
+    working directory — which is wherever the program was launched from, not where
+    the script lives.
+  </p>
+
+  <div id="predict1"></div>
+
+  <p>
+    That gap is the bug. <code>open("data.csv")</code> works when you run the
+    script from its own folder and fails the moment a scheduler or a test runner
+    launches it from elsewhere.
+  </p>
+
+  <h2><span class="n">2</span>pathlib: paths as objects</h2>
+
+  <p>
+    The <code>pathlib</code> module gives you <code>Path</code> objects instead of
+    strings. The <code>/</code> operator joins them, and the result is correct on
+    every platform:
+  </p>
+
+  <pre><code>from pathlib import Path
+
+here = Path(__file__).parent      # the folder this script lives in
+data = here / "data" / "rows.csv" # joined, not concatenated
+
+print(data.exists())
+print(data.read_text())</code></pre>
+
+  <p>
+    <code>Path(__file__).parent</code> is the key line. It anchors the path to the
+    script, not to wherever you happened to be standing.
+  </p>
+
+  <div id="intro1"></div>
+
+  <h2><span class="n">3</span>Why string joining breaks</h2>
+
+  <p>
+    Building paths with <code>+</code> and <code>"/"</code> looks harmless and
+    fails in three ways: a missing separator, a doubled separator, and the wrong
+    separator on Windows.
+  </p>
+
+  <div id="trace1"></div>
+
+  <p>
+    <code>Path</code> handles all three. It also gives you <code>exists()</code>,
+    <code>mkdir()</code>, <code>suffix</code>, <code>stem</code> and
+    <code>read_text()</code> — the operations you would otherwise hand-roll.
+  </p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Anchor paths to <code>__file__</code>, not to the working directory. A script
+    should not care where it was launched from.
+  </div>
+
+  <h2><span class="n">4</span>Checking before you open</h2>
+
+  <p>
+    A path is a claim about the filesystem, and claims can be wrong. Check before
+    you act:
+  </p>
+
+  <pre><code>p = Path("config.json")
+if not p.exists():
+    raise FileNotFoundError(f"missing: {p}")
+
+p.parent.mkdir(parents=True, exist_ok=True)  # ensure the folder
+p.write_text("{}")</code></pre>
+
+  <div id="diagram1"></div>
+
+  <p>
+    <code>parents=True, exist_ok=True</code> means "create the whole chain, and do
+    not complain if it is already there". That pair is worth memorising.
+  </p>
+
+  <div class="note good">
+    <span class="note-label">Why this matters later</span>
+    Every pipeline in this course reads from and writes to paths. Getting the
+    anchoring right once means the JSON and CSV lessons just work, wherever the
+    code runs.
+  </div>
+
+  <h2><span class="n">5</span>Check yourself</h2>
+
+  <p>
+    Answer from memory — do not scroll back up. Each option has the same number of
+    words, so nothing gives the answer away.
+  </p>
+
+  <div id="fill1"></div>
+  <div id="quiz"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>
+      You can now build paths that resolve correctly no matter where the program is
+      launched, and you can check the filesystem before acting on it. That removes
+      the most common "works on my machine" failure in data code.
+    </p>
+  </div>
+
+  <h2><span class="n">6</span>Do this next</h2>
+
+  <ol>
+    <li>
+      Write a script that opens a file with a relative path, then run it from a
+      different directory. Watch it fail.
+    </li>
+    <li>
+      Fix it with <code>Path(__file__).parent</code> and run it from anywhere.
+    </li>
+    <li>
+      Use <code>mkdir(parents=True, exist_ok=True)</code> to create a nested output
+      folder, then write a file into it.
+    </li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Read the Python docs on
+    <a href="https://docs.python.org/3/library/pathlib.html">pathlib</a>,
+    especially the "Basic use" section and the list of Path methods.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher (me) anything — "what is the current
+    working directory?", "how do I list a folder?", "what is a symlink?". There are
+    no bad questions here.
+  </div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  /* pathlib essentials */
+  TeachWidgets.introCards("#intro1", {
+    cards: [
+      { ico: "📁", title: "Path(__file__)", body: "The path of the running script itself." },
+      { ico: "➗", title: "The / operator", body: "Joins path parts correctly on every platform." },
+      { ico: "✅", title: ".exists()", body: "Checks the filesystem before you act on a path." }
+    ]
+  });
+
+  /* predict-then-reveal */
+  TeachWidgets.predict("#predict1", {
+    q: "A script uses `open(\"data.csv\")`. When does it fail?",
+    a: ["Never, it always works", "When run from another folder", "Only on Windows machines"],
+    c: 1,
+    why: "A relative path resolves against the working directory, so launching from elsewhere breaks it."
+  });
+
+  /* step-through trace of path building */
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "here = Path(__file__).parent",
+      "  -> /app/scripts",
+      "data = here / \"data\" / \"rows.csv\"",
+      "  -> /app/scripts/data/rows.csv",
+      "data.exists() -> True"
+    ],
+    steps: [
+      { line: 0, vars: { anchored: "script folder" } },
+      { line: 1, vars: { here: "/app/scripts" } },
+      { line: 2, vars: { joining: "with /" } },
+      { line: 3, vars: { data: "full path" } },
+      { line: 4, vars: { checked: "exists" } }
+    ]
+  });
+
+  /* filesystem checks */
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      { title: "Check", lines: ["p.exists()", "before acting"] },
+      { title: "Create folder", lines: ["parents=True", "exist_ok=True"] },
+      { title: "Write", lines: ["p.write_text()", "safe to proceed"] }
+    ]
+  });
+
+  /* recall from memory */
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — pathlib",
+    lines: [
+      "The module for path objects is <code><0></code>",
+      "The operator that joins paths is <code><1></code>",
+      "The attribute giving the script's folder is <code>Path(__file__).<2></code>"
+    ],
+    blanks: [
+      { a: ["pathlib"], why: "pathlib provides the Path class for filesystem paths." },
+      { a: ["/"], why: "The / operator joins path parts correctly on every platform." },
+      { a: ["parent"], why: "Path(__file__).parent is the directory containing the script." }
+    ]
+  });
+
+  /* the quiz — every option is exactly three words */
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is a relative path?",
+      a: ["Anchored to the root", "Resolved from the working directory", "Always a full address", "A path without a name"],
+      c: 1,
+      why: "A relative path is resolved against the current working directory, which can change."
+    },
+    {
+      q: "Why anchor to __file__?",
+      a: ["It runs much faster", "It ignores the working directory", "It compresses the path", "It avoids using pathlib"],
+      c: 1,
+      why: "Anchoring to the script's own location makes the path independent of where it was launched."
+    },
+    {
+      q: "What does the / operator do?",
+      a: ["Divides two numbers", "Joins path parts", "Splits a path", "Checks a path"],
+      c: 1,
+      why: "Path objects overload / to join path components correctly on every platform."
+    }
+    {
+      q: "Why avoid string concatenation?",
+      a: ["It is much slower", "Separators break across platforms", "It needs extra imports", "It cannot handle folders"],
+      c: 1,
+      why: "Joining with + risks missing, doubled, or wrong separators; Path handles all three."
+    }
+  ]);
+</script>
+</body>
+</html>

@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 03 — Guard clauses and reducing nesting</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="clean-code" data-lesson="3" data-lesson-id="guard-clauses-and-reducing-nesting">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 03</span> · Small Functions & Guards</span>
+
+  <h1 class="lesson-title">Guard clauses and reducing nesting</h1>
+  <p class="lesson-lede">
+    Flatten the Pyramid of Doom. Learn how early returns and guard clauses turn deeply nested arrow-shaped code into clean, readable linear pipelines.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Flatten deeply nested conditional statements using guard clauses and early returns</span>
+    <span><b>Mission link</b> Dramatically reduces cognitive load and cyclomatic complexity in logic</span>
+  </div>
+
+  <h2><span class="n">1</span>The arrow anti-pattern</h2>
+  <p>Deeply nested code looks like an arrow pointing to the right: <code>if ... { if ... { if ... { if ... } } } }</code>. This is the <b>Pyramid of Doom</b>. To understand what happens on line 20, a reader must hold four nested boolean conditions in their working memory simultaneously.</p><p>You can eliminate nesting completely using <b>Guard Clauses (Return Early)</b>. Check error and boundary conditions at the very top of the function and return immediately. Once the guards are passed, the main happy path executes linearly down the left margin!</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Return early on failure conditions at the top of the function; keep the happy path unnested.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Pyramid of Doom versus Guard Clauses</h2>
+  <p>Contrast nested indentation with the clean linear execution of guard clauses.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing guard clause execution</h2>
+  <p>Trace how invalid inputs are rejected early, leaving the core business action clean and visible.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of guard clause patterns.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can refactor deeply nested conditional code into flat, readable linear functions using guard clauses.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Take a function with 3 levels of nested if statements and refactor it using early returns.</li>
+    <li>Remove all unnecessary 'else' blocks that follow an early return statement.</li>
+    <li>Measure the reduction in cyclomatic complexity after applying guard clauses.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Martin Fowler, *Refactoring: Improving the Design of Existing Code*, 'Replace Nested Conditional with Guard Clauses'.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What happens to code readability when you replace nested if/else statements with guard clauses?",
+    a: ["The code flattens against the left margin, and readers can verify error exits quickly without nesting","The code becomes three times longer","The compiler rejects early return statements","The function runs in reverse order"],
+    c: 0,
+    why: "Early returns handle edge cases upfront, leaving the happy path linear and unindented."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Pyramid of Doom (Arrow)",
+            "lines": [
+                  "if (user) {",
+                  "  if (user.active) {",
+                  "    if (has_balance) { ... }",
+                  "strain on human working memory!"
+            ]
+      },
+      {
+            "title": "Guard Clauses (Linear)",
+            "lines": [
+                  "if (!user) return;",
+                  "if (!user.active) return;",
+                  "if (!has_balance) return;",
+                  "happyPathExecution();"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "def cancel_order(order, user):",
+      "    if not order: return {'error': 'Order not found'}",
+      "    if order.status != 'pending': return {'error': 'Order already processed'}",
+      "    if order.user_id != user.id: return {'error': 'Unauthorized'}",
+      "    # Happy path: Clean, un-nested execution down the left margin!",
+      "    order.mark_cancelled()",
+      "    return {'status': 'success'}"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "guard_1": "null check rejected early"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "guard_2": "state check rejected early"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "guard_3": "permission check rejected early"
+            }
+      },
+      {
+            "line": 5,
+            "vars": {
+                  "happy_path": "core business operation executed at indent level 1"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "A conditional exit at the top of a function is a <0> clause.",
+      "Exiting a function as soon as a failure is detected is returning <1>.",
+      "The anti-pattern of deep nested indentation is the <2> of Doom."
+],
+    blanks: [
+      {
+            "a": [
+                  "guard"
+            ],
+            "why": "Guard clauses protect functions from invalid states."
+      },
+      {
+            "a": [
+                  "early"
+            ],
+            "why": "Early returns eliminate trailing else blocks."
+      },
+      {
+            "a": [
+                  "Pyramid"
+            ],
+            "why": "Pyramid of Doom describes arrow-shaped nesting."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is a 'Guard Clause' in clean code craftsmanship?",
+      a: ["A conditional statement at the start of a function that checks for boundary or error conditions and returns immediately","A security firewall rule on a server","A software license agreement","A password validation check in SQL"],
+      c: 0,
+      why: "Guard clauses validate preconditions upfront and exit early, avoiding nested indentation."
+    },
+    {
+      q: "Why is an 'else' block unnecessary when an 'if' block ends with a 'return' statement?",
+      a: ["If the condition is met, the function exits immediately; code following the if block only runs if the condition was false","Because else blocks are illegal in modern ECMAScript","Because else blocks slow down the CPU","Else blocks are always required by compilers"],
+      c: 0,
+      why: "Early returns eliminate the need for else; subsequent code naturally acts as the alternative branch."
+    },
+    {
+      q: "What is 'Cyclomatic Complexity' in software metrics?",
+      a: ["A quantitative measurement of the number of linearly independent paths through program source code (branching complexity)","The physical temperature of the CPU chip","The number of lines of code in a file","The time taken to download dependencies"],
+      c: 0,
+      why: "Cyclomatic complexity measures branching paths; lower complexity means easier testing and reading."
+    },
+    {
+      q: "How do guard clauses support the 'happy path' readability concept?",
+      a: ["They discard all edge cases and error handling at the top, allowing the normal expected workflow to read linearly down the margin","They make the computer screen display brighter colors","They translate code into positive uplifting phrases","They eliminate all error logging"],
+      c: 0,
+      why: "Handling anomalies upfront leaves the main happy path prominent, clear, and unindented."
+    }
+  ]);
+</script>
+</body>
+</html>

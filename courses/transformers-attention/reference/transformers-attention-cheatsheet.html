@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Transformers & Attention — Cheat Sheet</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+<style>
+  .ref-toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0 8px; }
+  .ref-toc a { font-size: .8rem; border: 1px solid var(--border); background: #111a30; padding: 5px 11px; border-radius: 999px; color: var(--muted); text-decoration: none; border-bottom: 1px solid var(--border); }
+  .ref-toc a:hover { color: #fff; border-color: #3d5488; }
+  .lesson-wrap h2 { scroll-margin-top: 20px; }
+  .snippet { margin: 14px 0 22px; }
+  .snippet .lbl { font-size: .72rem; font-weight: 800; letter-spacing: .7px; text-transform: uppercase; color: var(--accent2); margin-bottom: 6px; }
+  .see { font-size: .82rem; color: var(--muted); margin: -6px 0 12px; }
+  .see a { color: var(--accent2); border-bottom: 0; }
+  .see a:hover { color: #fff; }
+  .snippet pre { padding-top: 34px; }
+  @media print { .snippet pre { padding-top: 18px; } }
+</style>
+</head>
+<body class="lesson-body" data-course="transformers-attention">
+
+<div class="lesson-wrap">
+
+  <span class="lesson-kicker">Reference · Cheat sheet</span>
+  <h1 class="lesson-title">Transformers & Attention — Cheat Sheet</h1>
+  <p class="lesson-lede">
+    The whole course on one page. Every snippet links back to the lesson that
+    teaches it.
+  </p>
+
+  <div class="ref-toc">
+    <a href="#sec-1">Scaled Dot-Product Attention Equation</a>
+    <a href="#sec-2">Causal Attention Masking</a>
+    <a href="#sec-3">Modern Pre-LN Transformer Block</a>
+    <a href="#sec-4">RoPE Relative Rotary Injection</a>
+  </div>
+
+  <h2 id="sec-1"><span class="n">1</span>Scaled Dot-Product Attention Equation</h2>
+  <div class="snippet">
+    <div class="lbl">The universal transformer formula</div>
+    <pre><code># Attention(Q, K, V) = softmax(Q @ K.T / sqrt(d_k)) @ V
+import numpy as np
+def self_attention(Q, K, V):
+    d_k = Q.shape[-1]
+    scores = np.matmul(Q, K.T) / np.sqrt(d_k)
+    weights = np.exp(scores) / np.sum(np.exp(scores), axis=-1, keepdims=True)
+    return np.matmul(weights, V)</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0004-scaled-dot-product-attention-math.html">Lesson 04 — Scaled Dot-Product Attention: Math and Mechanics</a>.</p>
+
+  <h2 id="sec-2"><span class="n">2</span>Causal Attention Masking</h2>
+  <div class="snippet">
+    <div class="lbl">Autoregressive triangular mask</div>
+    <pre><code>import numpy as np
+# Prevent attending to future tokens (upper triangle masked to -inf):
+seq_len = 5
+mask = np.triu(np.full((seq_len, seq_len), -np.inf), k=1)
+# scores_with_mask = scores + mask</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0007-encoder-vs-decoder-bert-gpt.html">Lesson 07 — Encoder vs Decoder Architectures (BERT vs GPT)</a>.</p>
+
+  <h2 id="sec-3"><span class="n">3</span>Modern Pre-LN Transformer Block</h2>
+  <div class="snippet">
+    <div class="lbl">RMSNorm + Residual shortcuts</div>
+    <pre><code># 1. Token Communication:
+x = x + attention(rmsnorm1(x))
+# 2. Token Factual Computation (MLP):
+x = x + feed_forward(rmsnorm2(x))</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0008-complete-transformer-block.html">Lesson 08 — Residual Connections, LayerNorm, and Feed-Forward Networks</a>.</p>
+
+  <h2 id="sec-4"><span class="n">4</span>RoPE Relative Rotary Injection</h2>
+  <div class="snippet">
+    <div class="lbl">Rotary position rotation</div>
+    <pre><code># Rotates Query and Key vectors in 2D pairs by angle m * theta:
+# dot_product(Q_m, K_n) depends strictly on relative offset (m - n)!
+# Scales seamlessly to 128k+ long contexts.</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0006-positional-encodings-order.html">Lesson 06 — Positional Encodings: Giving Sequences a Sense of Order</a>.</p>
+
+  <div class="lesson-foot">
+    <div class="links">
+      <a href="transformers-attention-glossary.html">📖 Glossary</a>
+      <a href="../course.html">← Course map</a>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

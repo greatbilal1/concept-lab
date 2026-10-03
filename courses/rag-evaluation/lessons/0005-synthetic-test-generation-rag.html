@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 05 — Synthetic Test Generation for RAG</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="rag-evaluation" data-lesson="5" data-lesson-id="synthetic-test-generation-rag">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 05</span> · Synthetic Datasets</span>
+
+  <h1 class="lesson-title">Synthetic Test Generation for RAG</h1>
+  <p class="lesson-lede">
+    Scaling test coverage: using LLMs to generate synthetic (question, context, ground_truth) test cases from raw documents.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to scale evaluation coverage using automated synthetic test generation.</span>
+    <span><b>Mission link</b> Mastering synthetic test generation for rag across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Synthetic Test Generation for RAG</h2>
+  <p>The biggest bottleneck in AI evaluation is <strong>dataset authoring</strong>. Handcrafting 200 realistic test questions, finding the matching document passages, and writing verified ground-truth answers takes a team of engineers two full weeks.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Scaling test coverage: using LLMs to generate synthetic (question, context, ground_truth) test cases from raw documents.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Synthetic Test Question Archetypes</h2>
+  <p><strong>Synthetic Test Generation</strong> uses frontier models to automate this process:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>The 10-Minute Bootstrap</h2>
+  <ul><li><strong>1. Document Ingestion:</strong> The generator reads your raw documentation (PDFs, Markdown, wikis).</li><li><strong>2. Evolution of Questions:</strong> The model generates realistic questions across distinct cognitive archetypes:<ul><li><em>Simple Factoid:</em> Single-chunk lookup (<em>'What is the maximum upload size?'</em>).</li><li><em>Multi-Hop Reasoning:</em> Questions requiring synthesizing facts across two separate documents!</li><li><em>Conditional / Branching:</em> <em>'If I am on the Pro tier in Europe, what tax rate applies?'</em></li></ul></li><li><strong>3. Ground-Truth Synthesis:</strong> The model extracts the exact supporting context and formulates the gold-standard answer automatically.</li></ul><pre><code># Generating a Synthetic Test Suite with Ragas in Python:
+from ragas.testset.generator import TestsetGenerator
+from langchain_community.document_loaders import DirectoryLoader
+
+# Load raw documentation:
+documents = DirectoryLoader("./docs", glob="*.md").load()
+
+# Initialize generator with frontier models:
+generator = TestsetGenerator.with_openai()
+
+# Generate 50 diverse synthetic test cases with ground truths!
+testset = generator.generate_with_langchain_docs(documents, test_size=50)
+testset.to_pandas().to_json("evals/synthetic_testset.jsonl", orient="records")</code></pre><div class="callout"><p><strong>The Bootstrap Rule:</strong> Use synthetic generation to bootstrap an initial 100-case eval dataset in 10 minutes. Then have a human engineer spend 1 hour auditing and refining the generated cases!</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the synthetic dataset sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to scale evaluation coverage using automated synthetic test generation.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where synthetic test generation for rag applies.</li>
+    <li>Author a unit test or verification script exercising synthetic test generation for rag.</li>
+    <li>Document team architectural conventions regarding synthetic test generation for rag.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Synthetic Test Generation for RAG.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "How does Synthetic Test Generation (like Ragas Testset Generator) help teams build evaluation datasets?",
+    a: ["It automatically reads your raw documentation and generates hundreds of diverse questions and verified ground-truth answers in minutes","It writes fake news articles","It generates random strings of characters","It deletes duplicate documents"],
+    c: 0,
+    why: "Synthetic test generators parse raw documents and synthesize realistic questions, reasoning queries, and ground truths."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1. Simple Factoid",
+            "lines": [
+                  "Direct single-chunk fact",
+                  "'What is the database port?'"
+            ]
+      },
+      {
+            "title": "2. Multi-Hop Reasoning",
+            "lines": [
+                  "Synthesizes across 2 documents",
+                  "'Does User A have permission to access Feature B?'"
+            ]
+      },
+      {
+            "title": "3. Conditional Logic",
+            "lines": [
+                  "Branching if-then scenario",
+                  "'What happens if a subscription lapses in Canada?'"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Synthetic Test Generation for RAG",
+      "def execute_flow():",
+      "    # Scaling test coverage: using LLMs to generate synt...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Synthetic Test Generation for RAG"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Raw Documents"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Synthetic Testset"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Synthetic test generators analyze raw documentation to automatically produce diverse questions, multi-hop reasoning tasks, and verified {1} {2}."
+],
+    blanks: [
+      {
+            "a": [
+                  "ground"
+            ],
+            "why": "Baseline verification truth"
+      },
+      {
+            "a": [
+                  "truth"
+            ],
+            "why": "Verified factual answers"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is a 'Multi-Hop' test question in synthetic evaluation?",
+      a: ["A question that requires retrieving and reasoning across multiple separate document chunks to arrive at the correct answer","A question about jumping","A question written in two languages","A network ping test"],
+      c: 0,
+      why: "Multi-hop questions evaluate whether the retriever can find multiple disjoint pieces of supporting context."
+    },
+    {
+      q: "Why is human auditing recommended after running automated synthetic test generation?",
+      a: ["To verify that the generated questions sound like realistic human user queries and that ground truths are 100% accurate","Because AI models cannot write English","It is required by the FDA","To delete the test set"],
+      c: 0,
+      why: "Human curation filters out awkward phrasing and validates ground-truth accuracy."
+    },
+    {
+      q: "How does synthetic test generation save engineering time?",
+      a: ["It generates a comprehensive 50-100 case benchmark dataset in minutes rather than requiring weeks of manual human authoring","It makes models run without GPUs","It eliminates the need for unit tests","It speeds up Python compilation"],
+      c: 0,
+      why: "Automating draft question-answer generation slashes the time required to build eval datasets."
+    },
+    {
+      q: "Can synthetic test generation create negative cases where the answer is intentionally absent from docs?",
+      a: ["Yes; generators can formulate out-of-scope questions to test whether the RAG pipeline correctly admits it does not know","No; synthetic generation only creates positive matches","Only in Linux","Only on Sundays"],
+      c: 0,
+      why: "Generating out-of-scope queries tests the system's ability to trigger the 'I don't know' fallback."
+    }
+  ]);
+</script>
+</body>
+</html>

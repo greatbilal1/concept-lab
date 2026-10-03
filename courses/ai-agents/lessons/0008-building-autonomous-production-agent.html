@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 08 — Building an Autonomous Production Agent</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="ai-agents" data-lesson="8" data-lesson-id="building-autonomous-production-agent">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 08</span> · Production Agent</span>
+
+  <h1 class="lesson-title">Building an Autonomous Production Agent</h1>
+  <p class="lesson-lede">
+    Synthesizing the complete architecture: building a production-grade autonomous agent with tools, state, memory, and safety.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You have completed the AI Agents & Agent Loops course.</span>
+    <span><b>Mission link</b> Mastering building an autonomous production agent across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Building an Autonomous Production Agent</h2>
+  <p>We have explored every individual component of autonomous agent engineering: the autonomy spectrum, the Goal-Plan-Act-Observe loop, task decomposition with ReAct, tool registries and execution, state management graphs, self-correction circuit breakers, and human approval gates.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Synthesizing the complete architecture: building a production-grade autonomous agent with tools, state, memory, and safety.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Complete Production Agent Architecture</h2>
+  <p>Now, we synthesize these into a <strong>Complete Autonomous Production Agent</strong>:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>The Autonomous Engineering Partner</h2>
+  <ul><li><strong>1. Goal & Scratchpad Initialization:</strong> The agent ingests the goal and writes an initial `todo_list` in working memory.</li><li><strong>2. Tool Dispatcher & Sandboxed Execution:</strong> Connects to sandboxed tools (file reading, writing, terminal testing) with strict timeouts and Pydantic schemas.</li><li><strong>3. Observability & Telemetry:</strong> Every turn, tool call, token count, and latency metric is logged to an OpenTelemetry tracing backend (Langfuse).</li><li><strong>4. Safety & Circuit Breakers:</strong> Bounded by a 15-turn ceiling, $2.00 cost cap, and human confirmation gates on destructive write actions.</li><li><strong>5. Final Verification & Handoff:</strong> When tests pass 100% green, the agent generates an executive summary and commits its work.</li></ul><pre><code># The Autonomous Agent Architecture in Production:
+class ProductionAgent:
+    def __init__(self, model, tools, state_store, checkpointer):
+        self.model = model
+        self.tools = tools
+        self.state_store = state_store
+        self.circuit_breaker = CircuitBreaker(max_turns=15, max_cost=2.00)
+
+    async def execute(self, user_goal):
+        state = self.initialize_state(user_goal)
+        while not state.is_complete:
+            self.circuit_breaker.check(state)
+            action = await self.plan_and_decide(state)
+            if action.is_done:
+                return self.finalize(state)
+            observation = await self.tools.dispatch(action)
+            state = self.update_state(state, action, observation)
+        return state.summary</code></pre><div class="callout"><p><strong>The Final Achievement:</strong> You have graduated from building simple single-turn prompts to architecting resilient, multi-turn autonomous agents capable of real-world engineering problem solving.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the production agent sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You have completed the AI Agents & Agent Loops course.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where building an autonomous production agent applies.</li>
+    <li>Author a unit test or verification script exercising building an autonomous production agent.</li>
+    <li>Document team architectural conventions regarding building an autonomous production agent.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Building an Autonomous Production Agent.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What architectural components must be present in a production-ready autonomous coding agent?",
+    a: ["A ReAct loop, tool registry with sandboxing, state machine with checkpoints, working memory scratchpad, and circuit breakers","Just an open chat window","A single prompt template in Python","An open-source license only"],
+    c: 0,
+    why: "Production agents require comprehensive architecture: loop, tools, sandbox, state, memory, and circuit breakers."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1. Goal & Scratchpad",
+            "lines": [
+                  "Ingests goal & sets todo list",
+                  "Tracks active subtask state"
+            ]
+      },
+      {
+            "title": "2. Sandboxed Tools",
+            "lines": [
+                  "Grep, file edits, terminal runner",
+                  "Executed with 30s timeout guards"
+            ]
+      },
+      {
+            "title": "3. State Machine & Checkpoints",
+            "lines": [
+                  "Saves turns to persistent database",
+                  "Allows pause, resume, & rewinds"
+            ]
+      },
+      {
+            "title": "4. Circuit Breakers & Verification",
+            "lines": [
+                  "Caps turns & token budgets",
+                  "Verifies green tests before completion"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Building an Autonomous Production Agent",
+      "def execute_flow():",
+      "    # Synthesizing the complete architecture: building a...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Building an Autonomous Production Agent"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Human Role (Architect)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Agent Role (Implementer)"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "A production autonomous agent synthesizes the Goal-Plan-Act-Observe loop, sandboxed {1}, persistent state checkpoints, and {2} breakers for safe execution."
+],
+    blanks: [
+      {
+            "a": [
+                  "tools"
+            ],
+            "why": "External executable functions"
+      },
+      {
+            "a": [
+                  "circuit"
+            ],
+            "why": "Safety boundaries preventing runaway loops"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the primary indicator that an autonomous coding agent has succeeded at its task?",
+      a: ["All unit and integration tests pass with exit code 0, and all acceptance criteria are objectively satisfied","The agent outputs a long apology","The agent finishes in 1 second","The computer restarts"],
+      c: 0,
+      why: "Passing automated test suites provides objective, empirical proof of task completion."
+    },
+    {
+      q: "Why must tool execution be decoupled from the model client via an asynchronous dispatcher?",
+      a: ["To allow non-blocking concurrent tool execution, enforce timeout guards, and handle error recovery cleanly","To make Python run in C","To eliminate the need for GPUs","To delete the database"],
+      c: 0,
+      why: "Asynchronous dispatchers provide process control, timeout enforcement, and concurrency."
+    },
+    {
+      q: "What role does tracing (with tools like Langfuse or Arize) play in production agent operations?",
+      a: ["It records every thought, tool call, observation, token spend, and latency metric for debugging and cost optimization","It records video of the developer","It encrypts the source code","It speeds up the CPU fan"],
+      c: 0,
+      why: "Tracing provides end-to-end visibility into multi-step agent reasoning and tool executions."
+    },
+    {
+      q: "What is the ultimate mark of an expert AI agent systems architect?",
+      a: ["Building agents with clear guardrails, resilient error recovery, transparent state, and strict human confirmation gates","Letting agents run with root access without tests","Writing 10,000-word prompt templates","Avoiding version control"],
+      c: 0,
+      why: "Disciplined architecture, safety guardrails, and verification rigor define true engineering excellence."
+    }
+  ]);
+</script>
+</body>
+</html>

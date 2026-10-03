@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 02 — Finding the entry point</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="reading-code" data-lesson="2" data-lesson-id="finding-the-entry-point">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 02</span> · Orientation & Entry Points</span>
+
+  <h1 class="lesson-title">Finding the entry point</h1>
+  <p class="lesson-lede">
+    Every program has a door. Learn how to discover where execution starts in web apps, CLIs, microservices, and frontend codebases.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Locate the primary entry point file of any project in under two minutes</span>
+    <span><b>Mission link</b> The necessary starting point for every data flow trace</span>
+  </div>
+
+  <h2><span class="n">1</span>The front door of a program</h2>
+  <p>A codebase is not a tangled ball of string; it is a tree rooted at an entry point. In command-line tools, this is often <code>main.py</code> or <code>index.js</code>. In web servers, it is the file that binds HTTP routes to a network port.</p><p>Always inspect the project manifest first (such as <code>package.json</code>, <code>pyproject.toml</code>, or <code>Cargo.toml</code>). Manifests explicitly declare executable scripts, startup commands, and main modules.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    The manifest file tells you exactly which file the runtime executes first.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Common entry point conventions</h2>
+  <p>Different frameworks establish standard entry conventions. Learn where to look across common software ecosystems.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing boot sequence</h2>
+  <p>Trace how a web service boot script initializes database pools, registers routers, and starts listening on a network socket.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your ability to spot project entry points quickly.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can open any repository and immediately locate the exact file where execution begins.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Check package.json or pyproject.toml in three different projects to find their entry points.</li>
+    <li>Locate where an HTTP router mounts its URL handlers in a web backend.</li>
+    <li>Trace the first five lines of code executed when the application starts.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Michael Feathers, *Working Effectively with Legacy Code* (Chapter on Seams and Entry Points).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "In a Node.js repository, where is the application entry point most reliably defined?",
+    a: ["In the node_modules directory README","In the 'main' or 'scripts.start' field of package.json","In the browser cookie store file","In the git ignore configuration file"],
+    c: 1,
+    why: "package.json defines project metadata including the main script and execution entry points."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "CLI Tool",
+            "lines": [
+                  "__main__.py or bin/cli",
+                  "argparse or click"
+            ]
+      },
+      {
+            "title": "Web API",
+            "lines": [
+                  "app.py or server.ts",
+                  "app.listen or uvicorn"
+            ]
+      },
+      {
+            "title": "Frontend",
+            "lines": [
+                  "index.html -> src/main.tsx",
+                  "ReactDOM.render()"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# entry: main.py",
+      "config = load_config()",
+      "db = connect_database(config.db_url)",
+      "app = create_server(db)",
+      "app.listen(8080)"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "config": "loaded from env"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "db": "pool connected"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "app": "routes mounted"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "status": "listening on port 8080"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "In Python, a standalone module is executed via if __name__ == '__<0>__':.",
+      "In Node.js, project startup scripts are listed in <1>.json.",
+      "The file that binds routes and listens on ports is the server <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "main"
+            ],
+            "why": "'__main__' is the namespace assigned to top-level executed scripts."
+      },
+      {
+            "a": [
+                  "package"
+            ],
+            "why": "package.json defines npm scripts and entry files."
+      },
+      {
+            "a": [
+                  "entry",
+                  "entry point"
+            ],
+            "why": "The entry point bootstraps dependencies and network listeners."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the primary role of an entry point file?",
+      a: ["To contain all application business logic in a single file","To bootstrap configuration, dependencies, and start listeners","To store persistent customer data in plain text format","To format source code according to style guidelines"],
+      c: 1,
+      why: "Entry points orchestrate initialization and hand off control to routers or event loops."
+    },
+    {
+      q: "Where should you look if a Python project does not have a main.py?",
+      a: ["Look for setup.cfg or pyproject.toml under project.scripts","Assume the project is unusable and delete it from disk","Look inside the hidden .git object directories","Check the system temporary folder for log files"],
+      c: 0,
+      why: "Modern Python packaging specifies executable entry points inside pyproject.toml."
+    },
+    {
+      q: "What line in a web server entry point signals that initialization is complete?",
+      a: ["import os","app.listen() or uvicorn.run()","x = 10","print('hello')"],
+      c: 1,
+      why: "Listening on a network port marks the end of boot and the start of request handling."
+    },
+    {
+      q: "Why is knowing the entry point crucial for code comprehension?",
+      a: ["It gives you a deterministic starting node for tracing execution paths","It guarantees that the software will never experience crashes","It automatically generates unit tests for all classes","It enables dark mode in all modern code editors"],
+      c: 0,
+      why: "Without the entry point, you are guessing where dependencies and configurations originate."
+    }
+  ]);
+</script>
+</body>
+</html>

@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 07 — Visualizing High Dimensions: t-SNE and UMAP</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="embeddings" data-lesson="7" data-lesson-id="visualizing-high-dimensions-tsne-umap">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 07</span> · Dimensionality Reduction</span>
+
+  <h1 class="lesson-title">Visualizing High Dimensions: t-SNE and UMAP</h1>
+  <p class="lesson-lede">
+    Projecting 1,536-dimensional vector spaces into 2D and 3D maps using PCA, t-SNE, and UMAP.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to project and inspect high-dimensional vector spaces using UMAP and t-SNE.</span>
+    <span><b>Mission link</b> Mastering visualizing high dimensions: t-sne and umap across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Visualizing High Dimensions: t-SNE and UMAP</h2>
+  <p>When an embedding model outputs a 1,536-dimensional vector, our human brains cannot visualize it. We cannot draw 1,536 orthogonal axes! To audit our vector spaces, detect clusters, and diagnose anomalies, we must project high dimensions down to <strong>2D or 3D scatter plots</strong>.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Projecting 1,536-dimensional vector spaces into 2D and 3D maps using PCA, t-SNE, and UMAP.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Dimensionality Reduction Methods</h2>
+  <p>Three classic dimensionality reduction algorithms govern this projection:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>The 2D Semantic Landscape</h2>
+  <ul><li><strong>1. Principal Component Analysis (PCA):</strong> A fast, linear technique that finds the directions (principal components) of maximum variance. Great for an initial macro-overview, but cannot capture complex non-linear manifolds.</li><li><strong>2. t-SNE (t-Distributed Stochastic Neighbor Embedding):</strong> A non-linear probabilistic technique that preserves <em>local neighborhoods</em>. Points that are close in 1,536D cluster tightly together in 2D. (Warning: global distances between distant clusters in t-SNE are meaningless!).</li><li><strong>3. UMAP (Uniform Manifold Approximation and Projection):</strong> The modern gold standard. Faster than t-SNE, preserves both <strong>local clusters AND global macro-structure</strong>, and scales to millions of vectors.</li></ul><pre><code># Projecting Embeddings to 2D with UMAP in Python:
+import umap
+import matplotlib.pyplot as plt
+
+# Reduce 10,000 vectors from 1,536D -> 2D coordinates
+reducer = umap.UMAP(n_neighbors=15, min_dist=0.1, metric='cosine')
+embedding_2d = reducer.fit_transform(embeddings_1536d)
+
+# Plot the resulting 2D semantic landscape!
+plt.scatter(embedding_2d[:, 0], embedding_2d[:, 1], c=labels, cmap='Spectral')</code></pre><div class="callout"><p><strong>The Visual Audit:</strong> Plotting your RAG document chunks with UMAP reveals topic clusters, gaps in knowledge, and outliers where poor data quality lurks.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the dimensionality reduction sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to project and inspect high-dimensional vector spaces using UMAP and t-SNE.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where visualizing high dimensions: t-sne and umap applies.</li>
+    <li>Author a unit test or verification script exercising visualizing high dimensions: t-sne and umap.</li>
+    <li>Document team architectural conventions regarding visualizing high dimensions: t-sne and umap.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Visualizing High Dimensions: t-SNE and UMAP.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Why can humans not directly visualize high-dimensional embedding spaces (e.g. 1,536 dimensions) without dimensionality reduction?",
+    a: ["Human visual perception is biologically constrained to three spatial dimensions","Monitors cannot display more than 256 colors","High-dimensional math is illegal in graphics cards","Python limits plot axes to three"],
+    c: 0,
+    why: "Dimensionality reduction algorithms project high-dimensional manifolds down to 2D/3D for human inspection."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "PCA (Linear)",
+            "lines": [
+                  "Fast linear projection",
+                  "Preserves global variance",
+                  "Poor at separating dense non-linear clusters"
+            ]
+      },
+      {
+            "title": "t-SNE (Non-Linear)",
+            "lines": [
+                  "Preserves local neighborhood clusters",
+                  "Global distances between clusters are distorted"
+            ]
+      },
+      {
+            "title": "UMAP (Modern Standard)",
+            "lines": [
+                  "Preserves local clusters AND global geometry",
+                  "Blazing fast, scales to millions of points"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Visualizing High Dimensions: t-SNE and UMAP",
+      "def execute_flow():",
+      "    # Projecting 1,536-dimensional vector spaces into 2D...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Visualizing High Dimensions: t-SNE and UMAP"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Cluster A: Auth Docs"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Cluster B: Billing Docs"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Algorithms like {1} project high-dimensional embeddings into 2D plots while preserving both local clusters and {2} relationships."
+],
+    blanks: [
+      {
+            "a": [
+                  "UMAP"
+            ],
+            "why": "Uniform Manifold Approximation and Projection"
+      },
+      {
+            "a": [
+                  "global"
+            ],
+            "why": "Macro-level spatial arrangement"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the primary limitation of Principal Component Analysis (PCA) compared to UMAP?",
+      a: ["PCA is a linear projection and cannot untangle complex, non-linear high-dimensional manifolds","PCA takes 100x longer to compute than UMAP","PCA is only supported in C++","PCA cannot handle numbers"],
+      c: 0,
+      why: "Linear projections flatten non-linear manifolds, overlapping distinct clusters."
+    },
+    {
+      q: "Why should you never measure the physical distance between two distant clusters on a t-SNE plot?",
+      a: ["t-SNE optimizes strictly for preserving local neighbor distances; global distances across the plot are arbitrary and non-interpretable","t-SNE plots change their scale every second","t-SNE uses non-Euclidean monitors","The distance is always zero"],
+      c: 0,
+      why: "t-SNE's optimization objective focuses on local neighborhood preservation at the expense of global geometry."
+    },
+    {
+      q: "How does visualizing document embeddings help engineers debugging a RAG pipeline?",
+      a: ["It visually reveals semantic gaps, overlapping confusing clusters, and outlier documents that degrade search quality","It compiles Python code into WebAssembly","It speeds up network latency","It turns off database logging"],
+      c: 0,
+      why: "Visual inspection of embedding clusters highlights data quality anomalies and boundary overlaps."
+    },
+    {
+      q: "What distance metric should you configure UMAP to use when reducing text embeddings?",
+      a: ["Cosine distance (metric='cosine')","Manhattan distance on integers","Hamming distance on strings","Pixel brightness"],
+      c: 0,
+      why: "Text embeddings are normalized direction vectors; using cosine distance matches their intrinsic geometry."
+    }
+  ]);
+</script>
+</body>
+</html>

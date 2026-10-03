@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 07 — Infrastructure as Code (IaC) and GitOps Principles</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="ci-cd" data-lesson="7" data-lesson-id="infrastructure-as-code-iac-gitops">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 07</span> · IaC & GitOps</span>
+
+  <h1 class="lesson-title">Infrastructure as Code (IaC) and GitOps Principles</h1>
+  <p class="lesson-lede">
+    Automated infrastructure: Terraform / OpenTofu (declarative cloud provisioning), GitOps principles (ArgoCD, Flux), and reconciliation loops.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to define cloud infrastructure using IaC and implement GitOps reconciliation workflows.</span>
+    <span><b>Mission link</b> Mastering infrastructure as code (iac) and gitops principles across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Infrastructure as Code (IaC) and GitOps Principles</h2>
+  <p>Configuring cloud infrastructure by clicking buttons in the AWS or Azure web console is an anti-pattern known as <strong>'ClickOps'</strong>. ClickOps is non-reproducible, lacks change history, and makes disaster recovery impossible: if your AWS region is destroyed, nobody remembers which 40 checkboxes were clicked in the console.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Automated infrastructure: Terraform / OpenTofu (declarative cloud provisioning), GitOps principles (ArgoCD, Flux), and reconciliation loops.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>ClickOps vs Infrastructure as Code</h2>
+  <p>The Paradigm of <strong>Infrastructure as Code (Terraform / OpenTofu)</strong>:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>The GitOps Reconciliation Loop</h2>
+  <ul><li><strong>1. Declarative State:</strong> You write code describing the <em>desired state</em>: <code>resource "aws_s3_bucket" "invoices" { bucket = "company-invoices-prod" }</code>. Terraform computes the mathematical diff (`terraform plan`) and creates it (`terraform apply`).</li><li><strong>2. Version-Controlled Cloud:</strong> Your entire infrastructure lives in a Git repository. Adding an S3 bucket or scaling a database is done via a Pull Request with peer review!</li><li><strong>3. What is GitOps (ArgoCD / Flux)?</strong> Git is the single source of truth for <strong>both infrastructure and application state</strong>. An in-cluster operator (ArgoCD) continuously monitors the Git repository. When a commit changes the image tag, ArgoCD automatically syncs and deploys the change to Kubernetes!</li><li><strong>4. Automated Reconciliation:</strong> If someone manually modifies a production container, the GitOps operator detects the drift and <strong>automatically reverts it back to match Git</strong>!</li></ul><pre><code># Declarative Infrastructure with Terraform (HCL):
+resource "aws_security_group" "api_ingress" {
+  name        = "api-production-sg"
+  description = "Allow HTTPS inbound traffic"
+
+  ingress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+# Executing `terraform apply` provisions the exact security group reproducibly in any region!</code></pre><div class="callout"><p><strong>The GitOps Law:</strong> If it isn't in Git, it doesn't exist. Never modify production systems manually. Change the code in Git, and let automated CI/CD and GitOps sync the world.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the IaC sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to define cloud infrastructure using IaC and implement GitOps reconciliation workflows.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where infrastructure as code (iac) and gitops principles applies.</li>
+    <li>Author a unit test or verification script exercising infrastructure as code (iac) and gitops principles.</li>
+    <li>Document team architectural conventions regarding infrastructure as code (iac) and gitops principles.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Infrastructure as Code (IaC) and GitOps Principles.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is 'Infrastructure as Code' (IaC) and why has it replaced manual cloud console clicking?",
+    a: ["Defining and provisioning cloud infrastructure (VPCs, databases, clusters) using declarative, version-controlled code files rather than manual console clicks","Writing code in Microsoft Word","Building physical servers by hand","A technique for speeding up Wi-Fi"],
+    c: 0,
+    why: "IaC replaces error-prone manual cloud console clicking with declarative, version-controlled, reproducible code."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "ClickOps (Fragile Anti-Pattern)",
+            "lines": [
+                  "Clicking buttons in AWS web console",
+                  "Zero audit trail of who changed what",
+                  "Disaster recovery is impossible to replicate"
+            ]
+      },
+      {
+            "title": "Infrastructure as Code (Terraform)",
+            "lines": [
+                  "Declarative HCL checked into Git",
+                  "Peer-reviewed Pull Requests for infra changes",
+                  "100% reproducible in any cloud region!"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Infrastructure as Code (IaC) and GitOps Principles",
+      "def execute_flow():",
+      "    # Automated infrastructure: Terraform / OpenTofu (de...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Infrastructure as Code (IaC) and GitOps Principles"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Git Repository (Desired State)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "ArgoCD In-Cluster Operator"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Infrastructure as Code defines cloud resources declaratively in version-controlled repositories, while GitOps operators continuously reconcile production to match {1} as the single source of {2}."
+],
+    blanks: [
+      {
+            "a": [
+                  "Git"
+            ],
+            "why": "Distributed version control system"
+      },
+      {
+            "a": [
+                  "truth"
+            ],
+            "why": "Authoritative state baseline"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What problem does 'ClickOps' (manually creating cloud resources in web consoles) cause for engineering teams?",
+      a: ["Configuration drift, lack of audit trails, inability to replicate environments, and high human error during disaster recovery","It makes cloud bills cheaper","It speeds up computers","It deletes source code"],
+      c: 0,
+      why: "Manual configuration lacks auditability and cannot be reliably reproduced or automated."
+    },
+    {
+      q: "What does 'terraform plan' do before applying infrastructure changes?",
+      a: ["It computes the execution diff between current cloud infrastructure and desired code, showing exactly what resources will be created, modified, or destroyed","It applies the changes immediately","It shuts down the cloud","It reboots the servers"],
+      c: 0,
+      why: "terraform plan previews all proposed modifications before making real-world cloud mutations."
+    },
+    {
+      q: "What is 'Configuration Drift' in cloud infrastructure?",
+      a: ["When the real-world state of a cloud resource diverges from the code defined in Git (e.g. someone manually edited a security group in the console)","Computers drifting on a desk","A bug in the mouse driver","A slow network connection"],
+      c: 0,
+      why: "Configuration drift occurs when manual out-of-band changes alter resources outside version control."
+    },
+    {
+      q: "How does an automated GitOps operator (like ArgoCD) react when manual configuration drift occurs in a Kubernetes cluster?",
+      a: ["It detects the discrepancy between Git and the live cluster, automatically reverting the unauthorized change to match the Git repository","It crashes the cluster","It sends an angry email","It shuts down GitHub"],
+      c: 0,
+      why: "GitOps continuously enforces the Git repository as the authoritative desired state, overwriting drift."
+    }
+  ]);
+</script>
+</body>
+</html>

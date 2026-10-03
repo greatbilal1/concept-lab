@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 05 — State Management and Agent Working Memory</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="ai-agents" data-lesson="5" data-lesson-id="state-management-agent-working-memory">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 05</span> · State Management</span>
+
+  <h1 class="lesson-title">State Management and Agent Working Memory</h1>
+  <p class="lesson-lede">
+    Agent state architectures: conversational state, execution context, scratchpad memory, and StateGraph patterns.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to architect robust state management and graph workflows for AI agents.</span>
+    <span><b>Mission link</b> Mastering state management and agent working memory across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of State Management and Agent Working Memory</h2>
+  <p>In a simple chatbot, state is just a list of messages. In an autonomous agent, state is an evolving, rich <strong>State Machine</strong>. An agent tracks active goals, extracted variables, files modified, remaining retries, and tool results across time.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Agent state architectures: conversational state, execution context, scratchpad memory, and StateGraph patterns.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Stateful Agent Graph</h2>
+  <p>Modern agent frameworks (such as <strong>LangGraph</strong>) model agents as stateful graphs:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>State Checkpointing and Rewind</h2>
+  <ul><li><strong>1. The State Schema:</strong> An explicit typed structure (e.g. TypedDict or Pydantic) defining all variables the agent tracks: `messages`, `working_todo`, `modified_files`, `error_count`.</li><li><strong>2. Nodes (State Mutators):</strong> Functions that take the current state, perform an action (reasoning, tool execution, human input), and return updated state variables.</li><li><strong>3. Edges (Conditional Transitions):</strong> Logic deciding the next node: <em>'If tests fail and error_count < 3, transition to DebugNode; else transition to HumanReviewNode.'</em></li></ul><pre><code># LangGraph Agent State Schema in Python:
+from typing import TypedDict, Annotated
+import operator
+
+class AgentState(TypedDict):
+    messages: Annotated[list, operator.add] # Appends new messages
+    todo_list: list[str]
+    active_task_index: int
+    consecutive_errors: int
+    is_verified: bool</code></pre><p>By modeling state explicitly, you gain complete auditability: you can inspect the exact state at turn 4, rewind state, or save checkpoints to PostgreSQL for long-running workflows.</p><div class="callout"><p><strong>The Graph Power:</strong> Explicit state graphs turn unpredictable agent chaos into structured, auditable, and deterministic state machine transitions.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the state management sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to architect robust state management and graph workflows for AI agents.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where state management and agent working memory applies.</li>
+    <li>Author a unit test or verification script exercising state management and agent working memory.</li>
+    <li>Document team architectural conventions regarding state management and agent working memory.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for State Management and Agent Working Memory.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is 'Agent State' in modern orchestration frameworks like LangGraph or AutoGen?",
+    a: ["A structured data object tracking message history, accumulated tool outputs, active task status, and working variables across turns","The physical state of the computer processor","The state of the company's bank account","A US state where servers are located"],
+    c: 0,
+    why: "Agent state is the centralized data structure passed and mutated across nodes in an agentic workflow."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "State: {messages, todo, errors}",
+            "lines": [
+                  "Centralized shared data structure",
+                  "Passed to all active nodes"
+            ]
+      },
+      {
+            "title": "Agent Node (Reasoning)",
+            "lines": [
+                  "Reads state -> Emits tool call",
+                  "Updates messages array"
+            ]
+      },
+      {
+            "title": "Conditional Edge",
+            "lines": [
+                  "If tool_call requested -> ToolNode",
+                  "If goal complete -> EndNode"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing State Management and Agent Working Memory",
+      "def execute_flow():",
+      "    # Agent state architectures: conversational state, e...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "State Management and Agent Working Memory"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Turn Checkpoint (Turn 4)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Human Intervention"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Modern agent frameworks model workflows as state machines where nodes mutate a centralized {1} object and conditional {2} govern transitions."
+],
+    blanks: [
+      {
+            "a": [
+                  "state"
+            ],
+            "why": "Centralized shared data dictionary"
+      },
+      {
+            "a": [
+                  "edges"
+            ],
+            "why": "Conditional routing paths between nodes"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the primary advantage of modeling an agent as a state graph (like LangGraph) over a plain Python while-loop?",
+      a: ["It provides explicit branching logic, state persistence, automated checkpointing, and human-in-the-loop pause/resume capabilities","It eliminates the need for an LLM","It makes Python run in web browsers","It compiles code into assembly"],
+      c: 0,
+      why: "Graph frameworks provide formal state machine governance, persistence, and checkpoint recovery."
+    },
+    {
+      q: "What is 'State Checkpointing' in long-running agent workflows?",
+      a: ["Saving a serialized snapshot of the complete agent state to a database after each turn to allow resuming or rewinding","Saving a screenshot of the desktop","Backing up the operating system","Running git push"],
+      c: 0,
+      why: "Checkpointing enables persistent execution that survives process restarts and allows time-travel debugging."
+    },
+    {
+      q: "How does tracking 'consecutive_errors' in the agent state prevent thrashing?",
+      a: ["A conditional edge can check if errors >= 3 and automatically route the agent to a human escalation node rather than looping forever","It deletes the error messages","It turns off the model","It makes the model smarter"],
+      c: 0,
+      why: "Explicit error counters provide the circuit-breaking condition needed to halt thrashing loops."
+    },
+    {
+      q: "Can multiple agents in a workflow share and mutate the same central state object?",
+      a: ["Yes; in blackboard and graph architectures, multiple specialized agents read and update shared state fields collaboratively","No; agents can never share data","Only in Java","Only if running on the same GPU"],
+      c: 0,
+      why: "Shared state architectures allow collaborating agents to build upon each other's contributions."
+    }
+  ]);
+</script>
+</body>
+</html>

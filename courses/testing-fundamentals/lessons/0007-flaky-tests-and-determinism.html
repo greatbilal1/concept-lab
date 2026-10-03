@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 07 — Flaky Tests and Non-Determinism</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="testing-fundamentals" data-lesson="7" data-lesson-id="flaky-tests-and-determinism">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 07</span> · Determinism</span>
+
+  <h1 class="lesson-title">Flaky Tests and Non-Determinism</h1>
+  <p class="lesson-lede">
+    Rooting out flaky tests: eliminating time dependencies, network calls, race conditions, and uncontrolled randomness.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to diagnose and eradicate non-deterministic and flaky tests.</span>
+    <span><b>Mission link</b> Mastering flaky tests and non-determinism across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Flaky Tests and Non-Determinism</h2>
+  <p>A <strong>flaky test</strong> is a test that can pass or fail on the exact same commit without any code changes. Flakiness destroys team productivity and trust. When CI turns red, developers shrug and click 'Rerun' instead of investigating the failure.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Rooting out flaky tests: eliminating time dependencies, network calls, race conditions, and uncontrolled randomness.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Sources of Flakiness</h2>
+  <p>The most common root causes of flakiness are:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Time Freezing Strategy</h2>
+  <ul><li><strong>Real-time clocks:</strong> Calling `datetime.now()` or using `time.sleep()`.</li><li><strong>Uncontrolled randomness:</strong> Using `random.randint()` without a fixed seed.</li><li><strong>Unordered collections:</strong> Asserting on list order from database queries without `ORDER BY`.</li><li><strong>Shared state / test leaks:</strong> Tests modifying shared database rows or global singletons.</li><li><strong>Network I/O:</strong> Tests calling real internet endpoints that occasionally time out.</li></ul><pre><code># BAD: Flaky timing dependency
+def test_cache_expiration():
+    cache.set("key", "val", ttl=1)
+    time.sleep(1.05)  # Fragile! Under CI CPU load, sleep might not be enough
+    assert cache.get("key") is None
+
+# GOOD: Deterministic frozen time with freezegun or time-machine
+from freezegun import freeze_time
+
+def test_cache_expiration_deterministic():
+    with freeze_time("2026-01-01 12:00:00") as frozen_time:
+        cache.set("key", "val", ttl=60)
+        frozen_time.tick(delta=timedelta(seconds=61))
+        assert cache.get("key") is None</code></pre><div class="callout"><p><strong>Zero Tolerance:</strong> When a test is identified as flaky, quarantine it immediately. Either fix the non-determinism or delete the test. Never leave flaky tests in CI.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the sentence on flaky test remedies</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to diagnose and eradicate non-deterministic and flaky tests.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where flaky tests and non-determinism applies.</li>
+    <li>Author a unit test or verification script exercising flaky tests and non-determinism.</li>
+    <li>Document team architectural conventions regarding flaky tests and non-determinism.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Flaky Tests and Non-Determinism.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Why are flaky tests considered toxic to engineering teams?",
+    a: ["They erode trust in the build; developers ignore test failures and merge broken code","They cause hard drives to corrupt data","They change the syntax of Python files","They disable git pull requests permanently"],
+    c: 0,
+    why: "When tests fail intermittently, developers stop trusting CI failures, allowing real regressions into production."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Timing / Sleep",
+            "lines": [
+                  "Using time.sleep()",
+                  "Fails under high CI CPU load"
+            ]
+      },
+      {
+            "title": "Unordered Data",
+            "lines": [
+                  "Query without ORDER BY",
+                  "Dictionary / set iteration shifts"
+            ]
+      },
+      {
+            "title": "Shared State",
+            "lines": [
+                  "Uncleaned DB records",
+                  "Order-dependent execution"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Flaky Tests and Non-Determinism",
+      "def execute_flow():",
+      "    # Rooting out flaky tests: eliminating time dependen...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Flaky Tests and Non-Determinism"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "1. Freeze Time"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "2. Step Forward"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "step": "3. Immediate Assert"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "To prevent timing flakiness, replace sleep calls with {1} and enforce strict {2} on database queries."
+],
+    blanks: [
+      {
+            "a": [
+                  "frozen clocks"
+            ],
+            "why": "Controlling the passage of virtual time"
+      },
+      {
+            "a": [
+                  "ordering"
+            ],
+            "why": "Deterministic query sorting"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why is 'time.sleep(2)' an anti-pattern in automated tests?",
+      a: ["It slows the test suite down and still fails under heavy CI resource contention","Python limits sleep to 1 second in test files","Operating systems terminate processes that sleep","Sleep invalidates SSL certificates"],
+      c: 0,
+      why: "Arbitrary sleeps waste execution time and remain vulnerable to CPU throttling on CI runners."
+    },
+    {
+      q: "How does freezing time with libraries like freezegun eliminate flakiness?",
+      a: ["It controls the return value of system time calls without waiting in real time","It pauses the entire operating system kernel","It disables internet access temporarily","It compiles Python to machine code"],
+      c: 0,
+      why: "Freezing time provides complete, instant control over timestamps and timeouts."
+    },
+    {
+      q: "What should an engineering team do when a flaky test is discovered in CI?",
+      a: ["Quarantine or fix it immediately so developers maintain trust in test results","Click rerun until it turns green and ignore it","Disable the entire CI pipeline","Delete the production feature"],
+      c: 0,
+      why: "Leaving flaky tests in the pipeline erodes confidence in the entire testing system."
+    },
+    {
+      q: "Why can querying a SQL database without 'ORDER BY' cause flaky assertions?",
+      a: ["Relational databases do not guarantee row order without explicit ORDER BY clauses","SQL requires ORDER BY for all SELECT queries","Database drivers shuffle rows to save bandwidth","Indexes are always random"],
+      c: 0,
+      why: "SQL tables are unordered sets; without explicit ORDER BY, row return sequence is non-deterministic."
+    }
+  ]);
+</script>
+</body>
+</html>

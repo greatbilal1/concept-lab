@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 04 — The mystery of NULL and three-valued logic</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="sql-relational-databases" data-lesson="4" data-lesson-id="the-mystery-of-null-and-three-valued-logic">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 04</span> · Declarative Querying & Filtering</span>
+
+  <h1 class="lesson-title">The mystery of NULL and three-valued logic</h1>
+  <p class="lesson-lede">
+    Why does 'val = NULL' never evaluate to true? Master SQL's three-valued logic (TRUE, FALSE, UNKNOWN), IS NULL, and the COALESCE function.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Handle missing values correctly using IS NULL, IS NOT NULL, and COALESCE</span>
+    <span><b>Mission link</b> Prevents subtle query bugs where missing data causes records to vanish from results</span>
+  </div>
+
+  <h2><span class="n">1</span>NULL is not a value; it is an unknown</h2>
+  <p>In SQL, <code>NULL</code> does not mean zero, false, or an empty string. <b>NULL represents the complete absence of data, or an unknown value</b>.</p><p>Because NULL is unknown, you cannot compare it with equality: <code>NULL = NULL</code> does NOT return true — it returns <b>UNKNOWN</b>! Because WHERE clauses only keep rows that evaluate strictly to TRUE, writing <code>WHERE status = NULL</code> returns zero rows forever. You must use <code>IS NULL</code>.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    NULL means unknown; always compare with IS NULL or IS NOT NULL, never equality (=).
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Three-valued logic truth table</h2>
+  <p>Understand how SQL's three-valued logic handles AND, OR, and NOT with UNKNOWN.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing COALESCE default value substitution</h2>
+  <p>Trace how COALESCE provides safe fallbacks for missing data in calculations.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of NULL behavior.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can navigate three-valued logic and write queries that handle missing data without silent row-omission bugs.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Run SELECT NULL = NULL in your database and observe that it does not return true.</li>
+    <li>Use COALESCE to provide a default string when querying an optional column.</li>
+    <li>Check how COUNT(*) counts rows while COUNT(column) ignores NULL rows.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Bill Karwin, *SQL Antipatterns*, Chapter 13: 'Fear of the Unknown'.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What does 'SELECT * FROM users WHERE middle_name != 'Smith'' return for a user whose middle_name is NULL?",
+    a: ["The row is NOT returned, because comparing NULL with anything returns UNKNOWN, which WHERE treats as false","The row is returned because NULL is not 'Smith'","An error is thrown","The middle_name is converted to 'Smith'"],
+    c: 0,
+    why: "Any comparison with NULL yields UNKNOWN; WHERE only accepts expressions that evaluate to TRUE."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "NULL = NULL",
+            "lines": [
+                  "evaluates to UNKNOWN",
+                  "never true, never false!"
+            ]
+      },
+      {
+            "title": "IS NULL / IS NOT NULL",
+            "lines": [
+                  "evaluates strictly to TRUE or FALSE",
+                  "the only safe check for absence"
+            ]
+      },
+      {
+            "title": "COALESCE(val, fallback)",
+            "lines": [
+                  "returns first non-NULL value",
+                  "COALESCE(middle_name, '')"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Table: users (id=1, bonus=NULL), (id=2, bonus=500)",
+      "# Query: SELECT id, salary + bonus AS total FROM users;",
+      "# Problem: 50,000 + NULL = NULL! (salary wiped out for user 1)",
+      "# Solution: SELECT id, salary + COALESCE(bonus, 0) AS total FROM users;",
+      "# Result: User 1 total = 50,000; User 2 total = 50,500"
+],
+    steps: [
+      {
+            "line": 2,
+            "vars": {
+                  "arithmetic_trap": "any math operation with NULL produces NULL"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "fix": "COALESCE replaces NULL bonus with 0"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "outcome": "salaries calculated accurately for all employees"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "To test if a column has an absent value, use the operator IS <0>.",
+      "SQL logic has three states: TRUE, FALSE, and <1>.",
+      "The function returning the first non-null argument is <2>()."
+],
+    blanks: [
+      {
+            "a": [
+                  "NULL"
+            ],
+            "why": "IS NULL checks for missing values."
+      },
+      {
+            "a": [
+                  "UNKNOWN"
+            ],
+            "why": "Three-valued logic includes UNKNOWN."
+      },
+      {
+            "a": [
+                  "COALESCE"
+            ],
+            "why": "COALESCE(a, b, c) returns the first non-null expression."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why does 'WHERE column = NULL' always return zero rows in SQL?",
+      a: ["Because equality comparison with NULL evaluates to UNKNOWN, and WHERE clauses only retain rows evaluating to TRUE","Because NULL deletes records from the query result set","Because SQL requires column names to be enclosed in brackets","Because the equals sign is reserved only for mathematical calculations"],
+      c: 0,
+      why: "In three-valued logic, any comparison with NULL yields UNKNOWN, which fails the WHERE filter."
+    },
+    {
+      q: "What does the function 'COALESCE(a, b, c)' do?",
+      a: ["Evaluates arguments from left to right and returns the first argument that is not NULL","Concatenates the three values into a single text string","Sorts the three values from lowest to highest","Calculates the average of the three numbers"],
+      c: 0,
+      why: "COALESCE returns the first non-null parameter, providing clean fallback values."
+    },
+    {
+      q: "What is the difference between COUNT(*) and COUNT(email)?",
+      a: ["COUNT(*) counts all rows including those with NULLs; COUNT(email) counts only rows where email IS NOT NULL","COUNT(*) only works on numbers; COUNT(email) works on text","COUNT(email) runs twice as fast as COUNT(*)","There is no difference between them"],
+      c: 0,
+      why: "COUNT(column) ignores NULL values in that specific column; COUNT(*) counts total rows."
+    },
+    {
+      q: "What does the expression '10 + NULL' evaluate to in SQL arithmetic?",
+      a: ["NULL","10","0","An error is thrown"],
+      c: 0,
+      why: "Any mathematical operation with an unknown value produces an unknown value (NULL)."
+    }
+  ]);
+</script>
+</body>
+</html>

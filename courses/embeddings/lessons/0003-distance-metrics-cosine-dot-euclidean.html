@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 03 — Distance Metrics: Cosine Similarity, Dot Product, Euclidean</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="embeddings" data-lesson="3" data-lesson-id="distance-metrics-cosine-dot-euclidean">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 03</span> · Similarity Metrics</span>
+
+  <h1 class="lesson-title">Distance Metrics: Cosine Similarity, Dot Product, Euclidean</h1>
+  <p class="lesson-lede">
+    Measuring semantic similarity in vector space: Dot Product, Cosine Similarity, and Euclidean Distance (L2).
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to calculate and choose between Cosine Similarity, Dot Product, and Euclidean Distance.</span>
+    <span><b>Mission link</b> Mastering distance metrics: cosine similarity, dot product, euclidean across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Distance Metrics: Cosine Similarity, Dot Product, Euclidean</h2>
+  <p>Once text is converted into high-dimensional vectors, how do you mathematically determine which two vectors are most similar? Machine learning relies on three fundamental <strong>Distance and Similarity Metrics</strong>:</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Measuring semantic similarity in vector space: Dot Product, Cosine Similarity, and Euclidean Distance (L2).
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Three Distance Metrics</h2>
+  <ul><li><strong>1. Dot Product ($u \cdot v = \sum u_i v_i$):</strong> Multiplies corresponding elements and sums them. Measures both direction <em>and</em> magnitude. Extremely fast to compute on GPUs, but sensitive to vector length.</li><li><strong>2. Euclidean Distance ($L2 = \sqrt{\sum (u_i - v_i)^2}$):</strong> Measures the straight-line physical distance between two points in space. Smaller distance = higher similarity.</li><li><strong>3. Cosine Similarity ($\cos(\theta) = \frac{u \cdot v}{\|u\| \|v\|}$):</strong> Measures the <strong>cosine of the angle</strong> between two vectors, normalized between $-1.0$ and $+1.0$. A score of $+1.0$ means vectors point in the identical direction; $0.0$ means orthogonal; $-1.0$ means opposite.</li></ul>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Vector Normalization Trick</h2>
+  <pre><code># Computing Cosine Similarity in Python:
+import numpy as np
+
+def cosine_similarity(u, v):
+    dot_product = np.dot(u, v)
+    norm_u = np.linalg.norm(u)
+    norm_v = np.linalg.norm(v)
+    return dot_product / (norm_u * norm_v)
+
+# If vectors are already L2-normalized (length = 1.0):
+# Cosine Similarity is simply the Dot Product! (Ultra-fast on GPUs!)</code></pre><div class="callout"><p><strong>The Database Shortcut:</strong> Vector databases (pgvector, Chroma, Qdrant) normalize all vectors to length 1.0 upon insertion. This allows them to compute Cosine Similarity using blazing-fast Dot Product operations!</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the similarity metric sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to calculate and choose between Cosine Similarity, Dot Product, and Euclidean Distance.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where distance metrics: cosine similarity, dot product, euclidean applies.</li>
+    <li>Author a unit test or verification script exercising distance metrics: cosine similarity, dot product, euclidean.</li>
+    <li>Document team architectural conventions regarding distance metrics: cosine similarity, dot product, euclidean.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Distance Metrics: Cosine Similarity, Dot Product, Euclidean.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Why is Cosine Similarity the preferred metric for comparing text embeddings over raw Euclidean Distance?",
+    a: ["Cosine similarity measures the angle between vectors, making it immune to vector magnitude differences caused by text length","Cosine similarity only uses integer math","Euclidean distance cannot be computed in Python","Cosine similarity is required by NVIDIA"],
+    c: 0,
+    why: "Cosine similarity isolates directional orientation (angle) from magnitude, preventing document length from biasing similarity."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Dot Product (u . v)",
+            "lines": [
+                  "Sum of element-wise products",
+                  "Combines angle and magnitude",
+                  "Fastest GPU computation"
+            ]
+      },
+      {
+            "title": "Euclidean Distance (L2)",
+            "lines": [
+                  "Straight-line spatial distance",
+                  "Sensitive to vector length differences"
+            ]
+      },
+      {
+            "title": "Cosine Similarity (cos theta)",
+            "lines": [
+                  "Angle between vectors (-1 to +1)",
+                  "Immune to document length differences"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Distance Metrics: Cosine Similarity, Dot Product, Euclidean",
+      "def execute_flow():",
+      "    # Measuring semantic similarity in vector space: Dot...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Distance Metrics: Cosine Similarity, Dot Product, Euclidean"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Raw Vectors"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "L2-Normalized (||v|| = 1.0)"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Cosine similarity measures the {1} between vectors, and equals the dot product when vectors are normalized to {2} length."
+],
+    blanks: [
+      {
+            "a": [
+                  "angle"
+            ],
+            "why": "Orientation in space theta"
+      },
+      {
+            "a": [
+                  "unit"
+            ],
+            "why": "Length equal to 1.0"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the range of possible values for Cosine Similarity?",
+      a: ["Between -1.0 (opposite direction) and +1.0 (identical direction)","Between 0 and 100","Always positive integers","Between 0.0 and infinity"],
+      c: 0,
+      why: "The trigonometric cosine function is strictly bounded between -1.0 and +1.0."
+    },
+    {
+      q: "What does a Cosine Similarity score of 0.0 indicate about two embedding vectors?",
+      a: ["The vectors are orthogonal (at a 90-degree angle), indicating zero linear correlation or shared semantic direction","The vectors are identical","The vectors have opposite meanings","One vector is empty"],
+      c: 0,
+      why: "Orthogonal vectors have a dot product of zero, representing unaligned directions in space."
+    },
+    {
+      q: "Why do vector databases prefer storing normalized unit vectors?",
+      a: ["It allows computing cosine similarity using a simple dot product without expensive square root norm divisions at query time","It reduces disk storage by half","It encrypts the database","Unit vectors cannot be deleted"],
+      c: 0,
+      why: "For unit vectors, cosine similarity simplifies to dot product, enabling extreme query throughput."
+    },
+    {
+      q: "If vector A has coordinates [1, 0] and vector B has coordinates [0, 1], what is their cosine similarity?",
+      a: ["0.0 (they are orthogonal)","1.0","0.5","-1.0"],
+      c: 0,
+      why: "Dot product: 1*0 + 0*1 = 0; norm is 1*1 = 1; 0 / 1 = 0.0."
+    }
+  ]);
+</script>
+</body>
+</html>

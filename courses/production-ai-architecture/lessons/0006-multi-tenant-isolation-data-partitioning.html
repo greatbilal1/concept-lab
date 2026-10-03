@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 06 — Multi-Tenant Isolation and Data Partitioning</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="production-ai-architecture" data-lesson="6" data-lesson-id="multi-tenant-isolation-data-partitioning">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 06</span> · Tenant Isolation</span>
+
+  <h1 class="lesson-title">Multi-Tenant Isolation and Data Partitioning</h1>
+  <p class="lesson-lede">
+    Enterprise compliance: row-level security, metadata filtering in vector databases, tenant-isolated encryption keys, and preventing cross-tenant leakage.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to enforce multi-tenant isolation across vector indices and persistent databases.</span>
+    <span><b>Mission link</b> Mastering multi-tenant isolation and data partitioning across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Multi-Tenant Isolation and Data Partitioning</h2>
+  <p>In B2B SaaS, customer trust is non-negotiable. If a healthcare provider or law firm uses your AI platform, their patient records or legal briefs must be <strong>100% physically and logically isolated</strong> from all other organizations. A single cross-tenant data leak can destroy a company.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Enterprise compliance: row-level security, metadata filtering in vector databases, tenant-isolated encryption keys, and preventing cross-tenant leakage.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Multi-Tenant Isolation Pillars</h2>
+  <p>Three Pillars of <strong>Multi-Tenant AI Isolation</strong>:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Cross-Tenant Leakage Prevention</h2>
+  <ul><li><strong>1. Hard Vector Metadata Partitioning:</strong> Every single document chunk in your vector database MUST contain `tenant_id`. Every single vector search query MUST enforce a hard filter: <code>filter={"tenant_id": current_user.tenant_id}</code>. If `tenant_id` is missing, the query must fail by default!</li><li><strong>2. Database Row-Level Security (PostgreSQL RLS):</strong> Enforce PostgreSQL Row-Level Security policies on conversation tables. Even if a developer writes a buggy `SELECT * FROM chats`, Postgres physically blocks rows that don't match the active tenant session!</li><li><strong>3. Tenant-Isolated Encryption Keys (BYOK):</strong> For enterprise clients, encrypt sensitive documents and embeddings using customer-managed encryption keys (AWS KMS / Vault). If the customer revokes the key, their data becomes unreadable cryptographically.</li></ul><pre><code># Enforcing Hard Multi-Tenant Filtering in Vector Search:
+def search_company_knowledge(query: str, user: AuthenticatedUser):
+    if not user.tenant_id:
+        raise SecurityException("CRITICAL: Unauthenticated tenant access attempt!")
+        
+    query_vector = embed(query)
+    
+    # The vector database CANNOT search outside this tenant's namespace:
+    results = vector_db.query(
+        vector=query_vector,
+        top_k=5,
+        filter={"tenant_id": {"$eq": user.tenant_id}} # Hard isolation guarantee!
+    )
+    return results</code></pre><div class="callout"><p><strong>The Default-Deny Rule:</strong> In vector and session databases, query filters must default to DENY if a tenant identifier is absent. Never permit an unbounded search across the whole index.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the tenant isolation sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to enforce multi-tenant isolation across vector indices and persistent databases.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where multi-tenant isolation and data partitioning applies.</li>
+    <li>Author a unit test or verification script exercising multi-tenant isolation and data partitioning.</li>
+    <li>Document team architectural conventions regarding multi-tenant isolation and data partitioning.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Multi-Tenant Isolation and Data Partitioning.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What catastrophic security failure occurs if a vector database is queried without strict 'tenant_id' metadata filtering?",
+    a: ["Cross-tenant data leakage: User A's search query retrieves confidential internal documents belonging to Customer B","The vector database deletes all vectors","The server loses power","The database changes its name"],
+    c: 0,
+    why: "Without tenant metadata filtering, vector searches search the entire corpus, leaking private documents across customers."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1. Vector Metadata Filtering",
+            "lines": [
+                  "Every chunk tagged with tenant_id",
+                  "Queries physically restricted to tenant namespace",
+                  "Zero cross-tenant search matches"
+            ]
+      },
+      {
+            "title": "2. PostgreSQL Row-Level Security",
+            "lines": [
+                  "Database engine enforces tenant boundaries",
+                  "Bugs in app code cannot leak rows across tenants"
+            ]
+      },
+      {
+            "title": "3. Bring-Your-Own-Key (BYOK)",
+            "lines": [
+                  "Customer-managed encryption keys in KMS",
+                  "Instant cryptographic revocation"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Multi-Tenant Isolation and Data Partitioning",
+      "def execute_flow():",
+      "    # Enterprise compliance: row-level security, metadat...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Multi-Tenant Isolation and Data Partitioning"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Unfiltered Query (BREACH)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Partitioned Query (SECURE)"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Multi-tenant AI systems prevent cross-tenant data leakage by enforcing hard {1} metadata filters in vector databases and Row-Level Security in {2}."
+],
+    blanks: [
+      {
+            "a": [
+                  "tenant_id"
+            ],
+            "why": "Unique customer organization identifier"
+      },
+      {
+            "a": [
+                  "PostgreSQL"
+            ],
+            "why": "Relational database system with RLS"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is PostgreSQL Row-Level Security (RLS)?",
+      a: ["A database engine feature where security policies are evaluated per query to restrict which rows a user can see based on session variables","Encrypting the hard drive","Putting passwords on tables","Backing up rows to tape"],
+      c: 0,
+      why: "RLS enforces authorization policies at the database engine level, preventing application-level data leaks."
+    },
+    {
+      q: "Why must vector databases enforce metadata filtering at the search engine level rather than filtering after retrieval?",
+      a: ["Filtering after retrieval drops Top-K matches and can return zero results; filtering inside the search query guarantees Top-K within the tenant","Post-filtering is illegal","Vector databases cannot do post-filtering","Post-filtering corrupts vectors"],
+      c: 0,
+      why: "In-query filtering evaluates vector distance strictly within the tenant's candidate pool, preserving Top-K quality."
+    },
+    {
+      q: "What does 'Bring Your Own Key' (BYOK) encryption provide to enterprise customers?",
+      a: ["The customer controls the master cryptographic encryption key in their cloud KMS; revoking the key instantly renders all stored data unreadable","Customers bring their own keyboards","Customers buy their own servers","Customers write their own code"],
+      c: 0,
+      why: "BYOK grants customers ultimate cryptographic control over their data at rest."
+    },
+    {
+      q: "What architectural pattern guarantees that an engineer cannot accidentally forget a tenant filter in code?",
+      a: ["Using a repository wrapper or dependency injection layer that automatically injects tenant_id filters into every database query","Writing code without filters","Hoping engineers remember","Banning database queries"],
+      c: 0,
+      why: "Automated repository abstraction ensures that tenant scoping is enforced systematically on every query."
+    }
+  ]);
+</script>
+</body>
+</html>

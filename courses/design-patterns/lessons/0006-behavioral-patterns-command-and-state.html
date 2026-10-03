@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 06 — Behavioral patterns: Command and State</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="design-patterns" data-lesson="6" data-lesson-id="behavioral-patterns-command-and-state">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 06</span> · Behavioral Patterns</span>
+
+  <h1 class="lesson-title">Behavioral patterns: Command and State</h1>
+  <p class="lesson-lede">
+    How do you build undo/redo, transaction queues, and complex state machines? Master the Command pattern for encapsulating actions, and the State pattern for dynamic behavior.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Implement undo/redo systems using the Command pattern and state machines with the State pattern</span>
+    <span><b>Mission link</b> Essential for workflow orchestration, task queues, and complex UI state models</span>
+  </div>
+
+  <h2><span class="n">1</span>Commands as first-class objects</h2>
+  <p>Normally, calling a method executes code immediately. But what if you want to <b>queue an action to execute later</b>, log it to an audit trail, or <b>support Undo/Redo</b>?</p><p>The <b>Command Pattern</b> encapsulates an action as an object: <code>class InsertTextCommand { execute(), undo() }</code>. By storing commands in an execution history stack, implementing Undo is as simple as popping the last command and calling <code>cmd.undo()</code>! Similarly, the <b>State Pattern</b> lets an object alter its behavior when its internal state changes (e.g. Draft &rarr; Moderation &rarr; Published) without messy if/else statements.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Command turns actions into undoable objects; State turns internal state into polymorphic classes.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The State pattern versus conditional flags</h2>
+  <p>Contrast messy if/else state checks with clean polymorphic State pattern classes.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing Command execution and Undo</h2>
+  <p>Trace how a text editor executes a command and rolls it back cleanly.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of Command and State patterns.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can implement undoable command queues and model complex lifecycle workflows using the State pattern.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Implement a Command pattern undo stack for a simple text or counter application.</li>
+    <li>Refactor an entity with a 'status' string (draft, review, published) into the State pattern.</li>
+    <li>Explain how message queues (like Celery or SQS) embody the Command pattern over the network.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Erich Gamma et al., *Design Patterns*, 'Command' & 'State'.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "How does the Command pattern implement multi-level Undo in an application?",
+    a: ["It maintains a stack of executed command objects; pressing Undo pops the command and calls its undo() method","It rolls back the computer operating system to a backup point","It reboots the computer hardware","It deletes the user's hard drive"],
+    c: 0,
+    why: "Each command object stores the reverse operation in its undo() method, enabling infinite undo stacks."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Messy Conditionals",
+            "lines": [
+                  "if (status == 'DRAFT') ...",
+                  "else if (status == 'REVIEW') ...",
+                  "else if (status == 'PUBLISHED') ...",
+                  "scattered switch statements everywhere!"
+            ]
+      },
+      {
+            "title": "State Pattern (Polymorphic)",
+            "lines": [
+                  "class Document { state: DocumentState }",
+                  "DraftState -> ReviewState -> PublishedState",
+                  "each state class encapsulates its own rules!"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "class CutCommand(Command):",
+      "    def __init__(self, editor): self.editor = editor; self.backup = ''",
+      "    def execute(self): self.backup = self.editor.get_selection(); self.editor.delete_selection()",
+      "    def undo(self): self.editor.insert_text(self.backup)",
+      "# User presses Ctrl-Z -> history.pop().undo() restores text perfectly in 0.001ms!"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "command_created": "CutCommand captures editor context and backup buffer"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "executed": "execute() saves deleted text and removes selection"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "undo_capability": "undo() restores saved backup text flawlessly"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Encapsulating a request as an object with execute() and undo() is the <0> pattern.",
+      "Allowing an object to alter its behavior when internal state changes is the <1> pattern.",
+      "An undo stack stores executed commands in a <2> (LIFO) data structure."
+],
+    blanks: [
+      {
+            "a": [
+                  "Command"
+            ],
+            "why": "The Command pattern encapsulates actions."
+      },
+      {
+            "a": [
+                  "State"
+            ],
+            "why": "The State pattern encapsulates state transitions."
+      },
+      {
+            "a": [
+                  "stack"
+            ],
+            "why": "Stacks provide natural LIFO history tracking."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the primary role of the Command pattern?",
+      a: ["Encapsulates a request as an object, thereby letting you parameterize clients with different requests, queue requests, and support undoable operations","Executes commands in the Linux bash terminal","Encrypts database passwords","Compresses image files"],
+      c: 0,
+      why: "Turning actions into objects enables queuing, scheduling, logging, and undo/redo."
+    },
+    {
+      q: "What is the difference between the State pattern and the Strategy pattern if their class diagrams are identical?",
+      a: ["In Strategy, the client chooses the strategy upfront; in State, the context transitions between different state classes automatically as its internal state changes","Strategy is for Python; State is for Java","Strategy runs on disk; State runs in memory","There is no difference between them"],
+      c: 0,
+      why: "Intent differentiates them: Strategy is pluggable algorithms; State models dynamic lifecycle transitions."
+    },
+    {
+      q: "How does the State pattern adhere to the Single Responsibility Principle?",
+      a: ["It isolates the behavior and validation rules of each individual state into its own dedicated class","It allows states to be saved to database tables","It eliminates the need for unit testing","It makes functions smaller by deleting code"],
+      c: 0,
+      why: "Each state class has one reason to change: when the business rules for that specific state change."
+    },
+    {
+      q: "What is a 'Macro Command' (or Composite Command)?",
+      a: ["A command that contains and executes a sequential list of other commands in a batch (a transaction script)","A command written in C++ macros","A command that runs on supercomputers","A command that takes more than five minutes to execute"],
+      c: 0,
+      why: "Composite commands execute multiple sub-commands in order, like a recorded macro."
+    }
+  ]);
+</script>
+</body>
+</html>

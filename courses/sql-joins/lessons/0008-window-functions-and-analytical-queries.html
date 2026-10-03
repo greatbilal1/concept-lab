@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 08 — Window functions and analytical queries</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="sql-joins" data-lesson="8" data-lesson-id="window-functions-and-analytical-queries">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 08</span> · Advanced Joins & Windows</span>
+
+  <h1 class="lesson-title">Window functions and analytical queries</h1>
+  <p class="lesson-lede">
+    Aggregate metrics without collapsing rows. Master window functions (OVER, PARTITION BY, ROW_NUMBER, RANK, LEAD, LAG) for running totals and rankings.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Author analytical queries using window functions without collapsing row detail</span>
+    <span><b>Mission link</b> The pinnacle of advanced analytical SQL querying</span>
+  </div>
+
+  <h2><span class="n">1</span>Calculations across a sliding window</h2>
+  <p>Traditional <code>GROUP BY</code> aggregates rows by collapsing them: if you group 100 orders by customer, you get 1 summary row per customer, losing individual order rows. What if you want to display each individual order alongside the customer's running total?</p><p>This is the superpower of <b>Window Functions</b>. Using the <code>OVER (PARTITION BY ... ORDER BY ...)</code> clause, the database calculates rankings, running sums, or moving averages across related rows <b>while preserving every single individual row</b>.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Window functions compute aggregate metrics across related row partitions without collapsing rows.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Anatomy of the OVER clause</h2>
+  <p>Understand the three components that define a window partition and ordering.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing ROW_NUMBER and running totals</h2>
+  <p>Trace how a window function ranks employees by salary within their respective departments.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of window function syntax.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can write advanced analytical SQL queries calculating rankings, percentiles, running totals, and period-over-period deltas.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Calculate a running cumulative total of revenue by date using SUM(amount) OVER (ORDER BY date).</li>
+    <li>Rank products within each category using ROW_NUMBER() and DENSE_RANK().</li>
+    <li>Calculate day-over-day revenue differences using LAG(revenue, 1) OVER (ORDER BY date).</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    PostgreSQL Documentation: *Window Functions* (postgresql.org/docs/current/tutorial-window.html).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is the primary difference between GROUP BY and a Window Function (OVER)?",
+    a: ["GROUP BY collapses rows into a single summary row per group; Window functions preserve all original rows","GROUP BY is for text; Window functions are for numbers","Window functions only work in Microsoft Windows operating systems","There is no difference between them"],
+    c: 0,
+    why: "Window functions append calculations to each individual row without reducing row count."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "PARTITION BY",
+            "lines": [
+                  "divides rows into buckets",
+                  "e.g. PARTITION BY department"
+            ]
+      },
+      {
+            "title": "ORDER BY",
+            "lines": [
+                  "defines evaluation sequence",
+                  "e.g. ORDER BY salary DESC"
+            ]
+      },
+      {
+            "title": "Frame (ROWS/RANGE)",
+            "lines": [
+                  "sliding calculation window",
+                  "running totals, moving averages"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "SELECT department, name, salary,",
+      "  ROW_NUMBER() OVER (PARTITION BY department ORDER BY salary DESC) AS rank,",
+      "  SUM(salary) OVER (PARTITION BY department ORDER BY salary DESC) AS running_dept_total",
+      "FROM employees;"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "row_preservation": "every employee row is retained"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "ranking": "rank numbers reset to 1 at each new department partition"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "running_sum": "accumulates salary row-by-row down the department"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The clause identifying a window function is the <0> clause.",
+      "The sub-clause partitioning rows inside an OVER clause is PARTITION <1>.",
+      "The window function returning the value of the PREVIOUS row is <2>()."
+],
+    blanks: [
+      {
+            "a": [
+                  "OVER"
+            ],
+            "why": "The OVER clause designates a window function."
+      },
+      {
+            "a": [
+                  "BY"
+            ],
+            "why": "PARTITION BY partitions the calculation frame."
+      },
+      {
+            "a": [
+                  "LAG"
+            ],
+            "why": "LAG() accesses preceding rows; LEAD() accesses subsequent rows."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What does 'ROW_NUMBER() OVER (PARTITION BY department ORDER BY hire_date)' do?",
+      a: ["Assigns sequential integers (1, 2, 3...) to employees ordered by hire date, resetting back to 1 for each new department","Counts the total number of departments in the company","Sorts all employees alphabetically by department name","Deletes employees with duplicate hire dates"],
+      c: 0,
+      why: "ROW_NUMBER numbers rows sequentially, resetting numbering for each new partition."
+    },
+    {
+      q: "What is the difference between RANK() and DENSE_RANK() when two rows have equal values (a tie)?",
+      a: ["RANK() skips subsequent rank numbers after a tie (1, 2, 2, 4); DENSE_RANK() does not skip numbers (1, 2, 2, 3)","RANK() is for numbers; DENSE_RANK() is for text","DENSE_RANK() only works on PostgreSQL","There is no difference between them"],
+      c: 0,
+      why: "RANK skips ranks after ties (like Olympic medals); DENSE_RANK leaves no gaps in sequence."
+    },
+    {
+      q: "What do the LAG() and LEAD() window functions allow you to do?",
+      a: ["Access values from preceding (LAG) or succeeding (LEAD) rows without writing a self-join","Calculate the geometric latency of database connections","Speed up database disk writes","Encrypt database table columns"],
+      c: 0,
+      why: "LAG and LEAD provide native lookahead and lookbehind across rows in the partition."
+    },
+    {
+      q: "Can window functions be placed inside the WHERE clause of the same query?",
+      a: ["No, because window functions execute after the WHERE clause; wrap in a CTE or subquery to filter by window results","Yes, window functions can appear anywhere in SQL","Only if wrapped in double quotes","Only on SQLite databases"],
+      c: 0,
+      why: "Window functions evaluate after WHERE; filtering on window results requires a CTE or derived table."
+    }
+  ]);
+</script>
+</body>
+</html>

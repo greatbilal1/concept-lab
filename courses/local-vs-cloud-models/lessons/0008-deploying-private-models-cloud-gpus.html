@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 08 — Deploying Private Open-Source Models to Cloud GPUs</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="local-vs-cloud-models" data-lesson="8" data-lesson-id="deploying-private-models-cloud-gpus">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 08</span> · Private Cloud Deployment</span>
+
+  <h1 class="lesson-title">Deploying Private Open-Source Models to Cloud GPUs</h1>
+  <p class="lesson-lede">
+    Deploying private open models to serverless GPU infrastructure: vLLM, Docker, Ray, Modal, RunPod, and Kubernetes.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You have completed the Local Models vs Cloud Models course.</span>
+    <span><b>Mission link</b> Mastering deploying private open-source models to cloud gpus across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Deploying Private Open-Source Models to Cloud GPUs</h2>
+  <p>If you want the privacy and control of open-weights models, but your company does not want to buy physical server racks or manage physical data centers, the solution is <strong>Private Cloud GPU Deployment</strong>.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Deploying private open models to serverless GPU infrastructure: vLLM, Docker, Ray, Modal, RunPod, and Kubernetes.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Private Cloud Deployment Topology</h2>
+  <p>Modern MLOps provides serverless and managed GPU infrastructure (Modal, RunPod, Together AI, AWS SageMaker, Kubernetes with KServe) that allows you to deploy containerized models in minutes:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Scale-to-Zero Financial Efficiency</h2>
+  <ul><li><strong>1. Containerize with vLLM:</strong> Package the model weights and `vLLM` engine inside a standardized Docker container.</li><li><strong>2. Scale-to-Zero Architecture:</strong> Serverless platforms automatically spin up GPU instances when requests arrive, and <strong>scale down to zero</strong> after 5 minutes of inactivity. You never pay for an idle GPU!</li><li><strong>3. Private VPC Peering:</strong> Peer the GPU cluster directly with your main application backend over a private virtual cloud network (VPC), with zero exposure to the public internet.</li></ul><pre><code># Deploying Llama 3 with vLLM in a Docker Container:
+# Dockerfile:
+FROM vllm/vllm-openai:latest
+ENTRYPOINT ["python3", "-m", "vllm.entrypoints.openai.api_server"]
+CMD ["--model", "meta-llama/Meta-Llama-3-70B-Instruct", \
+     "--tensor-parallel-size", "2", \
+     "--gpu-memory-utilization", "0.95", \
+     "--max-model-len", "8192"]</code></pre><p>This gives your enterprise the ultimate combination: complete ownership of model weights, private VPC networking, automatic scaling, and pay-per-second infrastructure.</p><div class="callout"><p><strong>The Operational Victory:</strong> You have graduated from being an API consumer to being an AI systems architect capable of designing, sizing, and deploying private foundation models at scale.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the private cloud deployment sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You have completed the Local Models vs Cloud Models course.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where deploying private open-source models to cloud gpus applies.</li>
+    <li>Author a unit test or verification script exercising deploying private open-source models to cloud gpus.</li>
+    <li>Document team architectural conventions regarding deploying private open-source models to cloud gpus.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Deploying Private Open-Source Models to Cloud GPUs.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is 'Serverless GPU' deployment (like Modal, RunPod, or Baseten) for open-weights models?",
+    a: ["Cloud infrastructure that dynamically spins up GPU containers to run inference and scales down to zero when idle, avoiding idle hardware costs","GPUs that run without computer servers","Free GPUs provided by governments","Running models on CPU servers"],
+    c: 0,
+    why: "Serverless GPUs provide on-demand GPU instances that scale to zero when not in use, eliminating idle waste."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Application Backend",
+            "lines": [
+                  "Node / Python backend in private VPC",
+                  "Calls model via private DNS"
+            ]
+      },
+      {
+            "title": "Private VPC Peering",
+            "lines": [
+                  "Secure internal network tunnel",
+                  "Zero public internet exposure"
+            ]
+      },
+      {
+            "title": "Serverless vLLM Cluster",
+            "lines": [
+                  "Docker container with Llama 3 70B",
+                  "Autoscales with load, scales to zero when idle"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Deploying Private Open-Source Models to Cloud GPUs",
+      "def execute_flow():",
+      "    # Deploying private open models to serverless GPU in...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Deploying Private Open-Source Models to Cloud GPUs"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Dedicated GPU Server"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Serverless GPU (Scale-to-Zero)"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Serverless GPU platforms deploy containerized {1} engines inside private VPC networks that scale to {2} when idle."
+],
+    blanks: [
+      {
+            "a": [
+                  "vLLM"
+            ],
+            "why": "High-throughput serving engine"
+      },
+      {
+            "a": [
+                  "zero"
+            ],
+            "why": "Zero instances running during off-hours"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is 'Tensor Parallelism' (--tensor-parallel-size) in vLLM deployment?",
+      a: ["Splitting individual weight matrices across multiple GPUs (e.g. 2 or 4 GPUs) to fit large models and execute math in parallel","Running two different models at the same time","Translating tensors into text","A tool for formatting code"],
+      c: 0,
+      why: "Tensor parallelism shards matrix multiplications across multiple GPUs within a single node."
+    },
+    {
+      q: "Why is deploying models inside a private VPC with peering safer than public API endpoints?",
+      a: ["Internal network traffic never traverses the public internet, eliminating exposure to external packet sniffing and unauthorized access","VPCs make models run 10x faster","VPCs are free of charge","Public APIs are illegal in enterprise software"],
+      c: 0,
+      why: "Private VPC peering keeps inference requests strictly contained within the internal corporate network."
+    },
+    {
+      q: "What is 'Cold Start Latency' in serverless GPU deployment?",
+      a: ["The initial delay (typically 15-45 seconds) required to provision the GPU container and load weights into VRAM when waking from zero","The time to warm up the room","The CPU fan starting up","The internet connecting"],
+      c: 0,
+      why: "Waking from zero requires spinning up the container and streaming gigabytes of weights into GPU memory."
+    },
+    {
+      q: "What metric should trigger autoscaling additional GPU instances in an enterprise cluster?",
+      a: ["The number of queued requests in the vLLM waiting queue or average time-to-first-token latency","The time of day","The number of lines of code in the repo","The price of bitcoin"],
+      c: 0,
+      why: "Queue depth directly indicates whether active GPUs are saturated and unable to keep up with incoming request volume."
+    }
+  ]);
+</script>
+</body>
+</html>

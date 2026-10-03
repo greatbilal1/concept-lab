@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 03 — Document Parsing and Chunking Strategies</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="rag" data-lesson="3" data-lesson-id="document-parsing-and-chunking">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 03</span> · Chunking Strategies</span>
+
+  <h1 class="lesson-title">Document Parsing and Chunking Strategies</h1>
+  <p class="lesson-lede">
+    Chunking text effectively: fixed-size chunking, recursive character splitting, markdown-aware splitting, and semantic boundary chunking.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to select and tune document chunking strategies for diverse data types.</span>
+    <span><b>Mission link</b> Mastering document parsing and chunking strategies across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Document Parsing and Chunking Strategies</h2>
+  <p>The single most underestimated component of RAG performance is <strong>Chunking</strong>. If you chunk poorly, your retrieval will fail: split in the middle of a sentence, and you cut the subject from its verb; make chunks too large, and you dilute semantic specificity.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Chunking text effectively: fixed-size chunking, recursive character splitting, markdown-aware splitting, and semantic boundary chunking.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Chunking Strategies Compared</h2>
+  <p>The three dominant chunking strategies in production engineering:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>The Structure Hierarchy</h2>
+  <ul><li><strong>1. Fixed-Size Chunking (Naive):</strong> Slicing text into fixed token blocks (e.g. 500 tokens). Simple, but chops sentences in half and ignores document structure.</li><li><strong>2. Recursive Character Splitting (Industry Standard):</strong> Splits on a prioritized list of separators: first trying double newlines (`\n\n` - paragraphs), then single newlines (`\n` - lines), then sentence endings (`. `), and finally spaces. Keeps complete thoughts intact!</li><li><strong>3. Document-Aware / Markdown Splitting:</strong> Splits on semantic markdown headers (`#`, `##`, `###`). Keeps code blocks, tables, and sections intact as self-contained units.</li><li><strong>4. Semantic Chunking (Advanced):</strong> Calculates embedding similarity between consecutive sentences; inserts a chunk break whenever similarity drops significantly (indicating a topic shift!).</li></ul><pre><code># Recursive Character Splitting with LangChain in Python:
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+
+splitter = RecursiveCharacterTextSplitter(
+    chunk_size=500,        # Target chunk size in characters
+    chunk_overlap=50,      # Overlap between consecutive chunks
+    separators=["\n\n", "\n", ". ", " ", ""]  # Priority hierarchy!
+)
+chunks = splitter.split_text(raw_document)</code></pre><div class="callout"><p><strong>The Markdown Rule:</strong> For technical documentation and codebases, always use Markdown-aware splitters that preserve code blocks and header hierarchies intact!</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the chunking sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to select and tune document chunking strategies for diverse data types.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where document parsing and chunking strategies applies.</li>
+    <li>Author a unit test or verification script exercising document parsing and chunking strategies.</li>
+    <li>Document team architectural conventions regarding document parsing and chunking strategies.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Document Parsing and Chunking Strategies.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Why is 'Recursive Character Text Splitting' superior to naive fixed-character chunking (e.g. slicing every 500 characters)?",
+    a: ["It attempts to split on natural document boundaries (paragraphs, then sentences, then words) rather than slicing in the middle of a sentence","It compiles text into WebAssembly","It uses no RAM","It runs 10x faster"],
+    c: 0,
+    why: "Recursive splitters prioritize structural boundaries (newlines, periods), keeping coherent thoughts intact."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Fixed Slicing (Naive)",
+            "lines": [
+                  "Chops every 500 chars",
+                  "Cuts sentences in half: 'The price is $... [CHUNK END]'"
+            ]
+      },
+      {
+            "title": "Recursive Splitting (Standard)",
+            "lines": [
+                  "Splits on \\n\\n, then \\n, then period",
+                  "Preserves complete paragraphs & sentences"
+            ]
+      },
+      {
+            "title": "Markdown Aware (Technical)",
+            "lines": [
+                  "Splits on # Header 1 and ## Header 2",
+                  "Preserves code blocks and tables intact"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Document Parsing and Chunking Strategies",
+      "def execute_flow():",
+      "    # Chunking text effectively: fixed-size chunking, re...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Document Parsing and Chunking Strategies"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Priority 1: Paragraph (\\n\\n)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Priority 2: Sentence ('. ')"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "step": "Priority 3: Word (' ')"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Recursive text splitters prioritize natural linguistic boundaries like {1} and sentences to prevent cutting coherent {2} in half."
+],
+    blanks: [
+      {
+            "a": [
+                  "paragraphs"
+            ],
+            "why": "Double newline breaks \\n\\n"
+      },
+      {
+            "a": [
+                  "thoughts"
+            ],
+            "why": "Semantic concepts and statements"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What happens when fixed-character chunking slices a sentence like 'The system must NEVER allow unauthorized access' right after 'NEVER'?",
+      a: ["The negative constraint is separated from the predicate, creating two confusing and contradictory chunk fragments","The text turns into numbers","The computer crashes","The model fixes it automatically"],
+      c: 0,
+      why: "Chopping sentences across chunk boundaries severs context and inverts semantic meaning."
+    },
+    {
+      q: "What chunk size (in tokens) is generally considered the sweet spot for dense semantic retrieval?",
+      a: ["250 to 512 tokens (roughly 1 to 2 paragraphs)","Exactly 1 token","50,000 tokens","10,000 tokens"],
+      c: 0,
+      why: "250-512 tokens provides sufficient contextual depth while maintaining high semantic specificity."
+    },
+    {
+      q: "Why is preserving code blocks (```python ... ```) inside a single chunk essential when chunking documentation?",
+      a: ["Slicing a code block in half produces syntactically broken code that an agent cannot compile or understand","Code blocks cannot be vectorized","Markdown code blocks are illegal in RAG","Code blocks use too many tokens"],
+      c: 0,
+      why: "Partial code snippets lack imports, definitions, and syntax closure, breaking downstream agent reasoning."
+    },
+    {
+      q: "How does Semantic Chunking determine where to split text?",
+      a: ["It monitors embedding vector similarity between adjacent sentences, splitting whenever similarity drops below a threshold","By counting words","By using a timer","By checking punctuation marks"],
+      c: 0,
+      why: "Significant drops in sentence embedding similarity signal natural shifts in topic."
+    }
+  ]);
+</script>
+</body>
+</html>

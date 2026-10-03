@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Working With AI-Generated Architecture — Cheat Sheet</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+<style>
+  .ref-toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0 8px; }
+  .ref-toc a { font-size: .8rem; border: 1px solid var(--border); background: #111a30; padding: 5px 11px; border-radius: 999px; color: var(--muted); text-decoration: none; border-bottom: 1px solid var(--border); }
+  .ref-toc a:hover { color: #fff; border-color: #3d5488; }
+  .lesson-wrap h2 { scroll-margin-top: 20px; }
+  .snippet { margin: 14px 0 22px; }
+  .snippet .lbl { font-size: .72rem; font-weight: 800; letter-spacing: .7px; text-transform: uppercase; color: var(--accent2); margin-bottom: 6px; }
+  .see { font-size: .82rem; color: var(--muted); margin: -6px 0 12px; }
+  .see a { color: var(--accent2); border-bottom: 0; }
+  .see a:hover { color: #fff; }
+  .snippet pre { padding-top: 34px; }
+  @media print { .snippet pre { padding-top: 18px; } }
+</style>
+</head>
+<body class="lesson-body" data-course="ai-generated-architecture">
+
+<div class="lesson-wrap">
+
+  <span class="lesson-kicker">Reference · Cheat sheet</span>
+  <h1 class="lesson-title">Working With AI-Generated Architecture — Cheat Sheet</h1>
+  <p class="lesson-lede">
+    The whole course on one page. Every snippet links back to the lesson that
+    teaches it.
+  </p>
+
+  <div class="ref-toc">
+    <a href="#sec-1">Clean Inward Dependency Rule</a>
+    <a href="#sec-2">Strict Pydantic Contract</a>
+    <a href="#sec-3">Automated Architectural Fitness Check</a>
+    <a href="#sec-4">Production Hardening Checklist</a>
+  </div>
+
+  <h2 id="sec-1"><span class="n">1</span>Clean Inward Dependency Rule</h2>
+  <div class="snippet">
+    <div class="lbl">Architectural layer contract</div>
+    <pre><code># ALLOWED: Infrastructure -&gt; Application -&gt; Domain
+# FORBIDDEN: Domain importing SQLAlchemy, FastAPI, or Redis!
+# Rule: Domain models must be pure dataclasses / classes.</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0002-enforcing-module-boundaries.html">Lesson 02 — Enforcing Module Boundaries and Dependency Directions</a>.</p>
+
+  <h2 id="sec-2"><span class="n">2</span>Strict Pydantic Contract</h2>
+  <div class="snippet">
+    <div class="lbl">Guarding against hallucinated keys</div>
+    <pre><code>from pydantic import BaseModel, ConfigDict, Field
+
+class CreateOrderSchema(BaseModel):
+    model_config = ConfigDict(strict=True, extra='forbid')
+    sku: str = Field(min_length=3)
+    quantity: int = Field(gt=0)</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0004-schema-and-contract-discipline.html">Lesson 04 — Schema and Contract Discipline</a>.</p>
+
+  <h2 id="sec-3"><span class="n">3</span>Automated Architectural Fitness Check</h2>
+  <div class="snippet">
+    <div class="lbl">import-linter contract (.importlinter)</div>
+    <pre><code>[importlinter:contract:1]
+name = Pure Domain Boundary
+type = forbidden
+source_modules = src.domain
+forbidden_modules = src.infrastructure, src.api, sqlalchemy</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0007-architectural-fitness-functions.html">Lesson 07 — Architectural Fitness Functions and Linting</a>.</p>
+
+  <h2 id="sec-4"><span class="n">4</span>Production Hardening Checklist</h2>
+  <div class="snippet">
+    <div class="lbl">Bridging prototype to production</div>
+    <pre><code>1. TIMEOUTS: Ensure all HTTP calls have timeout=5.0.
+2. CONFIG: Move magic numbers to environment variables.
+3. LOGS: Emit structured JSON logs with request_id.
+4. ERRORS: Replace generic except with explicit handlers.</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0006-refactoring-prototypes-to-production.html">Lesson 06 — Refactoring AI Prototyped Code into Production Shape</a>.</p>
+
+  <div class="lesson-foot">
+    <div class="links">
+      <a href="ai-generated-architecture-glossary.html">📖 Glossary</a>
+      <a href="../course.html">← Course map</a>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

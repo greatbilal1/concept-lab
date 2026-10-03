@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 02 — Hardware Requirements: VRAM, Unified Memory, and Quantization</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="local-vs-cloud-models" data-lesson="2" data-lesson-id="hardware-requirements-vram-unified-memory">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 02</span> · Hardware Math</span>
+
+  <h1 class="lesson-title">Hardware Requirements: VRAM, Unified Memory, and Quantization</h1>
+  <p class="lesson-lede">
+    The physics of inference hardware: calculating VRAM requirements, Apple Silicon unified memory, and memory bandwidth bounds.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to calculate exact VRAM requirements for local model deployment.</span>
+    <span><b>Mission link</b> Mastering hardware requirements: vram, unified memory, and quantization across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Hardware Requirements: VRAM, Unified Memory, and Quantization</h2>
+  <p>Before running or buying hardware for local models, an engineer must be able to perform <strong>Inference Memory Math</strong>. The amount of Video RAM (VRAM) required to run a model is not a mystery; it is governed by a precise mathematical formula.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    The physics of inference hardware: calculating VRAM requirements, Apple Silicon unified memory, and memory bandwidth bounds.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Memory Precision Footprint</h2>
+  <p>Every model parameter is a numerical floating-point number. Its precision dictates its memory footprint:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>NVIDIA VRAM vs Apple Unified Memory</h2>
+  <ul><li><strong>16-bit Precision (FP16 / BF16):</strong> 2 bytes per parameter. A 7B model takes $7 \times 2 = 14\text{GB}$. A 70B model takes $70 \times 2 = 140\text{GB}$!</li><li><strong>8-bit Precision (INT8):</strong> 1 byte per parameter. A 70B model takes $70 \times 1 = 70\text{GB}$.</li><li><strong>4-bit Precision (INT4 / GGUF):</strong> 0.5 bytes per parameter. A 70B model takes $70 \times 0.5 = 35\text{GB}$!</li></ul><pre><code># The Complete VRAM Sizing Formula:
+# Total_VRAM = (Parameters * Bytes_Per_Weight) * 1.2 (for KV-cache and activation buffer)
+# Examples:
+# - Llama 3 8B (4-bit):  (8B * 0.5 bytes)  * 1.2 = ~4.8 GB  -> Fits on an 8GB laptop!
+# - Llama 3 70B (4-bit): (70B * 0.5 bytes) * 1.2 = ~42 GB   -> Fits on a 64GB Mac Studio!</code></pre><p>The Apple Silicon Advantage: <strong>Unified Memory</strong>. On an M3/M4 Max MacBook or Mac Studio, the CPU and GPU share the same high-speed memory pool (up to 128GB or 192GB). A single Mac Studio can run a 70B model locally that would otherwise require two $10,000 NVIDIA enterprise server GPUs!</p><div class="callout"><p><strong>The Memory Buffer Rule:</strong> Always add 20% overhead above model weights for the KV-cache. A model that barely fits in VRAM will crash with an Out-of-Memory error as soon as context fills up!</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the hardware memory sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to calculate exact VRAM requirements for local model deployment.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where hardware requirements: vram, unified memory, and quantization applies.</li>
+    <li>Author a unit test or verification script exercising hardware requirements: vram, unified memory, and quantization.</li>
+    <li>Document team architectural conventions regarding hardware requirements: vram, unified memory, and quantization.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Hardware Requirements: VRAM, Unified Memory, and Quantization.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "How much VRAM is required to load an unquantized 70-Billion parameter model in standard 16-bit floating point (FP16)?",
+    a: ["Approximately 140 Gigabytes of VRAM (70B parameters * 2 bytes per parameter)","Only 512 Megabytes","Exactly 1 Terabyte","VRAM is not required for models"],
+    c: 0,
+    why: "In FP16, each parameter takes 2 bytes of memory: 70B * 2 bytes = 140GB of VRAM."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "FP16 (16-bit) - 2 Bytes",
+            "lines": [
+                  "7B model = 14 GB VRAM",
+                  "70B model = 140 GB VRAM (Demands multi-GPU cluster)"
+            ]
+      },
+      {
+            "title": "INT4 (4-bit) - 0.5 Bytes",
+            "lines": [
+                  "7B model = 4 GB VRAM (Runs on phone!)",
+                  "70B model = 35 GB VRAM (Runs on 64GB Mac Studio!)"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Hardware Requirements: VRAM, Unified Memory, and Quantization",
+      "def execute_flow():",
+      "    # The physics of inference hardware: calculating VRA...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Hardware Requirements: VRAM, Unified Memory, and Quantization"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "PC / Linux Workstation"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Apple Silicon (Unified Memory)"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "In 4-bit quantization, each parameter consumes roughly {1} bytes, allowing a 70-billion parameter model to fit into roughly {2} GB of VRAM."
+],
+    blanks: [
+      {
+            "a": [
+                  "0.5"
+            ],
+            "why": "Half a byte per 4-bit weight"
+      },
+      {
+            "a": [
+                  "40"
+            ],
+            "why": "Approximately 35-42GB with overhead"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What happens if a model's weights and KV-cache exceed the physical VRAM capacity of a GPU?",
+      a: ["CUDA Out-Of-Memory (OOM) crash, or extreme slowdown as layers are offloaded to slow system RAM across PCIe","The GPU catches fire","The model converts text to numbers","The computer restarts"],
+      c: 0,
+      why: "Exceeding VRAM causes crash or severe PCIe memory-bandwidth bottlenecking."
+    },
+    {
+      q: "Why is Apple Silicon Unified Memory popular for local AI researchers and developers?",
+      a: ["It allows consumer/workstation Macs with 64GB-128GB of unified RAM to load massive models without expensive server GPUs","Apple computers do not need electricity","Apple Silicon runs code in C++","Apple Silicon eliminates the need for models"],
+      c: 0,
+      why: "Unified architecture allows the GPU to access massive shared RAM pools at high bandwidth."
+    },
+    {
+      q: "What component of memory usage grows dynamically as the conversation context window fills up?",
+      a: ["The KV-Cache (Key-Value cache storing past attention projections)","The model weight parameters","The operating system kernel","The monitor resolution"],
+      c: 0,
+      why: "The KV-cache stores attention vectors for all active tokens, expanding as context length increases."
+    },
+    {
+      q: "How much VRAM does an 8-billion parameter model require at 4-bit precision including a safe context buffer?",
+      a: ["Approximately 5 to 6 Gigabytes of VRAM","50 Gigabytes","100 Megabytes","1 Terabyte"],
+      c: 0,
+      why: "8B * 0.5 bytes = 4GB for weights, plus ~1-2GB for KV-cache and activations."
+    }
+  ]);
+</script>
+</body>
+</html>

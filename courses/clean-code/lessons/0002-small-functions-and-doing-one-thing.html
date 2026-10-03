@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 02 — Small functions and doing one thing</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="clean-code" data-lesson="2" data-lesson-id="small-functions-and-doing-one-thing">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 02</span> · Meaningful Names & Simplicity</span>
+
+  <h1 class="lesson-title">Small functions and doing one thing</h1>
+  <p class="lesson-lede">
+    The first rule of functions: they should be small. The second rule: they should be smaller than that. Master the Single Responsibility Principle and eliminate boolean flag arguments.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Refactor multi-page monolithic functions into small, single-responsibility units</span>
+    <span><b>Mission link</b> The primary structural technique for making code understandable and testable</span>
+  </div>
+
+  <h2><span class="n">1</span>Do one thing well</h2>
+  <p>Functions should do <b>one thing</b>. They should do it well. They should do it only. When a function is 200 lines long, it is never doing one thing: it is parsing inputs, querying the database, sending emails, logging errors, and formatting HTML.</p><p>How do you know if a function does more than one thing? <b>If you can extract another function from it with a name that is not merely a restatement of its implementation, it was doing too much.</b></p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Functions should do exactly one thing at a single level of abstraction.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Step-Down rule</h2>
+  <p>Code should read like a top-down newspaper article: high-level summaries descend into detailed helpers.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing function extraction</h2>
+  <p>Trace how extracting a helper function clarifies the business intent of an order workflow.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of function design rules.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can decompose monolithic functions into small, expressive, and easily testable units.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Take a 100-line function and extract two sub-functions with clear domain names.</li>
+    <li>Eliminate a boolean flag argument by creating two explicitly named functions.</li>
+    <li>Ensure every function in a module operates at a single consistent level of abstraction.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Robert C. Martin, *Clean Code*, Chapter 3: 'Functions'.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Why are boolean flag arguments (e.g. 'render(true)') considered a code smell in function design?",
+    a: ["A boolean flag proves the function does two completely different things: one thing if true, another if false! Split into two functions instead","Boolean values cannot be passed to functions in modern languages","Booleans use too much memory on the heap","Flags cause network latency"],
+    c: 0,
+    why: "Flag arguments violate doing one thing: render(true) versus render(false) should be renderForAdmin() and renderForUser()."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "High-Level: checkout()",
+            "lines": [
+                  "validate_cart()",
+                  "charge_payment()",
+                  "send_confirmation()"
+            ]
+      },
+      {
+            "title": "Mid-Level: charge_payment()",
+            "lines": [
+                  "calculate_taxes()",
+                  "invoke_gateway()"
+            ]
+      },
+      {
+            "title": "Low-Level: invoke_gateway()",
+            "lines": [
+                  "HTTP POST /v1/charges",
+                  "handle 402 card error"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Before: monolithic loop with embedded tax math",
+      "# After: clean helper extraction",
+      "def calculate_order_total(items, customer):",
+      "    subtotal = sum(item.price for item in items)",
+      "    tax = calculate_sales_tax(subtotal, customer.state) # extracted helper",
+      "    discount = calculate_loyalty_discount(customer)     # extracted helper",
+      "    return subtotal + tax - discount"
+],
+    steps: [
+      {
+            "line": 2,
+            "vars": {
+                  "core_intent": "order total formula is immediately readable in 4 lines"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "tax_isolated": "tax logic isolated in own testable unit"
+            }
+      },
+      {
+            "line": 5,
+            "vars": {
+                  "discount_isolated": "discount logic isolated in own testable unit"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The principle that a function should do one thing is the Single <0> Principle.",
+      "Passing a boolean to change function behavior creates a <1> argument.",
+      "Reading code from high-level policy down to low-level details is the <2>-down rule."
+],
+    blanks: [
+      {
+            "a": [
+                  "Responsibility"
+            ],
+            "why": "Single Responsibility Principle (SRP) guides function scope."
+      },
+      {
+            "a": [
+                  "flag"
+            ],
+            "why": "Flag arguments should be split into distinct functions."
+      },
+      {
+            "a": [
+                  "step",
+                  "Step"
+            ],
+            "why": "The Step-Down rule organizes functions hierarchically."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the recommended ideal length for a clean function in modern software craftsmanship?",
+      a: ["Small: ideally fitting on a single screen (typically under 20–25 lines of code)","At least 500 lines to keep everything in one place","Exactly one line only in all cases","The length of a function does not matter at all"],
+      c: 0,
+      why: "Small functions fit into human working memory and are easy to comprehend and test."
+    },
+    {
+      q: "What does it mean for a function to operate at a 'Single Level of Abstraction' (SLA)?",
+      a: ["All statements inside the function should be at the same conceptual level (e.g. not mixing high-level business rules with low-level string slicing)","The function can only use single-character variables","The function must be written in one programming language","The function can only take one argument"],
+      c: 0,
+      why: "Mixing high-level concepts with low-level plumbing confuses readers; extract plumbing into helpers."
+    },
+    {
+      q: "How many arguments should an ideal clean function accept?",
+      a: ["Zero to two arguments ideally (niladic, monadic, dyadic); avoid functions with 4+ arguments by grouping into an object","At least ten arguments to provide full flexibility","Exactly one hundred arguments","Arguments should be passed via global variables instead"],
+      c: 0,
+      why: "Functions with 4+ arguments are hard to remember, test, and read; encapsulate them in a parameter object."
+    },
+    {
+      q: "Why is code duplication (copy-pasting logic) considered the root of all software evil?",
+      a: ["When a bug is found or rules change, developers must remember to update every single duplicate copy; missed copies cause bugs","Duplication increases hard drive physical weight","Compilers delete duplicate code automatically","Duplication is illegal in open-source software"],
+      c: 0,
+      why: "Duplication multiplies maintenance burden and guarantees future inconsistency bugs."
+    }
+  ]);
+</script>
+</body>
+</html>

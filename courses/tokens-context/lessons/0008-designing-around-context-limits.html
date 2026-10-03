@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 08 — Designing Architectures Around Context Limits</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="tokens-context" data-lesson="8" data-lesson-id="designing-around-context-limits">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 08</span> · Architecture Design</span>
+
+  <h1 class="lesson-title">Designing Architectures Around Context Limits</h1>
+  <p class="lesson-lede">
+    Architectural patterns for context limits: map-reduce summarization, hierarchical retrieval, and external memory stores.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You have completed the Tokens, Context Windows & Context Limits course.</span>
+    <span><b>Mission link</b> Mastering designing architectures around context limits across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Designing Architectures Around Context Limits</h2>
+  <p>Great software architects do not complain about physics; they design systems that thrive within physical constraints. Context limits, latency curves, and token costs are the physical constraints of generative AI. You design around them using proven <strong>Scalable Context Patterns</strong>:</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Architectural patterns for context limits: map-reduce summarization, hierarchical retrieval, and external memory stores.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Map-Reduce Context Architecture</h2>
+  <ul><li><strong>1. Map-Reduce Summarization:</strong> To summarize a 500-page legal contract or 1,000 customer reviews: chunk the document into 50 pieces; run 50 parallel 'Map' model calls summarizing each chunk; then run one final 'Reduce' call synthesizing the 50 summaries into an executive report.</li><li><strong>2. Hierarchical Retrieval (RAG + Graph):</strong> Instead of searching flat text, search a knowledge graph or document tree: retrieve high-level section summaries first, then drill down into specific paragraph leaves on demand.</li><li><strong>3. External Ephemeral Memory:</strong> Store conversation state, scratchpads, and intermediate tables in Redis or SQLite. Let the agent query this state via tools rather than packing it all into the prompt!</li></ul>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>External Tool Memory Pattern</h2>
+  <pre><code># The Map-Reduce Architecture for Massive Documents:
+# Step 1 (Map): Process chunks in parallel
+chunk_summaries = await asyncio.gather(*[
+    summarize_chunk(chunk) for chunk in document_chunks
+])
+
+# Step 2 (Reduce): Synthesize intermediate summaries
+final_executive_report = await summarize_synthesis("\n".join(chunk_summaries))</code></pre><div class="callout"><p><strong>The Final Principle:</strong> Don't try to fit the entire world into one prompt. Build systems that route, chunk, map, and reduce information dynamically.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the architecture design sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You have completed the Tokens, Context Windows & Context Limits course.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where designing architectures around context limits applies.</li>
+    <li>Author a unit test or verification script exercising designing architectures around context limits.</li>
+    <li>Document team architectural conventions regarding designing architectures around context limits.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Designing Architectures Around Context Limits.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "How does the 'Map-Reduce' architectural pattern process a 10,000-page document that exceeds any single context window?",
+    a: ["Chunks are processed in parallel by multiple model calls (Map), and their summaries are synthesized into a final report (Reduce)","By compressing the 10,000 pages into a single image","By reading only the first page and guessing the rest","By running the model on quantum hardware"],
+    c: 0,
+    why: "Map-Reduce breaks massive texts into parallel independent slices, aggregating intermediate summaries into a final synthesis."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Document (500 Pages)",
+            "lines": [
+                  "Exceeds any context window",
+                  "Split into 50 independent chunks"
+            ]
+      },
+      {
+            "title": "Map Phase (Parallel)",
+            "lines": [
+                  "50 concurrent LLM calls",
+                  "Produces 50 concise summaries in 2s"
+            ]
+      },
+      {
+            "title": "Reduce Phase (Synthesis)",
+            "lines": [
+                  "Single LLM call aggregates summaries",
+                  "Outputs comprehensive executive report"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Designing Architectures Around Context Limits",
+      "def execute_flow():",
+      "    # Architectural patterns for context limits: map-red...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Designing Architectures Around Context Limits"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Prompt Context (Lean)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "External Store (SQLite/Redis)"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Scalable AI architectures process massive datasets using {1} patterns and store state in external {2} queried via tools."
+],
+    blanks: [
+      {
+            "a": [
+                  "map-reduce"
+            ],
+            "why": "Parallel split-and-combine pattern"
+      },
+      {
+            "a": [
+                  "databases"
+            ],
+            "why": "External storage like SQLite or Redis"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the primary advantage of Map-Reduce summarization over sequential reading?",
+      a: ["All chunks are processed concurrently in parallel, reducing processing time from hours to seconds","It uses no API tokens","It guarantees 100% human accuracy","It eliminates the need for Python"],
+      c: 0,
+      why: "Concurrent map calls leverage cloud parallelism to summarize massive texts in seconds."
+    },
+    {
+      q: "How does storing intermediate state in an external database (like SQLite) protect the context window?",
+      a: ["It offloads heavy state from the prompt, allowing the agent to query specific records on demand using tools","It encrypts the model weights","It converts SQL into natural language","It reduces GPU temperature"],
+      c: 0,
+      why: "External tool memory keeps prompt contexts lean while granting access to vast state stores."
+    },
+    {
+      q: "What is 'Hierarchical Retrieval' in advanced RAG systems?",
+      a: ["Retrieving high-level chapter or document summaries first, then retrieving specific paragraph chunks based on relevance","Sorting files alphabetically","Retrieving files by date","Using a single large vector"],
+      c: 0,
+      why: "Hierarchical retrieval navigates from macro summaries down to micro details, preserving context fidelity."
+    },
+    {
+      q: "What is the ultimate mark of an architect who understands context limits?",
+      a: ["They design modular systems using RAG, tool calling, and map-reduce rather than relying on giant brute-force prompts","They use the largest possible prompt for every task","They avoid using models with more than 1,000 tokens","They never write unit tests"],
+      c: 0,
+      why: "System architecture, data routing, and decomposition transcend raw context window size."
+    }
+  ]);
+</script>
+</body>
+</html>

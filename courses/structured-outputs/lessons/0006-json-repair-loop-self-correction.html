@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 06 — The JSON Repair Loop: Self-Correction with Error Feedback</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="structured-outputs" data-lesson="6" data-lesson-id="json-repair-loop-self-correction">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 06</span> · Self-Correction</span>
+
+  <h1 class="lesson-title">The JSON Repair Loop: Self-Correction with Error Feedback</h1>
+  <p class="lesson-lede">
+    Automated error recovery: building self-healing JSON repair loops that feed Pydantic validation errors back to the model.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to build self-healing JSON repair loops that recover from validation errors.</span>
+    <span><b>Mission link</b> Mastering the json repair loop: self-correction with error feedback across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of The JSON Repair Loop: Self-Correction with Error Feedback</h2>
+  <p>Even with constrained decoding, real-world systems occasionally experience validation errors: a string was 101 characters when the limit was 100, an enum had an unexpected character, or custom business validation failed. In amateur software, this throws an unhandled exception. In professional systems, it triggers a <strong>JSON Repair Loop</strong>.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Automated error recovery: building self-healing JSON repair loops that feed Pydantic validation errors back to the model.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Self-Healing Repair Loop</h2>
+  <p>The Self-Healing Repair Protocol:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Error Recovery Success Rate</h2>
+  <ul><li><strong>1. Attempt Parsing:</strong> The application attempts to validate the model's output using Pydantic: `Model.model_validate(json_data)`.</li><li><strong>2. Catch ValidationError:</strong> If validation fails, capture the exact Pydantic error details (field name, invalid value, expected type).</li><li><strong>3. Feedback Turn:</strong> Send an immediate follow-up message: <em>'Your previous output had validation errors: [Field 'severity' must be one of: 'low', 'high']. Please correct the JSON and return valid output.'</em></li><li><strong>4. Re-Validate:</strong> The model reads the error, understands its exact mistake, and emits corrected JSON in 1 turn!</li></ul><pre><code># The Self-Healing JSON Repair Loop in Python:
+for attempt in range(3):
+    raw_response = call_llm(prompt)
+    try:
+        return MySchema.model_validate_json(raw_response)
+    except ValidationError as err:
+        if attempt == 2:
+            raise  # Exhausted retries, fail safely
+        # Feed error back to model for self-correction!
+        prompt = f"""Your previous response failed validation:
+{err.json()}
+Correct the errors and return valid JSON matching the schema."""</code></pre><div class="callout"><p><strong>The 99.9% Reliability Seam:</strong> A single self-correction turn resolves over 95% of initial schema validation errors, elevating system reliability to production-grade thresholds.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the JSON repair sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to build self-healing JSON repair loops that recover from validation errors.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where the json repair loop: self-correction with error feedback applies.</li>
+    <li>Author a unit test or verification script exercising the json repair loop: self-correction with error feedback.</li>
+    <li>Document team architectural conventions regarding the json repair loop: self-correction with error feedback.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for The JSON Repair Loop: Self-Correction with Error Feedback.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is a 'JSON Repair Loop' in production LLM applications?",
+    a: ["An automated retry pattern where a Pydantic validation error message is fed back to the model to correct its own formatting mistake","A physical tool for soldering computer circuits","A database repair script","A feature in Microsoft Word"],
+    c: 0,
+    why: "Repair loops feed compiler and schema validation errors back to the model, enabling automated self-correction."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Attempt 1: Model Emits JSON",
+            "lines": [
+                  "Field 'age' output as string 'thirty'",
+                  "Pydantic raises ValidationError"
+            ]
+      },
+      {
+            "title": "Feedback Turn to Model",
+            "lines": [
+                  "Send Pydantic error trace",
+                  "'Field age must be an integer, not string'"
+            ]
+      },
+      {
+            "title": "Attempt 2: Self-Correction",
+            "lines": [
+                  "Model fixes 'age': 30",
+                  "Validation passes 100% cleanly!"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing The JSON Repair Loop: Self-Correction with Error Feedback",
+      "def execute_flow():",
+      "    # Automated error recovery: building self-healing JS...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "The JSON Repair Loop: Self-Correction with Error Feedback"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Single Pass Reliability"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "With 1 Repair Loop"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The JSON repair loop achieves high reliability by capturing Pydantic {1} errors and feeding them back to the model for automated {2}."
+],
+    blanks: [
+      {
+            "a": [
+                  "validation"
+            ],
+            "why": "Schema failure tracebacks"
+      },
+      {
+            "a": [
+                  "self-correction"
+            ],
+            "why": "The model repairing its own mistake"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What specific information should be fed back to the model during a JSON repair loop?",
+      a: ["The exact Pydantic ValidationError message detailing which field failed, the invalid value, and the expected constraint","The user's credit card number","A generic error message saying 'wrong'","The entire computer operating system log"],
+      c: 0,
+      why: "Precise error coordinates (field name and expected type) allow the model to fix its mistake in a single turn."
+    },
+    {
+      q: "How many retry attempts should a production repair loop typically permit before failing?",
+      a: ["2 to 3 attempts (allowing 1 or 2 self-corrections before raising an exception)","10,000 attempts","Infinite attempts","Zero attempts"],
+      c: 0,
+      why: "2-3 attempts resolve virtually all fixable errors without risking runaway token loops."
+    },
+    {
+      q: "Why do language models excel at fixing their own schema mistakes when given validation errors?",
+      a: ["Models can easily compare their previous output against the explicit compiler error message to pinpoint the delta","Models have human emotions","Models dislike failing tests","The compiler rewrites the model weights"],
+      c: 0,
+      why: "Compiler and schema error messages provide rich feedback that models use to condition the correction."
+    },
+    {
+      q: "What should happen if the model fails validation on all 3 repair loop attempts?",
+      a: ["Halt, raise an explicit exception, log the failure for engineering audit, and return a clean HTTP 500/502 to the user","Delete the user database","Restart the server","Pretend it succeeded"],
+      c: 0,
+      why: "Circuit-breaking after maximum attempts prevents infinite loops and alerts developers to flawed schemas."
+    }
+  ]);
+</script>
+</body>
+</html>

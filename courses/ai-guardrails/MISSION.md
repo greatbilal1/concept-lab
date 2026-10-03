@@ -1,0 +1,3 @@
+# Mission — AI Guardrails & Validation
+
+Transform unbounded probabilistic models into enterprise-safe software systems. Master the guardrail sandwich architecture, screen prompts at the perimeter for topicality and jailbreaks, scrub PII at ingress, enforce strict Pydantic output schemas, detect credential leakage with regex scanners, orchestrate safety using NeMo Guardrails and Guardrails AI, leverage free content moderation APIs, bound agent capabilities with strict allow-lists, establish human escalation protocols, and architect production guardrail gateways.

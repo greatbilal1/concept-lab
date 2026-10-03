@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 06 — Working Memory and Scratchpad State Management</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="ai-memory-context" data-lesson="6" data-lesson-id="working-memory-scratchpad-state">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 06</span> · Scratchpads</span>
+
+  <h1 class="lesson-title">Working Memory and Scratchpad State Management</h1>
+  <p class="lesson-lede">
+    Managing in-flight execution state: scratchpads, active todo lists, state machines, and goal progression tracking.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to manage working memory and scratchpad states for complex agent tasks.</span>
+    <span><b>Mission link</b> Mastering working memory and scratchpad state management across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Working Memory and Scratchpad State Management</h2>
+  <p>When an agent undertakes a multi-step project (e.g. <em>'Migrate user database to PostgreSQL and update all 12 queries'</em>), it easily loses track of progress. After fixing query #4, it forgets whether query #3 was completed or what remains to be done.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Managing in-flight execution state: scratchpads, active todo lists, state machines, and goal progression tracking.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Working Memory State Machine</h2>
+  <p>Human project managers solve this with checklists. AI agents require <strong>Working Memory Scratchpads</strong>:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Preventing Premature Completion</h2>
+  <ul><li><strong>1. Explicit Plan Formulation:</strong> At the start of a task, the agent writes a numbered task list with states: `not-started`, `in-progress`, `completed`.</li><li><strong>2. Dynamic State Transitions:</strong> Before taking an action, mark exactly ONE item as `in-progress`. Upon verifying the step, mark it `completed` immediately!</li><li><strong>3. Persistent Tool Memory (`manage_todo_list`):</strong> The active todo list is passed back and forth in working memory, anchoring the agent's attention on the single immediate next action.</li></ul><pre><code># The Active Working Memory Scratchpad:
+# Agent's Internal Working State:
+- [x] Step 1: Export SQLite schema to schema.sql (Done)
+- [x] Step 2: Convert SQLite types to PostgreSQL types (Done)
+- [-] Step 3: Run migration in local Docker PostgreSQL (IN-PROGRESS)
+- [ ] Step 4: Update SQLAlchemy database connection URL (Pending)
+- [ ] Step 5: Execute pytest tests/test_db.py (Pending)</code></pre><div class="callout"><p><strong>The Focus Rule:</strong> An agent with a structured scratchpad is 5x less likely to loop, skip steps, or hallucinate task completion prematurely.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the working memory sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to manage working memory and scratchpad states for complex agent tasks.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where working memory and scratchpad state management applies.</li>
+    <li>Author a unit test or verification script exercising working memory and scratchpad state management.</li>
+    <li>Document team architectural conventions regarding working memory and scratchpad state management.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Working Memory and Scratchpad State Management.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Why is an active todo list (scratchpad) essential when an AI agent executes a complex 15-step task?",
+    a: ["It provides a visible state anchor that prevents the agent from getting lost, skipping steps, or repeating completed subtasks","It allows the agent to play games","It speeds up internet downloads","Todo lists are required by Python compilers"],
+    c: 0,
+    why: "Structured working memory anchors agent attention on current progress and immediate next actions."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1. Task Initialization",
+            "lines": [
+                  "Formulate 5-step plan",
+                  "All items: 'not-started'"
+            ]
+      },
+      {
+            "title": "2. Step Execution",
+            "lines": [
+                  "Mark Step 1: 'in-progress'",
+                  "Execute tool -> Verify result"
+            ]
+      },
+      {
+            "title": "3. Immediate Update",
+            "lines": [
+                  "Mark Step 1: 'completed'",
+                  "Select Step 2: 'in-progress'"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Working Memory and Scratchpad State Management",
+      "def execute_flow():",
+      "    # Managing in-flight execution state: scratchpads, a...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Working Memory and Scratchpad State Management"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Unstructured Agent"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Scratchpad Agent"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Working memory scratchpads anchor agent execution by maintaining an active {1} of subtasks with explicit status {2}."
+],
+    blanks: [
+      {
+            "a": [
+                  "checklist"
+            ],
+            "why": "Structured list of todos"
+      },
+      {
+            "a": [
+                  "transitions"
+            ],
+            "why": "Moving from in-progress to completed"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What failure mode occurs when an agent has no working memory scratchpad on a complex task?",
+      a: ["Premature declaration of completion, skipping critical verification steps, or circular repetition of completed tasks","The model catches a virus","The computer processor stops","The internet disconnects"],
+      c: 0,
+      why: "Without a state tracker, models lose awareness of progress across multiple tool turns."
+    },
+    {
+      q: "How many items should typically be marked as 'in-progress' at any given moment in an agent's scratchpad?",
+      a: ["Exactly one item at a time, keeping focus concentrated on a single actionable subtask","All items simultaneously","Zero items","100 items"],
+      c: 0,
+      why: "Focusing on one in-progress item at a time prevents multitasking thrashing."
+    },
+    {
+      q: "When should an agent update its working memory scratchpad?",
+      a: ["Immediately before starting a subtask (mark in-progress) and immediately after verifying completion (mark completed)","Only once a week","After the entire project is finished","Never"],
+      c: 0,
+      why: "Real-time updates ensure the active state is always accurate on every turn."
+    },
+    {
+      q: "Where is an agent's working memory scratchpad typically stored during a session?",
+      a: ["In the active conversation message context or a dedicated session state file managed by tools","On a physical whiteboard","In the user's email","In the monitor firmware"],
+      c: 0,
+      why: "Scratchpads live in active working context where the model can inspect them on every turn."
+    }
+  ]);
+</script>
+</body>
+</html>

@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 06 — Shadow Deployments and Canary Testing for AI</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="reliable-ai-systems" data-lesson="6" data-lesson-id="shadow-deployments-canary-testing">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 06</span> · Canary Deployments</span>
+
+  <h1 class="lesson-title">Shadow Deployments and Canary Testing for AI</h1>
+  <p class="lesson-lede">
+    Safe release engineering: Shadow Deployments (mirroring live traffic with zero user impact), Canary rollouts (1% -> 5% -> 100%), and metric diffing.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to execute shadow deployments and canary rollouts for safe AI release engineering.</span>
+    <span><b>Mission link</b> Mastering shadow deployments and canary testing for ai across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Shadow Deployments and Canary Testing for AI</h2>
+  <p>Never deploy a prompt update or a new model version directly to 100% of production users based on offline tests alone. Real users type unpredictable edge cases that no benchmark can fully anticipate. Production release engineering uses <strong>Shadowing and Canaries</strong>.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Safe release engineering: Shadow Deployments (mirroring live traffic with zero user impact), Canary rollouts (1% -> 5% -> 100%), and metric diffing.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Progressive Release Lifecycle</h2>
+  <p>The Progressive AI Release Pipeline:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Automated Rollback Circuit</h2>
+  <ul><li><strong>1. Phase 1: Shadow Deployment (Dark Traffic Mirroring):</strong> The API Gateway duplicates 100% of incoming live user requests. The primary model answers the user. Simultaneously, a background thread sends the same prompt to the candidate model! Compare candidate latency, schema adherence, and output quality with <strong>zero risk to real users</strong>!</li><li><strong>2. Phase 2: Canary Rollout (1% $\rightarrow$ 5% $\rightarrow$ 25%):</strong> Route 1% of live user traffic to the candidate model. Monitor error rates, user thumbs-down signals, and latency.</li><li><strong>3. Automated Rollback Trigger:</strong> If candidate error rate exceeds 1.0% or thumbs-down feedback spikes by 20%, <strong>the canary automatically rolls back to 0% in under 5 seconds!</strong></li><li><strong>4. Phase 3: Full 100% Promotion:</strong> Once metrics prove superior or equal to the baseline over 24 hours, promote candidate to 100%.</li></ul><pre><code># Shadow Deployment Traffic Mirroring Pattern (Gateway):
+async def handle_user_query(user_query: str) -> str:
+    # 1. Primary Model serves real user:
+    primary_response = await primary_model.generate(user_query)
+    
+    # 2. Shadow Candidate executes asynchronously in background (Zero user impact!):
+    asyncio.create_task(
+        run_and_log_shadow_candidate(candidate_model, user_query, primary_response)
+    )
+    
+    return primary_response # User receives fast, tested baseline response!</code></pre><div class="callout"><p><strong>The Safe Release Law:</strong> In mission-critical systems, every major model upgrade must survive a 48-hour shadow deployment before touching a single real customer.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the release engineering sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to execute shadow deployments and canary rollouts for safe AI release engineering.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where shadow deployments and canary testing for ai applies.</li>
+    <li>Author a unit test or verification script exercising shadow deployments and canary testing for ai.</li>
+    <li>Document team architectural conventions regarding shadow deployments and canary testing for ai.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Shadow Deployments and Canary Testing for AI.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is a 'Shadow Deployment' (Dark Traffic Mirroring) in AI systems?",
+    a: ["Duplicating live user traffic to test a new candidate model in the background without returning its results to the user, comparing outputs safely","Deploying models in dark mode","Deploying code at night","Deploying without source code"],
+    c: 0,
+    why: "Shadow deployments replicate live traffic to candidate models in the background to verify performance without user risk."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Phase 1: Shadow Traffic (0% User Exposure)",
+            "lines": [
+                  "Mirrors live prompts to candidate in background",
+                  "Compares latency, token spend, & quality safely"
+            ]
+      },
+      {
+            "title": "Phase 2: Canary Rollout (1% -> 5% -> 25%)",
+            "lines": [
+                  "Small percentage of real users routed to candidate",
+                  "Monitors error spikes & user thumbs-down"
+            ]
+      },
+      {
+            "title": "Phase 3: 100% Full Promotion",
+            "lines": [
+                  "Candidate proven superior -> Promoted to default",
+                  "Automated instant rollback if regressions occur!"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Shadow Deployments and Canary Testing for AI",
+      "def execute_flow():",
+      "    # Safe release engineering: Shadow Deployments (mirr...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Shadow Deployments and Canary Testing for AI"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Canary Anomaly Detected"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Progressive release engineering tests AI updates using {1} deployments to mirror live traffic without user risk, followed by gradual {2} rollouts."
+],
+    blanks: [
+      {
+            "a": [
+                  "shadow"
+            ],
+            "why": "Dark traffic mirroring in background"
+      },
+      {
+            "a": [
+                  "canary"
+            ],
+            "why": "Small incremental percentage rollout"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the primary safety benefit of a Shadow Deployment for AI models?",
+      a: ["It tests the new model's latency, cost, and output quality against real-world production traffic with absolutely zero risk of delivering bad answers to users","It costs zero money","It eliminates the need for software code","It runs without internet"],
+      c: 0,
+      why: "Shadow responses are logged for evaluation but never shown to end users, eliminating risk."
+    },
+    {
+      q: "What automated metric should immediately trigger a Canary rollback?",
+      a: ["A statistically significant spike in schema validation errors, HTTP 500s, or user thumbs-down ratings compared to the control group","The time of day reaching midnight","A user typing in lowercase","The computer monitor refreshing"],
+      c: 0,
+      why: "Error and dissatisfaction spikes indicate the candidate release is regressing customer experience."
+    },
+    {
+      q: "Why is Canary testing superior to big-bang (0% to 100%) deployments?",
+      a: ["If a catastrophic bug exists in the new prompt, it only affects 1% of users for a few minutes before rolling back rather than impacting all customers","Canary testing uses no servers","Canary testing is required by law","Big-bang deployments are illegal"],
+      c: 0,
+      why: "Canary rollouts limit the blast radius of unforeseen defects to a tiny fraction of users."
+    },
+    {
+      q: "How does comparing the candidate model's outputs against the baseline model in a shadow run help engineers?",
+      a: ["Engineers can run automated semantic diffs to identify specific prompts where the new model's answer diverges significantly from the established baseline","It translates text to German","It deletes slow queries","It reduces GPU temperature"],
+      c: 0,
+      why: "Output divergence analysis highlights edge cases where the candidate model behaves unexpectedly."
+    }
+  ]);
+</script>
+</body>
+</html>

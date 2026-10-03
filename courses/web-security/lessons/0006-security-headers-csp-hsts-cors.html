@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 06 — Security Headers (CSP, HSTS, CORS) and Modern Browser Defenses</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="web-security" data-lesson="6" data-lesson-id="security-headers-csp-hsts-cors">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 06</span> · Security Headers</span>
+
+  <h1 class="lesson-title">Security Headers (CSP, HSTS, CORS) and Modern Browser Defenses</h1>
+  <p class="lesson-lede">
+    Browser defense in depth: Content Security Policy (CSP), HTTP Strict Transport Security (HSTS), and Cross-Origin Resource Sharing (CORS).
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to configure CSP, HSTS, CORS, and modern browser security headers.</span>
+    <span><b>Mission link</b> Mastering security headers (csp, hsts, cors) and modern browser defenses across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Security Headers (CSP, HSTS, CORS) and Modern Browser Defenses</h2>
+  <p>Modern web browsers are sophisticated security operating systems with powerful built-in defense sandboxes. However, the browser will only activate these defenses if your server explicitly instructs it to do so using <strong>HTTP Security Headers</strong>.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Browser defense in depth: Content Security Policy (CSP), HTTP Strict Transport Security (HSTS), and Cross-Origin Resource Sharing (CORS).
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Core Security Headers Suite</h2>
+  <p>The Four Essential Browser Security Headers:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>CORS vs Same-Origin Policy</h2>
+  <ul><li><strong>1. Content Security Policy (CSP):</strong> Restricts trusted sources of executable code: <code>Content-Security-Policy: default-src 'self'; script-src 'self' https://trusted-cdn.com</code>. Blocks injected inline scripts and rogue third-party tracking scripts!</li><li><strong>2. HTTP Strict Transport Security (HSTS):</strong> Instructs the browser <strong>never to use unencrypted HTTP</strong> for this domain for the next year: <code>Strict-Transport-Security: max-age=31536000; includeSubDomains; preload</code>. Prevents SSL-stripping attacks.</li><li><strong>3. Cross-Origin Resource Sharing (CORS):</strong> Governs which external origins are allowed to read API responses in JavaScript. <em>Never use `Access-Control-Allow-Origin: *` with credentials!</em></li><li><strong>4. X-Content-Type-Options:</strong> <code>X-Content-Type-Options: nosniff</code>. Prevents browsers from guessing (MIME-sniffing) file types and executing uploaded images as JavaScript!</li></ul><pre><code># Complete Security Headers Middleware in Python (FastAPI):
+@app.middleware("http")
+async def add_security_headers(request: Request, call_next):
+    response = await call_next(request)
+    response.headers["Content-Security-Policy"] = "default-src 'self'; script-src 'self'"
+    response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY" # Blocks Clickjacking iframe attacks!
+    return response</code></pre><div class="callout"><p><strong>The HSTS Preload List:</strong> Submitting your domain to the official Chromium HSTS Preload list hardcodes HTTPS into all major browsers, ensuring connections are encrypted from the very first visit.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the security headers sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to configure CSP, HSTS, CORS, and modern browser security headers.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where security headers (csp, hsts, cors) and modern browser defenses applies.</li>
+    <li>Author a unit test or verification script exercising security headers (csp, hsts, cors) and modern browser defenses.</li>
+    <li>Document team architectural conventions regarding security headers (csp, hsts, cors) and modern browser defenses.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Security Headers (CSP, HSTS, CORS) and Modern Browser Defenses.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What does a 'Content Security Policy' (CSP) header enforce in modern web browsers?",
+    a: ["It restricts which external domains and sources a browser is permitted to load scripts, styles, images, and fonts from, neutralizing XSS attacks","It copyright protects web content","It changes the font style of the website","It accelerates internet speed"],
+    c: 0,
+    why: "CSP tells browsers which sources are trusted for scripts and assets, preventing unauthorized code execution."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Content-Security-Policy (CSP)",
+            "lines": [
+                  "Blocks unauthorized scripts & frames",
+                  "Neutralizes injected XSS payloads"
+            ]
+      },
+      {
+            "title": "Strict-Transport-Security (HSTS)",
+            "lines": [
+                  "Enforces 100% HTTPS connections",
+                  "Prevents SSL-stripping & man-in-the-middle"
+            ]
+      },
+      {
+            "title": "X-Frame-Options: DENY",
+            "lines": [
+                  "Prevents embedding in malicious iframes",
+                  "Neutralizes Clickjacking attacks"
+            ]
+      },
+      {
+            "title": "X-Content-Type-Options: nosniff",
+            "lines": [
+                  "Prevents MIME-type confusion attacks",
+                  "Blocks executing images as scripts"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Security Headers (CSP, HSTS, CORS) and Modern Browser Defenses",
+      "def execute_flow():",
+      "    # Browser defense in depth: Content Security Policy ...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Security Headers (CSP, HSTS, CORS) and Modern Browser Defenses"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Default Browser SOP"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Broken CORS: Access-Control-Allow-Origin: *"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Content Security Policy neutralizes XSS by restricting allowed script sources, while {1} enforces permanent HTTPS and {2} blocks clickjacking iframe embedding."
+],
+    blanks: [
+      {
+            "a": [
+                  "HSTS"
+            ],
+            "why": "HTTP Strict Transport Security header"
+      },
+      {
+            "a": [
+                  "X-Frame-Options"
+            ],
+            "why": "Header preventing iframe embedding"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What happens if an attacker injects an XSS script into a website protected by a strict 'Content-Security-Policy: default-src 'self'' header?",
+      a: ["The browser refuses to execute the inline script or load external attacker code, reporting a CSP violation in the developer console","The browser crashes","The website deletes its code","The script executes anyway"],
+      c: 0,
+      why: "CSP policies instruct browsers to refuse execution of unauthorized scripts, neutralizing XSS."
+    },
+    {
+      q: "What is an 'SSL-Stripping' attack that HSTS prevents?",
+      a: ["An attacker intercepting initial plaintext HTTP requests on public Wi-Fi to downgrade connections before encryption establishes","A computer virus that deletes SSL files","A hardware defect in network cards","A technique for speeding up Wi-Fi"],
+      c: 0,
+      why: "HSTS instructs browsers to refuse unencrypted HTTP, preventing protocol downgrade attacks."
+    },
+    {
+      q: "What is 'Clickjacking' and how does 'X-Frame-Options: DENY' stop it?",
+      a: ["Embedding a target website inside a transparent iframe so clicks hit hidden buttons; DENY tells browsers never to render the site inside an iframe","Stealing a user's mouse","Clicking too fast on a website","A broken hyperlink"],
+      c: 0,
+      why: "X-Frame-Options: DENY prevents third-party sites from framing your UI to trick users into clicking buttons."
+    },
+    {
+      q: "Why is setting 'Access-Control-Allow-Origin: *' on authenticated private API endpoints dangerous?",
+      a: ["It permits any external website on the internet to read sensitive private API responses in client-side JavaScript","It causes hard drives to fill up","It is illegal in Python","It slows down internet speed"],
+      c: 0,
+      why: "Wildcard CORS headers disable the browser's Same-Origin protection, exposing private data to any site."
+    }
+  ]);
+</script>
+</body>
+</html>

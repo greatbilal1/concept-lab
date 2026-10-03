@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 04 — Latency Profiling: TTFT, Generation Speed, and Bottlenecks</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="llm-observability" data-lesson="4" data-lesson-id="latency-profiling-ttft-throughput">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 04</span> · Latency Profiling</span>
+
+  <h1 class="lesson-title">Latency Profiling: TTFT, Generation Speed, and Bottlenecks</h1>
+  <p class="lesson-lede">
+    Deep latency profiling: breaking down Time-to-First-Token (TTFT), inter-token arrival time (ITL), and network transit.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to profile, decompose, and optimize LLM latency bottlenecks.</span>
+    <span><b>Mission link</b> Mastering latency profiling: ttft, generation speed, and bottlenecks across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Latency Profiling: TTFT, Generation Speed, and Bottlenecks</h2>
+  <p>When users complain: <em>'The AI feels slow'</em>, saying 'we need to optimize' is useless. You must decompose total request duration into its three physical components:</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Deep latency profiling: breaking down Time-to-First-Token (TTFT), inter-token arrival time (ITL), and network transit.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Latency Decomposition Breakdown</h2>
+  <ul><li><strong>1. Network Transit Latency:</strong> The speed-of-light round trip from client to cloud data center (typically 40-150ms).</li><li><strong>2. Time-to-First-Token (TTFT):</strong> How long the model takes to ingest and compute attention over all prompt tokens (pre-fill phase). If your prompt has 50,000 tokens, TTFT will be high!</li><li><strong>3. Inter-Token Latency (ITL) / Throughput:</strong> The time taken to emit each subsequent token during decoding (typically 15-30ms per token = 30-70 tokens/sec).</li></ul>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Diagnosing Latency Bottlenecks</h2>
+  <pre><code># The Latency Decomposition Equation:
+# Total_Duration = Network_RTT + TTFT + (Output_Tokens * Inter_Token_Latency)
+#
+# Case A (Prompt Bloat):  TTFT = 4.2s, Output = 0.5s -> BOTTLENECK: Prompt is too big!
+# Case B (Verbose Output): TTFT = 0.4s, Output = 7.5s -> BOTTLENECK: Model generating too much text!</code></pre><p>By profiling these metrics in your observability traces, the fix becomes obvious: if TTFT is high, prune your prompt and enable prompt caching; if generation time is high, enforce concise output constraints.</p><div class="callout"><p><strong>The Profiling Rule:</strong> Always monitor p95 and p99 latency percentiles, not just the average. Outliers with giant prompts distort user experience.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the latency profiling sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to profile, decompose, and optimize LLM latency bottlenecks.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where latency profiling: ttft, generation speed, and bottlenecks applies.</li>
+    <li>Author a unit test or verification script exercising latency profiling: ttft, generation speed, and bottlenecks.</li>
+    <li>Document team architectural conventions regarding latency profiling: ttft, generation speed, and bottlenecks.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Latency Profiling: TTFT, Generation Speed, and Bottlenecks.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What does 'Inter-Token Latency' (ITL) measure in streaming LLM generation?",
+    a: ["The average duration between consecutive streamed tokens during the decoding phase (measuring generation throughput)","The time to download the model file","The delay before the first token appears","The speed of the network router"],
+    c: 0,
+    why: "ITL measures the time between consecutive emitted tokens, defining the smoothness and speed of text generation."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Network RTT (40-100ms)",
+            "lines": [
+                  "Speed-of-light client-server transit",
+                  "Minimized via geographic CDN edge routing"
+            ]
+      },
+      {
+            "title": "Time-to-First-Token (TTFT)",
+            "lines": [
+                  "Prompt pre-fill computation",
+                  "Minimized via prompt pruning & caching"
+            ]
+      },
+      {
+            "title": "Generation Duration (ITL)",
+            "lines": [
+                  "Tokens-per-second decoding speed",
+                  "Minimized via concise output constraints"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Latency Profiling: TTFT, Generation Speed, and Bottlenecks",
+      "def execute_flow():",
+      "    # Deep latency profiling: breaking down Time-to-Firs...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Latency Profiling: TTFT, Generation Speed, and Bottlenecks"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Symptom: High TTFT (5s+)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Symptom: High ITL (Slow Stream)"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Latency profiling breaks down total duration into network round-trip, {1} for prompt pre-fill, and inter-token latency for {2} throughput."
+],
+    blanks: [
+      {
+            "a": [
+                  "TTFT"
+            ],
+            "why": "Time-to-First-Token pre-fill duration"
+      },
+      {
+            "a": [
+                  "generation"
+            ],
+            "why": "Decoding speed across output tokens"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What does a high p99 TTFT indicate when average TTFT is low?",
+      a: ["Occasional outlier requests with massive prompt sizes or cache misses are causing severe response delays for a subset of users","The computer monitor is refreshing slowly","Python is running in debug mode","The internet was disconnected for everyone"],
+      c: 0,
+      why: "p99 percentiles expose tail outliers (like massive document attachments) that averages conceal."
+    },
+    {
+      q: "How does prompt caching dramatically reduce Time-to-First-Token (TTFT)?",
+      a: ["By avoiding recomputing attention over large static prefixes, allowing the model to begin generating output tokens immediately","By making the text shorter","By deleting prompt tokens","By running on quantum hardware"],
+      c: 0,
+      why: "Loading pre-computed KV-cache states bypasses the heavy pre-fill computation phase."
+    },
+    {
+      q: "Why is streaming Inter-Token Latency (ITL) important for user perception?",
+      a: ["If ITL is erratic or jittery, text generation feels stuttery and unnatural to read on screen","It changes the color of the text","It causes hard drive crashes","It affects CSS rendering"],
+      c: 0,
+      why: "Consistent, low ITL ensures smooth, typewriter-like visual streaming."
+    },
+    {
+      q: "What simple prompt directive slashes generation duration in half?",
+      a: ["Instructing the model: 'Be concise. Answer in 2-3 bullet points without introductory filler.'","Telling the model to run faster","Writing in all capital letters","Setting temperature to 2.0"],
+      c: 0,
+      why: "Halving the number of emitted tokens directly halves the generation decoding duration."
+    }
+  ]);
+</script>
+</body>
+</html>

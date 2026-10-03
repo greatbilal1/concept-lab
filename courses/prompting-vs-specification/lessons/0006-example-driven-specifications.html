@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 06 — Example-Driven Specifications</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="prompting-vs-specification" data-lesson="6" data-lesson-id="example-driven-specifications">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 06</span> · Concrete Examples</span>
+
+  <h1 class="lesson-title">Example-Driven Specifications</h1>
+  <p class="lesson-lede">
+    Using concrete input-output examples and golden references to eliminate ambiguity in specs.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to use concrete examples to eliminate specification ambiguity.</span>
+    <span><b>Mission link</b> Mastering example-driven specifications across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Example-Driven Specifications</h2>
+  <p>Human language is notoriously ambiguous. If you say: <em>'Return a user profile with address and account status'</em>, the agent might return:</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Using concrete input-output examples and golden references to eliminate ambiguity in specs.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Show vs Tell</h2>
+  <ul><li>`{"user_address": "123 Main St", "status": 1}`</li><li>`{"address": {"street": "123 Main St", "city": "Boston"}, "is_active": true}`</li><li>`{"Address": "123 Main St", "AccountStatus": "ACTIVE"}`</li></ul>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Golden File Pattern</h2>
+  <p>Every variation has different casing, different field names, and different data types. Your frontend will break on all but one.</p><p>The solution is <strong>Example-Driven Specification</strong>. Show, don't just tell:</p><pre><code># Example-Driven Specification
+### Expected Request Payload
+POST /api/v1/orders
+Content-Type: application/json
+{
+  "customer_id": "usr_84920",
+  "items": [
+    {"sku": "WIDGET-01", "quantity": 2, "unit_price_cents": 1500}
+  ]
+}
+
+### Expected Response (HTTP 201 Created)
+{
+  "order_id": "ord_91823",
+  "total_cents": 3000,
+  "status": "pending_payment",
+  "created_at": "2026-03-31T14:22:00Z"
+}</code></pre><p>When an agent sees concrete examples, the ambiguity vanishes. The agent mirrors the exact field names (`unit_price_cents`, `created_at`), casing (`snake_case`), and ISO timestamp formatting without guessing.</p><div class="callout"><p><strong>The Golden Reference:</strong> Point to existing code in your repository as an example: <em>'Follow the pattern used in src/billing/charges.py lines 20-55.'</em></p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the example-driven sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to use concrete examples to eliminate specification ambiguity.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where example-driven specifications applies.</li>
+    <li>Author a unit test or verification script exercising example-driven specifications.</li>
+    <li>Document team architectural conventions regarding example-driven specifications.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Example-Driven Specifications.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Why do concrete JSON/code examples clarify specifications better than paragraphs of text?",
+    a: ["Examples demonstrate exact field names, data types, casing, and nested structures without ambiguity","Examples take fewer tokens than single words","Examples bypass the model's tokenizer","Examples compile directly to machine code"],
+    c: 0,
+    why: "Concrete examples eliminate semantic ambiguity around schemas, formats, and data structures."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Prose Description (Ambiguous)",
+            "lines": [
+                  "'Return order info with items'",
+                  "Agent guesses camelCase vs snake_case",
+                  "Agent guesses integer cents vs float dollars"
+            ]
+      },
+      {
+            "title": "Concrete Example (Precise)",
+            "lines": [
+                  "Exact JSON with field names & types",
+                  "ISO-8601 timestamp string format",
+                  "Zero room for statistical deviation"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Example-Driven Specifications",
+      "def execute_flow():",
+      "    # Using concrete input-output examples and golden re...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Example-Driven Specifications"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Specification Directive"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Agent Execution"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Providing concrete input-output {1} eliminates ambiguity by demonstrating exact field names, types, and {2}."
+],
+    blanks: [
+      {
+            "a": [
+                  "examples"
+            ],
+            "why": "Sample JSON payloads or code snippets"
+      },
+      {
+            "a": [
+                  "casing"
+            ],
+            "why": "Naming convention like snake_case or camelCase"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why is specifying 'unit_price_cents: 1500' in an example better than saying 'price should be an integer'?",
+      a: ["It clarifies both the currency unit (cents vs dollars) and the integer datatype simultaneously","It makes the JSON file smaller","It avoids paying credit card fees","It converts dollars to euros"],
+      c: 0,
+      why: "Concrete values convey domain meaning and units of measure without confusion."
+    },
+    {
+      q: "How does pointing an agent to an existing 'Golden Reference' file improve code quality?",
+      a: ["The agent borrows existing project patterns, import styles, and error handling rather than inventing new ones","It deletes the reference file","It copies the file without modifications","It turns off type checking"],
+      c: 0,
+      why: "Reference files ground the agent in proven, existing repository conventions."
+    },
+    {
+      q: "What happens when an agent is given conflicting prose and examples?",
+      a: ["The agent becomes confused and may produce erratic code; ensure examples match prose descriptions exactly","The agent automatically rewrites the spec","The compiler fixes the contradiction","The terminal prints a warning"],
+      c: 0,
+      why: "Inconsistencies between prose and examples create cognitive dissonance in language models."
+    },
+    {
+      q: "How many input-output examples are typically sufficient for an endpoint specification?",
+      a: ["One happy path example and one or two representative error/edge case examples","At least 1,000 examples","Zero examples; models don't like examples","Exactly 50 examples"],
+      c: 0,
+      why: "A happy path plus critical error cases provides strong few-shot guidance with minimal token overhead."
+    }
+  ]);
+</script>
+</body>
+</html>

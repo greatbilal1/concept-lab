@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 04 — Positioning: relative, absolute, fixed, sticky</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="css-layout" data-lesson="4" data-lesson-id="positioning-relative-absolute-fixed-sticky">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 04</span> · Normal Flow & Positioning</span>
+
+  <h1 class="lesson-title">Positioning: relative, absolute, fixed, sticky</h1>
+  <p class="lesson-lede">
+    Break out of normal flow when you need to. Learn how relative, absolute, fixed, and sticky positioning coordinate frames and stacking contexts.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Position tooltips, overlays, and sticky headers using CSS position properties</span>
+    <span><b>Mission link</b> Enables creation of complex UI overlays and floating navigation components</span>
+  </div>
+
+  <h2><span class="n">1</span>The four positioning modes</h2>
+  <p>Normal flow places elements in order. The <code>position</code> property lets you override this:</p><p><b>relative</b> moves an element without removing its original space. <b>absolute</b> removes the element from flow and positions it relative to its closest <i>positioned ancestor</i>. <b>fixed</b> positions relative to the browser viewport. <b>sticky</b> acts as relative until scrolled past a threshold, then sticks like fixed.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Absolute elements position relative to their closest ancestor with position other than static.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The containing block anchor pattern</h2>
+  <p>The classic pattern: place position: relative on the parent to anchor an absolute child.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing stacking context layering</h2>
+  <p>Trace how z-index operates within local stacking contexts to determine front-to-back paint order.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your recall of CSS positioning modes.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can position badges, tooltips, sticky navigation headers, and modal overlays with mathematical precision.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Create a card with position: relative and anchor an absolute badge to its top-right corner.</li>
+    <li>Implement a sticky navigation header using position: sticky and top: 0.</li>
+    <li>Inspect a stacking context using the 3D Layers tool in Chrome DevTools.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    W3C: *CSS Positioned Layout Module Level 3* (w3.org/TR/css-position-3).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "If an element has 'position: absolute; top: 0;', but none of its parents have a position property, what does it align to?",
+    a: ["The initial containing block (the viewport / page root)","Its immediate parent div anyway","The center of the computer screen","It disappears completely"],
+    c: 0,
+    why: "Without a positioned ancestor, an absolute element resolves against the root viewport."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Parent (.card)",
+            "lines": [
+                  "position: relative",
+                  "establishes containing block"
+            ]
+      },
+      {
+            "title": "Child (.badge)",
+            "lines": [
+                  "position: absolute; top: 10px; right: 10px;",
+                  "anchors to card corner perfectly"
+            ]
+      },
+      {
+            "title": "Sticky Header (.nav)",
+            "lines": [
+                  "position: sticky; top: 0;",
+                  "scrolls with page until hitting top, then locks"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# .parent (z-index: 1, creates stacking context)",
+      "#   .child (z-index: 9999)",
+      "# .sibling (z-index: 2)",
+      "# Result: .sibling paints IN FRONT of .child despite 9999!",
+      "# Reason: .child is trapped inside parent's level-1 stacking context"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "parent_context": "level 1 stacking context"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "child_internal": "z-index 9999 internal to parent"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "sibling_context": "level 2 stacking context"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "result": "level 2 beats level 1; child cannot escape parent context"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The positioning mode that keeps an element locked to the viewport is <0>.",
+      "An absolute element positions relative to its nearest <1> ancestor.",
+      "The hybrid positioning mode that sticks on scroll is position: <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "fixed"
+            ],
+            "why": "fixed positions relative to the screen viewport."
+      },
+      {
+            "a": [
+                  "positioned"
+            ],
+            "why": "Ancestors must have position other than static."
+      },
+      {
+            "a": [
+                  "sticky"
+            ],
+            "why": "sticky toggles between relative and fixed based on scroll."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why must a parent container have 'position: relative' when anchoring an 'position: absolute' child?",
+      a: ["To establish a containing block coordinate frame for the absolute child","To make the parent element animate smoothly","To prevent the browser from deleting the child element","To convert the child element into an inline tag"],
+      c: 0,
+      why: "An absolute element looks up the DOM tree for the nearest ancestor with position !== static."
+    },
+    {
+      q: "What happens to the space originally occupied by an element when it becomes 'position: absolute'?",
+      a: ["It is completely removed from flow, and subsequent elements move up to fill the void","The space remains as an empty white rectangle","The space doubles in size","The browser crashes immediately"],
+      c: 0,
+      why: "Absolute elements are pulled out of flow; other elements layout as if it never existed."
+    },
+    {
+      q: "Why does 'z-index: 999999' sometimes fail to bring an element in front of another element?",
+      a: ["The element is confined inside a parent stacking context that has a lower z-index than the other element","CSS z-index values cannot exceed 100","The computer screen does not support 3D coordinates","The z-index property only works on images"],
+      c: 0,
+      why: "Stacking contexts are hierarchical; child elements cannot escape their parent's stack level."
+    },
+    {
+      q: "Why might 'position: sticky; top: 0;' fail to stick when scrolling?",
+      a: ["An ancestor element has overflow: hidden, clip, or auto, which confines the scroll container","Sticky positioning only works in desktop Safari browsers","The top property must be set to a negative number","The element must have a red background color"],
+      c: 0,
+      why: "overflow: hidden on any ancestor clips the scroll boundary and breaks sticky behavior."
+    }
+  ]);
+</script>
+</body>
+</html>

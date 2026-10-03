@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 03 — Token Accounting, Cost Tracking, and Quotas</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="llm-observability" data-lesson="3" data-lesson-id="token-accounting-cost-tracking-quotas">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 03</span> · Token Accounting</span>
+
+  <h1 class="lesson-title">Token Accounting, Cost Tracking, and Quotas</h1>
+  <p class="lesson-lede">
+    Financial observability: calculating exact dollar spend per query, user, and feature, and enforcing real-time budget quotas.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to track token economics, attribute costs, and enforce real-time tenant quotas.</span>
+    <span><b>Mission link</b> Mastering token accounting, cost tracking, and quotas across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Token Accounting, Cost Tracking, and Quotas</h2>
+  <p>In traditional SaaS, an active user might cost you $0.001 per month in server compute. In generative AI, a single power user running agentic refactoring loops can easily burn <strong>$50.00 of API tokens in one afternoon</strong>. Without granular token accounting, your SaaS margins will collapse.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Financial observability: calculating exact dollar spend per query, user, and feature, and enforcing real-time budget quotas.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Token Accounting Pipeline</h2>
+  <p>A production <strong>Token Accounting & Quota Engine</strong> enforces three controls:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Feature Cost Attribution</h2>
+  <ul><li><strong>1. Granular Tagging:</strong> Every trace span must be tagged with metadata: `user_id`, `tenant_id`, `feature_name` (e.g. 'code-review' vs 'chat'), and `environment` ('prod' vs 'staging').</li><li><strong>2. Real-Time Cost Calculation:</strong> An ingestion pipeline calculates exact dollar costs: $\text{Cost} = (\text{Prompt} \times P_{in}) + (\text{Completion} \times P_{out})$, subtracting prompt caching discounts.</li><li><strong>3. Pre-Flight Quota Enforcement:</strong> Before invoking an LLM, check the tenant's remaining monthly token budget in Redis! If quota is exhausted, reject the request with HTTP 429 <code>quota_exceeded</code> before incurring API debt.</li></ul><pre><code># Pre-Flight Quota Gate in Python (FastAPI Middleware):
+async def check_tenant_quota(tenant_id: str, estimated_tokens: int):
+    current_spend = await redis.get(f"spend:{tenant_id}:current_month")
+    monthly_limit = await db.get_tenant_spend_limit(tenant_id)
+    
+    if float(current_spend or 0.0) >= monthly_limit:
+        raise HTTPException(
+            status_code=429,
+            detail="Monthly AI budget limit reached. Please upgrade your tier."
+        )</code></pre><div class="callout"><p><strong>The Margin Rule:</strong> Tag every single LLM call with a `feature_name`. If a feature costs $5,000/month but drives zero user retention, kill the feature!</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the token accounting sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to track token economics, attribute costs, and enforce real-time tenant quotas.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where token accounting, cost tracking, and quotas applies.</li>
+    <li>Author a unit test or verification script exercising token accounting, cost tracking, and quotas.</li>
+    <li>Document team architectural conventions regarding token accounting, cost tracking, and quotas.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Token Accounting, Cost Tracking, and Quotas.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Why must an enterprise AI platform track token consumption tagged by 'tenant_id' or 'user_id'?",
+    a: ["To accurately allocate cloud costs, bill customers for usage, and detect abusive accounts before they deplete company margins","To see what customers are doing in private","To report users to the police","It is required by computer hardware"],
+    c: 0,
+    why: "Attributing token consumption to tenants protects gross margins and enforces tier limits."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1. Span Tagging",
+            "lines": [
+                  "tenant_id: 'org_842', feature: 'auto-summary'",
+                  "Captures prompt & completion tokens"
+            ]
+      },
+      {
+            "title": "2. Cost Engine",
+            "lines": [
+                  "Calculates exact dollar cost in real time",
+                  "Applies model-specific pricing tiers"
+            ]
+      },
+      {
+            "title": "3. Quota Ledger",
+            "lines": [
+                  "Atomically increments Redis monthly spend",
+                  "Blocks calls when budget ceiling is breached"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Token Accounting, Cost Tracking, and Quotas",
+      "def execute_flow():",
+      "    # Financial observability: calculating exact dollar ...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Token Accounting, Cost Tracking, and Quotas"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Feature A: Customer Chat"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Feature B: Uncached Vector Search"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Token accounting attributes dollar costs to specific {1} and features, using pre-flight Redis checks to enforce monthly budget {2}."
+],
+    blanks: [
+      {
+            "a": [
+                  "tenants"
+            ],
+            "why": "Customer organizations or accounts"
+      },
+      {
+            "a": [
+                  "quotas"
+            ],
+            "why": "Spending limits and ceilings"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What happens if an application does not enforce a pre-flight budget quota check on user requests?",
+      a: ["An abusive user or runaway script can generate millions of requests, racking up massive third-party API debts","The computer will crash","The model weights will be deleted","Python will throw a syntax error"],
+      c: 0,
+      why: "Without pre-flight budget checks, users can consume unbounded API resources at company expense."
+    },
+    {
+      q: "How does prompt caching affect the mathematical calculation of request cost?",
+      a: ["Cached input tokens must be billed at the discounted provider rate (typically 50% to 90% cheaper) rather than standard input pricing","Cached tokens are free forever","Cached tokens cost 10x more","Caching does not affect pricing"],
+      c: 0,
+      why: "Accurate cost accounting accounts for cached token discounts provided by the model vendor."
+    },
+    {
+      q: "Why is tagging traces by 'feature_name' valuable for product managers?",
+      a: ["It reveals the exact return on investment (ROI) and operating cost of individual AI features across the product","It makes the feature load faster","It formats the UI in dark mode","It changes the button color"],
+      c: 0,
+      why: "Feature-level cost attribution helps teams invest in high-value capabilities and prune unprofitable features."
+    },
+    {
+      q: "What data store is commonly used to maintain fast, atomic real-time user token budgets?",
+      a: ["Redis (using atomic INCRBYFLOAT commands)","A CSV file on desktop","A physical notebook","Git commit history"],
+      c: 0,
+      why: "Redis provides high-speed, atomic in-memory incrementing ideal for rate limits and quotas."
+    }
+  ]);
+</script>
+</body>
+</html>

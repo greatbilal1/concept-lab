@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 02 — The fragile base class problem</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="composition-vs-inheritance" data-lesson="2" data-lesson-id="the-fragile-base-class-problem">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 02</span> · The Fragile Base Class Problem</span>
+
+  <h1 class="lesson-title">The fragile base class problem</h1>
+  <p class="lesson-lede">
+    You edit one private method in a base class, and five innocent subclasses break. Explore the Fragile Base Class problem and Joshua Bloch's famous CustomSet counter failure.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Diagnose and explain the Fragile Base Class problem in subclass hierarchies</span>
+    <span><b>Mission link</b> The architectural flaw that makes deep class inheritance dangerous to maintain</span>
+  </div>
+
+  <h2><span class="n">1</span>The innocent parent edit</h2>
+  <p>The <b>Fragile Base Class Problem</b> is an architectural nightmare: seemingly safe, benign modifications to a base class can silently cause unexpected regressions and bugs in derived subclasses.</p><p>Joshua Bloch documented the classic example: you subclass <code>HashSet</code> to count how many items were added (<code>CustomSet</code>). You override <code>add()</code> to increment a counter. But in the base class, <code>addAll()</code> calls <code>add()</code> internally! When you call <code>addAll([1, 2, 3])</code>, your counter increments by 6 instead of 3! <b>Subclasses are vulnerable to the private implementation choices of their parents.</b></p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Subclasses break when base classes modify internal self-use method invocations.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Fragile Base Class trap</h2>
+  <p>Observe how internal parent implementation details leak into child behavior.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing the double-count bug</h2>
+  <p>Trace the execution steps demonstrating how self-use in the parent corrupts subclass accounting.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of the Fragile Base Class problem.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can identify the Fragile Base Class problem and avoid building inheritance hierarchies vulnerable to parent self-use changes.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Read Item 18 in Joshua Bloch's *Effective Java* to review the InstrumentedHashSet case study.</li>
+    <li>Demonstrate how composition and forwarding fixes the double-counting bug completely.</li>
+    <li>Audit a class hierarchy to see if any subclass overrides depend on parent internal calling order.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Joshua Bloch, *Effective Java* (3rd Edition, Addison-Wesley), Item 18: 'Favor composition over inheritance'.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "In Joshua Bloch's HashSet example, why did overriding add() and addAll() double-count added items?",
+    a: ["Because the superclass's addAll() method internally looped and called add(), triggering the subclass override a second time","Because Java integers multiply automatically","Because the computer RAM was corrupted","Because HashSet is not thread-safe"],
+    c: 0,
+    why: "Internal self-use of methods in the superclass causes subclass overrides to fire repeatedly."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Base: HashSet",
+            "lines": [
+                  "addAll(items) {",
+                  "  for item in items: this.add(item) # hidden self-use!",
+                  "}"
+            ]
+      },
+      {
+            "title": "Child: CustomSet",
+            "lines": [
+                  "override add(): count++",
+                  "override addAll(): count += items.len",
+                  "Result: count is DOUBLED! (broken!)"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "custom_set = CustomSet() # count = 0",
+      "custom_set.addAll([1, 2, 3])",
+      "# 1. Subclass addAll runs: count += 3 (count = 3)",
+      "# 2. Subclass calls super.addAll([1, 2, 3])",
+      "# 3. Super addAll loops: calls this.add(1), this.add(2), this.add(3)",
+      "# 4. Subclass add() override fires on each call: count increments 3 MORE times!",
+      "# Final count = 6! (Double counting bug due to fragile base class)"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "initial": "count = 0"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step_1": "custom addAll adds 3"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "hidden_loop": "super calls overridden add() three times"
+            }
+      },
+      {
+            "line": 6,
+            "vars": {
+                  "bug": "count reaches 6 instead of 3"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "When parent changes break child classes, it is the <0> Base Class problem.",
+      "When a method in a class calls another method in the same class, it is <1>-use.",
+      "Subclassing breaks <2> because the child depends on parent implementation details."
+],
+    blanks: [
+      {
+            "a": [
+                  "Fragile"
+            ],
+            "why": "Fragile base classes cause unexpected regressions."
+      },
+      {
+            "a": [
+                  "self"
+            ],
+            "why": "Internal self-use creates subtle override traps."
+      },
+      {
+            "a": [
+                  "encapsulation"
+            ],
+            "why": "Inheritance exposes internal implementation mechanics."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the 'Fragile Base Class' problem?",
+      a: ["A design flaw where modifications to a base class unintentionally break derived subclasses because subclasses depend on parent implementation details","A base class that has too many unit tests","A class that cannot be saved to disk","An error that happens when compiling C++ code"],
+      c: 0,
+      why: "It describes the fragility of inheritance when superclasses evolve without knowing child assumptions."
+    },
+    {
+      q: "Why does class inheritance break object-oriented encapsulation?",
+      a: ["Subclasses must know how the parent implements its methods (e.g. does addAll call add?) to avoid duplicate accounting bugs","Inheritance makes all private fields public","Inheritance deletes comments","Inheritance is forbidden by security standards"],
+      c: 0,
+      why: "A subclass is coupled to the internal execution sequence of its superclass, violating black-box boundaries."
+    },
+    {
+      q: "How does Java's Stack class extending Vector illustrate a historic inheritance mistake?",
+      a: ["Stack is a LIFO structure, but because it inherits from Vector, users can call insertElementAt(index) and violate LIFO rules completely!","Stack cannot store numbers","Vector was deleted from Java","Stack requires an internet connection"],
+      c: 0,
+      why: "Inheriting gave Stack 50 Vector methods that allow breaking fundamental LIFO stack integrity."
+    },
+    {
+      q: "How do modern languages like Kotlin, C#, and Java mitigate the fragile base class problem?",
+      a: ["By making classes and methods 'final' (or non-open) by default, requiring explicit author permission to subclass","By banning all object-oriented programming","By making all variables global","By deleting the extends keyword"],
+      c: 0,
+      why: "Classes closed/final by default prevent uncontrolled subclassing and fragile base class traps."
+    }
+  ]);
+</script>
+</body>
+</html>

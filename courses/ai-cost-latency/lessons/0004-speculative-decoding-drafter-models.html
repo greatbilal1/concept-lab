@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 04 — Speculative Decoding and Small Drafter Models</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="ai-cost-latency" data-lesson="4" data-lesson-id="speculative-decoding-drafter-models">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 04</span> · Speculative Decoding</span>
+
+  <h1 class="lesson-title">Speculative Decoding and Small Drafter Models</h1>
+  <p class="lesson-lede">
+    Accelerating autoregressive decoding: small drafter models (1B), large target models (70B), speculative verification, and 2x-3x speedups.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how speculative decoding multiplies generation throughput without sacrificing output quality.</span>
+    <span><b>Mission link</b> Mastering speculative decoding and small drafter models across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Speculative Decoding and Small Drafter Models</h2>
+  <p>Recall the physical law: <strong>Large models are slow because decoding transfers tens of gigabytes of weights for each single token</strong>. What if we could generate 4 or 5 tokens in the time it takes to generate 1?</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Accelerating autoregressive decoding: small drafter models (1B), large target models (70B), speculative verification, and 2x-3x speedups.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Speculative Decoding Mechanics</h2>
+  <p><strong>Speculative Decoding (Leviathan et al., 2023)</strong> makes this possible:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Zero Loss in Intelligence</h2>
+  <ul><li><strong>1. The Small Drafter Model:</strong> A tiny, lightweight model (e.g. Llama-3-1B) runs on GPU SRAM, drafting 4 candidate tokens in milliseconds: <code>["The", "capital", "of", "France"]</code>.</li><li><strong>2. Parallel Target Verification:</strong> The massive target model (Llama-3-70B) receives all 4 drafted tokens at once. In <strong>a single forward pass</strong> (pre-fill mode), it computes probabilities for all 4 tokens simultaneously!</li><li><strong>3. Mathematical Acceptance:</strong> If the target model agrees with 3 of the 4 tokens, all 3 tokens are accepted instantly! The target model samples the 4th token, and the loop repeats.</li><li><strong>4. Zero Quality Degradation:</strong> The output distribution is <strong>mathematically identical</strong> to running the 70B model alone! You get a <strong>2x to 3x generation speedup</strong> with zero loss in intelligence.</li></ul><pre><code># Speculative Decoding Speedup:
+# Baseline 70B Model:     22 tokens / second (Sequential decoding)
+# With 1B Speculative:    58 tokens / second (2.6x faster!)
+# Quality Difference:     0.0% (Mathematically exact match!)</code></pre><div class="callout"><p><strong>The Serving Revolution:</strong> Frameworks like vLLM and TensorRT-LLM support speculative decoding out of the box. Enable it in your self-hosted inference clusters for instant throughput multiplication.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the speculative decoding sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how speculative decoding multiplies generation throughput without sacrificing output quality.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where speculative decoding and small drafter models applies.</li>
+    <li>Author a unit test or verification script exercising speculative decoding and small drafter models.</li>
+    <li>Document team architectural conventions regarding speculative decoding and small drafter models.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Speculative Decoding and Small Drafter Models.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is 'Speculative Decoding' in modern AI inference engines?",
+    a: ["A technique where a fast, tiny model drafts multiple candidate tokens, and a large target model verifies them all in parallel in a single forward pass","Guessing what the user will type next week","Trading stocks with AI","A type of code compression"],
+    c: 0,
+    why: "Speculative decoding uses a small model to draft tokens and a large model to verify them in parallel, doubling generation speed."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1. Drafter (Llama-3-1B)",
+            "lines": [
+                  "Fast, lightweight draft generation",
+                  "Emits 4 candidate tokens in 8ms"
+            ]
+      },
+      {
+            "title": "2. Verifier (Llama-3-70B)",
+            "lines": [
+                  "Parallel forward pass over 4 tokens",
+                  "Verifies candidates in 1 single step"
+            ]
+      },
+      {
+            "title": "3. Accepted Tokens",
+            "lines": [
+                  "Accepts 3 tokens + generates 1 fresh",
+                  "Result: 4 tokens generated in 1 cycle!"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Speculative Decoding and Small Drafter Models",
+      "def execute_flow():",
+      "    # Accelerating autoregressive decoding: small drafte...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Speculative Decoding and Small Drafter Models"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Output Quality"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Speculative decoding pairs a fast small {1} model with a large target model that verifies candidate tokens in {2}, achieving 2x to 3x speedups."
+],
+    blanks: [
+      {
+            "a": [
+                  "drafter"
+            ],
+            "why": "Lightweight model generating candidate tokens"
+      },
+      {
+            "a": [
+                  "parallel"
+            ],
+            "why": "Single simultaneous forward pass"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why does speculative decoding produce the exact same text distribution as the target model alone?",
+      a: ["The mathematical acceptance-rejection sampling criterion guarantees that accepted tokens strictly follow the target model's probability distribution","The models share the same hard drive","The small model is deleted","It runs on paper"],
+      c: 0,
+      why: "Modified rejection sampling guarantees provable distribution equivalence to the target model."
+    },
+    {
+      q: "What happens if the drafter model generates a token that the target model rejects?",
+      a: ["Execution stops at the rejected token, the target model samples the correct token, and drafting resumes from there","The server crashes","The model restarts from scratch","The token is deleted"],
+      c: 0,
+      why: "Only verified prefix tokens are kept; the target model corrects the first divergence."
+    },
+    {
+      q: "What serving frameworks provide built-in speculative decoding support for open models?",
+      a: ["vLLM, TensorRT-LLM, and Hugging Face TGI","Microsoft Excel","Git bash","React Native"],
+      c: 0,
+      why: "Production inference engines like vLLM natively support speculative decoding drafters."
+    },
+    {
+      q: "What is the ideal parameter size ratio between a target model and a drafter model?",
+      a: ["A drafter should be roughly 10x to 50x smaller than the target model (e.g. 1B drafter for 70B target) to minimize drafting latency","The drafter should be larger than the target","They should be identical size","The drafter should have zero parameters"],
+      c: 0,
+      why: "A much smaller drafter generates candidates quickly without consuming excessive GPU compute."
+    }
+  ]);
+</script>
+</body>
+</html>

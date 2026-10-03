@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 06 — Certificates and Certificate Authorities</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="dns-domains-tls" data-lesson="6" data-lesson-id="certificates-and-certificate-authorities">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 06</span> · Encryption & Certificates</span>
+
+  <h1 class="lesson-title">Certificates and Certificate Authorities</h1>
+  <p class="lesson-lede">
+    How do you know you are really talking to your bank and not an impostor on the coffee shop Wi-Fi? Learn about the X.509 chain of trust and Let's Encrypt.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Explain X.509 certificate chains, Certificate Authorities, and automated ACME issuance</span>
+    <span><b>Mission link</b> Prevents Man-in-the-Middle attacks and validates digital identity</span>
+  </div>
+
+  <h2><span class="n">1</span>The Man-in-the-Middle problem</h2>
+  <p>Encryption alone is not enough. If you connect to <code>bank.com</code>, an attacker on your local network could impersonate the bank, generate their own public key, and encrypt the connection with you while forwarding traffic to the bank. This is a <b>Man-in-the-Middle (MitM)</b> attack.</p><p>To prevent impersonation, the internet relies on <b>Digital Certificates</b> issued by trusted <b>Certificate Authorities (CAs)</b>. A certificate binds a domain name to a specific public key, backed by the cryptographic digital signature of a CA.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    A certificate is a cryptographically signed identity card proving that a public key belongs to a domain.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The certificate chain of trust</h2>
+  <p>Every certificate is validated upwards through intermediate certificates to a Root CA pre-installed in your OS.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing ACME automated issuance</h2>
+  <p>Trace how Let's Encrypt issues free certificates in seconds using automated HTTP-01 challenges.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your recall of Public Key Infrastructure (PKI) components.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can explain the complete certificate chain of trust and troubleshoot invalid certificate warnings on production servers.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>View the certificate chain for a website by clicking the padlock in your browser address bar.</li>
+    <li>Inspect the Root CAs trusted by your operating system in Keychain Access or /etc/ssl/certs.</li>
+    <li>Automate certificate renewal using Certbot or Caddy server.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Ivan Ristić, *Bulletproof TLS and PKI*, Chapter 3: 'Public Key Infrastructure (PKI)'.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What happens if a website presents a self-signed certificate not trusted by any Certificate Authority?",
+    a: ["The browser displays a prominent security warning screen blocking access","The computer automatically reboots","The website loads normally without any indication of a problem","The web server deletes the certificate file"],
+    c: 0,
+    why: "Browsers only trust certificates signed by CAs installed in the operating system root trust store."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Root CA (in OS Trust Store)",
+            "lines": [
+                  "DigiCert / ISRG Root X1",
+                  "self-signed, immutable trust anchor"
+            ]
+      },
+      {
+            "title": "Intermediate CA",
+            "lines": [
+                  "Let's Encrypt R3",
+                  "signed by Root CA, signs leaf certs"
+            ]
+      },
+      {
+            "title": "Leaf Certificate (example.com)",
+            "lines": [
+                  "signed by Intermediate CA",
+                  "contains public key and domain SANs"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "Certbot -> Requests certificate for 'api.example.com'",
+      "Let's Encrypt CA -> Challenges: 'Place secret token at /.well-known/acme-challenge/xyz'",
+      "Certbot -> Writes token to web server root",
+      "Let's Encrypt CA -> Fetches http://api.example.com/.well-known/acme-challenge/xyz",
+      "CA validates token -> Issues signed X.509 certificate!"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "request": "certificate for api.example.com"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "challenge": "HTTP-01 domain ownership proof"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "verification": "CA verified server control over domain"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "issued": "signed certificate delivered in 3 seconds"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "A trusted third party that signs digital certificates is a Certificate <0>.",
+      "The standard digital certificate format used in TLS is X.<1>.",
+      "The automated protocol used by Let's Encrypt to issue free certificates is <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "Authority",
+                  "CA"
+            ],
+            "why": "Certificate Authorities act as identity verifiers."
+      },
+      {
+            "a": [
+                  "509"
+            ],
+            "why": "X.509 is the international standard for public key certificates."
+      },
+      {
+            "a": [
+                  "ACME"
+            ],
+            "why": "Automated Certificate Management Environment (ACME) powers Let's Encrypt."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the primary role of a Certificate Authority (CA)?",
+      a: ["To verify that an applicant controls a domain and cryptographically sign their public key certificate","To charge credit cards on behalf of internet websites","To store backups of website source code in secure data centers","To provide broadband internet connections to businesses"],
+      c: 0,
+      why: "CAs verify domain ownership and issue signed certificates asserting that identity."
+    },
+    {
+      q: "Why do Certificate Authorities use Intermediate certificates instead of signing directly with the Root CA?",
+      a: ["To keep the Root CA private key offline in an air-gapped safe, protecting it from compromise","Because Root certificates are only compatible with Windows operating systems","To make TLS handshakes run twice as fast","Because international laws forbid using root keys"],
+      c: 0,
+      why: "Intermediate certificates can be revoked easily if breached without replacing root trust stores."
+    },
+    {
+      q: "What field inside an X.509 certificate lists all the domain names the certificate is valid for?",
+      a: ["Subject Alternative Name (SAN)","User-Agent","Content-Type","HTTP Host Header"],
+      c: 0,
+      why: "The SAN extension lists all valid hostnames (including wildcards like *.example.com)."
+    },
+    {
+      q: "What does the ACME protocol automate?",
+      a: ["Domain ownership verification, certificate issuance, and automated renewals","The physical installation of fiber optic cables under streets","The creation of database tables and schema migrations","The compilation of C++ source code into binary executables"],
+      c: 0,
+      why: "ACME (RFC 8555) automated the entire manual certificate issuance process for the web."
+    }
+  ]);
+</script>
+</body>
+</html>

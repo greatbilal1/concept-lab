@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Web Application Security — Cheat Sheet</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+<style>
+  .ref-toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0 8px; }
+  .ref-toc a { font-size: .8rem; border: 1px solid var(--border); background: #111a30; padding: 5px 11px; border-radius: 999px; color: var(--muted); text-decoration: none; border-bottom: 1px solid var(--border); }
+  .ref-toc a:hover { color: #fff; border-color: #3d5488; }
+  .lesson-wrap h2 { scroll-margin-top: 20px; }
+  .snippet { margin: 14px 0 22px; }
+  .snippet .lbl { font-size: .72rem; font-weight: 800; letter-spacing: .7px; text-transform: uppercase; color: var(--accent2); margin-bottom: 6px; }
+  .see { font-size: .82rem; color: var(--muted); margin: -6px 0 12px; }
+  .see a { color: var(--accent2); border-bottom: 0; }
+  .see a:hover { color: #fff; }
+  .snippet pre { padding-top: 34px; }
+  @media print { .snippet pre { padding-top: 18px; } }
+</style>
+</head>
+<body class="lesson-body" data-course="web-security">
+
+<div class="lesson-wrap">
+
+  <span class="lesson-kicker">Reference · Cheat sheet</span>
+  <h1 class="lesson-title">Web Application Security — Cheat Sheet</h1>
+  <p class="lesson-lede">
+    The whole course on one page. Every snippet links back to the lesson that
+    teaches it.
+  </p>
+
+  <div class="ref-toc">
+    <a href="#sec-1">AsyncPG Parameterized SQL Query</a>
+    <a href="#sec-2">Secure Session Cookie Holy Trinity</a>
+    <a href="#sec-3">DOMPurify Rich Text Sanitization</a>
+    <a href="#sec-4">Hardened Security Headers Middleware</a>
+  </div>
+
+  <h2 id="sec-1"><span class="n">1</span>AsyncPG Parameterized SQL Query</h2>
+  <div class="snippet">
+    <div class="lbl">100% SQL injection immunity</div>
+    <pre><code># Code and data are strictly separated:
+row = await db.fetchrow(
+    "SELECT id, email, role FROM users WHERE email = $1 AND is_active = $2",
+    untrusted_user_input, True
+)</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0002-injection-attacks-sqli-parameterized-queries.html">Lesson 02 — Injection Attacks: SQLi, Command Injection, and Parameterized Queries</a>.</p>
+
+  <h2 id="sec-2"><span class="n">2</span>Secure Session Cookie Holy Trinity</h2>
+  <div class="snippet">
+    <div class="lbl">Maximum browser cookie protection</div>
+    <pre><code>response.set_cookie(
+    key="session_token", value=secure_token,
+    httponly=True,  # Blocks XSS JavaScript read access
+    secure=True,    # Requires HTTPS transmission
+    samesite="Lax"  # Blocks CSRF cross-origin POSTs
+)</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0004-csrf-and-samesite-cookies.html">Lesson 04 — Cross-Site Request Forgery (CSRF) and SameSite Cookies</a>.</p>
+
+  <h2 id="sec-3"><span class="n">3</span>DOMPurify Rich Text Sanitization</h2>
+  <div class="snippet">
+    <div class="lbl">Client-side XSS prevention</div>
+    <pre><code>import DOMPurify from 'dompurify';
+// Strips &lt;script&gt;, onerror, and dangerous attributes:
+const cleanHtml = DOMPurify.sanitize(userContent);
+document.getElementById('bio').innerHTML = cleanHtml;</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0003-cross-site-scripting-xss-stored-reflected-dom.html">Lesson 03 — Cross-Site Scripting (XSS): Stored, Reflected, and DOM-Based</a>.</p>
+
+  <h2 id="sec-4"><span class="n">4</span>Hardened Security Headers Middleware</h2>
+  <div class="snippet">
+    <div class="lbl">FastAPI browser defense headers</div>
+    <pre><code>@app.middleware("http")
+async def add_security_headers(request, call_next):
+    res = await call_next(request)
+    res.headers["Content-Security-Policy"] = "default-src 'self'"
+    res.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+    res.headers["X-Frame-Options"] = "DENY"
+    res.headers["X-Content-Type-Options"] = "nosniff"
+    return res</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0006-security-headers-csp-hsts-cors.html">Lesson 06 — Security Headers (CSP, HSTS, CORS) and Modern Browser Defenses</a>.</p>
+
+  <div class="lesson-foot">
+    <div class="links">
+      <a href="web-security-glossary.html">📖 Glossary</a>
+      <a href="../course.html">← Course map</a>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

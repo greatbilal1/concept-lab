@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 07 — A/B Testing, User Feedback, and Production Ground Truth</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="ai-evaluation" data-lesson="7" data-lesson-id="ab-testing-user-feedback-ground-truth">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 07</span> · Production Evals</span>
+
+  <h1 class="lesson-title">A/B Testing, User Feedback, and Production Ground Truth</h1>
+  <p class="lesson-lede">
+    Validating in production: online A/B testing, user feedback signals (thumbs up/down, copy rates), and creating feedback flywheels.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to use A/B testing and production feedback to drive compounding quality flywheels.</span>
+    <span><b>Mission link</b> Mastering a/b testing, user feedback, and production ground truth across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of A/B Testing, User Feedback, and Production Ground Truth</h2>
+  <p>You can score 99% on your offline golden eval dataset and still fail in the market. Why? Because an offline eval is a static snapshot. Real users have dynamic intent, emotional nuance, and fast-shifting workflows that no static benchmark can fully capture.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Validating in production: online A/B testing, user feedback signals (thumbs up/down, copy rates), and creating feedback flywheels.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Quality Flywheel</h2>
+  <p>The final tier of AI evaluation is <strong>Online Production Validation</strong>:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Explicit vs Implicit Signals</h2>
+  <ul><li><strong>1. Production A/B Testing:</strong> Route 50% of production traffic to Prompt A and 50% to Prompt B. Compare real business metrics (task completion rate, retention, session length).</li><li><strong>2. Implicit Feedback Signals (Gold Mines):</strong> Don't just rely on survey forms. Track implicit user actions: Did the user click 'Copy to Clipboard'? Did they accept the generated code? Did they regenerate the response?</li><li><strong>3. Explicit Feedback (Thumbs Up / Down):</strong> Simple thumbs buttons allow users to flag bad answers.</li><li><strong>4. The Quality Flywheel:</strong> When a user gives a thumbs-down or rejects code, automatically export that prompt and response into your triage queue to add to your Golden Eval Dataset!</li></ul><pre><code># The Quality Flywheel Loop:
+1. User dislikes answer -> clicks Thumbs Down (with optional comment).
+2. Backend captures: {user_query, model_response, failure_reason}.
+3. Asynchronously added to `evals/candidates_for_review.jsonl`.
+4. Human engineer reviews -> Adds to Golden Eval Suite as test case #105!
+5. Prompt is updated & verified in CI -> Model will never make that mistake again!</code></pre><div class="callout"><p><strong>The Compounding Flywheel:</strong> The best AI companies do not have smarter models; they have tighter feedback flywheels that turn production failures into automated test cases every single day.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the production evals sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to use A/B testing and production feedback to drive compounding quality flywheels.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where a/b testing, user feedback, and production ground truth applies.</li>
+    <li>Author a unit test or verification script exercising a/b testing, user feedback, and production ground truth.</li>
+    <li>Document team architectural conventions regarding a/b testing, user feedback, and production ground truth.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for A/B Testing, User Feedback, and Production Ground Truth.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Why is offline benchmark evaluation alone insufficient without online production A/B testing?",
+    a: ["Offline benchmarks are static proxies; real users interact with unpredictable intent, evolving language, and subjective satisfaction","Offline benchmarks do not use computers","A/B testing is required by law","Offline benchmarks only test math"],
+    c: 0,
+    why: "Real user behavior and satisfaction in production represent the ultimate ground truth of system value."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1. Production Usage",
+            "lines": [
+                  "User encounters subtle defect",
+                  "Clicks Thumbs Down / Regenerate"
+            ]
+      },
+      {
+            "title": "2. Failure Harvest",
+            "lines": [
+                  "Telemetry records failure payload",
+                  "Sent to engineering triage queue"
+            ]
+      },
+      {
+            "title": "3. Golden Eval Addition",
+            "lines": [
+                  "Promoted to permanent eval suite",
+                  "Model permanently immunized against regression!"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing A/B Testing, User Feedback, and Production Ground Truth",
+      "def execute_flow():",
+      "    # Validating in production: online A/B testing, user...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "A/B Testing, User Feedback, and Production Ground Truth"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Explicit Signals"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Implicit Signals (Higher Volume)"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The quality flywheel achieves compounding reliability by capturing production user feedback and promoting failure cases into permanent {1} {2} datasets."
+],
+    blanks: [
+      {
+            "a": [
+                  "golden"
+            ],
+            "why": "Curated benchmark test set"
+      },
+      {
+            "a": [
+                  "eval"
+            ],
+            "why": "Evaluation and testing suites"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is an 'Implicit Feedback Signal' in an AI coding application?",
+      a: ["A user behavior like copying code to the clipboard, accepting an autocomplete ghost text, or immediately editing generated lines","A user sending an email to support","A user rating the app in the app store","A user closing their laptop"],
+      c: 0,
+      why: "Implicit actions (copying, accepting, undoing) provide natural high-volume behavioral signals."
+    },
+    {
+      q: "Why is the 'Regenerate' button click considered a strong negative signal in chat products?",
+      a: ["It indicates the user was dissatisfied with the previous response and requested a second attempt","It means the user loved the answer","It speeds up the server","It saves API tokens"],
+      c: 0,
+      why: "Clicking regenerate directly communicates that the previous answer was insufficient."
+    },
+    {
+      q: "What is the primary benefit of running a production A/B test between two model prompts?",
+      a: ["It evaluates real customer business outcomes (conversion, retention, satisfaction) in a randomized controlled trial","It makes both models run faster","It eliminates the need for software engineering","It makes API calls free"],
+      c: 0,
+      why: "A/B testing isolates the causal business impact of prompt modifications on real users."
+    },
+    {
+      q: "What happens if a company ignores production feedback and never updates its evaluation benchmarks?",
+      a: ["The evaluation suite drifts away from real user needs, and the application accumulates blind spots that alienate customers","The model updates itself automatically","The database becomes faster","The software becomes open source"],
+      c: 0,
+      why: "Without incorporating production failures, eval benchmarks become stale and unrepresentative."
+    }
+  ]);
+</script>
+</body>
+</html>

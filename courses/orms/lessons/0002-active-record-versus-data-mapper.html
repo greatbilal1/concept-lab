@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 02 — Active Record versus Data Mapper</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="orms" data-lesson="2" data-lesson-id="active-record-versus-data-mapper">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 02</span> · The Impedance Mismatch & Patterns</span>
+
+  <h1 class="lesson-title">Active Record versus Data Mapper</h1>
+  <p class="lesson-lede">
+    How should an ORM be structured? Compare the Active Record pattern (Django, Rails) with the Data Mapper pattern (SQLAlchemy, Prisma, Hibernate).
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Contrast Active Record and Data Mapper architectures and select the right tool for your project</span>
+    <span><b>Mission link</b> Guides framework selection and domain model architecture</span>
+  </div>
+
+  <h2><span class="n">1</span>Two competing ORM philosophies</h2>
+  <p>In Martin Fowler's <i>Patterns of Enterprise Application Architecture</i>, two distinct ORM patterns emerged: <b>Active Record</b> and <b>Data Mapper</b>.</p><p>In <b>Active Record</b> (Ruby on Rails, Django models), the entity class <i>knows how to save itself</i>: <code>user = User.find(1); user.save()</code>. It is simple, rapid to build, and tightly couples domain logic to the database. In <b>Data Mapper</b> (SQLAlchemy, Hibernate, Prisma), the domain model is pure data; a separate <code>Session</code> or <code>EntityManager</code> handles all database I/O.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Active Record models save themselves; Data Mapper keeps domain models pure and delegates I/O to a session.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Active Record versus Data Mapper architecture</h2>
+  <p>Observe the architectural difference between coupled persistence and isolated domain models.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing Data Mapper session persistence</h2>
+  <p>Trace how a Data Mapper session tracks modified entities and flushes changes in a batch.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of ORM patterns.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can articulate the architectural trade-offs between rapid Active Record prototyping and scalable Data Mapper decoupling.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Inspect an Active Record model (e.g. in Django or Rails) and identify persistence methods.</li>
+    <li>Inspect a Data Mapper model (e.g. in SQLAlchemy or Prisma) and observe its pure data structure.</li>
+    <li>Explain to a peer why Data Mapper models are easier to unit test without database mocks.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Martin Fowler, *Patterns of Enterprise Application Architecture*, Chapter 10: 'Data Mapper' & 'Active Record'.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Which pattern provides cleaner separation of concerns for complex enterprise domain logic: Active Record or Data Mapper?",
+    a: ["Data Mapper, because domain model classes have zero knowledge of or dependency on the database","Active Record, because all code lives in one giant class","Neither, they are identical patterns","Only raw SQL can provide separation of concerns"],
+    c: 0,
+    why: "Data Mapper decouples business entities from persistence, enabling clean domain modeling."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Active Record (Coupled)",
+            "lines": [
+                  "class User inherits Model",
+                  "user.save(), user.delete()",
+                  "fast prototyping, tight coupling"
+            ]
+      },
+      {
+            "title": "Data Mapper (Decoupled)",
+            "lines": [
+                  "class User (pure domain data)",
+                  "Session / Repository handles I/O",
+                  "session.add(user); session.commit();"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "user = session.get(User, 42); # pure domain instance",
+      "user.email = 'new@example.com'; # modify property in memory",
+      "# No SQL emitted yet! Session tracks user as 'dirty'",
+      "session.commit(); # Session emits UPDATE users SET email = ... WHERE id = 42"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "loaded": "user entity loaded into session identity map"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "mutated": "memory property changed; zero network I/O"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "flush": "commit() flushes all dirty changes in an atomic transaction"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The pattern where models contain save() and find() methods is Active <0>.",
+      "The pattern keeping models decoupled from database I/O is Data <1>.",
+      "The architectural author who documented these patterns is Martin <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "Record"
+            ],
+            "why": "Active Record couples models to database tables."
+      },
+      {
+            "a": [
+                  "Mapper"
+            ],
+            "why": "Data Mapper isolates domain models from persistence."
+      },
+      {
+            "a": [
+                  "Fowler"
+            ],
+            "why": "Martin Fowler authored Patterns of Enterprise Application Architecture."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the defining characteristic of the Active Record pattern?",
+      a: ["An object wraps a single database row, and its class contains database query and persistence methods (e.g. user.save())","It only works on active internet connections","It records sound audio files inside the database","It automatically logs all queries to a public website"],
+      c: 0,
+      why: "In Active Record, the model class represents both database access and domain data."
+    },
+    {
+      q: "What is the primary advantage of the Data Mapper pattern over Active Record?",
+      a: ["It decouples business domain logic from database persistence, allowing models to be tested and refactored independently of SQL tables","It eliminates the need for database indexes","It runs on client mobile web browsers without a server","It converts Python models into C++ binaries"],
+      c: 0,
+      why: "Data Mapper enforces strict separation of concerns, keeping domain models independent of database schemas."
+    },
+    {
+      q: "Which popular framework famously popularized the Active Record pattern?",
+      a: ["Ruby on Rails (ActiveRecord) and Django (django.db.models)","PostgreSQL core server","React.js","Docker Containers"],
+      c: 0,
+      why: "Ruby on Rails and Django are the most famous practitioners of the Active Record pattern."
+    },
+    {
+      q: "Why are Data Mapper models easier to unit test than Active Record models?",
+      a: ["Data Mapper models are plain in-memory objects that do not attempt to connect to a real database when instantiated","Data Mapper models have built-in unit test runners","Active Record models cannot be used in Python","Data Mapper models are written in JSON"],
+      c: 0,
+      why: "Active Record models often attempt database connection on instantiation, making unit testing difficult."
+    }
+  ]);
+</script>
+</body>
+</html>

@@ -1,0 +1,3 @@
+# Mission — LLM Observability & Tracing
+
+Turn the black box of production AI into a transparent glass box. Understand why traditional flat logs fail, instrument applications with OpenTelemetry and OpenInference semantic standards, track granular token economics and enforce tenant quotas, profile latency bottlenecks across TTFT and generation, scrub PII at the telemetry boundary, set anomaly alerts on error surges, deploy self-hosted Langfuse clusters, and build fully observable production AI services.

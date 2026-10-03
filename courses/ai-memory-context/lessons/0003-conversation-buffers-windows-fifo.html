@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 03 — Conversation Buffers, Windows, and FIFO Truncation</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="ai-memory-context" data-lesson="3" data-lesson-id="conversation-buffers-windows-fifo">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 03</span> · Buffer Management</span>
+
+  <h1 class="lesson-title">Conversation Buffers, Windows, and FIFO Truncation</h1>
+  <p class="lesson-lede">
+    Pruning conversational history: sliding message windows, token-bounded FIFO buffers, and system prompt protection.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to implement robust token-bounded sliding windows with system prompt pinning.</span>
+    <span><b>Mission link</b> Mastering conversation buffers, windows, and fifo truncation across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Conversation Buffers, Windows, and FIFO Truncation</h2>
+  <p>The simplest way to manage conversation history is a <strong>Sliding Window</strong>. As new messages arrive, older messages are dropped from the prompt to keep total token consumption within a fixed budget.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Pruning conversational history: sliding message windows, token-bounded FIFO buffers, and system prompt protection.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Sliding Window Eviction</h2>
+  <p>Three sliding window implementation strategies:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Turn-Count vs Token-Bounded</h2>
+  <ul><li><strong>1. Turn-Count Window (Naive):</strong> Keep strictly the last $N$ turns (e.g. last 6 messages). Flaw: If turn 5 includes a giant 4,000-token code block, a turn-count window will still overflow the token budget!</li><li><strong>2. Token-Bounded FIFO Buffer (Professional):</strong> Track exact token counts for every message. Keep appending recent messages from newest to oldest until you hit a strict token budget (e.g. 6,000 tokens). Evict everything older!</li><li><strong>3. System Prompt Pinning:</strong> Always pin the System Prompt at the top! Never allow the FIFO eviction algorithm to drop the system message.</li></ul><pre><code># Token-Bounded Sliding Window in Python:
+import tiktoken
+enc = tiktoken.get_encoding("cl100k_base")
+
+def build_sliding_window(system_prompt, all_history_turns, token_limit=6000):
+    budget = token_limit - len(enc.encode(system_prompt))
+    selected_turns = []
+    current_tokens = 0
+    
+    # Iterate backwards from newest message to oldest:
+    for msg in reversed(all_history_turns):
+        msg_tokens = len(enc.encode(msg["content"]))
+        if current_tokens + msg_tokens <= budget:
+            selected_turns.append(msg)
+            current_tokens += msg_tokens
+        else:
+            break # Budget reached, stop adding older turns!
+            
+    return [{"role": "system", "content": system_prompt}] + list(reversed(selected_turns))</code></pre><div class="callout"><p><strong>The Amnesia Trade-off:</strong> Sliding windows prevent crashes, but introduce amnesia: the agent forgets decisions made at the start of the chat. To solve amnesia, combine sliding windows with summarization!</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the buffer management sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to implement robust token-bounded sliding windows with system prompt pinning.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where conversation buffers, windows, and fifo truncation applies.</li>
+    <li>Author a unit test or verification script exercising conversation buffers, windows, and fifo truncation.</li>
+    <li>Document team architectural conventions regarding conversation buffers, windows, and fifo truncation.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Conversation Buffers, Windows, and FIFO Truncation.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is a 'Token-Bounded Sliding Window' in conversation buffer management?",
+    a: ["A strategy that retains recent messages up to a strict token ceiling (e.g. 8,000 tokens), discarding the oldest turns as new ones arrive","A window in your office that opens automatically","A tool for sliding text across computer screens","A method for deleting all user data"],
+    c: 0,
+    why: "Token-bounded windows dynamically evict the oldest messages to maintain a fixed context budget."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "System Prompt (Pinned)",
+            "lines": [
+                  "Always preserved at index 0",
+                  "Never evicted by sliding window"
+            ]
+      },
+      {
+            "title": "Evicted Turns (1-10)",
+            "lines": [
+                  "Oldest messages dropped",
+                  "Prevents context overflow"
+            ]
+      },
+      {
+            "title": "Active Window (Turns 11-16)",
+            "lines": [
+                  "Most recent conversation state",
+                  "Fits comfortably in 6,000 token budget"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Conversation Buffers, Windows, and FIFO Truncation",
+      "def execute_flow():",
+      "    # Pruning conversational history: sliding message wi...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Conversation Buffers, Windows, and FIFO Truncation"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Turn-Count (K=6 messages)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Token-Bounded (Max 6k tokens)"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Token-bounded sliding windows maintain predictable costs by keeping the newest turns within a token budget while {1} older turns and pinning the {2} prompt."
+],
+    blanks: [
+      {
+            "a": [
+                  "evicting"
+            ],
+            "why": "Discarding or dropping oldest items"
+      },
+      {
+            "a": [
+                  "system"
+            ],
+            "why": "Foundational behavioral instruction"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why is token-bounded eviction safer than message-count eviction?",
+      a: ["Message lengths vary from 5 words to 5,000 words; tracking token counts guarantees the prompt never exceeds hardware limits","Token-bounded eviction is free","Message-count eviction is illegal","Tokens run faster on CPUs"],
+      c: 0,
+      why: "Token-bounded buffers prevent context overflows caused by unexpectedly large individual messages."
+    },
+    {
+      q: "Why must the system prompt remain pinned outside the FIFO eviction queue?",
+      a: ["Dropping the system prompt strips the model of its core persona, safety constraints, and formatting rules","The API throws an error without system prompts","System prompts cannot be deleted","System prompts take 0 tokens"],
+      c: 0,
+      why: "The system prompt anchors model behavior and must never be evicted."
+    },
+    {
+      q: "What is the primary user-facing downside of a pure sliding window without summarization?",
+      a: ["Conversational amnesia: the model forgets instructions, constraints, or decisions made in the early turns of the chat","The font changes","The chat window closes","The computer restarts"],
+      c: 0,
+      why: "Pure eviction erases early context completely, causing the model to forget initial user instructions."
+    },
+    {
+      q: "How should tool-calling turns be handled during sliding window eviction?",
+      a: ["Tool calls and tool results must be evicted together as an atomic pair to prevent orphaned tool messages that cause API errors","Evict only the result","Evict only the call","Never evict tools"],
+      c: 0,
+      why: "APIs require strict call-and-response pairing; evicting only one half breaks message schemas."
+    }
+  ]);
+</script>
+</body>
+</html>

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ORMs & Database Abstraction — Cheat Sheet</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+<style>
+  .ref-toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0 8px; }
+  .ref-toc a { font-size: .8rem; border: 1px solid var(--border); background: #111a30; padding: 5px 11px; border-radius: 999px; color: var(--muted); text-decoration: none; border-bottom: 1px solid var(--border); }
+  .ref-toc a:hover { color: #fff; border-color: #3d5488; }
+  .lesson-wrap h2 { scroll-margin-top: 20px; }
+  .snippet { margin: 14px 0 22px; }
+  .snippet .lbl { font-size: .72rem; font-weight: 800; letter-spacing: .7px; text-transform: uppercase; color: var(--accent2); margin-bottom: 6px; }
+  .see { font-size: .82rem; color: var(--muted); margin: -6px 0 12px; }
+  .see a { color: var(--accent2); border-bottom: 0; }
+  .see a:hover { color: #fff; }
+  .snippet pre { padding-top: 34px; }
+  @media print { .snippet pre { padding-top: 18px; } }
+</style>
+</head>
+<body class="lesson-body" data-course="orms">
+
+<div class="lesson-wrap">
+
+  <span class="lesson-kicker">Reference · Cheat sheet</span>
+  <h1 class="lesson-title">ORMs & Database Abstraction — Cheat Sheet</h1>
+  <p class="lesson-lede">
+    The whole course on one page. Every snippet links back to the lesson that
+    teaches it.
+  </p>
+
+  <div class="ref-toc">
+    <a href="#sec-1">Data Mapper vs Active Record</a>
+    <a href="#sec-2">Fixing the N+1 Query Problem</a>
+    <a href="#sec-3">Identity Map Pattern</a>
+    <a href="#sec-4">When to Drop to Raw SQL</a>
+  </div>
+
+  <h2 id="sec-1"><span class="n">1</span>Data Mapper vs Active Record</h2>
+  <div class="snippet">
+    <div class="lbl">Architectural patterns compared</div>
+    <pre><code>// Active Record (Ruby on Rails, Django models)
+// Model carries both business data AND database query methods
+user = User.find(42)
+user.save()
+
+// Data Mapper (SQLAlchemy, Prisma, Hibernate)
+// Domain model is pure data; separate Repository/Session handles I/O
+user = session.get(User, 42)
+user.email = "new@example.com"
+session.commit()</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0002-active-record-versus-data-mapper.html">Lesson 02 — Active Record versus Data Mapper</a>.</p>
+
+  <h2 id="sec-2"><span class="n">2</span>Fixing the N+1 Query Problem</h2>
+  <div class="snippet">
+    <div class="lbl">Eager loading patterns</div>
+    <pre><code>-- The N+1 Disaster:
+SELECT * FROM users;            -- 1 query (returns 100 users)
+-- Then in a loop:
+SELECT * FROM orders WHERE user_id = 1; -- N queries! (100 extra round-trips)
+
+-- The Fix: Eager Loading (SQLAlchemy / Prisma)
+-- SQLAlchemy: select(User).options(joinedload(User.orders))
+-- Emits: SELECT * FROM users LEFT JOIN orders ON ... (1 query!)</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0003-the-n-plus-1-query-problem-and-eager-loading.html">Lesson 03 — The N+1 query problem and eager loading</a>.</p>
+
+  <h2 id="sec-3"><span class="n">3</span>Identity Map Pattern</h2>
+  <div class="snippet">
+    <div class="lbl">In-memory entity deduplication</div>
+    <pre><code>// Both queries fetch User #42 within the same transaction session:
+const userA = session.get(User, 42);
+const userB = session.get(User, 42);
+
+// Identity Map guarantees identical memory reference!
+assert(userA === userB); // TRUE! Zero duplicate query overhead.</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0005-unit-of-work-and-the-identity-map.html">Lesson 05 — Unit of Work and the Identity Map</a>.</p>
+
+  <h2 id="sec-4"><span class="n">4</span>When to Drop to Raw SQL</h2>
+  <div class="snippet">
+    <div class="lbl">Performance escape hatch</div>
+    <pre><code>-- Complex reporting, bulk updates, and window functions:
+-- Do NOT instantiate 100,000 ORM objects into memory!
+-- Use raw parameterized queries or query builders:
+UPDATE accounts SET balance = balance * 1.05 WHERE active = true;</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0008-when-to-use-an-orm-and-when-to-use-raw-sql.html">Lesson 08 — When to use an ORM and when to use raw SQL</a>.</p>
+
+  <div class="lesson-foot">
+    <div class="links">
+      <a href="orms-glossary.html">📖 Glossary</a>
+      <a href="../course.html">← Course map</a>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

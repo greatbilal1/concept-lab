@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 03 — Multi-Layer Perceptrons and Forward Propagation</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="neural-networks" data-lesson="3" data-lesson-id="mlp-and-forward-propagation">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 03</span> · Forward Pass</span>
+
+  <h1 class="lesson-title">Multi-Layer Perceptrons and Forward Propagation</h1>
+  <p class="lesson-lede">
+    Connecting layers: Multi-Layer Perceptrons (MLPs), matrix multiplications, and the complete forward propagation pass.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You understand the architecture of MLPs and the mechanics of forward propagation.</span>
+    <span><b>Mission link</b> Mastering multi-layer perceptrons and forward propagation across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Multi-Layer Perceptrons and Forward Propagation</h2>
+  <p>A single neuron can only draw a single straight decision line in space. To learn complex, curved decision boundaries, we stack neurons into <strong>Layers</strong>, forming a <strong>Multi-Layer Perceptron (MLP)</strong> (or Feed-Forward Neural Network):</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Connecting layers: Multi-Layer Perceptrons (MLPs), matrix multiplications, and the complete forward propagation pass.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Multi-Layer Perceptron Topology</h2>
+  <ul><li><strong>Input Layer:</strong> Ingests the raw feature vector $x$.</li><li><strong>Hidden Layers:</strong> Intermediate layers that transform raw inputs into increasingly abstract representations.</li><li><strong>Output Layer:</strong> Emits final predictions (class probabilities via Softmax, or continuous values).</li></ul>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Matrix Multiplication Representation</h2>
+  <p>The beauty of modern deep learning is that computing an entire layer of 1,000 neurons for a batch of 64 examples is a single mathematical operation: <strong>Matrix Multiplication</strong>!</p><pre><code># Complete Forward Propagation Pass in NumPy:
+import numpy as np
+
+def forward_pass(X, W1, b1, W2, b2):
+    # Layer 1 (Hidden):
+    Z1 = np.dot(X, W1) + b1       # Matrix multiply + bias
+    A1 = np.maximum(0, Z1)         # ReLU non-linearity
+
+    # Layer 2 (Output):
+    Z2 = np.dot(A1, W2) + b2      # Matrix multiply + bias
+    # Softmax output for classification probabilities:
+    exp_scores = np.exp(Z2 - np.max(Z2, axis=1, keepdims=True))
+    probabilities = exp_scores / np.sum(exp_scores, axis=1, keepdims=True)
+    return A1, probabilities</code></pre><div class="callout"><p><strong>GPU Hardware Superpower:</strong> Graphics Processing Units (GPUs) were engineered to multiply matrices for 3D video games. Deep learning exploded because GPUs can perform billions of forward-pass matrix multiplications in parallel!</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the forward propagation sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You understand the architecture of MLPs and the mechanics of forward propagation.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where multi-layer perceptrons and forward propagation applies.</li>
+    <li>Author a unit test or verification script exercising multi-layer perceptrons and forward propagation.</li>
+    <li>Document team architectural conventions regarding multi-layer perceptrons and forward propagation.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Multi-Layer Perceptrons and Forward Propagation.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "How is forward propagation computed across a layer of 100 neurons in modern deep learning libraries?",
+    a: ["A single parallel matrix multiplication (Y = X @ W + b) executed efficiently on GPU tensor cores","A nested Python for-loop iterating over each neuron one by one","A series of sequential SQL database queries","A bash script running in terminal"],
+    c: 0,
+    why: "Forward propagation evaluates entire layers in parallel using GPU matrix multiplications."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Input Layer (x)",
+            "lines": [
+                  "784 pixel values (28x28 image)",
+                  "Fed into layer 1"
+            ]
+      },
+      {
+            "title": "Hidden Layer (W1, b1)",
+            "lines": [
+                  "Z1 = X @ W1 + b1, A1 = ReLU(Z1)",
+                  "Extracts edges and contours"
+            ]
+      },
+      {
+            "title": "Output Layer (W2, b2)",
+            "lines": [
+                  "Z2 = A1 @ W2 + b2, P = Softmax(Z2)",
+                  "Outputs 10 digit probabilities (0-9)"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Multi-Layer Perceptrons and Forward Propagation",
+      "def execute_flow():",
+      "    # Connecting layers: Multi-Layer Perceptrons (MLPs),...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Multi-Layer Perceptrons and Forward Propagation"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Input Batch X (64 x 784)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Weight Matrix W (784 x 128)"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Forward propagation computes layer activations using parallel {1} multiplications followed by non-linear {2} functions."
+],
+    blanks: [
+      {
+            "a": [
+                  "matrix"
+            ],
+            "why": "Linear algebra 2D grid operations"
+      },
+      {
+            "a": [
+                  "activation"
+            ],
+            "why": "Functions like ReLU or Softmax"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What does the Softmax function do in the final layer of a classification network?",
+      a: ["It converts raw pre-activation scores (logits) into a valid probability distribution that sums to 1.0","It makes the font softer","It encrypts the output","It deletes negative weights"],
+      c: 0,
+      why: "Softmax exponentiates and normalizes logits so outputs represent valid probabilities."
+    },
+    {
+      q: "Why are GPUs vastly faster at deep learning forward passes than CPUs?",
+      a: ["GPUs have thousands of parallel cores designed specifically for concurrent matrix multiplication throughput","GPUs have larger hard drives","GPUs run on higher voltage","GPUs do not use RAM"],
+      c: 0,
+      why: "Massive parallel core architecture makes GPUs orders of magnitude faster at tensor math."
+    },
+    {
+      q: "What are 'logits' in a neural network?",
+      a: ["The unnormalized raw numerical scores output by the final layer before applying Softmax or Sigmoid","Log files saved to the disk","Logarithmic mathematical functions","Login credentials"],
+      c: 0,
+      why: "Logits are the raw linear outputs prior to probabilistic normalization."
+    },
+    {
+      q: "How does increasing the number of hidden layers (depth) affect network representation capacity?",
+      a: ["Deeper networks can learn hierarchical abstractions (edges -> shapes -> object parts -> whole objects)","Depth has zero impact on capacity","Deeper networks can only run in Python 2","Deeper networks use fewer parameters"],
+      c: 0,
+      why: "Hierarchical depth enables models to assemble complex concepts from simple primitives."
+    }
+  ]);
+</script>
+</body>
+</html>

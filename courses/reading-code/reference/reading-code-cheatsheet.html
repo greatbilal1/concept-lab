@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reading Code You Didn't Write — Cheat Sheet</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+<style>
+  .ref-toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0 8px; }
+  .ref-toc a { font-size: .8rem; border: 1px solid var(--border); background: #111a30; padding: 5px 11px; border-radius: 999px; color: var(--muted); text-decoration: none; border-bottom: 1px solid var(--border); }
+  .ref-toc a:hover { color: #fff; border-color: #3d5488; }
+  .lesson-wrap h2 { scroll-margin-top: 20px; }
+  .snippet { margin: 14px 0 22px; }
+  .snippet .lbl { font-size: .72rem; font-weight: 800; letter-spacing: .7px; text-transform: uppercase; color: var(--accent2); margin-bottom: 6px; }
+  .see { font-size: .82rem; color: var(--muted); margin: -6px 0 12px; }
+  .see a { color: var(--accent2); border-bottom: 0; }
+  .see a:hover { color: #fff; }
+  .snippet pre { padding-top: 34px; }
+  @media print { .snippet pre { padding-top: 18px; } }
+</style>
+</head>
+<body class="lesson-body" data-course="reading-code">
+
+<div class="lesson-wrap">
+
+  <span class="lesson-kicker">Reference · Cheat sheet</span>
+  <h1 class="lesson-title">Reading Code You Didn't Write — Cheat Sheet</h1>
+  <p class="lesson-lede">
+    The whole course on one page. Every snippet links back to the lesson that
+    teaches it.
+  </p>
+
+  <div class="ref-toc">
+    <a href="#sec-1">Locating Entry Points</a>
+    <a href="#sec-2">Data Path Tracing</a>
+    <a href="#sec-3">Tests as Specs</a>
+    <a href="#sec-4">Mental Model Distillation</a>
+  </div>
+
+  <h2 id="sec-1"><span class="n">1</span>Locating Entry Points</h2>
+  <div class="snippet">
+    <div class="lbl">Find where execution starts</div>
+    <pre><code># Python CLI / Web
+grep -rn "if __name__ == '__main__':" .
+grep -rn "FastAPI(" . || grep -rn "Flask(" .
+
+# Node.js
+jq .main package.json
+jq .scripts.start package.json</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0002-finding-the-entry-point.html">Lesson 02 — Finding the entry point</a>.</p>
+
+  <h2 id="sec-2"><span class="n">2</span>Data Path Tracing</h2>
+  <div class="snippet">
+    <div class="lbl">Follow records through the system</div>
+    <pre><code># 1. Locate schema / model definition
+# 2. Search for constructor / insertion points
+# 3. Follow the return value across function boundaries</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0003-following-the-data-path.html">Lesson 03 — Following the data path</a>.</p>
+
+  <h2 id="sec-3"><span class="n">3</span>Tests as Specs</h2>
+  <div class="snippet">
+    <div class="lbl">Read intent before implementation</div>
+    <pre><code># Run single test with verbose output
+pytest tests/test_orders.py -k "test_discount" -vv
+# Tests show:
+# - Valid inputs
+# - Expected outputs
+# - Failure edge cases</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0005-reading-tests-as-specifications.html">Lesson 05 — Reading tests as specifications</a>.</p>
+
+  <h2 id="sec-4"><span class="n">4</span>Mental Model Distillation</h2>
+  <div class="snippet">
+    <div class="lbl">Documenting core abstractions</div>
+    <pre><code>/*
+ Core Entities:
+ - User (auth, billing_tier)
+ - Subscription (status, renewal_date)
+ - Invoice (amount, line_items)
+*/</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0008-building-a-system-mental-model.html">Lesson 08 — Building a system mental model</a>.</p>
+
+  <div class="lesson-foot">
+    <div class="links">
+      <a href="reading-code-glossary.html">📖 Glossary</a>
+      <a href="../course.html">← Course map</a>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

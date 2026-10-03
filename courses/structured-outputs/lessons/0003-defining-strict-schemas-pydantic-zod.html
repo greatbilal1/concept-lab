@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 03 — Defining Strict Schemas with JSON Schema and Pydantic/Zod</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="structured-outputs" data-lesson="3" data-lesson-id="defining-strict-schemas-pydantic-zod">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 03</span> · Schema Authoring</span>
+
+  <h1 class="lesson-title">Defining Strict Schemas with JSON Schema and Pydantic/Zod</h1>
+  <p class="lesson-lede">
+    Authoring production schemas: Pydantic v2 in Python, Zod in TypeScript, Field constraints, and strict JSON Schema compliance.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to author robust Pydantic v2 and Zod schemas that guide structured output generation.</span>
+    <span><b>Mission link</b> Mastering defining strict schemas with json schema and pydantic/zod across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Defining Strict Schemas with JSON Schema and Pydantic/Zod</h2>
+  <p>To use structured outputs effectively, an engineer must master <strong>Schema Authoring</strong> using modern validation libraries: <strong>Pydantic v2</strong> (Python) or <strong>Zod</strong> (TypeScript). These libraries compile typed classes directly into standard <strong>JSON Schema</strong> specifications understood by LLM constrained decoding engines.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Authoring production schemas: Pydantic v2 in Python, Zod in TypeScript, Field constraints, and strict JSON Schema compliance.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Pydantic v2 Schema Anatomy</h2>
+  <p>Key rules for authoring agent-ready schemas in Pydantic v2:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>TypeScript Zod Equivalent</h2>
+  <ul><li><strong>1. Explicit Field Descriptions:</strong> Use `Field(description="...")`. The model reads these descriptions as instruction prompts for what that specific field should contain!</li><li><strong>2. Bounded Constraints:</strong> Use `gt`, `lt`, `min_length`, and `max_length` to constrain numbers and strings: `Field(ge=0, le=100)`.</li><li><strong>3. Explicit Literals & Enums:</strong> Never use raw `str` if only a fixed set of options is allowed. Use `Literal["low", "medium", "high"]` or standard Python `Enum`.</li><li><strong>4. Strict Schema Mode:</strong> Set `model_config = ConfigDict(strict=True, extra="forbid")` to prevent coercive casting or hallucinated keys.</li></ul><pre><code># Production Pydantic v2 Schema for Structured Extraction:
+from pydantic import BaseModel, Field, ConfigDict
+from typing import Literal
+
+class BugReportSchema(BaseModel):
+    model_config = ConfigDict(strict=True, extra="forbid")
+
+    title: str = Field(description="Concise 5-10 word summary of the bug")
+    severity: Literal["low", "medium", "high", "critical"] = Field(
+        description="Impact of the bug on user operations"
+    )
+    affected_module: str = Field(description="Component path (e.g. auth, billing, api)")
+    steps_to_reproduce: list[str] = Field(
+        min_length=1, description="Numbered list of reproduction steps"
+    )</code></pre><div class="callout"><p><strong>Field Descriptions as Prompts:</strong> Field descriptions in your Pydantic model are micro-prompts! Write clear descriptions to guide the model on exactly how to populate each attribute.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the schema authoring sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to author robust Pydantic v2 and Zod schemas that guide structured output generation.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where defining strict schemas with json schema and pydantic/zod applies.</li>
+    <li>Author a unit test or verification script exercising defining strict schemas with json schema and pydantic/zod.</li>
+    <li>Document team architectural conventions regarding defining strict schemas with json schema and pydantic/zod.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Defining Strict Schemas with JSON Schema and Pydantic/Zod.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What parameter in Pydantic v2 BaseModel configuration guarantees that all fields are strictly typed without coercive type casting?",
+    a: ["model_config = ConfigDict(strict=True)","strict_mode = True","strict = 1","debug = True"],
+    c: 0,
+    why: "ConfigDict(strict=True) enforces strict type validation without permissive type coercion."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "title: str = Field(...)",
+            "lines": [
+                  "type: 'string'",
+                  "description: Injected into model grammar"
+            ]
+      },
+      {
+            "title": "severity: Literal[...]",
+            "lines": [
+                  "enum: ['low', 'medium', 'high']",
+                  "Constrained decoding permits ONLY these 3 strings!"
+            ]
+      },
+      {
+            "title": "steps: list[str]",
+            "lines": [
+                  "type: 'array', items: {'type': 'string'}",
+                  "Guarantees list structure"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Defining Strict Schemas with JSON Schema and Pydantic/Zod",
+      "def execute_flow():",
+      "    # Authoring production schemas: Pydantic v2 in Pytho...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Defining Strict Schemas with JSON Schema and Pydantic/Zod"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "z.object({ ... })"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "In Pydantic v2, field {1} act as micro-prompts that guide the model on how to populate each attribute within the {2} contract."
+],
+    blanks: [
+      {
+            "a": [
+                  "descriptions"
+            ],
+            "why": "Text inside Field(description=...)"
+      },
+      {
+            "a": [
+                  "schema"
+            ],
+            "why": "Data model validation definition"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why is using Literal['A', 'B'] superior to raw str when a field has fixed categorical values?",
+      a: ["Constrained decoding limits the model to only emitting the exact tokens 'A' or 'B', making invalid string values impossible","Literal strings run 10x faster","Literal strings are encrypted","Raw str is deprecated in Python 3"],
+      c: 0,
+      why: "Literals compile to JSON Schema enums, restricting the sampling grammar to valid choices."
+    },
+    {
+      q: "How does an LLM know what to put inside a specific schema field?",
+      a: ["The model reads the field name, datatype, and the Field(description='...') text in the compiled JSON Schema","The model guesses randomly","The field values are stored in the database","The user types it in manually"],
+      c: 0,
+      why: "Field descriptions provide semantic guidance directly inside the JSON Schema contract."
+    },
+    {
+      q: "What is the TypeScript equivalent of Python's Pydantic library for schema definition?",
+      a: ["Zod","React","Express","Webpack"],
+      c: 0,
+      why: "Zod is the standard TypeScript-first schema declaration and validation library."
+    },
+    {
+      q: "What happens if a field is declared as 'Optional[int]' in Pydantic?",
+      a: ["The field can contain either a valid integer or null, but cannot contain an arbitrary string","The field is ignored by the model","The field deletes itself","The model crashes on null"],
+      c: 0,
+      why: "Optional fields allow null values while preserving strict type constraints on non-null values."
+    }
+  ]);
+</script>
+</body>
+</html>

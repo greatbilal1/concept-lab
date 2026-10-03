@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 04 — Tool Calling: Editing Files and Running Terminals</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="ai-coding-agents" data-lesson="4" data-lesson-id="tool-calling-edits-terminals">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 04</span> · Tool Execution</span>
+
+  <h1 class="lesson-title">Tool Calling: Editing Files and Running Terminals</h1>
+  <p class="lesson-lede">
+    Examining how agents apply precise file edits (replace string vs AST rewrites) and manage terminal sessions.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You understand how agents use file editing and terminal execution tools safely.</span>
+    <span><b>Mission link</b> Mastering tool calling: editing files and running terminals across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Tool Calling: Editing Files and Running Terminals</h2>
+  <p>To do real work, an agent must reach beyond text generation into the filesystem and the operating system. This is enabled by <strong>Tool Calling</strong> (also known as Function Calling).</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Examining how agents apply precise file edits (replace string vs AST rewrites) and manage terminal sessions.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>File Editing Strategies</h2>
+  <p>When modifying existing code, agents face a choice of editing strategies:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Terminal Execution Safety</h2>
+  <ul><li><strong>Full File Overwrite:</strong> The agent generates the entire 800-line file from scratch. <em>Dangerous!</em> Models frequently hallucinate missing sections, omit methods with comments like `// ...rest of code unchanged...`, and burn thousands of tokens.</li><li><strong>Exact String Replacement (replace_string_in_file):</strong> The agent specifies the exact target string to replace, along with 3-5 lines of surrounding context. Safe, precise, and minimal token usage.</li><li><strong>Terminal Commands (run_in_terminal):</strong> Executing build scripts, running unit tests, installing packages, or inspecting git diffs.</li></ul><pre><code># Anatomy of a Safe String Replacement Tool Call:
+{
+  "filePath": "/workspace/src/auth.py",
+  "oldString": "    if not token:\n        return False\n    return verify(token)",
+  "newString": "    if not token:\n        raise AuthenticationRequired()\n    return verify(token)"
+}</code></pre><p>Notice that `oldString` contains sufficient surrounding context lines to ensure the match is 100% unique in the file.</p><div class="callout"><p><strong>Safety Seam:</strong> Never allow an agent to run destructive commands like rm -rf or push directly to production without human confirmation gates.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the tool calling sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You understand how agents use file editing and terminal execution tools safely.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where tool calling: editing files and running terminals applies.</li>
+    <li>Author a unit test or verification script exercising tool calling: editing files and running terminals.</li>
+    <li>Document team architectural conventions regarding tool calling: editing files and running terminals.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Tool Calling: Editing Files and Running Terminals.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Why is exact string replacement (with context lines) preferred over rewriting entire files during agent edits?",
+    a: ["Full-file rewrites burn massive tokens and frequently introduce accidental truncation or missing code markers","Exact string replacement is forbidden in JavaScript","Operating systems cannot overwrite existing files","Rewriting files changes git ownership"],
+    c: 0,
+    why: "Full-file rewrites risk truncating code with '...existing code...' and waste huge token budgets."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Full File Overwrite",
+            "lines": [
+                  "Sends all 800 lines",
+                  "Risk of lazy truncation",
+                  "High token cost"
+            ]
+      },
+      {
+            "title": "Targeted Replacement",
+            "lines": [
+                  "Sends oldString & newString",
+                  "Context lines ensure uniqueness",
+                  "Low token cost, zero truncation"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Tool Calling: Editing Files and Running Terminals",
+      "def execute_flow():",
+      "    # Examining how agents apply precise file edits (rep...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Tool Calling: Editing Files and Running Terminals"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Command Request"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Terminal Capture"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "step": "Tool Result"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Agents use targeted {1} with context lines to safely modify code without risking accidental code {2}."
+],
+    blanks: [
+      {
+            "a": [
+                  "string replacement"
+            ],
+            "why": "Precise substring substitution tool"
+      },
+      {
+            "a": [
+                  "truncation"
+            ],
+            "why": "Dropping code with comments like ...rest of code..."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why must 'oldString' in replace_string_in_file include 3-5 lines of context?",
+      a: ["To guarantee that the target replacement location is uniquely identified within the file","To make the file size larger on disk","Because Python syntax requires 5-line blocks","To satisfy git commit message rules"],
+      c: 0,
+      why: "Context lines eliminate ambiguity if identical function names or variable patterns exist elsewhere in the file."
+    },
+    {
+      q: "What is the danger of using 'full-file rewrite' tools on large legacy files?",
+      a: ["Models often lazily emit comments like '// ... existing code ...', deleting large chunks of working functionality","Full-file rewrites disable git version control","Files become read-only","The CPU fan speeds up"],
+      c: 0,
+      why: "Models frequently summarize or omit unchanged middle sections when regenerating large files."
+    },
+    {
+      q: "How does an agent know whether a terminal command succeeded?",
+      a: ["By inspecting the numeric process exit code (0 for success, non-zero for failure) and stdout/stderr output","By asking the user in chat","By waiting 5 minutes","By checking the system clock"],
+      c: 0,
+      why: "Standard POSIX process exit codes provide unambiguous verification of command success."
+    },
+    {
+      q: "Why should interactive commands (like waiting for password prompts) be handled with care in agent terminals?",
+      a: ["Terminal commands run without a human TTY; interactive prompts can hang indefinitely without dedicated input handlers","Passwords are automatically deleted by the shell","Interactive commands overheat the CPU","Shells cannot accept input"],
+      c: 0,
+      why: "Non-interactive agent terminal runners hang if a command blocks waiting for stdin."
+    }
+  ]);
+</script>
+</body>
+</html>

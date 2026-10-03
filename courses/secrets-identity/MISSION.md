@@ -1,0 +1,3 @@
+# Mission — Secrets, Credentials & Identity
+
+Master the discipline of secret governance and machine identity. Understand the anatomy of secret leaks, replace vulnerable flat files with centralized encrypted vaults (Vault, AWS Secrets Manager), eliminate permanent keys with automated rotation and ephemeral STS tokens, enforce the principle of least privilege in IAM policies without wildcards, secure machine-to-machine communication with mTLS and OAuth2 Client Credentials, adopt keyless cloud deployments using OIDC Workload Identity Federation, implement automated secret scanning with Gitleaks and TruffleHog, and architect zero-trust secret environments.

@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 06 — Testing and fixture directories</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="software-project-structure" data-lesson="6" data-lesson-id="testing-and-fixtures-directory-patterns">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 06</span> · Entry Points & Testing</span>
+
+  <h1 class="lesson-title">Testing and fixture directories</h1>
+  <p class="lesson-lede">
+    Tests are code too, and need architecture. Learn how to structure unit, integration, and end-to-end tests alongside reusable fixtures.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Design a scalable test directory hierarchy with shared fixtures and mock data</span>
+    <span><b>Mission link</b> Prevents messy test duplication and slow, brittle test suites</span>
+  </div>
+
+  <h2><span class="n">1</span>Separating test layers</h2>
+  <p>A healthy test suite contains tests of different speeds and scopes. Mixing unit tests (which run in milliseconds in memory) with slow database integration tests creates a suite nobody wants to run.</p><p>Organize your <code>tests/</code> directory into clear subfolders: <code>unit/</code> for isolated function checks, <code>integration/</code> for database and API contracts, and <code>fixtures/</code> for static test payloads and mock responses.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Separate fast unit tests from slow integration tests so developers can get instant feedback.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The tests/ directory tree</h2>
+  <p>Examine the canonical structure of a multi-tiered automated test suite.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing fixture injection</h2>
+  <p>Trace how a test framework injects a shared database session fixture into a test function.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your recall of automated test directory organization.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can structure clean, multi-layered test suites that provide fast developer feedback and reliable integration verification.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Separate your test folder into unit/ and integration/ subdirectories.</li>
+    <li>Move duplicate test setup data into a shared conftest.py or fixtures module.</li>
+    <li>Configure your test runner to run unit tests separately from integration tests.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    pytest Documentation: *Fixtures: a prerequisite to clean testing* (docs.pytest.org).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Why should unit tests avoid connecting to real external databases?",
+    a: ["External I/O makes unit tests slow and introduces flaky network failure dependencies","Databases do not support automated testing queries","Unit tests cannot run SQL statements","Operating systems forbid tests from opening network sockets"],
+    c: 0,
+    why: "Unit tests must be fast and 100% deterministic; external I/O introduces latency and flakiness."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "tests/unit/",
+            "lines": [
+                  "pure logic tests",
+                  "zero network, zero disk I/O"
+            ]
+      },
+      {
+            "title": "tests/integration/",
+            "lines": [
+                  "database queries",
+                  "HTTP API endpoints"
+            ]
+      },
+      {
+            "title": "tests/fixtures/",
+            "lines": [
+                  "sample JSON payloads",
+                  "conftest.py shared fixtures"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# tests/conftest.py defines fixture: db_session",
+      "def test_create_user(db_session):",
+      "    user = create_user(db_session, 'Ada')",
+      "    assert user.id is not None",
+      "# db_session automatically rolls back transaction after test"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "fixture": "injected by pytest"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "test": "executes against clean isolated transaction"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "assertion": "verified user created"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "teardown": "transaction rolled back; database clean"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Fast in-memory tests of isolated functions are <0> tests.",
+      "Tests verifying collaboration between real services are <1> tests.",
+      "Reusable baseline test data and mock objects are called <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "unit"
+            ],
+            "why": "Unit tests test single units of logic in isolation."
+      },
+      {
+            "a": [
+                  "integration"
+            ],
+            "why": "Integration tests verify real component boundaries."
+      },
+      {
+            "a": [
+                  "fixtures"
+            ],
+            "why": "Fixtures provide consistent baseline environments for tests."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the primary role of a 'conftest.py' file in pytest suites?",
+      a: ["To declare shared fixtures, plugins, and hooks accessible to all test files in the directory","To store production user passwords","To compile Python into native C machine code","To format test files with code style rules"],
+      c: 0,
+      why: "conftest.py defines fixtures and plugins automatically discovered across test hierarchies."
+    },
+    {
+      q: "Why is transaction rollback used in database integration fixtures?",
+      a: ["It resets the database to a clean state after each test without slow re-creation of tables","It saves hard drive electricity consumption","It prevents database queries from being logged","It automatically optimizes SQL indexing performance"],
+      c: 0,
+      why: "Rolling back transactions ensures each test runs against an isolated, identical database state."
+    },
+    {
+      q: "What belongs in a 'tests/fixtures/' directory?",
+      a: ["Static sample files like JSON payloads, mock CSVs, or test certificates","The production database backup dumps","Executable compiler binary tools","The core application source code packages"],
+      c: 0,
+      why: "fixtures/ stores static sample data files required to simulate real inputs during tests."
+    },
+    {
+      q: "Why should unit tests execute in under a few seconds across the entire suite?",
+      a: ["To encourage developers to run tests constantly during active editing loops","Because cloud servers disconnect if tests run longer than 5 seconds","To avoid overheating the computer CPU processor","Because modern programming languages cannot run long tests"],
+      c: 0,
+      why: "Fast test suites enable tight test-driven feedback loops without breaking flow."
+    }
+  ]);
+</script>
+</body>
+</html>

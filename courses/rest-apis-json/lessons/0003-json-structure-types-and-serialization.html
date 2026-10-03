@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 03 — JSON structure, types, and serialization</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="rest-apis-json" data-lesson="3" data-lesson-id="json-structure-types-and-serialization">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 03</span> · JSON & Data Representations</span>
+
+  <h1 class="lesson-title">JSON structure, types, and serialization</h1>
+  <p class="lesson-lede">
+    JSON is the universal payload format of the web. Learn the six data types supported by ECMA-404, escaping rules, and how to safely serialize and parse data.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Serialize, parse, and validate JSON payloads across clients and servers</span>
+    <span><b>Mission link</b> The primary data interchange format across all modern web APIs</span>
+  </div>
+
+  <h2><span class="n">1</span>The six native JSON types</h2>
+  <p>Defined in ECMA-404, <b>JSON (JavaScript Object Notation)</b> is a text format containing exactly six data types: <b>string</b> (double-quoted), <b>number</b> (integer or floating point), <b>boolean</b> (<code>true</code> or <code>false</code>), <b>null</b>, <b>object</b> (key-value dictionary), and <b>array</b> (ordered list).</p><p>Notice what is missing: <b>JSON has no native Date, RegExp, or Function types</b>. Dates must be serialized as ISO 8601 strings (e.g. <code>"2026-10-03T12:00:00Z"</code>) and parsed explicitly by the receiver.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    JSON supports only six types; dates and binary buffers must be serialized as strings.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The JSON syntax rules</h2>
+  <p>Memorise the strict formatting rules that separate valid JSON from loose JavaScript object syntax.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing safe JSON parsing with try/catch</h2>
+  <p>Trace how JSON.parse handles malformed syntax without crashing the application.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of JSON formatting rules.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can serialize and deserialize JSON safely while avoiding trailing comma and type conversion pitfalls.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Test an invalid JSON string in JSONLint or your browser console.</li>
+    <li>Serialize a complex object with indentation using JSON.stringify(obj, null, 2).</li>
+    <li>Parse an ISO 8601 date string back into a native Date object using new Date(str).</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    ECMA-404: *The JSON Data Interchange Syntax* (ecma-international.org).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What does JSON.stringify({ d: new Date(), f: () => {} }) produce?",
+    a: ["Date converts to an ISO string, while the function property 'f' is completely omitted","An error is thrown because dates cannot be serialized","Both are converted to string code representations","A binary array buffer"],
+    c: 0,
+    why: "Dates serialize to ISO strings via toJSON(); functions are non-JSON types and are stripped."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Keys Must Be Quoted",
+            "lines": [
+                  "{\"name\": \"Ada\"} is valid",
+                  "{name: \"Ada\"} is INVALID JSON!"
+            ]
+      },
+      {
+            "title": "Double Quotes Only",
+            "lines": [
+                  "\"text\" is valid",
+                  "'text' single quotes are INVALID!"
+            ]
+      },
+      {
+            "title": "No Trailing Commas",
+            "lines": [
+                  "[1, 2, 3] is valid",
+                  "[1, 2, 3,] is INVALID JSON!"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "try {",
+      "    const data = JSON.parse(rawIncomingPayload);",
+      "    processOrder(data);",
+      "} catch (err) {",
+      "    return res.status(400).json({ error: 'Malformed JSON payload' });",
+      "}"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "input": "raw string from network body"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "check": "JSON.parse evaluates syntax"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "safeguard": "SyntaxError caught; 400 Bad Request returned cleanly"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The MIME type identifying JSON payloads is application/<0>.",
+      "JSON string values must strictly be enclosed in <1> quotes.",
+      "The standard format for serializing timestamps into JSON strings is ISO <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "json"
+            ],
+            "why": "application/json is the registered media type."
+      },
+      {
+            "a": [
+                  "double"
+            ],
+            "why": "Single quotes are strictly illegal in JSON syntax."
+      },
+      {
+            "a": [
+                  "8601"
+            ],
+            "why": "ISO 8601 provides unambiguous global date serialization."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Which of the following is valid JSON syntax?",
+      a: ["{\"user\": \"Ada\", \"active\": true}","{'user': 'Ada', 'active': true}","{user: \"Ada\", active: true}","{\"user\": \"Ada\", \"active\": true,}"],
+      c: 0,
+      why: "Keys must have double quotes, strings must have double quotes, and trailing commas are forbidden."
+    },
+    {
+      q: "How should timestamps and calendar dates be formatted in JSON APIs?",
+      a: ["As ISO 8601 strings in UTC format (e.g. '2026-10-03T12:00:00Z')","As local computer time strings like 'Saturday noon'","As raw binary millisecond memory addresses","Dates cannot be transmitted over internet connections"],
+      c: 0,
+      why: "ISO 8601 strings provide an unambiguous, timezone-aware global standard for dates."
+    },
+    {
+      q: "What does JSON.parse() throw when passed an ill-formed string with a trailing comma?",
+      a: ["A SyntaxError exception","A NullPointerException","A NetworkTimeoutError","It returns null silently"],
+      c: 0,
+      why: "JSON.parse strictly enforces ECMA-404; any syntax error throws a SyntaxError."
+    },
+    {
+      q: "Can a JSON payload natively serialize circular references (an object that points to itself)?",
+      a: ["No, attempting to stringify circular references throws a TypeError: Converting circular structure to JSON","Yes, JSON automatically handles circular pointers with pointers","Only on Linux servers","Yes, if the object has fewer than five keys"],
+      c: 0,
+      why: "JSON is a pure tree format and cannot represent cyclic directed graphs natively."
+    }
+  ]);
+</script>
+</body>
+</html>

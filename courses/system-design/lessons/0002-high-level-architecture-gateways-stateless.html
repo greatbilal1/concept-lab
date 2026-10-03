@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 02 — High-Level Architecture: API Gateways, Load Balancers, and Stateless Services</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="system-design" data-lesson="2" data-lesson-id="high-level-architecture-gateways-stateless">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 02</span> · High-Level Blueprint</span>
+
+  <h1 class="lesson-title">High-Level Architecture: API Gateways, Load Balancers, and Stateless Services</h1>
+  <p class="lesson-lede">
+    Constructing the skeleton: Anycast DNS, CDN edges, Application Load Balancers (ALBs), API Gateways, and stateless microservices.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to design decoupled, horizontally scalable high-level application architectures.</span>
+    <span><b>Mission link</b> Mastering high-level architecture: api gateways, load balancers, and stateless services across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of High-Level Architecture: API Gateways, Load Balancers, and Stateless Services</h2>
+  <p>Once requirements and scale are calculated, you construct the <strong>High-Level Architectural Blueprint</strong>. A planetary-scale system is structured like a funnel, shedding load and filtering traffic at each progressive layer.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Constructing the skeleton: Anycast DNS, CDN edges, Application Load Balancers (ALBs), API Gateways, and stateless microservices.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Architectural Ingress Funnel</h2>
+  <p>The Five Ingress & Application Tiers:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Vertical vs Horizontal Scaling</h2>
+  <ul><li><strong>1. Global Edge (Anycast DNS & CDN):</strong> Route 53 routes to Cloudflare/CloudFront. Terminates TLS locally and serves cached static assets (HTML, CSS, images) from edge RAM. 80% of total web traffic is absorbed here!</li><li><strong>2. Load Balancing (ALB / NLB):</strong> Balances remaining dynamic traffic across multiple Availability Zones using least-connections scheduling.</li><li><strong>3. API Gateway Tier (Kong / Envoy / Traefik):</strong> Single entry point for microservices: handles JWT authentication, tenant rate limiting, request routing, telemetry tracing, and SSL termination.</li><li><strong>4. Stateless Application Services:</strong> Microservices executing business logic. <strong>Stores ZERO user session state in memory!</strong></li><li><strong>5. Centralized State Tier:</strong> All session tokens, shopping carts, and active state are stored in distributed Redis clusters or databases.</li></ul><pre><code># The High-Level System Architecture Funnel:
+[Global Clients: 100M Users]
+      │ (Anycast DNS)
+      ▼
+[CDN Edge Layer: CloudFront / Cloudflare] ──(80% Static Traffic Absorbed!)
+      │ (20% Dynamic API Traffic)
+      ▼
+[Application Load Balancers (ALB across Multi-AZ)]
+      │
+      ▼
+[API Gateway: Auth, Rate Limiting, OTel Tracing]
+      │ (Internal gRPC / HTTP)
+      ▼
+[Stateless Microservices: Service A, Service B, Service C]
+      │
+      ▼
+[Shared Distributed State: Redis Cluster & PostgreSQL Database]</code></pre><div class="callout"><p><strong>The Scale-Out Invariant:</strong> If you need to handle 10x more traffic, you simply spin up 10x more stateless app containers behind the load balancer. Statelessness enables horizontal scalability.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the high-level architecture sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to design decoupled, horizontally scalable high-level application architectures.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where high-level architecture: api gateways, load balancers, and stateless services applies.</li>
+    <li>Author a unit test or verification script exercising high-level architecture: api gateways, load balancers, and stateless services.</li>
+    <li>Document team architectural conventions regarding high-level architecture: api gateways, load balancers, and stateless services.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for High-Level Architecture: API Gateways, Load Balancers, and Stateless Services.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Why must application backend servers in high-scale architectures remain completely stateless?",
+    a: ["Stateless servers store zero session state in local memory, allowing load balancers to distribute requests to any server and scale pods elastically","Stateless servers use no electricity","Stateful servers cannot run code","Statelessness is required by Python"],
+    c: 0,
+    why: "Statelessness allows application instances to scale from 2 to 200 nodes dynamically, serving any request from any node."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1. CDN Edge (80% Load Absorbed)",
+            "lines": [
+                  "Static assets, images, cached responses",
+                  "Terminates TLS in 10ms locally"
+            ]
+      },
+      {
+            "title": "2. API Gateway (Security & Routing)",
+            "lines": [
+                  "JWT verification, rate limiting, routing",
+                  "Prevents unauthorized requests"
+            ]
+      },
+      {
+            "title": "3. Stateless App Nodes",
+            "lines": [
+                  "Scales horizontally from 5 to 500 pods",
+                  "Zero local session memory"
+            ]
+      },
+      {
+            "title": "4. Distributed State Tier",
+            "lines": [
+                  "Redis Cluster & Database Shards"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing High-Level Architecture: API Gateways, Load Balancers, and Stateless Services",
+      "def execute_flow():",
+      "    # Constructing the skeleton: Anycast DNS, CDN edges,...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "High-Level Architecture: API Gateways, Load Balancers, and Stateless Services"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Vertical Scaling (Scale-Up)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Horizontal Scaling (Scale-Out)"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "High-level system design funnels traffic through CDN edges, API gateways, and load balancers to {1} application services that scale {2} on demand."
+],
+    blanks: [
+      {
+            "a": [
+                  "stateless"
+            ],
+            "why": "Storing zero session state in local memory"
+      },
+      {
+            "a": [
+                  "horizontally"
+            ],
+            "why": "Adding more nodes (scale-out)"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the primary architectural responsibility of an API Gateway in microservice systems?",
+      a: ["Providing a centralized entry point handling authentication, rate limiting, SSL termination, request routing, and telemetry tracing","Storing all company files","Writing code automatically","Managing physical data center cables"],
+      c: 0,
+      why: "API gateways centralize cross-cutting concerns like auth, rate limiting, and routing."
+    },
+    {
+      q: "Why is Horizontal Scaling (Scale-Out) preferred over Vertical Scaling (Scale-Up) for enterprise architectures?",
+      a: ["Horizontal scaling has no physical hardware ceiling, costs less using commodity cloud instances, and provides high fault tolerance","Horizontal scaling uses no electricity","Vertical scaling is illegal in cloud computing","Vertical scaling runs without code"],
+      c: 0,
+      why: "Horizontal scaling distributes load across multiple machines, eliminating single points of failure."
+    },
+    {
+      q: "Where should a user's active login session state be stored in a horizontally scaled web architecture?",
+      a: ["In a distributed in-memory cache like Redis or an encrypted client-side JWT, accessible by any backend server node","In a local text file on Server A","In the CPU registers","On the developer's laptop"],
+      c: 0,
+      why: "Shared in-memory stores allow any stateless application instance to validate and hydrate user sessions."
+    },
+    {
+      q: "How does an Application Load Balancer distribute traffic evenly across healthy backend instances?",
+      a: ["Using scheduling algorithms like Round-Robin or Least Outstanding Requests, continuously removing instances that fail healthchecks","By picking random computers","By asking the user which server they prefer","By sending all traffic to Server 1"],
+      c: 0,
+      why: "ALBs use algorithms like least-connections while monitoring healthchecks to balance traffic smoothly."
+    }
+  ]);
+</script>
+</body>
+</html>

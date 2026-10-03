@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 03 — God objects and information hiding</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="separation-of-concerns" data-lesson="3" data-lesson-id="god-objects-and-information-hiding">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 03</span> · Single Responsibility & Actors</span>
+
+  <h1 class="lesson-title">God objects and information hiding</h1>
+  <p class="lesson-lede">
+    The monster class that knows everything and does everything. Learn how to slay the God Object antipattern and enforce David Parnas's Information Hiding principle.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Slay God Objects by distributing responsibilities and encapsulating internal data structures</span>
+    <span><b>Mission link</b> Eliminates bloated monolithic classes that paralyze software maintenance</span>
+  </div>
+
+  <h2><span class="n">1</span>The monster that ate your architecture</h2>
+  <p>In decaying codebases, one class inevitably swells into a <b>God Object (Blob)</b>: <code>AppManager</code>, <code>SystemController</code>, or <code>UserDataContext</code>. It has 4,000 lines of code, holds 40 properties, and contains 60 methods. Every other class in the application depends on it.</p><p>The cure is David Parnas's foundational principle of <b>Information Hiding</b>: <i>Every module must hide a secret.</i> That secret might be a database schema, an algorithm, or a formatting rule. External classes must interact only through narrow, public interfaces, with zero access to internal data structures.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    A God Object knows and does too much; Information Hiding forces modules to encapsulate their secrets.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>God Object versus Modular Decomposition</h2>
+  <p>Contrast the central bottleneck of a God Object with decentralized, cohesive modules.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing God Object refactoring</h2>
+  <p>Trace how extracting cohesive secrets from a God Object breaks it down into small modules.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of information hiding principles.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can identify God Objects and systematically dismantle them using information hiding and module extraction.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Find the largest class in your repository by line count using git or wc -l.</li>
+    <li>Identify three distinct 'secrets' (e.g. file formats, third-party APIs) that class is failing to hide.</li>
+    <li>Extract one secret into a standalone, encapsulated module with private internal state.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    David Parnas: *On the Criteria To Be Used in Decomposing Systems into Modules* (Communications of the ACM, 1972).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is the primary symptom of a 'God Object' in an architectural code audit?",
+    a: ["A massive class that nearly every other class in the application imports and depends upon","A class written in assembly language","A class that has no methods","A class that is completely empty"],
+    c: 0,
+    why: "God Objects centralize all application logic, making the rest of the codebase dependent on them."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "God Object (The Blob)",
+            "lines": [
+                  "UserManager: 4,000 lines",
+                  "handles auth, billing, avatars, emails, DB",
+                  "every PR causes merge conflicts!"
+            ]
+      },
+      {
+            "title": "Modular Hiding (Parnas)",
+            "lines": [
+                  "AuthenticationService (hides JWT secret)",
+                  "BillingService (hides Stripe SDK)",
+                  "AvatarStorage (hides S3 bucket)"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Slaying AppManager (God Object):",
+      "# Step 1: Extract email formatting -> NotificationModule",
+      "# Step 2: Extract payment charging -> BillingModule",
+      "# Step 3: Extract database connections -> DatabasePoolModule",
+      "# Result: AppManager shrinks to a clean, 20-line orchestrator shell!"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "initial_smell": "4,000-line monolithic God Object"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "extraction_1": "notification concern isolated"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "extraction_2": "billing concern isolated"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "outcome": "god object dismantled into focused cohesive modules"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "A class that knows and does too much is a <0> Object.",
+      "The principle that every module must conceal an internal design choice is <1> hiding.",
+      "The pioneer who formulated Information Hiding in 1972 is David <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "God"
+            ],
+            "why": "God Objects centralize too much responsibility."
+      },
+      {
+            "a": [
+                  "information"
+            ],
+            "why": "Information hiding protects internal secrets."
+      },
+      {
+            "a": [
+                  "Parnas"
+            ],
+            "why": "David Parnas published the seminal 1972 paper."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What did David Parnas mean by 'hiding a secret' inside a module?",
+      a: ["Encapsulating an implementation detail (like a data structure or file format) so that if it changes, only that single module needs editing","Storing encrypted military passwords inside the source code","Hiding software source code from company shareholders","Deleting comments so competitors cannot read the logic"],
+      c: 0,
+      why: "Information hiding encapsulates design decisions that are likely to change behind stable APIs."
+    },
+    {
+      q: "Why do God Objects naturally emerge in neglected codebases over time?",
+      a: ["It is psychologically easier for developers to add 'just one more method' to an existing familiar class than to architect a new class","Programming language compilers force developers to use God Objects","God Objects use less hard drive space","Because God Objects run faster on multi-core processors"],
+      c: 0,
+      why: "The path of least resistance tempts developers to append methods to existing central classes."
+    },
+    {
+      q: "What is an effective strategy for refactoring an existing God Object without breaking production?",
+      a: ["Extract one cohesive responsibility at a time into a new class, delegating calls from the God Object until it becomes an empty shell","Delete the God Object on Friday afternoon and rewrite it over the weekend","Rename the God Object to Helper","Split the file randomly in half"],
+      c: 0,
+      why: "Incremental extraction with delegation allows safe, continuous refactoring without breaking callers."
+    },
+    {
+      q: "What role does public/private access modifiers (private, protected) play in Information Hiding?",
+      a: ["They enforce compile-time or runtime barriers preventing external classes from directly accessing internal implementation fields","They encrypt source code files on disk","They prevent junior developers from opening the file","They make functions run fifty percent faster"],
+      c: 0,
+      why: "Access modifiers restrict visibility, forcing consumers to interact solely through the public interface."
+    }
+  ]);
+</script>
+</body>
+</html>

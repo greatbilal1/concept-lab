@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 05 — Composite indexes and the leftmost prefix rule</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="database-indexes-performance" data-lesson="5" data-lesson-id="composite-indexes-and-the-leftmost-prefix-rule">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 05</span> · Composite Indexes & Sizing</span>
+
+  <h1 class="lesson-title">Composite indexes and the leftmost prefix rule</h1>
+  <p class="lesson-lede">
+    Index column order matters. Master multi-column composite indexes and the Leftmost Prefix Rule to serve multiple queries with a single index.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Design composite multi-column indexes respecting the Leftmost Prefix rule</span>
+    <span><b>Mission link</b> Prevents creating redundant single-column indexes and optimizes multi-clause queries</span>
+  </div>
+
+  <h2><span class="n">1</span>The phonebook analogy: column order is king</h2>
+  <p>A telephone directory is an index sorted by <b>(Last Name, First Name)</b>. You can quickly find everyone named 'Smith'. You can quickly find 'Smith, John'. But can you quickly find everyone whose first name is 'John' regardless of last name?</p><p>No! You would have to read every single page. A <b>Composite Index</b> on <code>(A, B)</code> is sorted by A first, and by B only within matching A values. This is the <b>Leftmost Prefix Rule</b>: an index on <code>(A, B, C)</code> can accelerate queries on <code>(A)</code>, <code>(A, B)</code>, and <code>(A, B, C)</code>, but is completely useless for queries on <code>(B)</code> or <code>(C)</code> alone.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Composite indexes are sorted left-to-right; queries must filter on leading columns to use the index.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Leftmost Prefix matrix</h2>
+  <p>Understand which WHERE clause combinations can utilize an index on (A, B, C).</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing composite index sorting</h2>
+  <p>Trace how a composite index on (status, created_at) satisfies both filtering and sorting in one seek.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of composite index rules.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can design compact composite indexes that serve multiple query patterns and eliminate runtime sorting.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Create a composite index on (user_id, status) and test queries filtering on user_id alone.</li>
+    <li>Verify in EXPLAIN that filtering on status alone fails to use the index.</li>
+    <li>Replace two redundant single-column indexes with one well-ordered composite index.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Markus Winand, *Use The Index, Luke!*, Section: 'The Concatenated Index'.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "If an index exists on '(tenant_id, created_at)', can it be used by 'WHERE created_at >= '2026-01-01''?",
+    a: ["No, because the query skips the leading column (tenant_id), violating the Leftmost Prefix rule","Yes, composite indexes work in any arbitrary order","Only on mobile SQLite databases","Yes, if created_at is a timestamp"],
+    c: 0,
+    why: "Skipping the leftmost column prevents B-tree range traversal; a separate index on created_at is needed."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Index on: (A, B, C)",
+            "lines": [
+                  "Sorted by A, then B, then C",
+                  "single index serves 3 query patterns!"
+            ]
+      },
+      {
+            "title": "CAN Use Index",
+            "lines": [
+                  "WHERE A = 1",
+                  "WHERE A = 1 AND B = 2",
+                  "WHERE A = 1 AND B = 2 AND C = 3"
+            ]
+      },
+      {
+            "title": "CANNOT Use Index",
+            "lines": [
+                  "WHERE B = 2 (skips A)",
+                  "WHERE C = 3 (skips A & B)",
+                  "WHERE B = 2 AND C = 3"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "CREATE INDEX idx_orders_status_date ON orders(status, created_at);",
+      "SELECT * FROM orders",
+      "WHERE status = 'pending'",
+      "ORDER BY created_at DESC",
+      "LIMIT 10;"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "index": "b-tree sorted by status, then created_at"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "seek": "jumps directly to status = 'pending' bucket"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "order": "created_at is ALREADY sorted inside pending bucket! Zero runtime sort!"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "result": "delivers 10 rows in 0.04ms"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "An index covering multiple columns is a <0> index.",
+      "Queries must filter by leading columns according to the <1> Prefix rule.",
+      "Equality columns should precede <2> columns in composite index definitions."
+],
+    blanks: [
+      {
+            "a": [
+                  "composite"
+            ],
+            "why": "Composite indexes span multiple columns."
+      },
+      {
+            "a": [
+                  "Leftmost"
+            ],
+            "why": "The Leftmost Prefix rule governs B-tree ordering."
+      },
+      {
+            "a": [
+                  "range"
+            ],
+            "why": "Range filters halt index traversal for subsequent columns."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the 'Leftmost Prefix Rule' in composite indexing?",
+      a: ["A composite index on (A, B, C) can only be used by queries that filter by column A, or (A, B), or (A, B, C)","The leftmost column must always be named 'id'","Indexes can only be placed on the left side of the table","The query must be written in English read from left to right"],
+      c: 0,
+      why: "B-trees are sorted hierarchically from the first column to the last."
+    },
+    {
+      q: "What is the general golden rule for column ordering in composite indexes?",
+      a: ["Equality columns first, then Range/Sort columns (Equality first, then Range)","Range columns first, then Equality columns","Alphabetical order of column names","Put the shortest column name first"],
+      c: 0,
+      why: "Range filters (<, >) prevent the index from using subsequent columns for filtering or sorting."
+    },
+    {
+      q: "If you have an index on (A, B), do you also need a separate index on (A)?",
+      a: ["No, the index on (A, B) already acts as an index on (A) alone due to the leftmost prefix rule","Yes, every single column must have its own standalone index","Only if column A is a number","Yes, otherwise the database throws a duplicate key error"],
+      c: 0,
+      why: "An index on (A, B) fully covers queries filtering by A alone; a separate index on A is pure waste."
+    },
+    {
+      q: "How does a composite index on (tenant_id, created_at) satisfy 'ORDER BY created_at DESC'?",
+      a: ["Within each tenant_id bucket, rows are already pre-sorted by created_at in the B-tree leaf nodes","The database sorts the rows in memory before returning them","It converts created_at into an integer","It runs the query twice"],
+      c: 0,
+      why: "Because rows are physically ordered by created_at inside each tenant bucket, no sorting pass is needed."
+    }
+  ]);
+</script>
+</body>
+</html>

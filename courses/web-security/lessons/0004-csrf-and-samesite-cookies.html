@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 04 — Cross-Site Request Forgery (CSRF) and SameSite Cookies</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="web-security" data-lesson="4" data-lesson-id="csrf-and-samesite-cookies">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 04</span> · CSRF Defense</span>
+
+  <h1 class="lesson-title">Cross-Site Request Forgery (CSRF) and SameSite Cookies</h1>
+  <p class="lesson-lede">
+    Session hijacking: Cross-Site Request Forgery (CSRF), cookie transmission mechanics, Anti-CSRF tokens, and the SameSite cookie attribute.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to prevent Cross-Site Request Forgery using SameSite cookie attributes and synchronizer tokens.</span>
+    <span><b>Mission link</b> Mastering cross-site request forgery (csrf) and samesite cookies across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Cross-Site Request Forgery (CSRF) and SameSite Cookies</h2>
+  <p>Imagine you are logged into your bank at `bank.com`. In another tab, you visit `evil-site.com`. That malicious site contains a hidden form that automatically submits a POST request to `bank.com/transfer?amount=1000&to=hacker`. Because browsers automatically attach `bank.com` cookies to cross-origin requests by default, <strong>the bank processes the transfer!</strong> This is <strong>CSRF</strong>.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Session hijacking: Cross-Site Request Forgery (CSRF), cookie transmission mechanics, Anti-CSRF tokens, and the SameSite cookie attribute.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>How CSRF Exploits Browsers</h2>
+  <p>The Two Definitive Defenses against CSRF:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>The Cookie Holy Trinity</h2>
+  <ul><li><strong>1. The SameSite Cookie Attribute (Modern Browser Shield):</strong> Setting <code>SameSite=Lax</code> or <code>SameSite=Strict</code> on session cookies instructs the browser <strong>never to attach the cookie on cross-site POST requests</strong>! SameSite=Lax is now the default in Chrome, Firefox, and Safari, eliminating 95% of CSRF risks.</li><li><strong>2. Anti-CSRF Synchronizer Tokens:</strong> The server generates a unique, cryptographically random token tied to the user's session (e.g. `csrf_token = "a8f92b..."`). The web app includes this token in forms and custom HTTP headers (`X-CSRF-Token`). Since evil-site.com cannot read the token due to the Same-Origin Policy, forged requests fail verification!</li></ul><pre><code># Setting a Modern Secure Session Cookie in Python (FastAPI):
+response.set_cookie(
+    key="session_id",
+    value=user_session_token,
+    httponly=True,   # XSS Shield: JavaScript cannot read this cookie!
+    secure=True,     # Transport Shield: Transmitted ONLY over HTTPS!
+    samesite="Lax"   # CSRF Shield: Blocked on cross-origin POST requests!
+)</code></pre><div class="callout"><p><strong>The Cookie Security Holy Trinity:</strong> Every authentication cookie must have: <code>HttpOnly; Secure; SameSite=Lax</code>. This one-line configuration neutralizes both XSS credential theft and CSRF attacks.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the CSRF defense sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to prevent Cross-Site Request Forgery using SameSite cookie attributes and synchronizer tokens.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where cross-site request forgery (csrf) and samesite cookies applies.</li>
+    <li>Author a unit test or verification script exercising cross-site request forgery (csrf) and samesite cookies.</li>
+    <li>Document team architectural conventions regarding cross-site request forgery (csrf) and samesite cookies.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Cross-Site Request Forgery (CSRF) and SameSite Cookies.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is 'Cross-Site Request Forgery' (CSRF) in web security?",
+    a: ["An attack where a malicious website tricks a victim's browser into sending an authenticated request (with cookies attached) to a target site without the user's consent","A broken CSS style sheet","A tool for making fake digital signatures","A type of SQL injection"],
+    c: 0,
+    why: "CSRF exploits the browser's automatic inclusion of session cookies to forge actions on behalf of authenticated users."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1. Victim Logged In",
+            "lines": [
+                  "User has valid session cookie for bank.com",
+                  "Session cookie stored in browser"
+            ]
+      },
+      {
+            "title": "2. Victim Visits Evil Site",
+            "lines": [
+                  "evil.com sends hidden POST to bank.com/transfer",
+                  "Browser automatically includes bank.com cookies!"
+            ]
+      },
+      {
+            "title": "3. The Defense Gate",
+            "lines": [
+                  "SameSite=Lax blocks cookie transmission!",
+                  "Request rejected by bank. Attack failed!"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Cross-Site Request Forgery (CSRF) and SameSite Cookies",
+      "def execute_flow():",
+      "    # Session hijacking: Cross-Site Request Forgery (CSR...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Cross-Site Request Forgery (CSRF) and SameSite Cookies"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "HttpOnly"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Secure"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "step": "SameSite=Lax"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "CSRF attacks trick browsers into sending authenticated requests, but setting {1} on cookies and enforcing anti-CSRF {2} prevents unauthorized actions."
+],
+    blanks: [
+      {
+            "a": [
+                  "SameSite=Lax"
+            ],
+            "why": "Cookie attribute blocking cross-origin requests"
+      },
+      {
+            "a": [
+                  "tokens"
+            ],
+            "why": "Random cryptographically signed request validation values"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why does setting 'SameSite=Lax' on a session cookie prevent CSRF attacks?",
+      a: ["Browsers will not include the cookie on cross-site POST requests or iframe submissions initiated by external websites","It deletes the cookie after 5 seconds","It makes the cookie visible to all websites","It turns off the browser"],
+      c: 0,
+      why: "SameSite=Lax blocks the automatic attachment of cookies on cross-origin state-changing POST requests."
+    },
+    {
+      q: "What happens if a session cookie is configured with 'Secure=True'?",
+      a: ["The browser will only transmit the cookie over encrypted HTTPS connections, refusing to send it over plaintext HTTP","The cookie is encrypted with a password","The user must enter a PIN","The cookie lasts forever"],
+      c: 0,
+      why: "The Secure flag ensures cookies are never transmitted over unencrypted HTTP channels."
+    },
+    {
+      q: "Why is an API that exclusively authenticates requests via an 'Authorization: Bearer <token>' header naturally immune to classic CSRF?",
+      a: ["Browsers do not automatically attach custom Authorization headers to cross-origin requests; headers must be explicitly set via JavaScript","Bearer tokens are encrypted","Bearer tokens run in C","Headers are forbidden in browsers"],
+      c: 0,
+      why: "Unlike cookies, custom headers are not automatically attached by browsers across origins."
+    },
+    {
+      q: "What is an 'Anti-CSRF Token' (Synchronizer Token)?",
+      a: ["A unique, unpredictable secret value generated by the server and validated on state-changing requests that external sites cannot access","A coin used for computer games","A password for the database","A hardware device"],
+      c: 0,
+      why: "Synchronizer tokens verify that state-changing requests originated from the genuine application UI."
+    }
+  ]);
+</script>
+</body>
+</html>

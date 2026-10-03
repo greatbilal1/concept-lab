@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 05 — Locking: pessimistic versus optimistic</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="transactions-data-integrity" data-lesson="5" data-lesson-id="locking-pessimistic-versus-optimistic">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 05</span> · Locking & Concurrency Control</span>
+
+  <h1 class="lesson-title">Locking: pessimistic versus optimistic</h1>
+  <p class="lesson-lede">
+    How do you prevent two users from booking the exact same seat? Compare pessimistic locking (SELECT FOR UPDATE) with optimistic locking (version columns).
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Implement pessimistic and optimistic locking strategies to eliminate lost updates</span>
+    <span><b>Mission link</b> Prevents race conditions in ticketing, inventory, and balance systems</span>
+  </div>
+
+  <h2><span class="n">1</span>The lost update problem</h2>
+  <p>Two users click 'Buy' on the last concert seat at the exact same second. Both transactions read <code>available = true</code>. Both proceed to charge the card. Both write <code>available = false</code>. The seat was sold twice! This is a <b>Lost Update anomaly</b>.</p><p>You can prevent this using <b>Pessimistic Locking</b> (<code>SELECT ... FOR UPDATE</code> locks the row immediately until transaction commit) or <b>Optimistic Locking</b> (checking a <code>version</code> column at write time: <code>UPDATE ... WHERE id = 1 AND version = 3</code>).</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Use pessimistic locking for high-contention writes; use optimistic locking for low-contention reads.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Pessimistic versus Optimistic comparison</h2>
+  <p>Evaluate the trade-offs between locking upfront versus checking versions on commit.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing optimistic lock conflict detection</h2>
+  <p>Trace how a version column detects concurrent edits and rejects the second writer cleanly.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of locking strategies.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can select and implement the right locking pattern to eliminate race conditions and double-spending bugs.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Implement a balance debit transaction using SELECT ... FOR UPDATE.</li>
+    <li>Add a version INTEGER column to an existing table for optimistic locking.</li>
+    <li>Use SKIP LOCKED to build a high-performance background worker task queue.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Martin Fowler, *Patterns of Enterprise Application Architecture*, Chapter 16: 'Pessimistic Offline Lock' & 'Optimistic Offline Lock'.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What does 'SELECT * FROM seats WHERE id = 42 FOR UPDATE' do?",
+    a: ["Locks row 42 with an exclusive write lock, forcing any other transaction trying to modify it to wait","Updates row 42 immediately to NULL","Deletes row 42 permanently","Converts row 42 into an Excel file"],
+    c: 0,
+    why: "FOR UPDATE acquires an exclusive row-level lock that blocks other writers until COMMIT."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Pessimistic (FOR UPDATE)",
+            "lines": [
+                  "locks rows upfront at read time",
+                  "ideal for high contention (concert seats)",
+                  "trade-off: blocks concurrent workers"
+            ]
+      },
+      {
+            "title": "Optimistic (Version Column)",
+            "lines": [
+                  "zero locks; checks version on write",
+                  "ideal for low contention (editing documents)",
+                  "trade-off: requires retry loop if conflict occurs"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# User A and User B both load Doc #1 (version = 3)",
+      "# User A saves first: UPDATE docs SET text='A', version=4 WHERE id=1 AND version=3; # Success (rows=1)",
+      "# User B saves second: UPDATE docs SET text='B', version=4 WHERE id=1 AND version=3;",
+      "# Result: rows affected = 0! (version is already 4, not 3!)",
+      "# App notifies User B: 'Conflict: document was modified by another user. Reload?'"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "initial": "both users read version 3"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "user_a_commit": "User A updates row and advances version to 4"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "user_b_attempt": "WHERE version = 3 fails to match any row"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "outcome": "collision detected cleanly with zero data loss"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Locking rows explicitly with SELECT ... FOR <0> is pessimistic locking.",
+      "Verifying a version column at write time is <1> locking.",
+      "The clause skipping already-locked rows without waiting is SKIP <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "UPDATE"
+            ],
+            "why": "SELECT FOR UPDATE acquires exclusive row locks."
+      },
+      {
+            "a": [
+                  "optimistic"
+            ],
+            "why": "Optimistic locking checks version without acquiring locks."
+      },
+      {
+            "a": [
+                  "LOCKED"
+            ],
+            "why": "SKIP LOCKED allows job workers to grab unassigned tasks."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "When is Optimistic Locking superior to Pessimistic Locking?",
+      a: ["In read-heavy applications with low write collision rates (e.g. users editing wiki pages over minutes)","When two people try to book the exact same concert seat at the same millisecond","When the database has zero indexes","When the database is running on a battery-powered laptop"],
+      c: 0,
+      why: "Optimistic locking avoids holding database locks open while humans think or edit forms."
+    },
+    {
+      q: "What does the 'SKIP LOCKED' clause do in PostgreSQL (e.g. SELECT ... FOR UPDATE SKIP LOCKED)?",
+      a: ["Skips any rows currently locked by other concurrent transactions, immediately returning available rows","Turns off all database security locks permanently","Deletes locked rows from the table","Causes queries to fail with an error"],
+      c: 0,
+      why: "SKIP LOCKED allows concurrent queue workers to claim distinct jobs without blocking each other."
+    },
+    {
+      q: "How does an application know that an Optimistic Lock conflict occurred?",
+      a: ["The UPDATE statement reports that 0 rows were affected/updated (rows_affected == 0)","The database server crashes with an error","The computer screen turns red","The user receives an email alert"],
+      c: 0,
+      why: "If WHERE version = N matches zero rows, another transaction has already bumped the version."
+    },
+    {
+      q: "When are locks acquired by 'SELECT FOR UPDATE' physically released?",
+      a: ["When the enclosing transaction ends with either a COMMIT or a ROLLBACK","Immediately after the SELECT query finishes executing","After exactly five seconds","Only when the database administrator runs UNLOCK"],
+      c: 0,
+      why: "Row-level locks are held for the entire transaction lifetime and released at commit/rollback."
+    }
+  ]);
+</script>
+</body>
+</html>

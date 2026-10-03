@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 05 — Replication Strategies: Single-Leader, Multi-Leader, and Leaderless</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="distributed-systems" data-lesson="5" data-lesson-id="replication-single-multi-leaderless">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 05</span> · Replication</span>
+
+  <h1 class="lesson-title">Replication Strategies: Single-Leader, Multi-Leader, and Leaderless</h1>
+  <p class="lesson-lede">
+    Replication topologies: Single-Leader (read replicas), Multi-Leader (cross-region writes), and Leaderless (Dynamo-style quorum $W + R > N$).
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to architect Single-Leader, Multi-Leader, and Leaderless quorum replication systems.</span>
+    <span><b>Mission link</b> Mastering replication strategies: single-leader, multi-leader, and leaderless across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Replication Strategies: Single-Leader, Multi-Leader, and Leaderless</h2>
+  <p>Why replicate data across multiple servers? Two reasons: <strong>Fault Tolerance</strong> (if a disk dies, another node has the data) and <strong>Read Throughput</strong> (serve 10,000 queries/sec across 10 replicas). But keeping copies of data synchronized across network links is one of computer science's greatest challenges.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Replication topologies: Single-Leader (read replicas), Multi-Leader (cross-region writes), and Leaderless (Dynamo-style quorum $W + R > N$).
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Three Replication Models</h2>
+  <p>The Three Fundamental Replication Topologies:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Read-After-Write Consistency</h2>
+  <ul><li><strong>1. Single-Leader Replication (Primary-Replica — PostgreSQL, MySQL):</strong> All writes go to one <em>Leader</em> node. The Leader streams changes to read-only <em>Replicas</em>. Simple, prevents write conflicts! <em>Limitation:</em> The Leader is a single bottleneck for writes; cross-continental writes suffer high latency.</li><li><strong>2. Multi-Leader Replication (Active-Active — Cross-Region):</strong> Multiple leader nodes accept writes simultaneously (e.g. Leader 1 in US, Leader 2 in Europe). Fast local writes! <em>Challenge:</em> <strong>Write Conflicts</strong>: What if User A edits their email on Leader 1 and Leader 2 at the same second? Requires conflict resolution (Last-Write-Wins, CRDTs).</li><li><strong>3. Leaderless Replication (Dynamo-Style — Cassandra, Amazon Dynamo):</strong> Any node can accept writes and reads. Clients send writes to $W$ nodes and reads from $R$ nodes concurrently! <strong>Quorum Guarantee:</strong> If $W + R > N$, at least one node in your read set is guaranteed to hold the latest write!</li></ul><pre><code># The Leaderless Quorum Equation in Action:
+# Total Replicas: N = 3
+# Write Quorum:   W = 2 (Write must succeed on at least 2 nodes)
+# Read Quorum:    R = 2 (Read must query at least 2 nodes)
+#
+# Calculation: W + R = 2 + 2 = 4
+# Since 4 > 3 (W + R > N holds!), the Pigeonhole Principle guarantees
+# that your Read set shares at least 1 overlapping node with your Write set!
+# Result: You are mathematically guaranteed to read the latest write!</code></pre><div class="callout"><p><strong>The Replication Lag Reality:</strong> In asynchronous single-leader systems, read replicas can lag behind the leader by seconds. A user who updates their profile and immediately refreshes might read their old stale data unless 'Read-Your-Own-Writes' consistency is enforced.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the replication sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to architect Single-Leader, Multi-Leader, and Leaderless quorum replication systems.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where replication strategies: single-leader, multi-leader, and leaderless applies.</li>
+    <li>Author a unit test or verification script exercising replication strategies: single-leader, multi-leader, and leaderless.</li>
+    <li>Document team architectural conventions regarding replication strategies: single-leader, multi-leader, and leaderless.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Replication Strategies: Single-Leader, Multi-Leader, and Leaderless.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is the mathematical condition for a 'Quorum Read/Write' in a Leaderless distributed database (Dynamo-style)?",
+    a: ["W + R > N (where N is total replicas, W is write quorum, and R is read quorum), guaranteeing that read and write sets overlap","W + R = 0","W = R = N","W + R < N"],
+    c: 0,
+    why: "When W + R > N, the read quorum is mathematically guaranteed to include at least one node with the latest write."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Single-Leader (Postgres)",
+            "lines": [
+                  "All writes hit one Primary node",
+                  "Replicas serve read-only queries",
+                  "Simple, zero write conflicts, write bottleneck"
+            ]
+      },
+      {
+            "title": "Multi-Leader (Active-Active)",
+            "lines": [
+                  "Multiple leaders accept writes (US & EU)",
+                  "Fast local write latency globally",
+                  "Complex write conflict resolution required!"
+            ]
+      },
+      {
+            "title": "Leaderless (Dynamo / Cassandra)",
+            "lines": [
+                  "Zero leaders; clients write to W nodes",
+                  "Read from R nodes concurrently",
+                  "Guaranteed consistent when W + R > N"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Replication Strategies: Single-Leader, Multi-Leader, and Leaderless",
+      "def execute_flow():",
+      "    # Replication topologies: Single-Leader (read replic...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Replication Strategies: Single-Leader, Multi-Leader, and Leaderless"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "User Updates Name to 'Alice'"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "User Immediately Refreshes"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "In leaderless replication architectures, configuring read and write quorums so that $W + R > N$ guarantees that read operations will always overlap with the latest {1} {2}."
+],
+    blanks: [
+      {
+            "a": [
+                  "write"
+            ],
+            "why": "Data mutation operation"
+      },
+      {
+            "a": [
+                  "quorum"
+            ],
+            "why": "Overlapping subset of replica nodes"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is 'Replication Lag' in single-leader database architectures?",
+      a: ["The delay between a write being committed on the primary leader and that change being propagated and applied to read replicas","The speed of the computer fan","A delay in typing code","The time to download a database"],
+      c: 0,
+      why: "Asynchronous replication causes replicas to lag slightly behind the leader during high write volume."
+    },
+    {
+      q: "What is 'Read-Your-Own-Writes' consistency?",
+      a: ["A guarantee that if a user updates a record, their subsequent reads will immediately reflect that update, even if other users see slight replication lag","Writing down what you read","A database query optimizer","Reading books out loud"],
+      c: 0,
+      why: "Read-your-own-writes ensures users see their own modifications immediately without confusion from replica lag."
+    },
+    {
+      q: "How does a multi-leader system resolve conflicting concurrent writes to the same record using 'Last-Write-Wins' (LWW)?",
+      a: ["It compares the timestamps attached to each write and keeps the write with the highest timestamp, discarding the older write","It keeps both writes merged together","It deletes the record","It asks the user to choose"],
+      c: 0,
+      why: "Last-Write-Wins uses wall-clock timestamps to order and resolve concurrent conflicting mutations."
+    },
+    {
+      q: "Why can Last-Write-Wins (LWW) cause silent data loss in distributed systems?",
+      a: ["Clock skew between server physical clocks can cause a truly newer write to have a lower timestamp, incorrectly overwriting real data","LWW is illegal in databases","LWW deletes random files","LWW runs in memory only"],
+      c: 0,
+      why: "Clock drift between servers can distort timestamp order, causing newer updates to be discarded."
+    }
+  ]);
+</script>
+</body>
+</html>

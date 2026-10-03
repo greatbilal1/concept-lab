@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 02 — IP addresses and subnets</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="how-the-internet-works" data-lesson="2" data-lesson-id="ip-addresses-and-subnets">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 02</span> · The Physical & Network Layer</span>
+
+  <h1 class="lesson-title">IP addresses and subnets</h1>
+  <p class="lesson-lede">
+    Every machine on the internet needs an address. Learn how 32-bit IPv4 numbers, 128-bit IPv6 identifiers, and CIDR subnet masks carve up the global address space.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Calculate IP address ranges and subnet boundaries using CIDR notation</span>
+    <span><b>Mission link</b> The foundation for all network routing and cloud infrastructure configuration</span>
+  </div>
+
+  <h2><span class="n">1</span>The digital mailing address</h2>
+  <p>Just as a postal letter needs a street and zip code, every packet on the internet needs a source and destination <b>IP address</b>. IPv4 addresses are 32-bit numbers traditionally written as four dot-separated octets (e.g. <code>192.168.1.1</code>).</p><p>Because 32 bits yield only 4.3 billion addresses — fewer than the number of smartphones on earth — <b>IPv6</b> was created with 128-bit addresses, offering 340 undecillion unique addresses.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    An IP address specifies the logical location of a network interface card on the internet.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>CIDR subnet notation</h2>
+  <p>Subnets divide the IP address into a <i>Network Prefix</i> (identifying the subnet) and a <i>Host Identifier</i> (identifying the machine).</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing subnet mask bitwise filtering</h2>
+  <p>Trace how a router uses a subnet mask bitwise AND operation to decide if an IP is local or remote.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of IP addressing and subnetting.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can read, calculate, and configure IP address ranges and CIDR subnets in cloud networks and local routers.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Find the subnet mask of your local Wi-Fi connection in network settings.</li>
+    <li>Calculate the number of usable host addresses in a /28 subnet.</li>
+    <li>Verify if 10.50.2.1 is a public or private IP address.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    IETF RFC 4632: *Classless Inter-domain Routing (CIDR): The Internet Address Assignment and Aggregation Plan*.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "How many total unique addresses can be represented by 32-bit IPv4 numbers?",
+    a: ["Approximately 4.3 billion addresses (2 to the power 32)","Exactly 1 million addresses","Infinite addresses","Only 65,536 addresses"],
+    c: 0,
+    why: "2 to the 32nd power is 4,294,967,296 unique mathematical combinations."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "192.168.1.0/24",
+            "lines": [
+                  "first 24 bits = network prefix",
+                  "last 8 bits = 256 host addresses"
+            ]
+      },
+      {
+            "title": "10.0.0.0/16",
+            "lines": [
+                  "first 16 bits = network prefix",
+                  "last 16 bits = 65,536 host addresses"
+            ]
+      },
+      {
+            "title": "Private RFC 1918",
+            "lines": [
+                  "10.0.0.0/8, 172.16.0.0/12",
+                  "192.168.0.0/16 (home/office LAN)"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "target_ip = '192.168.1.50'",
+      "subnet_mask = '255.255.255.0' (/24)",
+      "network_prefix = ip_bitwise_and(target_ip, subnet_mask)",
+      "# Result: 192.168.1.0 -> IP belongs to local LAN, deliver directly"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "ip": "192.168.1.50"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "mask": "24 ones followed by 8 zeroes"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "network": "192.168.1.0"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "decision": "match local subnet; deliver via ARP without gateway router"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "IPv4 addresses are composed of <0> bits.",
+      "IPv6 addresses are composed of <1> bits.",
+      "The notation that specifies subnet bit counts with a slash is <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "32"
+            ],
+            "why": "IPv4 uses 32 bits (4 octets of 8 bits each)."
+      },
+      {
+            "a": [
+                  "128"
+            ],
+            "why": "IPv6 uses 128 bits expressed in hexadecimal."
+      },
+      {
+            "a": [
+                  "CIDR"
+            ],
+            "why": "CIDR stands for Classless Inter-Domain Routing."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What does the '/24' in 192.168.1.0/24 indicate?",
+      a: ["The first 24 bits of the address represent the network prefix, leaving 8 bits for hosts","The network allows up to 24 connected devices simultaneously","The router restarts once every 24 hours automatically","The data transmission rate is capped at 24 megabits per second"],
+      c: 0,
+      why: "CIDR prefix /24 fixes the first 24 bits, leaving 2 to the 8th power (256) addresses for hosts."
+    },
+    {
+      q: "Which of the following is a reserved private IP address range (RFC 1918)?",
+      a: ["192.168.0.0/16","8.8.8.0/24","1.1.1.0/24","200.50.10.0/24"],
+      c: 0,
+      why: "192.168.0.0/16 is reserved for unrouted private local networks along with 10.0.0.0/8 and 172.16.0.0/12."
+    },
+    {
+      q: "Why was IPv6 introduced to replace IPv4?",
+      a: ["IPv4 address space ran out of unallocated addresses due to global device growth","IPv4 cannot transmit video or audio files","IPv4 was banned by international telecommunication treaties","IPv4 cannot run on fiber optic cables"],
+      c: 0,
+      why: "The explosion of internet-connected devices exhausted the 4.3 billion address limit of IPv4."
+    },
+    {
+      q: "What is the loopback IP address representing 'this local computer' in IPv4?",
+      a: ["127.0.0.1","192.168.1.1","0.0.0.0","255.255.255.255"],
+      c: 0,
+      why: "127.0.0.1 (localhost) always points back to the internal network stack of the current machine."
+    }
+  ]);
+</script>
+</body>
+</html>

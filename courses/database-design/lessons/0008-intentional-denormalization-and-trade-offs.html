@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 08 — Intentional denormalization and trade-offs</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="database-design" data-lesson="8" data-lesson-id="intentional-denormalization-and-trade-offs">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 08</span> · Anomalies & Denormalization</span>
+
+  <h1 class="lesson-title">Intentional denormalization and trade-offs</h1>
+  <p class="lesson-lede">
+    Normalization is for data correctness; denormalization is for read speed. Learn when, why, and how to intentionally introduce redundancy with eyes wide open.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Evaluate and apply intentional denormalization strategies to solve proven query bottlenecks</span>
+    <span><b>Mission link</b> Balances theoretical purity with real-world high-throughput performance</span>
+  </div>
+
+  <h2><span class="n">1</span>When 3NF meets high traffic</h2>
+  <p>In pure 3NF, querying an article with its author, category, tags, and comment count requires joining five tables. At 50,000 queries per second, calculating <code>COUNT(comments.id)</code> on every page render will melt your database CPU.</p><p><b>Intentional Denormalization</b> is the deliberate introduction of duplicate data or precomputed values (such as adding a <code>cached_comment_count</code> directly onto the <code>articles</code> table). It is not sloppy design: it is an intentional trade-off that trades write complexity for instant $O(1)$ read speed.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Denormalization trades write overhead and synchronization complexity for instant read performance.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Common denormalization patterns</h2>
+  <p>Understand the standard techniques for optimizing high-throughput read operations.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing snapshot data preservation</h2>
+  <p>Trace why an order must intentionally copy the product price rather than referencing the live catalog.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of denormalization trade-offs.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can make disciplined engineering decisions to denormalize specific bottlenecks while maintaining strict synchronization safeguards.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Identify an expensive COUNT() query in your application that could benefit from a cached counter.</li>
+    <li>Create a Materialized View in PostgreSQL and refresh it using REFRESH MATERIALIZED VIEW.</li>
+    <li>Ensure your order invoice schemas copy product prices as immutable historical snapshots.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Bill Karwin, *SQL Antipatterns*, Chapter 10: 'Phantom Files' & Chapter 21: 'Cryptic Column'.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is the primary risk introduced when adding a 'cached_comment_count' column to an articles table?",
+    a: ["The cached count can get out of sync with the actual number of comments if insert/delete logic has bugs","The database will automatically delete the comments table","SQL queries will become illegal syntax","The computer screen will display numbers in reverse"],
+    c: 0,
+    why: "Redundancy creates synchronization responsibility: every insert and delete must maintain the counter."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Cached Counters",
+            "lines": [
+                  "posts.comment_count",
+                  "updated via database trigger or app transaction",
+                  "eliminates expensive COUNT() queries"
+            ]
+      },
+      {
+            "title": "Materialized Views",
+            "lines": [
+                  "precomputed snapshot of complex joins",
+                  "refreshed periodically in background"
+            ]
+      },
+      {
+            "title": "Snapshot Duplication",
+            "lines": [
+                  "saving price_at_purchase on order_items",
+                  "historical audit stability; intentional redundancy"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Product Catalog: Book price = $20",
+      "# Ada buys Book today -> order_items copies price_cents = 2000",
+      "# Next month: Publisher raises Book price to $30 in catalog",
+      "# Ada's past invoice still displays $20! (Intentional snapshot redundancy preserves legal truth)"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "catalog_price": "$20"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "order_snapshot": "price copied permanently to order_items row"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "catalog_change": "live product price updated to $30"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "historical_integrity": "past invoice remains legally accurate at $20"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The deliberate reintroduction of redundancy for performance is <0>.",
+      "A precomputed cached query stored as a table is a <1> view.",
+      "Denormalization improves read speed at the expense of <2> complexity."
+],
+    blanks: [
+      {
+            "a": [
+                  "denormalization"
+            ],
+            "why": "Denormalization trades redundancy for speed."
+      },
+      {
+            "a": [
+                  "materialized"
+            ],
+            "why": "Materialized views persist query results on disk."
+      },
+      {
+            "a": [
+                  "write"
+            ],
+            "why": "Writes must now update multiple redundant locations."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "When is denormalization justified in professional software engineering?",
+      a: ["Only when real-world production performance measurements prove a specific normalized query is a bottleneck","At the very beginning of a project before writing any code","Whenever you want to avoid writing SQL joins","Only on databases with fewer than 100 users"],
+      c: 0,
+      why: "Premature denormalization introduces bugs; only optimize when real metrics justify the trade-off."
+    },
+    {
+      q: "Why is copying 'price_at_purchase' into an order_items table considered a necessary denormalization?",
+      a: ["It preserves historical financial truth: if the catalog price changes next year, past invoices remain accurate","Because SQL databases forbid referencing product tables from orders","It saves hard drive storage space","It prevents the server from needing memory"],
+      c: 0,
+      why: "Historical snapshots are business requirements: past financial records must not mutate when prices change."
+    },
+    {
+      q: "What is a Materialized View?",
+      a: ["A query result physically computed and stored on disk like a table, refreshed on a periodic schedule","A 3D virtual reality display for database administrators","A view that deletes all data after twenty seconds","A visual chart showing database CPU usage"],
+      c: 0,
+      why: "Materialized views persist precalculated complex joins to provide instant read performance."
+    },
+    {
+      q: "What mechanism is commonly used inside databases to keep denormalized counters synchronized automatically?",
+      a: ["Database Triggers (executing trigger functions on INSERT or DELETE)","Cron jobs running once per month","Sending emails to database users","Manual daily spreadsheets"],
+      c: 0,
+      why: "Triggers run automatically on table mutations, guaranteeing redundant counters update atomically."
+    }
+  ]);
+</script>
+</body>
+</html>

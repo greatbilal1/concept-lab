@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 01 — Components as pure functions</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="react-architecture" data-lesson="1" data-lesson-id="components-as-pure-functions">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 01</span> · Components & Unidirectional Flow</span>
+
+  <h1 class="lesson-title">Components as pure functions</h1>
+  <p class="lesson-lede">
+    UI as a function of state: UI = f(state). Discover why thinking of React components as pure mathematical functions makes UI predictable and bug-free.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Author pure React components with zero unexpected rendering side effects</span>
+    <span><b>Mission link</b> The fundamental mental model of modern React component engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>The pure function formula</h2>
+  <p>In modern React, a component is simply a JavaScript function: it accepts an input object (<b>props</b>) and returns a description of UI (<b>JSX</b>). If you pass the same props, it must return the same JSX.</p><p>A pure component has two rules: <b>1. It minds its own business:</b> it does not modify any objects or variables that existed before rendering. <b>2. Same inputs, same output:</b> given the same inputs, a component should always return the same JSX. Modifying global variables during render causes bizarre visual glitches.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    A React component must be a pure function: same props produce same JSX with zero side effects during render.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Pure versus Impure components</h2>
+  <p>Contrast an impure mutating component with a clean, deterministic pure component.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing React StrictMode double rendering</h2>
+  <p>Trace how React StrictMode renders components twice in development to expose impure side-effect bugs.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of pure component rules.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can write deterministic, pure React components that behave reliably across all render and hydration cycles.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit a component to ensure it does not mutate any variables outside its function body.</li>
+    <li>Observe why React StrictMode renders twice in your development console.</li>
+    <li>Pass data downward strictly through props rather than reading module-level variables.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    React Official Documentation: *Keeping Components Pure* (react.dev/learn/keeping-components-pure).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What happens if a component mutates an external variable (e.g. 'guestCount++') directly inside its function body during render?",
+    a: ["Every time the component re-renders (or in StrictMode), guestCount doubles or multiplies unexpectedly, creating visual bugs","The browser permanently crashes","React automatically deletes the variable","The component runs at 120 frames per second"],
+    c: 0,
+    why: "Impure components that mutate external state during render produce unpredictable bugs across renders."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Impure (Side Effect)",
+            "lines": [
+                  "let count = 0;",
+                  "function Cup() { count++; return <p>Cup #{count}</p> }",
+                  "mutates outer variable; buggy!"
+            ]
+      },
+      {
+            "title": "Pure (Deterministic)",
+            "lines": [
+                  "function Cup({ guestNumber }) {",
+                  "  return <p>Cup #{guestNumber}</p>",
+                  "}",
+                  "same prop -> same output always!"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# React.StrictMode active in development:",
+      "1. React calls Component(props) -> render 1",
+      "2. React immediately calls Component(props) AGAIN -> render 2",
+      "3. If Component is pure: Output 1 === Output 2 (clean!)",
+      "4. If Component mutates outer state: Output 2 != Output 1 (bug exposed immediately!)"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "environment": "development StrictMode enabled"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "check_1": "initial test invocation"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "check_2": "second verification invocation catches mutations"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "verdict": "pure components produce identical DOM output across both passes"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "A component that produces identical JSX for identical props is a <0> component.",
+      "The read-only input parameters passed to a component are <1>.",
+      "In development, React.<2>Mode invokes component functions twice to expose impurities."
+],
+    blanks: [
+      {
+            "a": [
+                  "pure"
+            ],
+            "why": "Pure functions have no side effects."
+      },
+      {
+            "a": [
+                  "props"
+            ],
+            "why": "Props configure child components immutably."
+      },
+      {
+            "a": [
+                  "Strict"
+            ],
+            "why": "StrictMode catches side effects in development."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is a 'side effect' in programming, and where do side effects belong in React?",
+      a: ["A change outside the function (network calls, DOM mutation); in React, side effects belong in event handlers or useEffect, NEVER in render bodies","A visual styling filter in CSS","A sound effect played through speakers","An error that happens when memory is full"],
+      c: 0,
+      why: "Rendering must stay pure; side effects belong in user event handlers or useEffect after paint."
+    },
+    {
+      q: "Can a component modify its own incoming 'props' object (e.g. props.title = 'New')?",
+      a: ["No, props are strictly read-only and immutable; a parent must pass new props to change them","Yes, components can mutate props freely","Only if props are strings","Only on mobile web browsers"],
+      c: 0,
+      why: "Props are frozen; attempting to mutate props breaks unidirectional data flow."
+    },
+    {
+      q: "Why does React execute components twice in development when wrapped in <React.StrictMode>?",
+      a: ["To intentionally expose impure functions that mutate variables or produce side effects during rendering","Because development computers have two CPU cores","To download the webpage twice","It is a bug in the React development build"],
+      c: 0,
+      why: "Double rendering acts as a stress test: if a component is pure, rendering twice produces identical output."
+    },
+    {
+      q: "What does the JSX syntax '<div>{message}</div>' compile to in modern React?",
+      a: ["A React.createElement() or jsx() function call that returns a plain JavaScript object describing the node","Raw HTML text sent directly to the operating system","A compiled C++ binary","A database SQL query"],
+      c: 0,
+      why: "JSX compiles into function calls that return plain JavaScript virtual DOM objects."
+    }
+  ]);
+</script>
+</body>
+</html>

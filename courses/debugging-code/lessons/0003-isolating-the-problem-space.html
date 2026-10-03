@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 03 — Isolating the problem space</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="debugging-code" data-lesson="3" data-lesson-id="isolating-the-problem-space">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 03</span> · Reproduction & Isolation</span>
+
+  <h1 class="lesson-title">Isolating the problem space</h1>
+  <p class="lesson-lede">
+    Do not search everywhere. Halve your search space repeatedly to narrow millions of lines of code down to the single offending statement.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Narrow a bug down to a single module using binary isolation</span>
+    <span><b>Mission link</b> Prevents cognitive overload during large codebase investigations</span>
+  </div>
+
+  <h2><span class="n">1</span>The principle of bisection</h2>
+  <p>When faced with a system containing 10,000 lines of code across 50 files, reading every line is impossible. Instead, divide the execution path in half. Insert a check at the midpoint. Is the state clean or infected?</p><p>If clean, the defect is in the second half. If infected, the defect occurred earlier. Repeating this cut ten times isolates the exact location in $O(\log n)$ steps.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Repeatedly halving the search space locates defects exponentially faster than sequential reading.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The bisection boundary</h2>
+  <p>Visualise how slicing a pipeline in half isolates whether a parser, transformer, or serializer corrupted the data payload.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing through pipeline checkpoints</h2>
+  <p>Walk through an execution pipeline where bad data is caught at step 2, proving step 1 introduced the infection.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Confirm your understanding of the bisection principle.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can partition any multi-stage system into halves and pinpoint the exact stage responsible for faulty behavior.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Place an assertion halfway through a complex data processing script.</li>
+    <li>Determine whether an existing bug is upstream or downstream of your probe.</li>
+    <li>Repeat the split until you have isolated the offending function.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Kernighan & Pike, *The Practice of Programming*, Chapter 5: 'Divide and Conquer'.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "If a program has 1,024 steps between input and failure, how many bisection checks are needed?",
+    a: ["1,024 checks","512 checks","10 checks","100 checks"],
+    c: 2,
+    why: "Because 2 to the power of 10 equals 1024, binary search requires only 10 cuts."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Input (Clean)",
+            "lines": [
+                  "raw user string",
+                  "correct format"
+            ]
+      },
+      {
+            "title": "Midpoint Probe",
+            "lines": [
+                  "check intermediate state",
+                  "is state corrupted?"
+            ]
+      },
+      {
+            "title": "Output (Corrupt)",
+            "lines": [
+                  "failure observed",
+                  "crash or bad output"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "raw = '{\"count\": \"5\"}'",
+      "parsed = json_loads(raw)  # step 1: type is str not int",
+      "assert isinstance(parsed['count'], int), 'bad type' # midpoint check",
+      "total = parsed['count'] * 2"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "raw": "'{\"count\": \"5\"}'"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "parsed": "{'count': '5'}"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "assertion": "AssertionError: bad type"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Dividing the search space in half repeatedly is <0> search.",
+      "An assertion placed in the middle of a pipeline is a <1>.",
+      "Binary isolation reduces search complexity to O(<2>)."
+],
+    blanks: [
+      {
+            "a": [
+                  "binary",
+                  "bisection"
+            ],
+            "why": "Binary search cuts the search domain in half at each step."
+      },
+      {
+            "a": [
+                  "probe",
+                  "checkpoint"
+            ],
+            "why": "A probe checks state validity midway through execution."
+      },
+      {
+            "a": [
+                  "log n",
+                  "log(n)"
+            ],
+            "why": "Logarithmic time means doubling size adds only one probe."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What makes binary isolation superior to reading code from top to bottom?",
+      a: ["It guarantees that all future bugs are automatically resolved","It cuts the remaining search space in half with every check","It runs entirely inside the computer compiler without human thought","It prevents developers from needing to write automated tests"],
+      c: 1,
+      why: "Halving the search space isolates the problem exponentially faster than linear scanning."
+    },
+    {
+      q: "If an assertion midway through a pipeline passes, where is the defect?",
+      a: ["It must be located before the assertion point","It must be located after the assertion point","The program does not have any defects anywhere","The operating system kernel must be reinstalled"],
+      c: 1,
+      why: "A clean state at the midpoint proves the error occurred in the subsequent steps."
+    },
+    {
+      q: "What is the primary requirement for binary isolation to succeed?",
+      a: ["You must be able to verify whether state is valid at the cut point","The code must be written in a functional language","The entire system must run in a single CPU thread","The project must have zero external library dependencies"],
+      c: 0,
+      why: "You cannot eliminate half the search space unless you can verify state health at the boundary."
+    },
+    {
+      q: "How many checks would be required to find a defect among 64 possible functions?",
+      a: ["Exactly 6 checks","Exactly 64 checks","Exactly 32 checks","Only 1 check"],
+      c: 0,
+      why: "2 to the 6th power is 64, so binary search requires exactly 6 checks."
+    }
+  ]);
+</script>
+</body>
+</html>

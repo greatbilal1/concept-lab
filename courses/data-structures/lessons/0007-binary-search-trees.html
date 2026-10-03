@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 07 — Binary search trees</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="data-structures" data-lesson="7" data-lesson-id="binary-search-trees">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 07</span> · Hierarchy</span>
+
+  <h1 class="lesson-title">Binary search trees</h1>
+  <p class="lesson-lede">
+    Last lesson the tree had no order — any value could sit anywhere. Add one
+    rule and everything changes: keep smaller values on the left and larger on the
+    right, and the tree becomes a search structure that halves its work at every
+    step.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Search a BST and explain why it is fast</span>
+    <span><b>Mission link</b> Order turns a tree into a search tool</span>
+  </div>
+
+  <h2><span class="n">1</span>The ordering rule</h2>
+
+  <p>
+    A <b>binary search tree</b> is a binary tree with one extra invariant: for
+    every node, all values in its left subtree are <b>smaller</b>, and all values
+    in its right subtree are <b>larger</b>.
+  </p>
+
+  <div id="diagram1"></div>
+
+  <p>
+    That rule holds at every node, not just the root. It is what lets you decide,
+    at each step, which half of the tree to ignore.
+  </p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    The ordering rule is a promise about the whole subtree, not just the immediate
+    children. Every value under a node's left branch is smaller than that node.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Searching</h2>
+
+  <p>
+    To find a value, start at the root and compare. Smaller? Go left. Larger? Go
+    right. Equal? Found it. Each comparison throws away an entire subtree.
+  </p>
+
+  <div id="trace1"></div>
+
+  <p>
+    On a balanced tree this halves the remaining nodes at every step, so search
+    costs O(log n) — the same trick as binary search on a sorted array, but
+    without needing the array to stay sorted.
+  </p>
+
+  <div class="note warn">
+    <span class="note-label">Watch out</span>
+    Insert values in sorted order and the BST degenerates into a linked list,
+    where search costs O(n). The speed depends on the tree staying balanced, not
+    on the rule alone.
+  </div>
+
+  <h2><span class="n">3</span>Traversal</h2>
+
+  <p>
+    A <b>traversal</b> visits every node in a defined order. The three depth-first
+    orders differ only in when you visit the node itself:
+  </p>
+
+  <ul>
+    <li><b>In-order</b> — left, node, right. On a BST this yields sorted output.</li>
+    <li><b>Pre-order</b> — node, left, right. Useful for copying a tree.</li>
+    <li><b>Post-order</b> — left, right, node. Useful for deleting a tree.</li>
+  </ul>
+
+  <pre><code>def in_order(node):
+    if node is None:
+        return
+    in_order(node.left)
+    print(node.value)
+    in_order(node.right)</code></pre>
+
+  <div id="intro1"></div>
+
+  <div id="fill1"></div>
+
+  <h2><span class="n">4</span>Where BSTs show up</h2>
+
+  <ul>
+    <li><b>Ordered maps</b> — dictionaries that keep keys sorted.</li>
+    <li><b>Range queries</b> — "all values between 10 and 20".</li>
+    <li><b>Databases</b> — indexes are tree-shaped for exactly this reason.</li>
+    <li><b>Autocomplete</b> — prefix search walks down a tree.</li>
+  </ul>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>
+      You can state the BST ordering rule, search a tree by comparing and
+      branching, and name the three depth-first traversals. You also know why a
+      BST is only fast while it stays balanced.
+    </p>
+  </div>
+
+  <h2><span class="n">5</span>Check yourself</h2>
+
+  <p>
+    Answer from memory — do not scroll back up. Each option has the same number of
+    words, so nothing gives the answer away.
+  </p>
+
+  <div id="quiz"></div>
+
+  <h2><span class="n">6</span>Do this next</h2>
+
+  <ol>
+    <li>
+      Insert 8, 3, 10, 1, 6, 14, 4 into an empty BST by hand. Draw the result.
+    </li>
+    <li>
+      Write <code>search(node, target)</code> that returns the node or
+      <code>None</code>, using the ordering rule.
+    </li>
+    <li>
+      Insert 1, 2, 3, 4, 5 in that order and draw the tree. Explain why it looks
+      like a linked list.
+    </li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Read <a href="https://en.wikipedia.org/wiki/Binary_search_tree">Binary search tree</a>.
+    The "Searching" and "Traversal" sections describe exactly the algorithm and
+    orders used here.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher (me) anything — "what is a
+    self-balancing tree?", "why is in-order sorted?", "how do I delete a node?".
+    There are no bad questions here.
+  </div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  /* the shape of a BST */
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      { title: "8", lines: ["root"] },
+      { title: "3", lines: ["smaller"] },
+      { title: "10", lines: ["larger"] },
+      { title: "1", lines: ["smaller still"] }
+    ],
+    vertical: true
+  });
+
+  /* predict-then-reveal */
+  TeachWidgets.predict("#predict1", {
+    q: "In a BST, where do smaller values live?",
+    a: ["In the left subtree", "In the right subtree", "In the root node"],
+    c: 0,
+    why: "The ordering rule puts every smaller value in the left subtree of a node."
+  });
+
+  /* step through a search */
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "node = root        # 8",
+      "target < 8 -> left # 3",
+      "target > 3 -> right# 6",
+      "target == 6 -> found"
+    ],
+    steps: [
+      { line: 0, vars: { node: "8", target: "6" } },
+      { line: 1, vars: { node: "3", remaining: "3 nodes" } },
+      { line: 2, vars: { node: "6", remaining: "1 node" } },
+      { line: 3, vars: { found: "6", comparisons: "3" } }
+    ]
+  });
+
+  /* three things a BST gives you */
+  TeachWidgets.introCards("#intro1", {
+    cards: [
+      { ico: "🔍", title: "Halving search", body: "Each comparison discards one whole subtree of the tree." },
+      { ico: "📑", title: "Sorted for free", body: "An in-order traversal of a BST prints values in order." },
+      { ico: "⚠️", title: "Balance required", body: "Sorted inserts degenerate the tree into a linked list." }
+    ]
+  });
+
+  /* recall from memory */
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the BST",
+    lines: [
+      "In a BST, smaller values go to the <0>",
+      "An in-order traversal visits left, node, then <1>",
+      "A BST that leans to one side becomes a <2>"
+    ],
+    blanks: [
+      { a: ["left"], why: "The ordering rule places smaller values in the left subtree." },
+      { a: ["right"], why: "In-order is left, node, right — which yields sorted output." },
+      { a: ["list"], why: "A degenerate BST has the depth and speed of a linked list." }
+    ]
+  });
+
+  /* the quiz — every option has equal word count */
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Where do smaller values go?",
+      a: ["Smaller on the left", "Larger on the left", "Smaller on the right", "Equal on both sides"],
+      c: 0,
+      why: "The BST invariant puts every smaller value in the left subtree."
+    },
+    {
+      q: "What does each comparison do?",
+      a: ["It halves the search", "It doubles the search", "It sorts the search", "It copies the search"],
+      c: 0,
+      why: "Comparing and branching discards one entire subtree at every step."
+    },
+    {
+      q: "What happens with sorted inserts?",
+      a: ["It becomes a list", "It becomes a tree", "It becomes a stack", "It becomes a queue"],
+      c: 0,
+      why: "Sorted inserts make every node lean one way, so the tree degenerates."
+    },
+    {
+      q: "What does an in-order traversal give?",
+      a: ["Values in sorted order", "Values in reverse order", "Values in random order", "Values in insertion order"],
+      c: 0,
+      why: "Visiting left, node, right on a BST emits the values in ascending order."
+    }
+  ]);
+</script>
+</body>
+</html>

@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 03 — Following the data path</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="reading-code" data-lesson="3" data-lesson-id="following-the-data-path">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 03</span> · Tracing Data & Call Paths</span>
+
+  <h1 class="lesson-title">Following the data path</h1>
+  <p class="lesson-lede">
+    Code exists to transform data. Follow a single data structure from ingestion to storage to understand how the entire system works.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Trace a data payload from user input across all architectural layers to storage</span>
+    <span><b>Mission link</b> Provides structural understanding of end-to-end system mechanics</span>
+  </div>
+
+  <h2><span class="n">1</span>Follow the data, not the syntax</h2>
+  <p>Syntax changes, patterns change, and frameworks come and go. But every business application fundamentally does one thing: it accepts data, validates it, transforms it, and stores or returns it.</p><p>Instead of trying to understand every class, pick one entity — like an <code>Order</code> or <code>User</code>. Trace its journey from the HTTP request body through the controller, service layer, and database query. Once you understand one entity's path, you understand the architecture of the entire app.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Following a single business entity through the stack reveals the architectural pattern of the entire system.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The standard four-layer path</h2>
+  <p>Most applications structure data flow across four predictable architectural boundaries.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing an order through the layers</h2>
+  <p>Follow an order payload as it moves from raw JSON to a typed domain model and database row.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of the typical application data pipeline.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can track any core domain entity across all architectural layers of an unfamiliar application.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Pick a primary entity in your repo and find where its database schema is defined.</li>
+    <li>Find the API endpoint where that entity is created by a user.</li>
+    <li>Trace every function the entity passes through between input and persistence.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Martin Fowler, *Patterns of Enterprise Application Architecture* (Chapter 2: 'Organizing Domain Logic').
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Why is following data more effective than memorising class hierarchies?",
+    a: ["Data structures reveal the actual business transformations of the software","Data structures are always written in assembly language","Data structures do not require memory allocation in RAM","Data structures eliminate all network communication latency"],
+    c: 0,
+    why: "Software exists to process data; tracing data paths shows what the code actually accomplishes."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Transport",
+            "lines": [
+                  "HTTP handler / controller",
+                  "parse JSON request"
+            ]
+      },
+      {
+            "title": "Validation",
+            "lines": [
+                  "schema validation / DTO",
+                  "check business rules"
+            ]
+      },
+      {
+            "title": "Domain Service",
+            "lines": [
+                  "core calculations",
+                  "apply business logic"
+            ]
+      },
+      {
+            "title": "Persistence",
+            "lines": [
+                  "ORM / SQL query",
+                  "commit to database"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "raw = '{\"item\": \"Book\", \"price\": 20}'",
+      "dto = parse_order(raw)     # validation layer",
+      "order = apply_tax(dto)     # domain layer",
+      "db_save(order)             # persistence layer"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "raw": "string payload"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "dto": "validated OrderDTO"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "order": "total with tax: $22"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "db": "INSERT INTO orders (id=101)"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "An object used purely to carry data between processes is a <0>.",
+      "The layer containing business logic and calculations is the <1> layer.",
+      "The layer responsible for saving data to storage is the <2> layer."
+],
+    blanks: [
+      {
+            "a": [
+                  "DTO",
+                  "data transfer object"
+            ],
+            "why": "DTOs transfer serialized data across boundaries."
+      },
+      {
+            "a": [
+                  "domain",
+                  "service"
+            ],
+            "why": "Domain services enforce business calculations and rules."
+      },
+      {
+            "a": [
+                  "persistence",
+                  "repository"
+            ],
+            "why": "Persistence handles database interactions and queries."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the primary benefit of tracing an entity from input to database?",
+      a: ["It exposes the architectural patterns shared by all other entities in the system","It speeds up internet connection bandwidth for local users","It prevents developers from needing to write automated tests","It converts dynamic typed code into compiled binary machine code"],
+      c: 0,
+      why: "Application architectures are repetitive: once you trace one entity, other entities follow the same path."
+    },
+    {
+      q: "Where does input validation typically occur in modern web architectures?",
+      a: ["Directly inside the physical network interface hardware card","At the boundary layer right after receiving raw transport data","Inside the database relational engine after writing records","Only when the user closes their web browser window"],
+      c: 1,
+      why: "Boundary validation protects internal domain logic from ill-formed or malicious data."
+    },
+    {
+      q: "What is the role of the domain or service layer?",
+      a: ["Rendering visual CSS animations on the client display","Enforcing core business rules, logic, and state transitions","Managing physical hard drive sector allocation tables","Handling DNS domain name resolution over UDP protocols"],
+      c: 1,
+      why: "Domain logic embodies business rules independent of transport or database technology."
+    },
+    {
+      q: "What should you do if an entity passes through unfamiliar intermediary middleware?",
+      a: ["Pause and understand what transformation the middleware performs on the data","Delete the middleware file immediately to simplify the architecture","Rewrite the entire application without using middleware","Assume the middleware does nothing and ignore it forever"],
+      c: 0,
+      why: "Middleware often handles authentication, logging, or transaction boundaries."
+    }
+  ]);
+</script>
+</body>
+</html>

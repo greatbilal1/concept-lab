@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 05 — Asynchronous Messaging: Message Queues, Pub/Sub, and Event Streams (Kafka)</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="system-design" data-lesson="5" data-lesson-id="asynchronous-messaging-queues-kafka">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 05</span> · Messaging & Streams</span>
+
+  <h1 class="lesson-title">Asynchronous Messaging: Message Queues, Pub/Sub, and Event Streams (Kafka)</h1>
+  <p class="lesson-lede">
+    Asynchronous decoupling: Point-to-Point Message Queues (RabbitMQ/SQS), Publish/Subscribe (SNS), and Distributed Commit Logs (Apache Kafka).
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to decouple microservices using Message Queues, Pub/Sub, and Apache Kafka event streams.</span>
+    <span><b>Mission link</b> Mastering asynchronous messaging: message queues, pub/sub, and event streams (kafka) across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Asynchronous Messaging: Message Queues, Pub/Sub, and Event Streams (Kafka)</h2>
+  <p>If your `OrderService` synchronously calls the `PaymentService`, `EmailService`, `InventoryService`, and `AnalyticsService` over HTTP during checkout, the checkout takes 4 seconds and fails if <em>any single service</em> is down. <strong>Asynchronous Messaging decouples services</strong>, making systems resilient and fast.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Asynchronous decoupling: Point-to-Point Message Queues (RabbitMQ/SQS), Publish/Subscribe (SNS), and Distributed Commit Logs (Apache Kafka).
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Three Messaging Paradigms</h2>
+  <p>The Three Messaging Paradigms:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Dead Letter Queue (DLQ) Protection</h2>
+  <ul><li><strong>1. Point-to-Point Message Queues (RabbitMQ, AWS SQS):</strong> A producer sends a message to a queue. <strong>Exactly one worker</strong> consumes and processes the message, after which it is deleted. Ideal for: <strong>Task distribution, background video transcoding, PDF generation</strong>.</li><li><strong>2. Publish/Subscribe (Pub/Sub — AWS SNS, Google Pub/Sub):</strong> A producer publishes an event to a Topic (e.g. `OrderPlaced`). <strong>Multiple independent subscribers</strong> receive a copy of the event simultaneously! The Order service publishes once; Billing, Shipping, and Analytics all react independently!</li><li><strong>3. Distributed Event Streaming (Apache Kafka):</strong> An append-only, partitioned, immutable distributed log. Events are stored persistently for days or months. Multiple consumer groups read events at their own pace and can <strong>replay history</strong> from any offset! High throughput: millions of events/sec!</li></ul><pre><code># Synchronous Coupling vs Asynchronous Event-Driven Decoupling:
+# SYNCHRONOUS (Fragile): 
+# [Order Service] ──HTTP──> [Payment Svc] ──HTTP──> [Email Svc] ──HTTP──> [Analytics]
+# (If Email Service times out, the entire customer checkout fails!)
+#
+# ASYNCHRONOUS EVENT-DRIVEN (Resilient & Fast):
+# [Order Service] ──Publishes: "OrderPlaced"──> [Kafka Topic / SNS]
+#                                                    ├──> [Payment Worker] (Processes)
+#                                                    ├──> [Email Worker]   (Processes)
+#                                                    └──> [Analytics Svc]  (Ingests)
+# (Customer receives instant HTTP 200 checkout confirmation in 40ms!)</code></pre><div class="callout"><p><strong>The Dead Letter Queue (DLQ):</strong> Always attach a Dead Letter Queue (DLQ) to message queues. If a poison-pill message fails processing 3 times, move it to the DLQ so the worker queue is not blocked!</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the asynchronous messaging sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to decouple microservices using Message Queues, Pub/Sub, and Apache Kafka event streams.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where asynchronous messaging: message queues, pub/sub, and event streams (kafka) applies.</li>
+    <li>Author a unit test or verification script exercising asynchronous messaging: message queues, pub/sub, and event streams (kafka).</li>
+    <li>Document team architectural conventions regarding asynchronous messaging: message queues, pub/sub, and event streams (kafka).</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Asynchronous Messaging: Message Queues, Pub/Sub, and Event Streams (Kafka).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is the fundamental architectural difference between a Message Queue (like SQS/RabbitMQ) and an Event Stream (like Apache Kafka)?",
+    a: ["Message queues delete messages once consumed by a worker; event streams retain immutable, ordered logs of events that multiple consumers can replay","Message queues are for text; event streams are for video","They are identical technologies","Kafka runs in the browser"],
+    c: 0,
+    why: "Queues delete messages upon processing; Kafka maintains persistent, replayable, ordered logs partitioned across consumers."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Message Queue (SQS / RabbitMQ)",
+            "lines": [
+                  "1 producer -> 1 consumer (Work queue)",
+                  "Message deleted upon successful processing",
+                  "Best for: Background task jobs & worker pools"
+            ]
+      },
+      {
+            "title": "Pub/Sub (SNS)",
+            "lines": [
+                  "1 publisher -> Multiple subscribers (Fan-out)",
+                  "Subscribers receive duplicate copies of event",
+                  "Best for: Event notifications & service decoupling"
+            ]
+      },
+      {
+            "title": "Event Stream (Apache Kafka)",
+            "lines": [
+                  "Partitioned, persistent, append-only log",
+                  "Events retained for days; consumers replay offsets",
+                  "Best for: High-throughput streaming & analytics"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Asynchronous Messaging: Message Queues, Pub/Sub, and Event Streams (Kafka)",
+      "def execute_flow():",
+      "    # Asynchronous decoupling: Point-to-Point Message Qu...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Asynchronous Messaging: Message Queues, Pub/Sub, and Event Streams (Kafka)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Worker Fails 3 Times"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Routed to DLQ"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Asynchronous architectures decouple services using point-to-point queues for worker tasks, pub/sub for event fan-out, and {1} for replayable, high-throughput event {2}."
+],
+    blanks: [
+      {
+            "a": [
+                  "Kafka"
+            ],
+            "why": "Distributed append-only event stream platform"
+      },
+      {
+            "a": [
+                  "streams"
+            ],
+            "why": "Ordered sequences of historical events"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is a 'Dead Letter Queue' (DLQ) in message processing architectures?",
+      a: ["A secondary queue where messages that fail processing repeatedly (poison-pill messages) are isolated for developer inspection without blocking the main queue","A queue for deleting emails","A broken network router","A queue for cancelled orders"],
+      c: 0,
+      why: "DLQs isolate unprocessable messages, preventing them from looping indefinitely and blocking workers."
+    },
+    {
+      q: "Why is Apache Kafka capable of handling millions of messages per second on modest hardware?",
+      a: ["Kafka writes sequentially to disk (which is as fast as sequential memory access) and uses OS zero-copy network transfer (sendfile)","Kafka runs in quantum memory","Kafka deletes messages immediately","Kafka is written in assembly"],
+      c: 0,
+      why: "Sequential disk I/O, page-cache utilization, and Linux zero-copy networking give Kafka extreme throughput."
+    },
+    {
+      q: "What is 'Consumer Lag' in Apache Kafka monitoring?",
+      a: ["The difference between the latest offset written to a Kafka partition and the offset currently being processed by a consumer group","A delay in the computer screen","A broken network cable","The time to boot Kafka"],
+      c: 0,
+      why: "Consumer lag measures how far behind workers are relative to incoming event production."
+    },
+    {
+      q: "How does asynchronous messaging improve user-perceived performance during checkout?",
+      a: ["The order is accepted immediately and background tasks (sending emails, updating analytics) execute asynchronously after the user response","It makes credit cards process faster","It eliminates taxes","It makes products free"],
+      c: 0,
+      why: "Decoupling secondary side effects allows the web server to respond immediately upon order creation."
+    }
+  ]);
+</script>
+</body>
+</html>

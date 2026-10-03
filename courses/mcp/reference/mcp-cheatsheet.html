@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MCP & Tool-Connected AI Systems — Cheat Sheet</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+<style>
+  .ref-toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0 8px; }
+  .ref-toc a { font-size: .8rem; border: 1px solid var(--border); background: #111a30; padding: 5px 11px; border-radius: 999px; color: var(--muted); text-decoration: none; border-bottom: 1px solid var(--border); }
+  .ref-toc a:hover { color: #fff; border-color: #3d5488; }
+  .lesson-wrap h2 { scroll-margin-top: 20px; }
+  .snippet { margin: 14px 0 22px; }
+  .snippet .lbl { font-size: .72rem; font-weight: 800; letter-spacing: .7px; text-transform: uppercase; color: var(--accent2); margin-bottom: 6px; }
+  .see { font-size: .82rem; color: var(--muted); margin: -6px 0 12px; }
+  .see a { color: var(--accent2); border-bottom: 0; }
+  .see a:hover { color: #fff; }
+  .snippet pre { padding-top: 34px; }
+  @media print { .snippet pre { padding-top: 18px; } }
+</style>
+</head>
+<body class="lesson-body" data-course="mcp">
+
+<div class="lesson-wrap">
+
+  <span class="lesson-kicker">Reference · Cheat sheet</span>
+  <h1 class="lesson-title">MCP & Tool-Connected AI Systems — Cheat Sheet</h1>
+  <p class="lesson-lede">
+    The whole course on one page. Every snippet links back to the lesson that
+    teaches it.
+  </p>
+
+  <div class="ref-toc">
+    <a href="#sec-1">Minimal FastMCP Server (Python)</a>
+    <a href="#sec-2">Claude Desktop Client Configuration</a>
+    <a href="#sec-3">Testing with MCP Inspector</a>
+    <a href="#sec-4">Filesystem Root Scoping Check</a>
+  </div>
+
+  <h2 id="sec-1"><span class="n">1</span>Minimal FastMCP Server (Python)</h2>
+  <div class="snippet">
+    <div class="lbl">Instant local tool server</div>
+    <pre><code>from mcp.server.fastmcp import FastMCP
+
+mcp = FastMCP("MyTools")
+
+@mcp.tool()
+def fetch_weather(city: str) -&gt; str:
+    """Get current weather conditions for a city."""
+    return f"Weather in {city}: 22C, Sunny"
+
+if __name__ == "__main__":
+    mcp.run(transport="stdio")</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0004-building-your-first-mcp-server.html">Lesson 04 — Building Your First MCP Server (FastMCP / Node.js)</a>.</p>
+
+  <h2 id="sec-2"><span class="n">2</span>Claude Desktop Client Configuration</h2>
+  <div class="snippet">
+    <div class="lbl">claude_desktop_config.json setup</div>
+    <pre><code>{
+  "mcpServers": {
+    "my-tools": {
+      "command": "/Users/alice/.venv/bin/python",
+      "args": ["/Users/alice/projects/server.py"],
+      "env": {"API_KEY": "secret_value"}
+    }
+  }
+}</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0005-connecting-mcp-clients-configuration.html">Lesson 05 — Connecting MCP Clients (Claude Desktop, Cursor, Copilot)</a>.</p>
+
+  <h2 id="sec-3"><span class="n">3</span>Testing with MCP Inspector</h2>
+  <div class="snippet">
+    <div class="lbl">Local browser testing harness</div>
+    <pre><code># Run official inspector to debug your server over stdio:
+npx @modelcontextprotocol/inspector python /path/to/server.py
+# Opens interactive UI on http://localhost:5173</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0004-building-your-first-mcp-server.html">Lesson 04 — Building Your First MCP Server (FastMCP / Node.js)</a>.</p>
+
+  <h2 id="sec-4"><span class="n">4</span>Filesystem Root Scoping Check</h2>
+  <div class="snippet">
+    <div class="lbl">Path traversal defense</div>
+    <pre><code>def check_root_security(requested_path, allowed_root):
+    real_path = os.path.realpath(requested_path)
+    if not real_path.startswith(os.path.realpath(allowed_root)):
+        raise PermissionError('Access denied: Outside allowed root!')</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0007-mcp-security-authentication-permissions.html">Lesson 07 — Security, Authentication, and Permission Scoping in MCP</a>.</p>
+
+  <div class="lesson-foot">
+    <div class="links">
+      <a href="mcp-glossary.html">📖 Glossary</a>
+      <a href="../course.html">← Course map</a>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

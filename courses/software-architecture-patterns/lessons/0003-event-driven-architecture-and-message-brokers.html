@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 03 — Event-driven architecture and message brokers</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="software-architecture-patterns" data-lesson="3" data-lesson-id="event-driven-architecture-and-message-brokers">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 03</span> · Event-Driven Architecture</span>
+
+  <h1 class="lesson-title">Event-driven architecture and message brokers</h1>
+  <p class="lesson-lede">
+    Stop chaining synchronous HTTP calls. Discover Event-Driven Architecture (EDA): domain events, asynchronous decoupling, and message brokers like Kafka and RabbitMQ.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Design asynchronous event-driven architectures using domain events and message queues</span>
+    <span><b>Mission link</b> Eliminates cascading synchronous HTTP outages across distributed systems</span>
+  </div>
+
+  <h2><span class="n">1</span>The synchronous HTTP chain of death</h2>
+  <p>In a naive distributed system, a checkout request triggers a chain of synchronous HTTP calls: <code>OrderService &rarr; HTTP &rarr; PaymentService &rarr; HTTP &rarr; InventoryService &rarr; HTTP &rarr; EmailService</code>. What happens if the EmailService has a 5-second network timeout?</p><p><b>The entire checkout request hangs, times out, and fails!</b> The availability of the chain is the <i>product of the availability of every service</i>: if each service is 99% reliable, a 5-service chain is only 95% reliable! <b>Event-Driven Architecture (EDA)</b> decouples this: OrderService publishes an <code>OrderPlaced</code> event to a message broker and responds in 5ms. Other services consume the event asynchronously at their own pace.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Asynchronous events decouple services in time: producers fire and forget; consumers process at their own pace.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Synchronous chain versus Event-Driven decoupling</h2>
+  <p>Contrast the brittle coupling of synchronous HTTP with the resilient buffering of an event broker.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing an asynchronous domain event lifecycle</h2>
+  <p>Trace how publishing a single OrderPlaced event triggers multiple background consumers concurrently.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of event-driven architecture.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can architect resilient, asynchronously decoupled systems using domain events and durable message brokers.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Design a domain event payload for a 'UserRegistered' event containing relevant data.</li>
+    <li>Explain why domain event names are always phrased in the past tense (e.g. OrderPlaced, not PlaceOrder).</li>
+    <li>Compare an event stream log (Apache Kafka) with a traditional message queue (RabbitMQ).</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Martin Fowler: *What do you mean by 'Event-Driven'?* (martinfowler.com/articles/201702-event-driven.html).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What happens in an event-driven system if the email service crashes for two hours?",
+    a: ["Users can still place orders normally; the message broker buffers the events, and emails are sent when the service recovers","All orders placed during those two hours are permanently deleted","The entire website shuts down immediately","The database crashes with a fatal error"],
+    c: 0,
+    why: "Message brokers act as durable buffers, decoupling uptime: downstream outages do not block producers."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Synchronous HTTP (Brittle)",
+            "lines": [
+                  "Order -> Payment -> Inventory -> Email",
+                  "cascading latency, single point of failure!"
+            ]
+      },
+      {
+            "title": "Event-Driven (Resilient)",
+            "lines": [
+                  "OrderService publishes 'OrderPlaced'",
+                  "Message Broker (Kafka / RabbitMQ) buffers event",
+                  "Email & Inventory consume at their own pace!"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# OrderService creates order in local DB, then publishes:",
+      "broker.publish('events.orders', {",
+      "    'event_id': 'evt_9912',",
+      "    'event_name': 'OrderPlaced',",
+      "    'data': { 'order_id': 101, 'customer_id': 42, 'total': 99.00 }",
+      "})",
+      "# Checkout responds 201 Created to user in 4ms!",
+      "# Consumer 1 (Inventory) receives event -> decrements stock",
+      "# Consumer 2 (Analytics) receives event -> updates dashboard"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "local_commit": "order saved to database"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "event_published": "OrderPlaced event pushed to broker topic in 1ms"
+            }
+      },
+      {
+            "line": 6,
+            "vars": {
+                  "instant_ui": "user receives confirmation response immediately"
+            }
+      },
+      {
+            "line": 7,
+            "vars": {
+                  "async_consumers": "independent services process event concurrently in background"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "An architecture driven by state change events is Event-<0> Architecture.",
+      "An event representing a business occurrence that already happened is a <1> event.",
+      "The middleware system persisting and routing asynchronous messages is a message <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "Driven"
+            ],
+            "why": "Event-Driven Architecture (EDA) is the standard term."
+      },
+      {
+            "a": [
+                  "domain"
+            ],
+            "why": "Domain events represent past immutable facts."
+      },
+      {
+            "a": [
+                  "broker"
+            ],
+            "why": "Message brokers (Kafka, RabbitMQ) buffer events."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why are domain events always named in the past tense (e.g. OrderPlaced, InvoicePaid)?",
+      a: ["Because an event is an immutable fact about something that has ALREADY occurred in the past; it cannot be rejected or cancelled","Because English grammar requires past tense in software","Because databases can only store past dates","To prevent the event from running in the future"],
+      c: 0,
+      why: "Events represent historical facts that already happened; commands represent requests to do something."
+    },
+    {
+      q: "What is the difference between a Command and an Event in messaging?",
+      a: ["A Command is a request directed to one recipient that can be rejected (e.g. PlaceOrder); an Event is an announcement of a past fact broadcast to anyone interested","A Command is written in Python; an Event is written in JSON","Commands run on servers; Events run on clients","There is no difference between them"],
+      c: 0,
+      why: "Commands express intent with a single handler; events express historical facts broadcast to many."
+    },
+    {
+      q: "What is the primary architectural benefit of an asynchronous message broker during high-traffic flash sales?",
+      a: ["Backpressure buffering: the broker queues incoming orders safely, allowing downstream billing and inventory services to process at a steady, sustainable rate without crashing","It turns off the payment gateway to save money","It makes the database ten times larger","It automatically generates customer reviews"],
+      c: 0,
+      why: "Brokers absorb traffic spikes, buffering surges so worker services are never overwhelmed."
+    },
+    {
+      q: "What is the 'Outbox Pattern' in event-driven architecture?",
+      a: ["Saving the domain event in a local database table inside the SAME atomic transaction as the business entity, then publishing it asynchronously to avoid lost events","Sending emails using Microsoft Outlook","Deleting events after they are read","A technique for organizing office mailrooms"],
+      c: 0,
+      why: "The Transactional Outbox pattern guarantees that database writes and event publications never desync."
+    }
+  ]);
+</script>
+</body>
+</html>

@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 07 — When inheritance is actually appropriate</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="composition-vs-inheritance" data-lesson="7" data-lesson-id="when-inheritance-is-actually-appropriate">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 07</span> · LSP & Legitimate Inheritance</span>
+
+  <h1 class="lesson-title">When inheritance is actually appropriate</h1>
+  <p class="lesson-lede">
+    Inheritance isn't evil; misapplied inheritance is evil. Discover the rare, legitimate use cases for class inheritance: Framework base classes, Template Method, and AST nodes.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Identify the specific architectural scenarios where inheritance is genuinely superior to composition</span>
+    <span><b>Mission link</b> Prevents dogmatic over-correction into 'anti-inheritance' extremes</span>
+  </div>
+
+  <h2><span class="n">1</span>The legitimate realm of inheritance</h2>
+  <p>'Favor composition over inheritance' does not mean 'never use inheritance'. Inheritance is an extraordinarily powerful language feature when applied correctly.</p><p>When is inheritance appropriate? <b>1. True 'is-a' relationships that are immutable:</b> an <code>AST BinaryExpression</code> is genuinely an <code>AST Node</code>. <b>2. Framework base classes:</b> React's <code>Component</code> or Django's <code>View</code>. <b>3. The Template Method pattern:</b> where an abstract algorithm skeleton is fixed, and subclasses fill in specific steps.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Inheritance shines in framework hooks, immutable syntax tree nodes, and the Template Method pattern.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Template Method architecture</h2>
+  <p>How an abstract base class locks in algorithm flow while allowing subclass customization.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing the Template Method execution</h2>
+  <p>Trace how the base class orchestrates execution order while calling subclass step overrides.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of appropriate inheritance use cases.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can identify when inheritance is genuinely the best architectural tool and implement the Template Method pattern cleanly.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Implement a Template Method abstract class using Python's abc.ABC and @abstractmethod.</li>
+    <li>Create an AST node hierarchy (LiteralNode, BinaryOpNode) using inheritance.</li>
+    <li>Explain to your team why framework hooks (like React.Component) use inheritance legitimately.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Erich Gamma et al., *Design Patterns: Elements of Reusable Object-Oriented Software*, 'Template Method'.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What pattern defines an algorithm skeleton in a base class while letting subclasses override specific steps?",
+    a: ["The Template Method pattern","The Singleton pattern","The Proxy pattern","The Observer pattern"],
+    c: 0,
+    why: "Template Method uses inheritance to fix algorithm structure while delegating step details to subclasses."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Base: DataMiner (Template Method)",
+            "lines": [
+                  "mine(): openFile() -> extractData() -> parseData() -> closeFile()",
+                  "flow is FIXED and FINAL!"
+            ]
+      },
+      {
+            "title": "Subclass: PdfDataMiner",
+            "lines": [
+                  "overrides: extractData() for PDF",
+                  "inherits open, parse, and close"
+            ]
+      },
+      {
+            "title": "Subclass: CsvDataMiner",
+            "lines": [
+                  "overrides: extractData() for CSV",
+                  "inherits open, parse, and close"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "class ReportGenerator:",
+      "    def generate(self): # Template Method",
+      "        self.fetch_data()",
+      "        self.format_body() # overridden by subclass",
+      "        self.export_file()",
+      "# Subclass HtmlReportGenerator overrides ONLY format_body()!"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "skeleton": "generate() defines unalterable execution workflow"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "hook": "calls format_body() implemented by specific subclass"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "completion": "base class handles export and cleanup automatically"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The pattern defining an algorithm skeleton in a base class is the <0> Method pattern.",
+      "A class designed only to be subclassed that cannot be instantiated is an <1> class.",
+      "Compilers can prevent further subclassing by marking classes as <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "Template"
+            ],
+            "why": "Template Method locks in algorithm steps."
+      },
+      {
+            "a": [
+                  "abstract"
+            ],
+            "why": "Abstract base classes define subclass contracts."
+      },
+      {
+            "a": [
+                  "final",
+                  "sealed"
+            ],
+            "why": "final/sealed classes prohibit subclassing."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the Template Method design pattern?",
+      a: ["A behavioral design pattern that defines the skeleton of an algorithm in a superclass, but lets subclasses override specific steps of the algorithm without changing its structure","A tool that creates HTML email templates","A database backup script","A compiler error in C++"],
+      c: 0,
+      why: "Template Method enforces overall algorithm sequence while allowing subclasses to customize steps."
+    },
+    {
+      q: "Why are Abstract Syntax Trees (ASTs) in compilers well-suited for class inheritance?",
+      a: ["The grammar is fixed, types have a genuine immutable 'is-a' relationship (AddExpression IS an Expression), and polymorphism is natural","Because compilers only work with inheritance","Because ASTs cannot be represented in JSON","Because inheritance makes compilers run fifty percent faster"],
+      c: 0,
+      why: "Compiler AST node grammars are stable, deeply hierarchical, and fit pure mathematical subtyping."
+    },
+    {
+      q: "What does Python's 'abc' module (Abstract Base Classes) provide?",
+      a: ["Tools like @abstractmethod that prevent instantiating incomplete base classes and enforce subclass method implementation","Alphabetical sorting of dictionary keys","Basic text encryption algorithms","Audio recording features"],
+      c: 0,
+      why: "abc.ABC and @abstractmethod enforce compile-time/instantiation contracts on derived classes."
+    },
+    {
+      q: "What is the recommended maximum inheritance depth in clean software architecture?",
+      a: ["Shallow: rarely deeper than 2 or 3 levels (Base -> Concrete); avoid 6-level deep hierarchies","At least 15 levels deep to maximize reuse","Exactly 10 levels","Depth does not matter at all"],
+      c: 0,
+      why: "Deep inheritance trees compound cognitive load, fragile base class bugs, and tight coupling."
+    }
+  ]);
+</script>
+</body>
+</html>

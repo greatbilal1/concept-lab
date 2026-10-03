@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 04 — The Refactor Step: Improving Without Breaking</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="tdd" data-lesson="4" data-lesson-id="the-refactor-step">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 04</span> · Refactoring</span>
+
+  <h1 class="lesson-title">The Refactor Step: Improving Without Breaking</h1>
+  <p class="lesson-lede">
+    Safely cleaning design, eliminating duplication, and improving clarity while tests remain green.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to safely and continuously refactor code under the protection of tests.</span>
+    <span><b>Mission link</b> Mastering the refactor step: improving without breaking across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of The Refactor Step: Improving Without Breaking</h2>
+  <p>Many developers treat TDD as just 'write tests first', completely neglecting the third and most important step: <strong>Refactor</strong>. When you rush from Green directly to the next Red test, your codebase accumulates tech debt and hacky shortcuts.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Safely cleaning design, eliminating duplication, and improving clarity while tests remain green.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Refactoring Safety Sandbox</h2>
+  <p>Refactoring is the dedicated phase where you pay back the debt incurred during the Green phase. Because all tests are passing, you have a completely safe sandbox to clean the code:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Separation of Hats</h2>
+  <ul><li><strong>Extract Method:</strong> Break large functions into small, well-named helpers.</li><li><strong>Eliminate Duplication:</strong> Apply DRY (Don't Repeat Yourself) between production methods and tests.</li><li><strong>Improve Names:</strong> Rename cryptic variables to intention-revealing terms.</li><li><strong>Introduce Value Objects:</strong> Group primitive fields into domain objects.</li></ul><pre><code># GREEN: Works, but messy and contains duplication
+def calculate_invoice(items, user):
+    subtotal = 0
+    for item in items:
+        subtotal += item.price * item.quantity
+    if user.is_vip:
+        subtotal = subtotal * 0.90
+    return subtotal + (subtotal * 0.08)
+
+# REFACTORED: Clean, modular, expressive (Tests still pass 100%!)
+def calculate_invoice(items, user):
+    subtotal = sum(item.total for item in items)
+    discounted = apply_discount(subtotal, user)
+    return apply_tax(discounted)</code></pre><div class="callout"><p><strong>Rule of Refactoring:</strong> Never add new features or fix unrelated bugs while in the Refactor step! If you want to add functionality, finish refactoring, ensure tests are green, and then write a new Red test.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the refactoring definition</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to safely and continuously refactor code under the protection of tests.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where the refactor step: improving without breaking applies.</li>
+    <li>Author a unit test or verification script exercising the refactor step: improving without breaking.</li>
+    <li>Document team architectural conventions regarding the refactor step: improving without breaking.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for The Refactor Step: Improving Without Breaking.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is the strict definition of Refactoring?",
+    a: ["Changing the internal structure of software to make it easier to understand and cheaper to modify, without changing its observable behavior","Adding new features while fixing old bugs","Rewriting an entire project in a different programming language","Formatting code with an automatic linter"],
+    c: 0,
+    why: "Refactoring improves internal structure while strictly preserving external behavior."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1. All Green",
+            "lines": [
+                  "Test suite passes 100%",
+                  "Baseline behavior is locked"
+            ]
+      },
+      {
+            "title": "2. Structural Edit",
+            "lines": [
+                  "Extract method / rename",
+                  "No behavioral changes"
+            ]
+      },
+      {
+            "title": "3. Immediate Verify",
+            "lines": [
+                  "Run suite in 200ms",
+                  "Confirm still green"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing The Refactor Step: Improving Without Breaking",
+      "def execute_flow():",
+      "    # Safely cleaning design, eliminating duplication, a...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "The Refactor Step: Improving Without Breaking"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Adding Functionality Hat"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Refactoring Hat"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Refactoring modifies the {1} structure of software without changing its {2} behavior."
+],
+    blanks: [
+      {
+            "a": [
+                  "internal"
+            ],
+            "why": "Code organization, names, and modules"
+      },
+      {
+            "a": [
+                  "observable"
+            ],
+            "why": "External outputs, results, and interfaces"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why must you avoid adding new functionality while refactoring?",
+      a: ["If a test breaks, you cannot tell whether the failure was caused by your refactoring or your new feature","Compilers reject simultaneous edits","It violates git commit history rules","It resets the test coverage metric to zero"],
+      c: 0,
+      why: "Keeping refactoring separate from feature addition keeps debugging simple and focused."
+    },
+    {
+      q: "What enables a developer to refactor aggressively with complete confidence?",
+      a: ["A comprehensive, fast automated test suite that immediately catches any regression","Extensive inline code comments","Writing code exclusively in typed languages","Reading software architecture books"],
+      c: 0,
+      why: "Fast tests provide the safety net that makes bold structural improvements safe."
+    },
+    {
+      q: "What should you do if a test fails while you are refactoring?",
+      a: ["Revert your last structural edit immediately to get back to green, then take a smaller step","Change the test assertion so that it passes","Disable the failing test in CI","Add a print statement and push to git"],
+      c: 0,
+      why: "If a test fails during refactoring, you altered behavior; revert and take a smaller, safer step."
+    },
+    {
+      q: "What code smells should you look to eliminate during the Refactor step?",
+      a: ["Long methods, duplicated logic, cryptic names, and feature envy","Unit tests with descriptive names","Functions that return booleans","Modules with fewer than 100 lines of code"],
+      c: 0,
+      why: "Refactoring targets classic code smells that impede readability and maintainability."
+    }
+  ]);
+</script>
+</body>
+</html>

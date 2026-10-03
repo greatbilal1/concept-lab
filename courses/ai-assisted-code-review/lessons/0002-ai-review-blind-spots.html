@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 02 — AI Blind Spots: Business Logic, Race Conditions, Architecture</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="ai-assisted-code-review" data-lesson="2" data-lesson-id="ai-review-blind-spots">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 02</span> · Blind Spots</span>
+
+  <h1 class="lesson-title">AI Blind Spots: Business Logic, Race Conditions, Architecture</h1>
+  <p class="lesson-lede">
+    Understanding where AI review fails: subtle concurrency race conditions, business domain rules, and architectural erosion.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know the critical blind spots of AI code review and how to defend against them.</span>
+    <span><b>Mission link</b> Mastering ai blind spots: business logic, race conditions, architecture across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of AI Blind Spots: Business Logic, Race Conditions, Architecture</h2>
+  <p>While AI models are brilliant at pattern-matching local syntax, they suffer from deep <strong>blind spots</strong> that human engineers must actively defend against.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Understanding where AI review fails: subtle concurrency race conditions, business domain rules, and architectural erosion.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Three Major Blind Spots</h2>
+  <p>The three most dangerous AI review blind spots are:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Race Condition Vulnerability</h2>
+  <ul><li><strong>1. Business Domain Correctness:</strong> An agent cannot know that your company's policy requires VAT to be calculated <em>before</em> loyalty points are applied, not after. If the math looks plausible, the AI will approve it.</li><li><strong>2. Concurrency & Race Conditions:</strong> Multi-threaded execution, distributed database isolation levels (`READ COMMITTED` vs `SERIALIZABLE`), and distributed cache invalidation cannot be simulated by reading a single file diff.</li><li><strong>3. Architectural Erosion:</strong> An agent will happily approve a diff that imports a database model directly into a frontend component, violating your clean architecture boundaries to save 5 lines of code.</li></ul><pre><code># THE CLASSIC AI BLIND SPOT (Race Condition):
+# AI Review verdict: "Looks clean and correct!"
+def withdraw(user_id, amount):
+    balance = db.get_balance(user_id) # Read
+    if balance >= amount:
+        # Vulnerable to TOCTOU (Time-of-Check to Time-of-Use) race condition!
+        # Two concurrent requests can withdraw simultaneously, creating negative balance!
+        db.set_balance(user_id, balance - amount)</code></pre><div class="callout"><p><strong>The Human Gate:</strong> Review PRs looking specifically for what the AI cannot see: race conditions, business rule mismatches, and architectural boundary violations.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the review blind spots sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know the critical blind spots of AI code review and how to defend against them.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where ai blind spots: business logic, race conditions, architecture applies.</li>
+    <li>Author a unit test or verification script exercising ai blind spots: business logic, race conditions, architecture.</li>
+    <li>Document team architectural conventions regarding ai blind spots: business logic, race conditions, architecture.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for AI Blind Spots: Business Logic, Race Conditions, Architecture.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Why do AI reviewers reliably miss concurrency race conditions and distributed timing bugs?",
+    a: ["Race conditions depend on asynchronous timing, thread scheduling, and database locks that cannot be seen in static text diffs alone","Language models do not know what threads are","Concurrency is prohibited in Python","Operating systems hide thread code"],
+    c: 0,
+    why: "Race conditions emerge from runtime interactions and scheduling across time, which static text analysis cannot simulate."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1. Business Logic",
+            "lines": [
+                  "Domain policy nuances",
+                  "Discount order of operations",
+                  "Legal & compliance rules"
+            ]
+      },
+      {
+            "title": "2. Concurrency & Locks",
+            "lines": [
+                  "TOCTOU race conditions",
+                  "Deadlocks & isolation levels",
+                  "Cache stampedes"
+            ]
+      },
+      {
+            "title": "3. Architecture Erosion",
+            "lines": [
+                  "Layer boundary leaks",
+                  "Circular module imports",
+                  "Bypassing domain models"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing AI Blind Spots: Business Logic, Race Conditions, Architecture",
+      "def execute_flow():",
+      "    # Understanding where AI review fails: subtle concur...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "AI Blind Spots: Business Logic, Race Conditions, Architecture"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Single-Thread Mindset"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Runtime Reality"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "AI reviewers reliably miss subtle {1} race conditions and business {2} rules that require deep institutional knowledge."
+],
+    blanks: [
+      {
+            "a": [
+                  "concurrency"
+            ],
+            "why": "Multi-threaded or asynchronous execution"
+      },
+      {
+            "a": [
+                  "domain"
+            ],
+            "why": "Business policies and regulatory rules"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is a TOCTOU (Time-of-Check to Time-of-Use) race condition?",
+      a: ["A vulnerability where state changes between checking a condition and acting upon it due to concurrent execution","A typo in a database column name","A compiler warning in C++","An outdated git branch"],
+      c: 0,
+      why: "Concurrent requests can alter data between the check and the mutation, corrupting state."
+    },
+    {
+      q: "Why is an AI model unable to determine if a discount calculation complies with internal company policy?",
+      a: ["Company policies are proprietary domain rules that live in institutional knowledge rather than public training data","Language models cannot do math","Discounts are illegal in software","Policies can only be read by human eyes"],
+      c: 0,
+      why: "Internal business policies require domain context that external language models do not possess."
+    },
+    {
+      q: "What architectural smell should human reviewers watch for when reviewing AI-assisted PRs?",
+      a: ["Layer contamination: importing database models or infrastructure drivers directly into presentation or domain logic","Functions with descriptive docstrings","Type hints on all arguments","Files with fewer than 200 lines"],
+      c: 0,
+      why: "Agents often take shortcuts that breach architectural boundaries unless strictly checked."
+    },
+    {
+      q: "How can a team safeguard against concurrency bugs in AI-assisted code?",
+      a: ["Require explicit database transactions with atomic row locks (FOR UPDATE) or distributed locks, reviewed by senior engineers","Tell the AI to make the code fast","Turn off multi-threading completely","Only run code on single-core CPUs"],
+      c: 0,
+      why: "Enforcing atomic transactions and human concurrency audits protects against race conditions."
+    }
+  ]);
+</script>
+</body>
+</html>

@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 08 — Production Schema Migration and Backward Compatibility</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="structured-outputs" data-lesson="8" data-lesson-id="production-schema-migration-compatibility">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 08</span> · Schema Evolution</span>
+
+  <h1 class="lesson-title">Production Schema Migration and Backward Compatibility</h1>
+  <p class="lesson-lede">
+    Evolving schemas in production: adding fields safely, backward compatibility, versioning, and deprecation cycles.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You have completed the Structured Outputs & JSON course.</span>
+    <span><b>Mission link</b> Mastering production schema migration and backward compatibility across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Production Schema Migration and Backward Compatibility</h2>
+  <p>Software is never static. As products evolve, schemas change: you add a <code>discount_code</code> field, split <code>full_name</code> into <code>first_name</code> and <code>last_name</code>, or introduce a new status enum. In an AI application, modifying a schema touches prompt templates, model outputs, cached records, and database rows.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Evolving schemas in production: adding fields safely, backward compatibility, versioning, and deprecation cycles.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Backward-Compatible Schema Migration</h2>
+  <p>To manage <strong>Schema Evolution without Breaking Production</strong>:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>The Missing Default Trap</h2>
+  <ul><li><strong>1. The Additive Default Rule:</strong> When adding a new field to an existing schema, <strong>always provide a default value</strong>: `discount_code: str | None = None`. This ensures that historical JSON objects stored in your database can still be deserialized cleanly!</li><li><strong>2. Schema Versioning:</strong> Name or tag schemas with explicit version identifiers: `InvoiceSchemaV1`, `InvoiceSchemaV2`. This allows you to run parallel endpoints during migrations.</li><li><strong>3. Two-Phase Migrations:</strong> Phase 1: Deploy code that can parse both V1 and V2 formats. Phase 2: Update the prompt to generate V2. Phase 3: Deprecate V1 after all cached responses have expired.</li></ul><pre><code># Backward-Compatible Schema Evolution (Pydantic v2):
+class UserProfileV2(BaseModel):
+    user_id: str
+    email: EmailStr
+    # NEW FIELD: Has default value, ensuring V1 records parse without errors!
+    tier: Literal["free", "pro", "enterprise"] = "free"
+    # DEPRECATED FIELD: Kept as optional for backward compatibility with old records
+    legacy_notes: str | None = None</code></pre><div class="callout"><p><strong>The Final Takeaway:</strong> You now possess the complete toolkit for structured data engineering: from grammar-constrained decoding to defensive validation, self-healing repair loops, and backward-compatible schema migrations.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the schema migration sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You have completed the Structured Outputs & JSON course.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where production schema migration and backward compatibility applies.</li>
+    <li>Author a unit test or verification script exercising production schema migration and backward compatibility.</li>
+    <li>Document team architectural conventions regarding production schema migration and backward compatibility.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Production Schema Migration and Backward Compatibility.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is the golden rule of backward compatibility when adding new fields to a production LLM schema?",
+    a: ["Always provide sensible default values for new fields so older records and cached responses continue to parse without errors","Delete all old database tables immediately","Change all existing field names to uppercase","Stop using schemas"],
+    c: 0,
+    why: "Providing defaults for new fields ensures that historical records and cached data remain fully backward-compatible."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Phase 1: Dual-Compatible Parser",
+            "lines": [
+                  "Deploy code accepting V1 & V2 schemas",
+                  "New fields have default values"
+            ]
+      },
+      {
+            "title": "Phase 2: Update LLM Prompt",
+            "lines": [
+                  "Update prompt to generate V2 output",
+                  "New fields populated by model"
+            ]
+      },
+      {
+            "title": "Phase 3: Clean Deprecation",
+            "lines": [
+                  "Remove legacy V1 support",
+                  "Safe, zero-downtime evolution"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Production Schema Migration and Backward Compatibility",
+      "def execute_flow():",
+      "    # Evolving schemas in production: adding fields safe...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Production Schema Migration and Backward Compatibility"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "New Field Without Default (Broken)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "New Field With Default (Safe)"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Backward-compatible schema migrations require providing {1} values for new attributes to ensure historical records remain fully {2}."
+],
+    blanks: [
+      {
+            "a": [
+                  "default"
+            ],
+            "why": "Fallback values like = None or = 'free'"
+      },
+      {
+            "a": [
+                  "parseable"
+            ],
+            "why": "Able to be deserialized without error"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why will adding a non-default required field 'company: str' break existing database records?",
+      a: ["Existing historical JSON records in the database lack the 'company' key, causing Pydantic to raise a missing field ValidationError upon deserialization","The database will delete the records","Python will refuse to run","The server runs out of disk space"],
+      c: 0,
+      why: "Strict validation fails when reading historical records that do not contain the newly required field."
+    },
+    {
+      q: "What is the recommended way to handle a breaking schema migration across frontend and backend?",
+      a: ["Version the schema (e.g. /v2/extract), supporting both versions in parallel until the frontend is fully updated","Deploy at midnight and hope nothing breaks","Change the database password","Shut down the application for three days"],
+      c: 0,
+      why: "Explicit schema versioning enables zero-downtime migrations with independent deployment schedules."
+    },
+    {
+      q: "What does Pydantic's 'Field(deprecated=True)' annotation communicate?",
+      a: ["It marks the field as deprecated in generated OpenAPI documentation, warning developers that the attribute will be removed in future versions","It immediately deletes the field","It turns off validation","It converts the field to null"],
+      c: 0,
+      why: "Deprecation flags signal future phase-out in API documentation without breaking active code."
+    },
+    {
+      q: "What is the ultimate mark of mature structured output engineering?",
+      a: ["Strict schema contracts, zero-hallucination constrained decoding, self-healing repair loops, and seamless backward-compatible evolution","Never changing a schema once written","Writing all schemas by hand in assembly","Using raw strings everywhere"],
+      c: 0,
+      why: "Combining constrained decoding, self-healing loops, and schema lifecycle discipline creates enterprise resilience."
+    }
+  ]);
+</script>
+</body>
+</html>

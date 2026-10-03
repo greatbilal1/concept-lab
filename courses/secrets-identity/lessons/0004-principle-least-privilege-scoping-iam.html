@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 04 — The Principle of Least Privilege: Scoping IAM Roles</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="secrets-identity" data-lesson="4" data-lesson-id="principle-least-privilege-scoping-iam">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 04</span> · Least Privilege</span>
+
+  <h1 class="lesson-title">The Principle of Least Privilege: Scoping IAM Roles</h1>
+  <p class="lesson-lede">
+    Access governance: the Principle of Least Privilege (PoLP), AWS IAM policy design, resource-level scoping, and eliminating wildcard ('*') permissions.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to design least-privilege IAM policies and eliminate dangerous wildcard permissions.</span>
+    <span><b>Mission link</b> Mastering the principle of least privilege: scoping iam roles across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of The Principle of Least Privilege: Scoping IAM Roles</h2>
+  <p>When setting up AWS IAM or cloud permissions, junior developers often attach <code>AdministratorAccess</code> or use wildcards: <code>Action: "s3:*", Resource: "*"</code> because 'it makes everything work without permission errors'. This is the security equivalent of giving the office janitor the nuclear launch codes.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Access governance: the Principle of Least Privilege (PoLP), AWS IAM policy design, resource-level scoping, and eliminating wildcard ('*') permissions.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Wildcard Disaster vs Least-Privilege Policy</h2>
+  <p>If a microservice with wildcard permissions is compromised via a dependency exploit, the attacker has <strong>complete control over your entire cloud infrastructure</strong>.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Limiting Blast Radius</h2>
+  <p>Engineering <strong>Least-Privilege IAM Policies</strong>:</p><ul><li><strong>1. Explicit Allowed Actions:</strong> Never use `s3:*` or `dynamodb:*`. Specify the exact required API operations: `["s3:GetObject", "s3:PutObject"]`. Deny `s3:DeleteBucket` and `s3:PutBucketPolicy`!</li><li><strong>2. Resource-Level Scoping:</strong> Never use `Resource: "*"`. Scope permissions to the exact target ARN: <code>Resource: "arn:aws:s3:::company-invoices-prod/*"</code>.</li><li><strong>3. Separation of Read and Write Roles:</strong> A data extraction service needs `s3:GetObject`, not write access. A logging service needs `s3:PutObject`, not read access.</li><li><strong>4. Condition Keys:</strong> Restrict actions by source IP, mandatory MFA, or secure transport: <code>Condition: {"Bool": {"aws:SecureTransport": "true"}}</code>.</li></ul><pre><code># SECURE Least-Privilege IAM Policy (JSON):
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "AllowInvoiceReadingOnly",
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetObject"
+      ],
+      "Resource": "arn:aws:s3:::company-invoices-prod/inbound/*",
+      "Condition": {
+        "Bool": {"aws:SecureTransport": "true"}
+      }
+    }
+  ]
+}</code></pre><div class="callout"><p><strong>The Wildcard Ban:</strong> In production IAM policies, treat <code>"*"</code> as a critical security smell. Always scope actions and resource ARNs explicitly.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the least privilege sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to design least-privilege IAM policies and eliminate dangerous wildcard permissions.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where the principle of least privilege: scoping iam roles applies.</li>
+    <li>Author a unit test or verification script exercising the principle of least privilege: scoping iam roles.</li>
+    <li>Document team architectural conventions regarding the principle of least privilege: scoping iam roles.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for The Principle of Least Privilege: Scoping IAM Roles.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What does the 'Principle of Least Privilege' (PoLP) dictate in cloud and infrastructure security?",
+    a: ["Every user, application, and service must be granted only the minimum necessary permissions required to perform its specific task, and nothing more","Every developer should have full AdministratorAccess","Nobody should have access to anything","Permissions should be granted randomly"],
+    c: 0,
+    why: "Least privilege restricts access to the bare minimum required, minimizing the blast radius of any compromised identity."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Wildcard Policy (Dangerous)",
+            "lines": [
+                  "Action: '*', Resource: '*'",
+                  "Compromised service gives attacker full cloud control",
+                  "Can delete databases, create keys, steal everything"
+            ]
+      },
+      {
+            "title": "Least-Privilege Policy (Secure)",
+            "lines": [
+                  "Action: ['s3:GetObject']",
+                  "Resource: 'arn:aws:s3:::bucket/folder/*'",
+                  "Compromised service confined to single folder!"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing The Principle of Least Privilege: Scoping IAM Roles",
+      "def execute_flow():",
+      "    # Access governance: the Principle of Least Privileg...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "The Principle of Least Privilege: Scoping IAM Roles"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Service Compromised"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The principle of least privilege limits the blast radius of compromise by replacing dangerous wildcard permissions with explicit {1} scoped to specific resource {2}."
+],
+    blanks: [
+      {
+            "a": [
+                  "actions"
+            ],
+            "why": "Allowed API operations like s3:GetObject"
+      },
+      {
+            "a": [
+                  "ARNs"
+            ],
+            "why": "Amazon Resource Names"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why is granting 'Action: *' and 'Resource: *' in an IAM policy dangerous?",
+      a: ["If the service or its API keys are compromised, the attacker inherits full administrative power across the entire cloud account","It makes cloud bills higher automatically","It makes servers run in debug mode","Wildcards are not supported in AWS"],
+      c: 0,
+      why: "Wildcard permissions grant unbounded administrative authority, maximizing the blast radius of any breach."
+    },
+    {
+      q: "What is an 'ARN' in Amazon Web Services IAM policy design?",
+      a: ["Amazon Resource Name: a globally unique identifier that specifies an exact individual resource (bucket, table, role)","A type of network cable","An AI algorithm","A programming language"],
+      c: 0,
+      why: "ARNs uniquely identify specific cloud resources to enable granular permission scoping."
+    },
+    {
+      q: "How does scoping a service to 's3:GetObject' protect against data destruction attacks like ransomware?",
+      a: ["The service lacks 's3:DeleteObject' and 's3:PutObject' permissions, making it mathematically impossible for an attacker to delete or overwrite files","It encrypts the hard drive","It turns off the internet","It deletes the bucket"],
+      c: 0,
+      why: "Without write or delete permissions, compromised credentials cannot destroy or encrypt data."
+    },
+    {
+      q: "What does an IAM 'Condition' block enforce in an access policy?",
+      a: ["Contextual constraints that must be satisfied for the policy to apply, such as requiring TLS transport or restricting source IP addresses","The weather outside the data center","The speed of the network router","The font of the JSON file"],
+      c: 0,
+      why: "Condition blocks evaluate environmental and contextual attributes before granting access."
+    }
+  ]);
+</script>
+</body>
+</html>

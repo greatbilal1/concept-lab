@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 05 — Shared State, Blackboard Architecture, and Isolated State</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="multi-agent-systems" data-lesson="5" data-lesson-id="shared-state-blackboard-isolated-state">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 05</span> · Shared State</span>
+
+  <h1 class="lesson-title">Shared State, Blackboard Architecture, and Isolated State</h1>
+  <p class="lesson-lede">
+    State architectures: The Blackboard Pattern (shared central workspace), Message Passing, and Isolated Memory silos.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to architect shared blackboard memory and isolated state patterns for multi-agent teams.</span>
+    <span><b>Mission link</b> Mastering shared state, blackboard architecture, and isolated state across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Shared State, Blackboard Architecture, and Isolated State</h2>
+  <p>When multiple agents collaborate on a complex system, how should they access and mutate shared data? Machine learning architectures rely on two primary state models:</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    State architectures: The Blackboard Pattern (shared central workspace), Message Passing, and Isolated Memory silos.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Blackboard vs Message Passing</h2>
+  <ul><li><strong>1. Isolated State (Message Passing):</strong> Each agent has private memory and zero access to other agents' internals. Data is transferred strictly through explicit messages (like microservices over gRPC). <em>Advantages:</em> Clean boundaries, zero concurrency race conditions. <em>Disadvantage:</em> Heavy synchronization overhead.</li><li><strong>2. Blackboard Architecture (Shared Workspace):</strong> A centralized, shared memory blackboard (e.g. a Redis store, a PostgreSQL state table, or a shared `PROJECT_STATE.md` file). Any agent can read the current state of the world, post discoveries, and inspect other agents' outputs.</li></ul>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Decoupled Agent Coordination</h2>
+  <pre><code># The Blackboard State Architecture:
+# Shared Blackboard (PostgreSQL / Redis / StateGraph):
+{
+  "goal": "Add multi-tenant billing support",
+  "shared_knowledge": {
+    "schema_file": "src/db/schemas.py",
+    "tenant_column": "tenant_uuid",
+    "active_migration": "0014_add_tenant.py"
+  },
+  "subsystem_status": {
+    "database": "MIGRATED",
+    "api_routes": "IN_PROGRESS",
+    "test_suite": "PENDING"
+  }
+}
+# Architect Agent reads -> posts schema_file.
+# Coder Agent reads schema_file -> implements routes -> updates api_routes status!
+# QA Agent watches for 'COMPLETED' status -> triggers test runner!</code></pre><div class="callout"><p><strong>The Golden Compromise:</strong> Use a shared Blackboard for global project state, but keep each agent's active conversational working context completely isolated.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the shared state sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to architect shared blackboard memory and isolated state patterns for multi-agent teams.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where shared state, blackboard architecture, and isolated state applies.</li>
+    <li>Author a unit test or verification script exercising shared state, blackboard architecture, and isolated state.</li>
+    <li>Document team architectural conventions regarding shared state, blackboard architecture, and isolated state.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Shared State, Blackboard Architecture, and Isolated State.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is the classic 'Blackboard Pattern' in multi-agent systems?",
+    a: ["A shared central repository or workspace where multiple specialized agents read problem state, post contributions, and inspect others' work","A physical chalkboard in an office","A dark-mode text editor","A database that only stores black text"],
+    c: 0,
+    why: "The Blackboard pattern provides a centralized shared problem space where agents collaborate asynchronously."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Blackboard Pattern (Shared Pool)",
+            "lines": [
+                  "Central shared state (Postgres / Redis)",
+                  "Agents read & post discoveries asynchronously",
+                  "High visibility, loose coupling"
+            ]
+      },
+      {
+            "title": "Message Passing (Actor Model)",
+            "lines": [
+                  "Private memory silos",
+                  "Data exchanged strictly via direct messages",
+                  "Strict isolation, higher message overhead"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Shared State, Blackboard Architecture, and Isolated State",
+      "def execute_flow():",
+      "    # State architectures: The Blackboard Pattern (share...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Shared State, Blackboard Architecture, and Isolated State"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "DB Agent updates state"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "API Agent triggers"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The Blackboard pattern coordinates multi-agent squads by providing a central {1} workspace where agents read state and post {2} asynchronously."
+],
+    blanks: [
+      {
+            "a": [
+                  "shared"
+            ],
+            "why": "Central collaborative memory pool"
+      },
+      {
+            "a": [
+                  "discoveries"
+            ],
+            "why": "Outputs, facts, and artifacts"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the primary risk of a shared blackboard architecture if concurrent agents write to the same key simultaneously?",
+      a: ["Race conditions and state overwrites, requiring atomic database transactions or lock mechanisms","The computer hard drive is deleted","The blackboard turns white","Python shuts down"],
+      c: 0,
+      why: "Concurrent writes to shared state require locking or atomic reducer updates to prevent data corruption."
+    },
+    {
+      q: "Why is keeping individual conversational contexts isolated even when using a shared blackboard essential?",
+      a: ["To prevent individual agent prompts from bloating with irrelevant conversational logs from other agents","Because models cannot read words written by other models","It is required by git","To save monitor electricity"],
+      c: 0,
+      why: "Context isolation preserves token budgets while the blackboard provides shared factual truth."
+    },
+    {
+      q: "What role does a 'State Reducer' function play in frameworks like LangGraph?",
+      a: ["It specifies how new updates from nodes are merged into the central state object (e.g. appending to a list vs overwriting a value)","It reduces the model's intelligence","It compresses files into zip format","It reduces GPU clock speed"],
+      c: 0,
+      why: "Reducers define deterministic rules for merging concurrent node outputs into shared state."
+    },
+    {
+      q: "What is an example of a simple, effective blackboard for an AI coding team in a git repository?",
+      a: ["A committed markdown file like STATE.md or ARCHITECTURE.md that agents read and update","A private chat room","The git commit author email","An encrypted binary blob"],
+      c: 0,
+      why: "Version-controlled markdown files act as transparent, auditable blackboards across agent runs."
+    }
+  ]);
+</script>
+</body>
+</html>

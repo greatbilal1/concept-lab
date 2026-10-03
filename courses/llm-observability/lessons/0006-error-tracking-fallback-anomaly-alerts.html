@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 06 — Error Tracking, Fallback Detection, and Anomaly Alerts</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="llm-observability" data-lesson="6" data-lesson-id="error-tracking-fallback-anomaly-alerts">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 06</span> · Alerting & Errors</span>
+
+  <h1 class="lesson-title">Error Tracking, Fallback Detection, and Anomaly Alerts</h1>
+  <p class="lesson-lede">
+    Production incident management: tracking provider error rates, detecting silent fallback cascades, and setting anomaly alerts.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to track errors, detect fallbacks, and configure anomaly alerts for production AI systems.</span>
+    <span><b>Mission link</b> Mastering error tracking, fallback detection, and anomaly alerts across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Error Tracking, Fallback Detection, and Anomaly Alerts</h2>
+  <p>When you build a resilient AI application with multi-provider fallbacks (e.g. falling back from OpenAI to Anthropic on error), the application stays online during an outage. However, if you don't monitor fallback events, you are flying blind: <em>your primary provider might be 100% down, and you won't know until the backup provider's bill arrives!</em></p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Production incident management: tracking provider error rates, detecting silent fallback cascades, and setting anomaly alerts.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Four Critical AI Alerts</h2>
+  <p>A production <strong>AI Alerting and Error Engine</strong> monitors four vital signals:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Fallback Event Lifecycle</h2>
+  <ul><li><strong>1. Error Rate Spikes:</strong> Alert on PagerDuty if HTTP 429 (Rate Limits) or HTTP 500 (Outages) exceed 2% of total traffic over a 5-minute window.</li><li><strong>2. Fallback Cascade Frequency:</strong> Track every time execution switches to the backup model: <code>metrics.increment("llm.fallback.invoked", tags=["from:openai", "to:anthropic"])</code>.</li><li><strong>3. Token Anomaly Alerts:</strong> Trigger alerts if an individual request consumes $> 50,000$ tokens, or if daily spend exceeds 150% of the rolling average. (Catches runaway prompt loops!).</li><li><strong>4. Schema Parse Failure Spikes:</strong> Alert if Pydantic validation failures exceed 1%, indicating that the model has degraded or a prompt edit introduced formatting bugs.</li></ul><pre><code># Monitoring Fallback Invocations in Datadog/Prometheus:
+async def resilient_model_call(prompt):
+    try:
+        return await call_openai(prompt)
+    except (openai.RateLimitError, openai.APIConnectionError) as e:
+        # Emit metric alert before falling back!
+        statsd.increment("llm.fallback.triggered", tags=["primary:openai", "backup:anthropic"])
+        logger.warning("Primary provider failed. Switching to fallback provider.", exc_info=e)
+        return await call_anthropic(prompt)</code></pre><div class="callout"><p><strong>The Incident Rule:</strong> A successful fallback is a temporary victory, not an excuse to ignore the outage. Investigate primary provider failures immediately.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the alerting sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to track errors, detect fallbacks, and configure anomaly alerts for production AI systems.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where error tracking, fallback detection, and anomaly alerts applies.</li>
+    <li>Author a unit test or verification script exercising error tracking, fallback detection, and anomaly alerts.</li>
+    <li>Document team architectural conventions regarding error tracking, fallback detection, and anomaly alerts.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Error Tracking, Fallback Detection, and Anomaly Alerts.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Why must an engineering team track when an automated 'Provider Fallback' is triggered in production?",
+    a: ["A provider fallback indicates that your primary model is failing; if unmonitored, the fallback provider might also fail or incur unexpected costs","Fallbacks are illegal in software","Fallbacks delete database records","Fallbacks cause hardware fires"],
+    c: 0,
+    why: "Fallbacks prevent downtime, but indicate underlying degradation that must be monitored and alerted."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1. Error Rate Spike (> 2%)",
+            "lines": [
+                  "Surge in 429s or 500s from provider",
+                  "Alerts on-call engineer immediately"
+            ]
+      },
+      {
+            "title": "2. Fallback Invocation Rate",
+            "lines": [
+                  "Tracks failovers from Primary -> Backup",
+                  "Flags upstream provider degradation"
+            ]
+      },
+      {
+            "title": "3. Token Spike Anomaly",
+            "lines": [
+                  "Single request > 50k tokens",
+                  "Catches infinite agent loops before cost explodes"
+            ]
+      },
+      {
+            "title": "4. Schema Parse Failures (> 1%)",
+            "lines": [
+                  "Pydantic validation errors",
+                  "Signals model drift or broken prompts"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Error Tracking, Fallback Detection, and Anomaly Alerts",
+      "def execute_flow():",
+      "    # Production incident management: tracking provider ...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Error Tracking, Fallback Detection, and Anomaly Alerts"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Primary Fails (HTTP 503)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Execute Fallback (Anthropic)"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Production observability systems track fallback invocations and trigger anomaly alerts on {1} rate spikes and unexpected token {2}."
+],
+    blanks: [
+      {
+            "a": [
+                  "error"
+            ],
+            "why": "HTTP 429 and 500 failure frequencies"
+      },
+      {
+            "a": [
+                  "surges"
+            ],
+            "why": "Sudden massive spikes in token spend"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What does a sudden surge in Pydantic validation errors in an AI endpoint indicate?",
+      a: ["The model provider updated backend serving weights causing format drift, or a recent prompt change broke schema adherence","The computer hard drive is full","The database changed its password","Users stopped typing"],
+      c: 0,
+      why: "Schema validation spikes indicate that model outputs are deviating from expected contracts."
+    },
+    {
+      q: "Why is alerting on abnormal token spikes critical for stopping runaway agent loops?",
+      a: ["An agent trapped in a recursive tool loop can consume thousands of dollars in minutes if not caught by token anomaly alerts","It causes hard drives to overheat","Tokens cannot be alerted on","It is required by the FDA"],
+      c: 0,
+      why: "Token anomaly alerts catch infinite loops and runaway recursions before financial damage occurs."
+    },
+    {
+      q: "What monitoring tool standardly integrates with OpenTelemetry to trigger on-call alerts via PagerDuty or Slack?",
+      a: ["Datadog, Prometheus/Grafana, or Honeycomb","Photoshop","Git bash","Microsoft Paint"],
+      c: 0,
+      why: "Enterprise monitoring backends ingest OTel metrics and trigger real-time alerts."
+    },
+    {
+      q: "How can an engineering team verify their fallback architecture works before a real provider outage occurs?",
+      a: ["By running Chaos Engineering tests that simulate API network timeouts and verifying that the fallback provider activates cleanly","By waiting for a real outage","By deleting their API keys","By shutting down the office"],
+      c: 0,
+      why: "Chaos testing proves that fallback switches, metrics, and alerts trigger reliably under simulated failure."
+    }
+  ]);
+</script>
+</body>
+</html>

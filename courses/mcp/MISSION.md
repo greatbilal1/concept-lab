@@ -1,0 +1,3 @@
+# Mission — MCP & Tool-Connected AI Systems
+
+Master the open standard connecting AI models to tools and enterprise data. Understand the M*N integration crisis, explore the JSON-RPC 2.0 client-host-server architecture, master the three core primitives (Resources, Prompts, Tools), author servers using FastMCP in Python, connect desktop clients (Claude, Cursor), navigate stdio vs SSE transports, enforce root scoping and least-privilege security, and compose modular multi-server AI platforms.

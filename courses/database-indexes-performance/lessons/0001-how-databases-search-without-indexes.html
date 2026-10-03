@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 01 — How databases search without indexes</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="database-indexes-performance" data-lesson="1" data-lesson-id="how-databases-search-without-indexes">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 01</span> · B-Trees & Scan Types</span>
+
+  <h1 class="lesson-title">How databases search without indexes</h1>
+  <p class="lesson-lede">
+    Imagine finding a name in an unalphabetized phone book: you must read every page from cover to cover. Discover the Sequential Scan and why O(n) lookups collapse at scale.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Explain why sequential scans cause query latency to scale linearly with table size</span>
+    <span><b>Mission link</b> The fundamental baseline that motivates index creation</span>
+  </div>
+
+  <h2><span class="n">1</span>The Sequential Scan (Table Scan)</h2>
+  <p>When a table has no index on a column, the database has only one way to answer <code>WHERE email = 'ada@example.com'</code>: it must read every single disk page and evaluate every single row from the first to the last. This is a <b>Sequential Scan (Seq Scan)</b>.</p><p>A sequential scan has a time complexity of <b>O(n)</b>. On 1,000 rows, it takes 0.5 milliseconds. On 10,000,000 rows, the database must pull gigabytes of data from disk into RAM, taking 15 seconds and consuming 100% of a CPU core.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Without an index, the database must read every row in the table (Sequential Scan) in O(n) time.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Sequential Scan versus Index Lookup</h2>
+  <p>Contrast reading an entire book from start to finish with jumping directly via the index in the back.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing disk page reading</h2>
+  <p>Trace how a table scan forces the database engine to load thousands of 8KB disk pages into memory.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of sequential scan mechanics.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can identify why unindexed queries scale linearly and recognize when a table has outgrown sequential scans.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Run EXPLAIN on an unindexed query in PostgreSQL and observe the 'Seq Scan' plan node.</li>
+    <li>Check the table size in megabytes using pg_size_pretty(pg_relation_size('table')).</li>
+    <li>Observe the dramatic CPU usage spike when running sequential scans on large tables.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Markus Winand, *Use The Index, Luke!*, Section: 'Anatomy of an Index'.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "If a sequential scan takes 100ms on 100,000 rows, approximately how long will it take when the table grows to 10,000,000 rows?",
+    a: ["Around 10,000ms (10 seconds), because sequential scan time scales linearly with row count","Still 100ms because databases are fast","0.1 milliseconds","Infinite time"],
+    c: 0,
+    why: "O(n) linear complexity means a 100x increase in rows causes a ~100x increase in scan time."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "No Index: Seq Scan (O(n))",
+            "lines": [
+                  "reads 10,000,000 rows one by one",
+                  "massive disk I/O, CPU at 100%"
+            ]
+      },
+      {
+            "title": "B-Tree Index: Seek (O(log n))",
+            "lines": [
+                  "traverses 3 tree levels",
+                  "reads exactly 1 row; finishes in 0.05ms!"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Table: users (10 million rows, 80,000 disk pages = 640 MB)",
+      "# Query: SELECT * FROM users WHERE email = 'ada@example.com';",
+      "# Engine reads page 1, page 2, page 3 ... page 80,000",
+      "# Total work: 640 MB transferred from disk to RAM just to find ONE row!"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "table_size": "10,000,000 rows across 80,000 pages"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "execution": "sequential disk reading loops through all 80,000 pages"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "cost": "640 MB read penalty for single record lookup"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Scanning an entire table from start to finish is a <0> scan.",
+      "The computational complexity of a sequential scan is O(<1>).",
+      "The storage unit transferred from disk to memory in PostgreSQL is an 8KB <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "sequential",
+                  "table"
+            ],
+            "why": "Sequential scans check every row in storage."
+      },
+      {
+            "a": [
+                  "n"
+            ],
+            "why": "O(n) represents linear scaling with table size."
+      },
+      {
+            "a": [
+                  "page",
+                  "block"
+            ],
+            "why": "Databases read and write in 8KB disk pages."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "When is a Sequential Scan actually faster and preferred by the database over an index scan?",
+      a: ["When the table is very small (e.g. under 100 rows), or when a query retrieves a large percentage (e.g. 60%) of all rows","When the computer has an SSD drive","Whenever the query contains an ORDER BY clause","Never; sequential scans are always mistakes"],
+      c: 0,
+      why: "On tiny tables, reading a few contiguous pages sequentially is faster than traversing an index tree."
+    },
+    {
+      q: "What is the physical time complexity of an indexed B-tree lookup?",
+      a: ["O(log n) logarithmic time","O(n) linear time","O(n^2) quadratic time","O(1) constant time"],
+      c: 0,
+      why: "Binary/B-tree search halves the search space at each branch level, operating in O(log n)."
+    },
+    {
+      q: "What hardware resource is primarily exhausted by large sequential scans?",
+      a: ["Disk I/O bandwidth and CPU cycles spent scanning memory pages","Graphics card GPU memory","Network broadband data cap","Computer monitor power"],
+      c: 0,
+      why: "Sequential scans flood memory buffers with disk reads and consume 100% CPU evaluating rows."
+    },
+    {
+      q: "What is the table 'heap' in PostgreSQL terminology?",
+      a: ["The physical file where the table's unsorted row data tuples are stored on disk","A memory cache for storing passwords","A database backup server","The trash bin for deleted rows"],
+      c: 0,
+      why: "The heap is the primary storage area holding actual table row records."
+    }
+  ]);
+</script>
+</body>
+</html>

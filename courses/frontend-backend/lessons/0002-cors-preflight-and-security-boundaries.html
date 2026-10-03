@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 02 — CORS, preflight, and security boundaries</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="frontend-backend" data-lesson="2" data-lesson-id="cors-preflight-and-security-boundaries">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 02</span> · The Network Boundary & CORS</span>
+
+  <h1 class="lesson-title">CORS, preflight, and security boundaries</h1>
+  <p class="lesson-lede">
+    Every frontend developer meets the dreaded CORS error. Learn how Cross-Origin Resource Sharing works, why preflight OPTIONS requests occur, and how to fix them properly.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Configure server-side CORS headers and troubleshoot preflight OPTIONS requests</span>
+    <span><b>Mission link</b> The mechanism that allows controlled, secure cross-domain API communication</span>
+  </div>
+
+  <h2><span class="n">1</span>Punching a safe hole in the Same-Origin Policy</h2>
+  <p>Modern web apps often host their frontend at <code>https://app.example.com</code> and their API at <code>https://api.example.com</code>. Because these are different origins, SOP blocks communication.</p><p><b>CORS (Cross-Origin Resource Sharing)</b> is a protocol that allows the server to explicitly tell the browser: <i>'I trust https://app.example.com to read my data.'</i> The server does this by including the <code>Access-Control-Allow-Origin</code> header in its response.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    CORS is not a frontend error: it is a server-side header configuration granting cross-origin permissions.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Simple requests versus Preflight checks</h2>
+  <p>When a request includes custom headers (like Authorization) or JSON Content-Type, the browser sends an OPTIONS preflight check first.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing preflight negotiation in DevTools</h2>
+  <p>Trace how a preflight OPTIONS handshake precedes an authenticated API request.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of CORS headers.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can diagnose and resolve CORS errors on backend servers and optimize preflight performance.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Inspect an OPTIONS preflight request in your browser DevTools Network tab.</li>
+    <li>Configure CORS middleware in your backend server to allow your local development origin.</li>
+    <li>Explain why setting Access-Control-Allow-Origin: * disables credentials like cookies.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    MDN Web Docs: *Cross-Origin Resource Sharing (CORS)* (developer.mozilla.org/en-US/docs/Web/HTTP/CORS).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Who enforces the CORS policy: the web server or the client web browser?",
+    a: ["The client web browser enforces CORS to protect user security","The backend web server blocks the incoming request","The internet service provider router blocks the packet","The operating system firewall"],
+    c: 0,
+    why: "CORS is a browser security mechanism; curl and backend servers completely ignore CORS rules."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1. Preflight (OPTIONS)",
+            "lines": [
+                  "Browser asks: 'Can I send JSON & Bearer token?'",
+                  "Origin: https://app.example.com"
+            ]
+      },
+      {
+            "title": "2. Server Approves",
+            "lines": [
+                  "Access-Control-Allow-Origin: https://app.example.com",
+                  "Access-Control-Allow-Headers: Authorization, Content-Type"
+            ]
+      },
+      {
+            "title": "3. Main Request (POST)",
+            "lines": [
+                  "Browser now sends actual POST /orders payload",
+                  "Server returns 201 Created"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "Browser -> OPTIONS /api/data (Origin: https://app.com, Access-Control-Request-Method: POST)",
+      "Server -> 204 No Content (Access-Control-Allow-Origin: https://app.com, Access-Control-Max-Age: 86400)",
+      "Browser -> POST /api/data (sends actual payload now that permission is confirmed)",
+      "Server -> 200 OK (data delivered successfully to frontend)"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "step_1": "browser checks permissions via preflight OPTIONS"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step_2": "server validates origin and caches preflight for 24h"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step_3": "browser fires actual authenticated POST request"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "step_4": "data delivered into JavaScript promise"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The header designating permitted client origins is Access-Control-Allow-<0>.",
+      "The HTTP method used by browsers for preflight checks is <1>.",
+      "The header caching preflight approval to avoid repeated checks is Access-Control-Max-<2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "Origin"
+            ],
+            "why": "Access-Control-Allow-Origin specifies trusted origins."
+      },
+      {
+            "a": [
+                  "OPTIONS"
+            ],
+            "why": "OPTIONS queries server capability before executing the main call."
+      },
+      {
+            "a": [
+                  "Age"
+            ],
+            "why": "Access-Control-Max-Age caches preflight results in seconds."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why does a curl command succeed against an API that fails with a CORS error in the browser?",
+      a: ["curl is a command-line tool that does not enforce browser security policies like CORS","curl encrypts traffic differently than browsers","curl bypasses network routers","curl runs in kernel mode"],
+      c: 0,
+      why: "CORS is strictly enforced by web browsers to protect end users; non-browser tools ignore it."
+    },
+    {
+      q: "What triggers a browser to send a preflight OPTIONS request before making a fetch call?",
+      a: ["Using non-simple methods (PUT, DELETE, PATCH) or custom headers (Authorization, application/json)","Making any GET request to any website","Clicking a link on an HTML page","Using a computer with a fast processor"],
+      c: 0,
+      why: "Requests that could alter server state or use custom headers require preflight permission checks."
+    },
+    {
+      q: "Why shouldn't you set 'Access-Control-Allow-Origin: *' on an API that uses cookie authentication?",
+      a: ["Browsers strictly forbid credentials (cookies, auth headers) when the wildcard '*' origin is used","The wildcard origin causes server memory to leak","The star character is illegal in HTTP header text","It automatically deletes all database records"],
+      c: 0,
+      why: "Security rule: credentials require explicit allowed origins, never wildcards."
+    },
+    {
+      q: "What does the 'Access-Control-Max-Age' header do in a preflight response?",
+      a: ["Instructs the browser to cache the preflight result for N seconds, avoiding repeated OPTIONS requests","Sets the maximum age of the user account","Forces the browser to delete the cookie after N seconds","Restricts the age of the developer who wrote the code"],
+      c: 0,
+      why: "Max-Age caches preflight approval, eliminating the round-trip delay on subsequent calls."
+    }
+  ]);
+</script>
+</body>
+</html>

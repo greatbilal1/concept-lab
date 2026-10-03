@@ -1,0 +1,3 @@
+# Mission — AI Evaluation & Testing
+
+Transition from subjective 'vibe-based' testing to empirical software evaluation. Curate high-signal golden benchmark datasets, distinguish deterministic code assertions from model judges, engineer bias-resistant LLM-as-a-Judge rubrics, evaluate semantic similarity with BERTScore, embed continuous evaluation into CI/CD pipelines to block regressions, harness production user feedback flywheels, and build a complete automated evaluation harness.

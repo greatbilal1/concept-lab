@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 03 — Managing Working Trees, Stashes, and Branching Strategies</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="large-ai-coding-projects" data-lesson="3" data-lesson-id="working-trees-stashes-branching">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 03</span> · Git Branching</span>
+
+  <h1 class="lesson-title">Managing Working Trees, Stashes, and Branching Strategies</h1>
+  <p class="lesson-lede">
+    Managing git branches, worktrees, and stashes to isolate experimental agent tasks safely.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to manage git branches, worktrees, and stashes for safe agent workflows.</span>
+    <span><b>Mission link</b> Mastering managing working trees, stashes, and branching strategies across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Managing Working Trees, Stashes, and Branching Strategies</h2>
+  <p>AI agents make changes rapidly. If you allow an agent to work directly on your `main` branch or a dirty working directory with uncommitted personal changes, disaster is inevitable. An accidental `git reset` will wipe out your uncommitted work, or a broken agent edit will pollute production history.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Managing git branches, worktrees, and stashes to isolate experimental agent tasks safely.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Branch Isolation Architecture</h2>
+  <p>Professional AI workflow demands <strong>Strict Git Branch Hygiene</strong>:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Git Worktree Concurrency</h2>
+  <ul><li><strong>1. Dedicated Feature Branches:</strong> Always create a clean branch: `git checkout -b feat/stripe-webhook-handler`. Never let an agent touch `main` directly.</li><li><strong>2. Git Stash as a Shield:</strong> If you have in-progress edits when starting an agent task, run `git stash save "wip personal"` to protect your work from agent overwrites.</li><li><strong>3. Git Worktrees for Parallel Tasks:</strong> Use `git worktree add ../agent-task-1 feat/branch-1` to let an agent work in a completely separate folder on disk while you continue coding in your primary directory!</li></ul><pre><code># The Safe Branch Workflow:
+$ git checkout main && git pull
+$ git checkout -b feat/task-1.2-invoice-calculation
+# Let the agent work on feat/task-1.2...
+# If agent succeeds: verify tests, commit, push PR!
+# If agent fails completely: git checkout main && git branch -D feat/task-1.2 (Zero mess!)</code></pre><div class="callout"><p><strong>The Worktree Superpower:</strong> `git worktree` allows multiple AI agents to work concurrently on different branches in separate folders without stepping on each other's files!</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the git branch hygiene sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to manage git branches, worktrees, and stashes for safe agent workflows.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where managing working trees, stashes, and branching strategies applies.</li>
+    <li>Author a unit test or verification script exercising managing working trees, stashes, and branching strategies.</li>
+    <li>Document team architectural conventions regarding managing working trees, stashes, and branching strategies.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Managing Working Trees, Stashes, and Branching Strategies.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Why is creating dedicated feature branches for each AI agent task essential?",
+    a: ["It isolates experimental agent edits from the stable main branch, making throwaway resets and clean reviews effortless","Git branches make Python code run 5x faster","Main branches cannot be edited by computers","Feature branches reduce cloud hosting costs"],
+    c: 0,
+    why: "Dedicated feature branches isolate agent work, allowing zero-risk experimentation and clean PR reviews."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "main Branch (Stable)",
+            "lines": [
+                  "Protected, deployable baseline",
+                  "Never touched directly by agents"
+            ]
+      },
+      {
+            "title": "feat/task-1.2 (Agent Sandbox)",
+            "lines": [
+                  "Agent writes code & runs tests",
+                  "Isolated, zero risk to team"
+            ]
+      },
+      {
+            "title": "PR Review Gate",
+            "lines": [
+                  "Squash and merge upon approval",
+                  "Clean, pristine commit history"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Managing Working Trees, Stashes, and Branching Strategies",
+      "def execute_flow():",
+      "    # Managing git branches, worktrees, and stashes to i...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Managing Working Trees, Stashes, and Branching Strategies"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Primary Workspace (/repo)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Worktree 1 (/repo-agent-1)"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Isolate agent experimentation by creating dedicated feature {1} and using git {2} to run parallel agent workspaces."
+],
+    blanks: [
+      {
+            "a": [
+                  "branches"
+            ],
+            "why": "Isolated git commit lines"
+      },
+      {
+            "a": [
+                  "worktrees"
+            ],
+            "why": "Multiple linked working directories on disk"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the primary benefit of using 'git worktree' with AI coding agents?",
+      a: ["It allows an agent to edit, build, and test a separate branch in an isolated directory without interrupting your active editor workspace","It makes git push 10x faster","It eliminates merge conflicts forever","It encrypts the source code"],
+      c: 0,
+      why: "Git worktrees provide completely separate checkouts on disk sharing the same underlying repository."
+    },
+    {
+      q: "Why should you never let an AI agent work directly on an uncommitted, dirty working tree?",
+      a: ["The agent's tool calls (like file rewrites or git resets) can permanently overwrite or delete your uncommitted personal changes","The computer will crash","Python will refuse to run","Git will corrupt the hard drive"],
+      c: 0,
+      why: "Uncommitted changes can be lost or overwritten by automated agent file modifications."
+    },
+    {
+      q: "What should you do if an agent's work on a feature branch proves to be a complete dead end?",
+      a: ["Checkout main and delete the feature branch; your baseline remains 100% clean and unharmed","Spend three days untangling the dead end","Delete the entire git repository and clone again","Push the dead end to main"],
+      c: 0,
+      why: "Branch isolation makes discarding failed experiments effortless and consequence-free."
+    },
+    {
+      q: "How does squashing commits before merging an agent feature PR keep history clean?",
+      a: ["It collapses 15 micro-trial commits into one clean, self-contained, descriptive commit on the main branch","It reduces GitHub hosting bills","It compiles Python code","It deletes all unit tests"],
+      c: 0,
+      why: "Squash-merging turns noisy trial-and-error agent commits into a clean, atomic historical record."
+    }
+  ]);
+</script>
+</body>
+</html>

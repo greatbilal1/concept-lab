@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 05 — Race conditions and request sequencing</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="frontend-backend" data-lesson="5" data-lesson-id="race-conditions-and-request-sequencing">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 05</span> · Race Conditions & Sequencing</span>
+
+  <h1 class="lesson-title">Race conditions and request sequencing</h1>
+  <p class="lesson-lede">
+    Fast typing breaks slow APIs. Discover why rapid search queries can return out of order, and how to fix race conditions using AbortController and debouncing.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Prevent out-of-order search autocomplete bugs using debouncing and AbortController</span>
+    <span><b>Mission link</b> Eliminates subtle asynchronous bugs where stale network data overwrites fresh data</span>
+  </div>
+
+  <h2><span class="n">1</span>The out-of-order response trap</h2>
+  <p>Imagine a search input. The user types 'cat', triggering Request A. Then they type 's' ('cats'), triggering Request B. Request B is sent <i>after</i> Request A, but due to network routing, <b>Request B finishes in 50ms, while Request A takes 300ms</b>.</p><p>What happens? Request B renders results for 'cats'. Then 250ms later, Request A finally arrives and overwrites the screen with results for 'cat'! The user typed 'cats', but sees results for 'cat'. This is a classic <b>network race condition</b>.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Later requests can arrive before earlier requests; always cancel or discard stale in-flight responses.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Debouncing versus cancellation</h2>
+  <p>Combine debouncing (delaying request firing) with AbortController (cancelling active requests).</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing search autocomplete cancellation</h2>
+  <p>Trace how AbortController eliminates race conditions on a dynamic search input.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of race condition prevention.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can implement rock-solid autocomplete search and tab switching that never display stale out-of-order data.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Implement a debounce helper function with a 300ms delay timer.</li>
+    <li>Add AbortController cancellation to an autocomplete search component.</li>
+    <li>Simulate out-of-order responses in DevTools by throttling a request to observe race conditions.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    MDN Web Docs: *AbortSignal* (developer.mozilla.org/en-US/docs/Web/API/AbortSignal).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "How can you cancel an in-flight search fetch request when the user types a new character?",
+    a: ["Call abort() on the AbortController associated with the previous request before creating the new one","Restart the user web browser","Set the input value to an empty string","Turn off the server Wi-Fi"],
+    c: 0,
+    why: "Calling controller.abort() terminates the stale in-flight request so it can never overwrite fresh results."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "User Types Rapidly",
+            "lines": [
+                  "c -> ca -> cat -> cats",
+                  "typing events fire 10 times in 1s"
+            ]
+      },
+      {
+            "title": "Debounce (300ms)",
+            "lines": [
+                  "waits for typing to pause",
+                  "fires ONE request instead of 10!"
+            ]
+      },
+      {
+            "title": "AbortController",
+            "lines": [
+                  "if previous request still in flight:",
+                  "controller.abort() cancels stale socket"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "let controller = null;",
+      "async function handleSearch(query) {",
+      "    if (controller) controller.abort(); # cancel previous request!",
+      "    controller = new AbortController();",
+      "    const res = await fetch(`/search?q=${query}`, { signal: controller.signal });",
+      "    render(await res.json());",
+      "}"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "init": "controller reference tracked in scope"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "check": "stale in-flight search request aborted instantly"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "fresh": "new controller created for current query"
+            }
+      },
+      {
+            "line": 5,
+            "vars": {
+                  "render": "only the freshest query response ever renders to screen"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "When responses arrive in a different order than sent, it is a race <0>.",
+      "The technique delaying execution until typing stops for N milliseconds is <1>.",
+      "The web API object used to abort in-flight fetch calls is <2>Controller."
+],
+    blanks: [
+      {
+            "a": [
+                  "condition"
+            ],
+            "why": "Race conditions occur when timing affects outcome."
+      },
+      {
+            "a": [
+                  "debouncing",
+                  "debounce"
+            ],
+            "why": "Debounce waits for idle intervals before firing."
+      },
+      {
+            "a": [
+                  "Abort"
+            ],
+            "why": "AbortController cancels pending fetch requests."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the difference between debouncing and throttling?",
+      a: ["Debouncing waits for an idle pause before executing; throttling executes at most once per fixed time interval","Debouncing is for mouse events; throttling is for keyboards","Debouncing speeds up the CPU; throttling slows down the GPU","There is no difference between them"],
+      c: 0,
+      why: "Debounce resets its timer on every event; throttle enforces a steady maximum execution rate."
+    },
+    {
+      q: "Why does a search input without cancellation frequently show the wrong results after fast typing?",
+      a: ["An earlier slower request can resolve AFTER a later faster request, overwriting the screen with stale data","Browsers delete search text if typed faster than 50 words per minute","Databases reverse the spelling of words when busy","Search queries must be submitted using HTTP POST"],
+      c: 0,
+      why: "Variable network latency means arrival order does not match dispatch order."
+    },
+    {
+      q: "What error does a fetch request throw when cancelled via an AbortController signal?",
+      a: ["A DOMException with the name 'AbortError'","A SyntaxError","A TypeError: Network Failed","It does not throw; it returns null silently"],
+      c: 0,
+      why: "Fetch rejects with an AbortError DOMException, which you should catch and ignore."
+    },
+    {
+      q: "How can you distinguish an intentional user abort from a genuine network crash?",
+      a: ["Check if 'err.name === 'AbortError'' in your catch block","Check if the computer screen is still turned on","Look at the color of the browser window border","Ask the user if they meant to cancel"],
+      c: 0,
+      why: "Checking err.name === 'AbortError' allows you to silence cancellations while alerting on real failures."
+    }
+  ]);
+</script>
+</body>
+</html>

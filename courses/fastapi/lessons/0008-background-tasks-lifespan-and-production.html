@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 08 — Background tasks, lifespan, and production</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="fastapi" data-lesson="8" data-lesson-id="background-tasks-lifespan-and-production">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 08</span> · Async Lifecycle & Background Tasks</span>
+
+  <h1 class="lesson-title">Background tasks, lifespan, and production</h1>
+  <p class="lesson-lede">
+    Don't make users wait for slow emails or webhook notifications. Master FastAPI BackgroundTasks, modern async lifespan context managers, and production deployment with Uvicorn.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Implement non-blocking background tasks and manage server startup/shutdown with lifespan</span>
+    <span><b>Mission link</b> Prepares FastAPI applications for high-throughput production deployment</span>
+  </div>
+
+  <h2><span class="n">1</span>Responding before doing the heavy lifting</h2>
+  <p>When a user registers, they should not wait 3 seconds while your server connects to an external email provider to send a welcome email. The HTTP response should return in 5 milliseconds!</p><p>FastAPI provides <b>BackgroundTasks</b>. You add a task: <code>background_tasks.add_task(send_email, user.email)</code>. FastAPI immediately sends the <code>201 Created</code> response back to the client, and then <b>executes the background task right after the response is delivered</b>.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    BackgroundTasks execute after sending the response, keeping API latencies ultra-low.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Modern async lifespan management</h2>
+  <p>How the lifespan async context manager manages startup database pools and graceful shutdowns.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing lifespan startup and background tasks</h2>
+  <p>Trace how lifespan initializes resources on boot and background tasks process post-response work.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of production FastAPI patterns.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can build production-ready FastAPI applications with non-blocking background tasks and graceful lifecycle management.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Implement an async lifespan context manager that initializes a database pool on startup.</li>
+    <li>Add a background task to an endpoint to log audit records asynchronously.</li>
+    <li>Configure Uvicorn with multiple workers for production using uvicorn main:app --workers 4.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Sebastián Ramírez, *FastAPI Documentation: Lifespan Events* & *Background Tasks* (fastapi.tiangolo.com).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "When does a function added via 'background_tasks.add_task(fn)' actually run?",
+    a: ["Directly AFTER the HTTP response has been sent back to the client user","Before the route function begins executing","Twenty-four hours later","Only when the server reboots"],
+    c: 0,
+    why: "BackgroundTasks run immediately after the response is delivered, keeping client latency fast."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Startup (Before Yield)",
+            "lines": [
+                  "connect database connection pool",
+                  "load ML model into memory"
+            ]
+      },
+      {
+            "title": "yield",
+            "lines": [
+                  "app serves incoming HTTP traffic",
+                  "active production runtime"
+            ]
+      },
+      {
+            "title": "Shutdown (After Yield)",
+            "lines": [
+                  "close database connection pool",
+                  "flush logs and clean up resources"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "@asynccontextmanager",
+      "async def lifespan(app: FastAPI):",
+      "    await db.connect() # startup",
+      "    yield",
+      "    await db.disconnect() # shutdown",
+      "# Route with background task:",
+      "@app.post('/orders')",
+      "async def create_order(tasks: BackgroundTasks):",
+      "    tasks.add_task(notify_warehouse, order_id=42)",
+      "    return {'status': 'order placed'} # client receives 200 in 2ms!"
+],
+    steps: [
+      {
+            "line": 2,
+            "vars": {
+                  "startup": "database connection pool established on boot"
+            }
+      },
+      {
+            "line": 9,
+            "vars": {
+                  "instant_response": "client receives response in 2ms"
+            }
+      },
+      {
+            "line": 8,
+            "vars": {
+                  "background_exec": "warehouse notification executed post-response without blocking client"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "shutdown": "clean disconnect on server SIGTERM"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The utility executing tasks after sending responses is <0>Tasks.",
+      "The modern async context manager handling startup and shutdown is <1>.",
+      "For heavy distributed background processing (hours-long), use a message queue like <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "Background"
+            ],
+            "why": "BackgroundTasks handles post-response jobs."
+      },
+      {
+            "a": [
+                  "lifespan"
+            ],
+            "why": "Lifespan context managers replace legacy on_event handlers."
+      },
+      {
+            "a": [
+                  "Celery",
+                  "Redis",
+                  "RQ"
+            ],
+            "why": "Heavy jobs require external distributed task queues."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "When is FastAPI's built-in BackgroundTasks appropriate versus an external queue like Celery or RQ?",
+      a: ["BackgroundTasks is ideal for lightweight in-process tasks (sending emails, logging); heavy CPU or long tasks require Celery","BackgroundTasks is only for downloading images","Celery is deprecated in modern Python","There is no difference between them"],
+      c: 0,
+      why: "BackgroundTasks runs in-process; if the server restarts, queued tasks are lost. Heavy jobs need Celery."
+    },
+    {
+      q: "What replaced the legacy '@app.on_event(\"startup\")' syntax in modern FastAPI?",
+      a: ["The async context manager 'lifespan' parameter on the FastAPI app instance","Global while loops in main.py","A cron job running on the host OS","Startup events are no longer supported"],
+      c: 0,
+      why: "The asynccontextmanager 'lifespan' pattern is the modern standard for startup and shutdown logic."
+    },
+    {
+      q: "How do you run FastAPI with multiple worker processes in production behind Uvicorn?",
+      a: ["uvicorn main:app --workers 4 --host 0.0.0.0 --port 8000","Run python main.py four times in different terminal tabs","uvicorn --multiverse 4","Add @app.multiworker(4) in Python code"],
+      c: 0,
+      why: "The --workers flag spawns multiple worker processes to utilize all available CPU cores."
+    },
+    {
+      q: "What happens if a BackgroundTask raises an unhandled exception after the response is sent?",
+      a: ["The exception is logged to server stderr, but the client response has already completed successfully","The client receives an HTTP 500 error after having already received a 200","The server operating system reboots","The database drops all tables"],
+      c: 0,
+      why: "The client response is already sent; background errors are logged to server error streams."
+    }
+  ]);
+</script>
+</body>
+</html>

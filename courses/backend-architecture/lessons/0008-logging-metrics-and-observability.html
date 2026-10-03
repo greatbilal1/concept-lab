@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 08 — Logging, metrics, and observability</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="backend-architecture" data-lesson="8" data-lesson-id="logging-metrics-and-observability">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 08</span> · Configuration & Observability</span>
+
+  <h1 class="lesson-title">Logging, metrics, and observability</h1>
+  <p class="lesson-lede">
+    If you can't measure it, you can't manage it. Master structured JSON logging, correlation IDs, Prometheus metrics, health checks, and graceful shutdowns.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Implement structured logging with correlation IDs, health checks, and graceful shutdown handlers</span>
+    <span><b>Mission link</b> Provides real-time visibility into production server health and operational stability</span>
+  </div>
+
+  <h2><span class="n">1</span>The three pillars of observability</h2>
+  <p>When an incident strikes production at 3:00 AM, you cannot attach an interactive debugger. You rely on the three pillars of observability: <b>Logs</b> (discrete event records), <b>Metrics</b> (aggregated numeric gauges and counters over time), and <b>Traces</b> (request journeys across distributed services).</p><p>Never use plain text <code>print('error')</code> statements. Production servers emit <b>Structured JSON Logging</b> tagged with a unique <b>Correlation ID (Request ID)</b> on every request, allowing you to trace all logs for a single user interaction across five different services.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Emit structured JSON logs tagged with correlation IDs to track requests across distributed services.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The graceful shutdown protocol</h2>
+  <p>How a production server terminates cleanly without dropping in-flight user requests.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing structured JSON log emission</h2>
+  <p>Trace how structured JSON logs allow automated log aggregators (Elasticsearch, Datadog) to index errors.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of backend observability.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can implement structured JSON logging, request tracing, health checks, and graceful shutdown handlers on production servers.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Configure your logger to output JSON logs with timestamp, level, and message fields.</li>
+    <li>Implement a middleware that generates a unique X-Request-ID and attaches it to response headers.</li>
+    <li>Implement a SIGTERM signal handler that drains database pools during shutdown.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Google Site Reliability Engineering (SRE) Book: *Monitoring Distributed Systems* (sre.google/sre-book/monitoring-distributed-systems/).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is a 'Correlation ID' (Request ID) in backend observability?",
+    a: ["A unique UUID generated at the API gateway and attached to all downstream logs and service calls for that single request","The user's credit card expiration date","The IP address of the local Wi-Fi router","A hash of the database password"],
+    c: 0,
+    why: "Correlation IDs tie together disparate log lines across multiple services for a single transaction."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1. SIGTERM Received",
+            "lines": [
+                  "Kubernetes / Docker sends stop signal",
+                  "health check endpoint switches to 503 (stop routing new traffic)"
+            ]
+      },
+      {
+            "title": "2. Drain In-Flight",
+            "lines": [
+                  "finish active HTTP requests (e.g. 10s grace period)",
+                  "close keep-alive client sockets"
+            ]
+      },
+      {
+            "title": "3. Clean Teardown",
+            "lines": [
+                  "close database connection pools",
+                  "flush buffered logs -> process exit(0)"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "logger.error('Payment failed', extra={",
+      "    'correlation_id': 'a8f9-c2e1-482a',",
+      "    'user_id': 42,",
+      "    'gateway': 'stripe',",
+      "    'error_code': 'card_declined'",
+      "})"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "event": "structured error logged"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "correlation": "tied to request a8f9-c2e1-482a"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "indexing": "log aggregator can query WHERE error_code = 'card_declined' instantly"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Formatting log output as machine-readable JSON is <0> logging.",
+      "The unique token tracing a request across multiple services is a <1> ID.",
+      "Stopping a server without dropping active requests is a <2> shutdown."
+],
+    blanks: [
+      {
+            "a": [
+                  "structured"
+            ],
+            "why": "Structured logging enables machine querying."
+      },
+      {
+            "a": [
+                  "correlation",
+                  "request"
+            ],
+            "why": "Correlation IDs tie distributed traces together."
+      },
+      {
+            "a": [
+                  "graceful"
+            ],
+            "why": "Graceful shutdowns drain active connections safely."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why is structured JSON logging preferred over plain text lines (e.g. print statements) in production?",
+      a: ["Log aggregators (like Datadog or Elasticsearch) can index, filter, and alert on specific JSON fields without fragile regex parsing","JSON logs take up less memory on the server","JSON logs prevent computers from crashing","JSON logs are required by international law"],
+      c: 0,
+      why: "Structured keys enable instant querying (e.g. status >= 500) across billions of log lines."
+    },
+    {
+      q: "What does a 'Graceful Shutdown' handler do when receiving SIGTERM?",
+      a: ["Stops accepting new connections, allows in-flight requests to complete within a timeout, closes database pools, and exits cleanly","Terminates the process immediately, dropping all active user connections","Reboots the physical server hardware","Deletes all log files from disk"],
+      c: 0,
+      why: "Graceful shutdowns ensure zero user requests are dropped during routine rolling deployments."
+    },
+    {
+      q: "What is the difference between a Liveness probe and a Readiness probe in production health checks?",
+      a: ["Liveness checks if the process is alive (restarts it if dead); Readiness checks if the process is ready to receive traffic (e.g. DB connected)","Liveness is for mobile; Readiness is for desktop","Liveness only runs once on startup; Readiness runs forever","There is no difference between them"],
+      c: 0,
+      why: "Liveness restarts frozen processes; readiness manages load balancer traffic routing."
+    },
+    {
+      q: "What is a 'Metric' in observability terminology?",
+      a: ["A numerical measurement aggregated over time intervals (e.g. requests_per_second counter, memory_usage gauge)","A text paragraph describing a bug report","A digital certificate signed by a Certificate Authority","The distance from the server to the user"],
+      c: 0,
+      why: "Metrics are numeric counters, gauges, and histograms evaluated for real-time alerting."
+    }
+  ]);
+</script>
+</body>
+</html>

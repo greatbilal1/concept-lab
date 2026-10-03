@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 02 — Anatomy of a B-tree index</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="database-indexes-performance" data-lesson="2" data-lesson-id="anatomy-of-a-b-tree-index">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 02</span> · B-Trees & Scan Types</span>
+
+  <h1 class="lesson-title">Anatomy of a B-tree index</h1>
+  <p class="lesson-lede">
+    How does a B-tree find 1 row out of 100 million in 3 disk reads? Explore the balanced search tree: root, intermediate branch nodes, leaf pages, and row pointers.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Explain how B-tree indexes maintain balanced logarithmic search paths and ordered leaf chains</span>
+    <span><b>Mission link</b> The primary internal data structure powering relational database performance</span>
+  </div>
+
+  <h2><span class="n">1</span>The self-balancing tree</h2>
+  <p>The default and most important index in almost every relational database is the <b>B-tree (Balanced Tree)</b>. A B-tree is an ordered tree structure that maintains balance: every leaf node is at the exact same depth from the root.</p><p>Because each branch node has a high fan-out (storing hundreds of keys per page), a B-tree of 100 million rows has a depth of only <b>3 or 4 levels</b>. To find any row, the engine traverses: <b>Root Node &rarr; Branch Node &rarr; Leaf Node</b>. Three page reads, and the exact row pointer is found!</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    A B-tree index has a wide fan-out, allowing lookups across millions of rows in 3 to 4 page hops.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>B-tree traversal hierarchy</h2>
+  <p>Visualise how a search key navigates from root to intermediate branch to leaf.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing B-tree range scan execution</h2>
+  <p>Trace how the doubly-linked leaf nodes enable blazing-fast range queries like WHERE age BETWEEN 20 AND 25.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of B-tree index anatomy.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can explain the internal mechanics of B-tree indexes and understand why they make lookups and range scans so fast.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Create an index on a column using CREATE INDEX idx_name ON table(column).</li>
+    <li>Inspect index size in PostgreSQL using pg_size_pretty(pg_relation_size('idx_name')).</li>
+    <li>Observe how an index accelerates both equality (=) and range (<, >, BETWEEN) queries.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    PostgreSQL Documentation: *B-Tree Indexes* (postgresql.org/docs/current/btree.html).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is stored in the leaf nodes of a secondary B-tree index?",
+    a: ["The indexed column value and a physical pointer (tuple ID / ctid) to the row in the table heap","The entire database table duplicated in full","An encrypted hash of the user password","A copy of the SQL query string"],
+    c: 0,
+    why: "Leaf nodes store the sorted index key paired with a pointer (TID/ctid) to the heap row."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Root Node (Level 1)",
+            "lines": [
+                  "contains key ranges: [A-H], [I-P], [Q-Z]",
+                  "guides to matching branch page"
+            ]
+      },
+      {
+            "title": "Branch Node (Level 2)",
+            "lines": [
+                  "finer ranges: [I-L], [M-N], [O-P]",
+                  "guides to matching leaf page"
+            ]
+      },
+      {
+            "title": "Leaf Pages (Level 3)",
+            "lines": [
+                  "sorted values: 'Ada' -> Tuple (Page 4, Row 12)",
+                  "doubly-linked: enables instant range scans!"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Query: SELECT * FROM users WHERE age >= 21 AND age <= 23;",
+      "Step 1: Traverse B-tree to find the first leaf matching age = 21 (3 reads)",
+      "Step 2: Walk the doubly-linked horizontal chain across leaf pages",
+      "Step 3: Stop as soon as age > 23 is encountered! Zero full-table scanning."
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "query": "range scan over age column"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "seek": "logarithmic seek locates start of range in 3 hops"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "scan": "sequential walk along ordered leaf page chain"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "halt": "stops instantly at boundary; finishes in 0.1ms"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The default self-balancing index structure in SQL is the <0>-tree.",
+      "The bottom-most nodes containing the sorted keys and row pointers are <1> nodes.",
+      "Because leaf pages are linked horizontally, B-trees excel at <2> queries."
+],
+    blanks: [
+      {
+            "a": [
+                  "B",
+                  "b"
+            ],
+            "why": "B-tree stands for Balanced Tree."
+      },
+      {
+            "a": [
+                  "leaf"
+            ],
+            "why": "Leaf nodes hold keys and physical tuple pointers."
+      },
+      {
+            "a": [
+                  "range"
+            ],
+            "why": "Ordered leaf chains allow fast range queries (BETWEEN, >=)."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why are B-trees preferred over binary search trees (BST) for database disk storage?",
+      a: ["B-trees have high fan-out (hundreds of keys per node), keeping tree depth very shallow and minimizing disk I/O","B-trees can only store text words","Binary search trees do not work on computers","B-trees do not use computer memory"],
+      c: 0,
+      why: "Disk reads are expensive; high fan-out keeps B-tree depth to 3-4 levels for 100M rows."
+    },
+    {
+      q: "What enables B-tree indexes to satisfy ORDER BY clauses without sorting the data at runtime?",
+      a: ["Keys are already stored in sorted order inside the B-tree leaf nodes","The query planner uses artificial intelligence to sort the data","The database sorts the table every night at midnight","ORDER BY is ignored when an index exists"],
+      c: 0,
+      why: "Because leaf nodes maintain pre-sorted order, reading the index satisfies ORDER BY for free."
+    },
+    {
+      q: "What is an index leaf node pointer in PostgreSQL?",
+      a: ["A Tuple ID (ItemPointer / ctid) containing the physical disk page number and item offset of the row","The user's internet IP address","A copy of the SQL query string","A hash of the database password"],
+      c: 0,
+      why: "ctid (e.g. (4, 12)) specifies block number 4, index slot 12 in the heap file."
+    },
+    {
+      q: "Why does the expression 'WHERE UPPER(email) = 'ADA'' fail to use a standard index on 'email'?",
+      a: ["The index stores raw 'email' values, not UPPER(email); wrapping a column in a function blinds the index","UPPER is forbidden in SQL queries","Capital letters cannot be stored in B-trees","The query will crash the database"],
+      c: 0,
+      why: "Functions applied to columns prevent standard index seeks; an expression index is required."
+    }
+  ]);
+</script>
+</body>
+</html>

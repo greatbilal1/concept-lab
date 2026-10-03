@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Function Calling & Tool Use — Cheat Sheet</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+<style>
+  .ref-toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0 8px; }
+  .ref-toc a { font-size: .8rem; border: 1px solid var(--border); background: #111a30; padding: 5px 11px; border-radius: 999px; color: var(--muted); text-decoration: none; border-bottom: 1px solid var(--border); }
+  .ref-toc a:hover { color: #fff; border-color: #3d5488; }
+  .lesson-wrap h2 { scroll-margin-top: 20px; }
+  .snippet { margin: 14px 0 22px; }
+  .snippet .lbl { font-size: .72rem; font-weight: 800; letter-spacing: .7px; text-transform: uppercase; color: var(--accent2); margin-bottom: 6px; }
+  .see { font-size: .82rem; color: var(--muted); margin: -6px 0 12px; }
+  .see a { color: var(--accent2); border-bottom: 0; }
+  .see a:hover { color: #fff; }
+  .snippet pre { padding-top: 34px; }
+  @media print { .snippet pre { padding-top: 18px; } }
+</style>
+</head>
+<body class="lesson-body" data-course="function-calling">
+
+<div class="lesson-wrap">
+
+  <span class="lesson-kicker">Reference · Cheat sheet</span>
+  <h1 class="lesson-title">Function Calling & Tool Use — Cheat Sheet</h1>
+  <p class="lesson-lede">
+    The whole course on one page. Every snippet links back to the lesson that
+    teaches it.
+  </p>
+
+  <div class="ref-toc">
+    <a href="#sec-1">OpenAI Tool Definition Schema</a>
+    <a href="#sec-2">Complete Agent Tool Execution Loop</a>
+    <a href="#sec-3">Parallel Tool Execution with AsyncIO</a>
+    <a href="#sec-4">Self-Correcting Tool Error Return</a>
+  </div>
+
+  <h2 id="sec-1"><span class="n">1</span>OpenAI Tool Definition Schema</h2>
+  <div class="snippet">
+    <div class="lbl">Standard tool specification</div>
+    <pre><code>tools = [{
+    "type": "function",
+    "function": {
+        "name": "fetch_customer_order",
+        "description": "Retrieve order details and shipping status by order ID.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "order_id": {"type": "string", "description": "Format ORD-12345"}
+            },
+            "required": ["order_id"]
+        }
+    }
+}]</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0002-defining-tool-schemas.html">Lesson 02 — Defining Tool Schemas: Names, Descriptions, and Parameters</a>.</p>
+
+  <h2 id="sec-2"><span class="n">2</span>Complete Agent Tool Execution Loop</h2>
+  <div class="snippet">
+    <div class="lbl">Iterative while loop</div>
+    <pre><code>while True:
+    res = client.chat.completions.create(model="gpt-4o", messages=messages, tools=tools)
+    msg = res.choices[0].message
+    messages.append(msg)
+    if res.choices[0].finish_reason == "stop": break
+    for call in msg.tool_calls:
+        result = dispatch(call.function.name, json.loads(call.function.arguments))
+        messages.append({"role": "tool", "tool_call_id": call.id, "content": json.dumps(result)})</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0005-execution-loop-multi-turn.html">Lesson 05 — The Execution Loop: Multi-Turn Tool Interactions</a>.</p>
+
+  <h2 id="sec-3"><span class="n">3</span>Parallel Tool Execution with AsyncIO</h2>
+  <div class="snippet">
+    <div class="lbl">Concurrent execution</div>
+    <pre><code>import asyncio
+# Execute multiple tool calls concurrently:
+tasks = [dispatch_async(c.function.name, json.loads(c.function.arguments)) for c in tool_calls]
+results = await asyncio.gather(*tasks)</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0006-parallel-tool-calling.html">Lesson 06 — Multiple Tool Calls in a Single Turn (Parallel Calling)</a>.</p>
+
+  <h2 id="sec-4"><span class="n">4</span>Self-Correcting Tool Error Return</h2>
+  <div class="snippet">
+    <div class="lbl">Returning exceptions as observations</div>
+    <pre><code>try:
+    result = run_query(args)
+except Exception as e:
+    result = {"status": "error", "message": f"Query failed: {str(e)}. Check column names."}
+messages.append({"role": "tool", "tool_call_id": call.id, "content": json.dumps(result)})</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0007-tool-error-handling-self-correction.html">Lesson 07 — Tool Error Handling: Passing Errors Back to the Model</a>.</p>
+
+  <div class="lesson-foot">
+    <div class="links">
+      <a href="function-calling-glossary.html">📖 Glossary</a>
+      <a href="../course.html">← Course map</a>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 02 — Box-sizing: border-box versus content-box</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="css-layout" data-lesson="2" data-lesson-id="box-sizing-border-box-versus-content-box">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 02</span> · The Box Model</span>
+
+  <h1 class="lesson-title">Box-sizing: border-box versus content-box</h1>
+  <p class="lesson-lede">
+    Why does adding padding make your element wider than 100%? Learn why the universal border-box reset is the first line of CSS every professional writes.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Apply the universal border-box reset to eliminate unexpected layout overflow</span>
+    <span><b>Mission link</b> Eliminates the #1 source of horizontal scrollbars in web layouts</span>
+  </div>
+
+  <h2><span class="n">1</span>The historical content-box flaw</h2>
+  <p>By default, browsers use <code>box-sizing: content-box</code>. In this mode, when you write <code>width: 100%; padding: 20px;</code>, the browser sets the <i>content</i> to 100% and then adds 40px of padding on top. The result: an element 100% + 40px wide that overflows the screen and creates a horizontal scrollbar.</p><p>With <code>box-sizing: border-box</code>, your declared <code>width: 100%</code> is the <i>total outer width</i>. The browser automatically absorbs padding and borders inwardly, keeping your layout predictable.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    border-box absorbs padding and borders inwardly so declared widths remain exact.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Comparing the two sizing models</h2>
+  <p>Contrast how content-box expands outward while border-box absorbs inward.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing the universal reset</h2>
+  <p>Trace how the standard universal reset applies border-box across all elements and pseudo-elements.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of box sizing modes.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can apply the universal border-box reset and build layouts without padding-induced overflow bugs.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Add the universal border-box reset to your CSS stylesheet.</li>
+    <li>Inspect an element in DevTools to confirm box-sizing is set to border-box.</li>
+    <li>Compare an input element with 100% width under content-box versus border-box.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    MDN Web Docs: *box-sizing* (developer.mozilla.org/en-US/docs/Web/CSS/box-sizing).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Under box-sizing: border-box, what is the total rendered width of 'width: 300px; padding: 20px; border: 5px solid red;'?",
+    a: ["300px","350px","250px","325px"],
+    c: 0,
+    why: "Under border-box, width: 300px is the final outer width; padding and borders fit inside it."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "content-box (Default)",
+            "lines": [
+                  "width: 300px sets content only",
+                  "+ 40px padding + 10px border = 350px rendered width!"
+            ]
+      },
+      {
+            "title": "border-box (Modern)",
+            "lines": [
+                  "width: 300px sets total border edge",
+                  "content shrinks to 250px; rendered width is strictly 300px"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "*, *::before, *::after {",
+      "    box-sizing: border-box;",
+      "}",
+      "# Every element, button, and card now sizes predictably without math headaches"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "selector": "matches all elements and pseudo-elements"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "rule": "border-box inherited everywhere"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "result": "100% wide elements never overflow container boundaries"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The property controlling element dimension calculation is box-<0>.",
+      "The modern mode where padding is included inside width is <1>-box.",
+      "The default legacy mode where padding expands element size is <2>-box."
+],
+    blanks: [
+      {
+            "a": [
+                  "sizing"
+            ],
+            "why": "box-sizing controls width calculation algorithms."
+      },
+      {
+            "a": [
+                  "border"
+            ],
+            "why": "border-box keeps total width fixed."
+      },
+      {
+            "a": [
+                  "content"
+            ],
+            "why": "content-box adds padding outside declared width."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why is the universal border-box reset recommended on virtually all modern websites?",
+      a: ["It makes element dimensions intuitive by including padding and border within the declared width","It speeds up website download times over cellular networks","It enables dark mode in all web browsers automatically","It compiles CSS into WebAssembly binaries"],
+      c: 0,
+      why: "border-box ensures that width: 100% elements never exceed their parent container width."
+    },
+    {
+      q: "Under default content-box, what happens when you add 20px padding to an element with width: 100%?",
+      a: ["The element becomes 100% plus 40px wide, breaking out of its container and causing horizontal overflow","The browser ignores the padding completely","The element shrinks by 20 pixels","The font size decreases automatically"],
+      c: 0,
+      why: "content-box adds padding outward on top of the 100% width, causing overflow."
+    },
+    {
+      q: "Why does the standard reset include *::before and *::after alongside *?",
+      a: ["To ensure pseudo-elements also inherit border-box sizing consistently","To remove all animations from the website","Because CSS requires all selectors to be at least 15 characters long","To force browsers to reload stylesheets"],
+      c: 0,
+      why: "The universal * selector does not match pseudo-elements in some browser engines."
+    },
+    {
+      q: "Does box-sizing: border-box include margins in the width calculation?",
+      a: ["No, margins remain external spacing outside the border edge","Yes, border-box includes margins, borders, and padding","Only on vertical block elements","Only when using CSS Grid"],
+      c: 0,
+      why: "border-box sets the boundary at the border edge; margins remain outside."
+    }
+  ]);
+</script>
+</body>
+</html>

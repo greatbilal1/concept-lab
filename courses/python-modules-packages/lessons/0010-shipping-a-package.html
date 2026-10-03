@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 10 — Shipping a package</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="python-modules-packages" data-lesson="10" data-lesson-id="shipping-a-package">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 10</span> · Together</span>
+
+  <h1 class="lesson-title">Shipping a package</h1>
+  <p class="lesson-lede">
+    Everything so far has been about importing code that lives on your disk. The
+    last step is making your code installable by someone else — turning a folder
+    into a distribution that <code>pip install</code> understands.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Describe a package properly</span>
+    <span><b>Mission link</b> Code that others can actually use</span>
+  </div>
+
+  <h2><span class="n">1</span>Source tree vs distribution</h2>
+
+  <p>
+    The folder you develop in is the <b>source tree</b>. What pip installs is a
+    <b>distribution</b> — a built artifact, either a <code>.whl</code> (wheel) or a
+    <code>.tar.gz</code> (sdist). They are not the same thing, and the gap between
+    them is what packaging fills.
+  </p>
+
+  <div id="intro1"></div>
+
+  <p>
+    A wheel is a zip of the files that will be placed into
+    <code>site-packages</code>, plus metadata describing the package. An sdist is
+    the raw source, which pip builds into a wheel before installing.
+  </p>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>pyproject.toml: the description</h2>
+
+  <p>
+    Modern Python projects declare themselves in <code>pyproject.toml</code>. It is
+    the single file that says what the package is called, what it needs, and how to
+    build it.
+  </p>
+
+  <pre><code>[project]
+name = "myapp"
+version = "0.1.0"
+dependencies = ["requests>=2.28"]
+
+[project.scripts]
+myapp = "myapp.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"</code></pre>
+
+  <p>
+    Three sections, three jobs. <code>[project]</code> is the metadata,
+    <code>[project.scripts]</code> declares a command-line entry point, and
+    <code>[build-system]</code> names the tool that turns the tree into a
+    distribution.
+  </p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    <code>pyproject.toml</code> is the package's <b>identity card</b>. Everything a
+    tool needs to know about your project is declared here, in one place.
+  </div>
+
+  <h2><span class="n">3</span>The entry point points at main</h2>
+
+  <p>
+    Look again at <code>myapp = "myapp.cli:main"</code>. That line says: when
+    someone runs the <code>myapp</code> command, import <code>myapp.cli</code> and
+    call its <code>main</code> function.
+  </p>
+
+  <div id="trace1"></div>
+
+  <p>
+    This is exactly the <code>main()</code> function from lesson 6. The guard made
+    the file runnable; the entry point makes the function installable as a command.
+    The two ideas meet here.
+  </p>
+
+  <h2><span class="n">4</span>Build, then install</h2>
+
+  <p>
+    With the description in place, building is one command, and the result is a
+    file you can hand to anyone:
+  </p>
+
+  <pre><code>python -m build
+# dist/myapp-0.1.0-py3-none-any.whl
+# dist/myapp-0.1.0.tar.gz
+
+pip install dist/myapp-0.1.0-py3-none-any.whl</code></pre>
+
+  <div id="diagram1"></div>
+
+  <p>
+    The wheel filename encodes the package name, version, Python version and
+    platform. <code>py3-none-any</code> means "any Python 3, no compiled code, any
+    platform" — the common case for pure-Python packages.
+  </p>
+
+  <div class="note good">
+    <span class="note-label">Why this matters later</span>
+    Every library you have ever installed went through this exact pipeline. When
+    you publish your own, the same <code>pip install</code> that fetched
+    <code>requests</code> will fetch yours. That is the last mile of this course:
+    your code, importable by strangers.
+  </div>
+
+  <h2><span class="n">5</span>Check yourself</h2>
+
+  <p>
+    Answer from memory — do not scroll back up. Each option has the same number of
+    words, so nothing gives the answer away.
+  </p>
+
+  <div id="fill1"></div>
+  <div id="quiz"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>
+      You can now describe a package in <code>pyproject.toml</code>, build it into
+      a wheel, and explain how a console command is wired to a function. That is
+      the whole course: a file, a package, an environment, and a distribution.
+    </p>
+  </div>
+
+  <h2><span class="n">6</span>Do this next</h2>
+
+  <ol>
+    <li>
+      Write a minimal <code>pyproject.toml</code> for a package you already have
+      and run <code>python -m build</code>. Inspect the wheel with
+      <code>unzip -l</code>.
+    </li>
+    <li>
+      Add a <code>[project.scripts]</code> entry pointing at a <code>main</code>
+      function, install the wheel, and run the command.
+    </li>
+    <li>
+      Install your own wheel into a fresh environment and import it. You have just
+      shipped a package.
+    </li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Read the Python Packaging Authority's
+    <a href="https://packaging.python.org/en/latest/tutorials/packaging-projects/">packaging tutorial</a>,
+    which walks this exact sequence from empty folder to uploaded distribution.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher (me) anything — "what is PyPI?",
+    "wheel vs sdist, which do I ship?", "how do I version a package?". There are no
+    bad questions here.
+  </div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  /* source tree vs distribution */
+  TeachWidgets.introCards("#intro1", {
+    cards: [
+      { ico: "🌳", title: "Source tree", body: "The folder you edit, with tests and docs." },
+      { ico: "🎡", title: "Wheel (.whl)", body: "A built zip of files plus metadata, ready to install." },
+      { ico: "📦", title: "Sdist (.tar.gz)", body: "The raw source, built into a wheel at install time." }
+    ]
+  });
+
+  /* predict-then-reveal */
+  TeachWidgets.predict("#predict1", {
+    q: "What does `pip install` actually place into site-packages?",
+    a: ["The whole source tree", "The built wheel contents", "A link to your folder"],
+    c: 1,
+    why: "pip installs the built distribution — the wheel's files and metadata — not your development folder."
+  });
+
+  /* step-through trace of an entry point */
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "myapp = \"myapp.cli:main\"",
+      "  -> user runs: myapp",
+      "  -> import myapp.cli",
+      "  -> call main()",
+      "  -> program runs"
+    ],
+    steps: [
+      { line: 0, vars: { declared: "myapp.cli:main" } },
+      { line: 1, vars: { command: "myapp" } },
+      { line: 2, vars: { imported: "myapp.cli" } },
+      { line: 3, vars: { called: "main()" } },
+      { line: 4, vars: { result: "program output" } }
+    ]
+  });
+
+  /* the build pipeline */
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      { title: "Source tree", lines: ["pyproject.toml", "your modules"] },
+      { title: "python -m build", lines: ["reads metadata", "produces artifacts"] },
+      { title: "dist/*.whl", lines: ["pip install", "into site-packages"] }
+    ]
+  });
+
+  /* recall from memory */
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — the packaging pieces",
+    lines: [
+      "The file that declares a project's metadata is <0>",
+      "The built artifact pip installs is called a <1>",
+      "A console command is declared under <code>[project.<2>]</code>."
+    ],
+    blanks: [
+      { a: ["pyproject.toml"], why: "It holds the name, version, dependencies and build backend." },
+      { a: ["wheel", "distribution"], why: "A wheel (.whl) is the built distribution pip installs." },
+      { a: ["scripts"], why: "[project.scripts] maps a command name to a module:function entry point." }
+    ]
+  });
+
+  /* the quiz — every option is exactly three words */
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is a wheel?",
+      a: ["A built distribution file", "A virtual environment folder", "A list of dependencies", "A Python source module"],
+      c: 0,
+      why: "A wheel is a built distribution — a zip of files plus metadata that pip installs."
+    },
+    {
+      q: "What is pyproject.toml for?",
+      a: ["Running the test suite", "Declaring project metadata", "Storing the virtual environment", "Listing installed packages"],
+      c: 1,
+      why: "pyproject.toml declares the package name, version, dependencies and build backend."
+    },
+    {
+      q: "What does an entry point do?",
+      a: ["Builds the wheel file", "Wires a command to code", "Installs the dependencies", "Creates the environment"],
+      c: 1,
+      why: "[project.scripts] maps a command name to a module and function to call."
+    },
+    {
+      q: "What does python -m build do?",
+      a: ["Installs the package locally", "Produces distribution artifacts", "Creates a virtual environment", "Runs the package tests"],
+      c: 1,
+      why: "It reads pyproject.toml and writes a wheel and an sdist into dist/."
+    }
+  ]);
+</script>
+</body>
+</html>

@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 09 — Annotations at runtime</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="python-type-hints" data-lesson="9" data-lesson-id="annotations-at-runtime">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 09</span> · Checking</span>
+
+  <h1 class="lesson-title">Annotations at runtime</h1>
+  <p class="lesson-lede">
+    Annotations are not enforced — but they are not invisible either. They are
+    stored, and frameworks read them to do real work.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~12 min</span>
+    <span><b>Win</b> Read annotations as data</span>
+    <span><b>Mission link</b> Types that drive behaviour</span>
+  </div>
+
+  <h2><span class="n">1</span>They are stored</h2>
+
+  <p>
+    Every annotation ends up in a dictionary on the object:
+  </p>
+
+  <pre><code>def greet(name: str) -> str:
+    return "Hi " + name
+
+greet.__annotations__
+# {'name': &lt;class 'str'&gt;, 'return': &lt;class 'str'&gt;}</code></pre>
+
+  <p>
+    Module-level and class-level annotations land in <code>__annotations__</code>
+    too. That is the whole mechanism frameworks build on.
+  </p>
+
+  <div id="intro1"></div>
+
+  <h2><span class="n">2</span>Forward references</h2>
+
+  <p>
+    A class cannot refer to itself by name inside its own body, because the name does
+    not exist yet. The fix is to write the annotation as a string:
+  </p>
+
+  <pre><code>class Node:
+    def next(self) -> "Node":
+        ...</code></pre>
+
+  <div id="predict1"></div>
+
+  <p>
+    The string is called a <b>forward reference</b>. It is resolved later, when
+    something actually asks for the type.
+  </p>
+
+  <h2><span class="n">3</span>Resolving them</h2>
+
+  <p>
+    <code>get_type_hints()</code> resolves annotations, including forward
+    references, into real objects:
+  </p>
+
+  <div id="diagram1"></div>
+
+  <p>
+    And <code>from __future__ import annotations</code> makes <i>every</i>
+    annotation a lazy string, which sidesteps most forward-reference problems and
+    speeds up imports.
+  </p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Who reads them</h2>
+
+  <p>
+    Dataclasses use them to generate <code>__init__</code>. Pydantic uses them to
+    validate input. FastAPI uses them to build request schemas and documentation.
+    None of that would work if annotations vanished at runtime.
+  </p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Annotations are stored as data in <code>__annotations__</code>. Frameworks read
+    them to generate code, validate input and build docs.
+  </div>
+
+  <h2><span class="n">5</span>Check yourself</h2>
+
+  <p>
+    Answer from memory — do not scroll back up. Each option has the same number of
+    words, so nothing gives the answer away.
+  </p>
+
+  <div id="fill1"></div>
+  <div id="quiz"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>
+      You can read a function's annotations at runtime, explain forward references,
+      and say why frameworks depend on annotations being stored.
+    </p>
+  </div>
+
+  <h2><span class="n">6</span>Do this next</h2>
+
+  <ol>
+    <li>Print <code>__annotations__</code> for one of your functions.</li>
+    <li>Write a self-referencing annotation as a string and resolve it.</li>
+    <li>Add <code>from __future__ import annotations</code> to a module and re-run.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Read the
+    <a href="https://docs.python.org/3/library/typing.html">typing module docs</a>
+    on <code>get_type_hints</code>, and
+    <a href="https://peps.python.org/pep-0563/">PEP 563</a>.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher (me) anything — "does this slow
+    imports?", "what is PEP 649?", "can I validate with annotations myself?". There
+    are no bad questions here.
+  </div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  /* runtime vocabulary */
+  TeachWidgets.introCards("#intro1", {
+    cards: [
+      { ico: "🗃️", title: "__annotations__", body: "The dict holding the types." },
+      { ico: "🔗", title: "Forward ref", body: "A type written as a string." },
+      { ico: "🧠", title: "get_type_hints", body: "Resolves them into real objects." }
+    ]
+  });
+
+  /* predict-then-reveal */
+  TeachWidgets.predict("#predict1", {
+    q: "Why write an annotation as a string?",
+    a: ["To make it faster", "Because the name is undefined", "To disable checking"],
+    c: 1,
+    why: "A forward reference is a string because the name it refers to does not exist yet at that point."
+  });
+
+  /* resolving */
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      { title: "__annotations__", lines: ["raw values", "may be strings"] },
+      { title: "get_type_hints", lines: ["resolves names", "returns real types"] },
+      { title: "Frameworks", lines: ["dataclasses", "pydantic, fastapi"] }
+    ]
+  });
+
+  /* step-through trace */
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "class Node:",
+      "  def next(self) -> \"Node\": ...",
+      "Node.__annotations__",
+      "get_type_hints(Node.next)",
+      "returns the real Node class"
+    ],
+    steps: [
+      { line: 0, vars: { Node: "class" } },
+      { line: 1, vars: { returns: "\"Node\" (string)" } },
+      { line: 2, vars: { value: "string form" } },
+      { line: 3, vars: { action: "resolve names" } },
+      { line: 4, vars: { result: "Node class" } }
+    ]
+  });
+
+  /* recall from memory */
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — runtime",
+    lines: [
+      "Annotations live in <0>",
+      "A string annotation is a <1> reference",
+      "The resolver helper is <2>"
+    ],
+    blanks: [
+      { a: ["__annotations__"], why: "Annotations are stored in the __annotations__ dictionary." },
+      { a: ["forward"], why: "A string annotation is called a forward reference." },
+      { a: ["get_type_hints", "get_type_hints()"], why: "get_type_hints resolves annotations into real objects." }
+    ]
+  });
+
+  /* the quiz — every option is exactly three words */
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Where are annotations stored?",
+      a: ["In the bytecode", "In __annotations__", "In a stub file", "In the docstring"],
+      c: 1,
+      why: "Annotations are stored in the __annotations__ dictionary on the object."
+    },
+    {
+      q: "What is a forward reference?",
+      a: ["A type written later", "A type written as string", "A type from a stub", "A type from a library"],
+      c: 1,
+      why: "A forward reference is an annotation written as a string because the name is not yet defined."
+    },
+    {
+      q: "What resolves forward references?",
+      a: ["The import system", "get_type_hints helper", "The mypy checker", "The dataclass decorator"],
+      c: 1,
+      why: "get_type_hints resolves annotations, including forward references, into real objects."
+    },
+    {
+      q: "What does the future import do?",
+      a: ["Runs code faster", "Makes annotations lazy", "Removes annotations", "Checks types at runtime"],
+      c: 1,
+      why: "`from __future__ import annotations` stores annotations as strings, avoiding most forward-reference problems."
+    }
+  ]);
+</script>
+</body>
+</html>

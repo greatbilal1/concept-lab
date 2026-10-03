@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 04 — The Dependency Inversion Principle (SOLID)</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="backend-architecture" data-lesson="4" data-lesson-id="dependency-inversion-principle-solid">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 04</span> · Hexagonal Architecture & Ports</span>
+
+  <h1 class="lesson-title">The Dependency Inversion Principle (SOLID)</h1>
+  <p class="lesson-lede">
+    High-level modules should not depend on low-level modules; both should depend on abstractions. Master the 'D' in SOLID and the mechanics of inversion.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Invert code dependencies using interfaces and abstract base protocols</span>
+    <span><b>Mission link</b> The object-oriented design principle powering Hexagonal and Clean architectures</span>
+  </div>
+
+  <h2><span class="n">1</span>The 'D' in SOLID</h2>
+  <p>In naive software design, high-level business logic directly imports low-level details: <code>PaymentService</code> imports <code>StripeClient</code>. This creates direct coupling: if Stripe changes their SDK, your core business logic breaks.</p><p>The <b>Dependency Inversion Principle (DIP)</b> inverts this dependency graph using an <b>Abstraction (Interface)</b>: <code>PaymentService</code> defines and depends on a <code>PaymentGateway</code> interface. <code>StripeClient</code> implements that interface. Now, <b>both high-level and low-level modules depend on the abstraction</b>!</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    High-level policy and low-level details both depend on abstractions; abstractions never depend on details.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Direct coupling versus Inverted coupling</h2>
+  <p>Contrast brittle direct coupling with the resilience of inverted dependency contracts.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing dependency inversion in Python</h2>
+  <p>Trace how a Python Protocol interface decouples a service from an SMS provider.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of Dependency Inversion.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can apply the Dependency Inversion Principle to eliminate direct vendor and database coupling from business logic.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Identify a service in your app that directly instantiates a third-party SDK and invert it with an interface.</li>
+    <li>Define an abstract Protocol or Interface for an external payment gateway.</li>
+    <li>Pass a test double implementing the interface into your service during testing.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Robert C. Martin, *The Dependency Inversion Principle* (C++ Report, 1996).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What direction does the source code dependency arrow point in a system with Dependency Inversion?",
+    a: ["From the low-level infrastructure detail toward the high-level domain interface","From the high-level business policy directly into the database driver","Randomly in both directions simultaneously","Dependencies do not exist in object-oriented code"],
+    c: 0,
+    why: "Inversion points the dependency arrow from the detail inward toward the domain interface."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Direct Coupling (Brittle)",
+            "lines": [
+                  "OrderService -> PostgresDatabase",
+                  "high-level depends directly on low-level!"
+            ]
+      },
+      {
+            "title": "Dependency Inversion (Resilient)",
+            "lines": [
+                  "OrderService -> OrderRepository (Interface)",
+                  "PostgresAdapter -> OrderRepository (Interface)",
+                  "both depend on the domain abstraction!"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "from typing import Protocol",
+      "class MessageSender(Protocol):",
+      "    def send_message(self, text: str, recipient: str) -> bool: ...",
+      "# High-level service depends solely on MessageSender protocol:",
+      "class AlertService:",
+      "    def __init__(self, sender: MessageSender): self.sender = sender",
+      "    def alert_admin(self, err): self.sender.send_message(f'Error: {err}', 'admin@co.com')"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "abstraction": "MessageSender protocol defines contract"
+            }
+      },
+      {
+            "line": 5,
+            "vars": {
+                  "constructor": "AlertService receives sender conforming to protocol"
+            }
+      },
+      {
+            "line": 6,
+            "vars": {
+                  "invocation": "invokes protocol method with zero vendor SDK imports"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The 'D' in SOLID stands for Dependency <0>.",
+      "High-level policies and low-level details should both depend on <1>.",
+      "In Python, static structural interfaces are defined using typing.<2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "Inversion"
+            ],
+            "why": "Dependency Inversion inverts coupling direction."
+      },
+      {
+            "a": [
+                  "abstractions",
+                  "interfaces"
+            ],
+            "why": "Abstractions decouple components."
+      },
+      {
+            "a": [
+                  "Protocol"
+            ],
+            "why": "typing.Protocol enables structural duck-typed interfaces."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the primary mandate of the Dependency Inversion Principle?",
+      a: ["High-level modules should not depend on low-level modules; both should depend on abstractions","Every class must inherit from a parent class","Functions must be inverted so the return statement is at the top","Databases must be inverted using reverse indexes"],
+      c: 0,
+      why: "DIP ensures core business policies are decoupled from volatile implementation details."
+    },
+    {
+      q: "What is the difference between Dependency Inversion (DIP) and Dependency Injection (DI)?",
+      a: ["DIP is the architectural principle (rely on abstractions); DI is the implementation technique (passing dependencies in from outside)","DIP is for Python; DI is for Java","DI is an architecture; DIP is a compiler flag","There is no difference between them"],
+      c: 0,
+      why: "DIP is the goal (inverted relationships); DI is the mechanism to supply those dependencies."
+    },
+    {
+      q: "Why shouldn't domain abstractions depend on implementation details?",
+      a: ["Because domain rules are stable business policies, while implementation details (libraries, vendors) change frequently","Because abstractions are written in machine code","Because details cannot be stored in computer memory","It violates open-source software licenses"],
+      c: 0,
+      why: "Stable business rules should dictate terms to volatile external tools, never vice-versa."
+    },
+    {
+      q: "What happens if a third-party API changes its SDK methods in a system that follows Dependency Inversion?",
+      a: ["Only the single outer Adapter class that wraps the vendor SDK needs updating; core business services are 100% unaffected","The entire backend codebase must be rewritten from scratch","The database table schemas must be dropped","The computer operating system must be reinstalled"],
+      c: 0,
+      why: "The adapter absorbs the vendor change, shielding the core domain from ripple effects."
+    }
+  ]);
+</script>
+</body>
+</html>

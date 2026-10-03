@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python Modules & Packages — Cheat Sheet</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+<style>
+  .ref-toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0 8px; }
+  .ref-toc a { font-size: .8rem; border: 1px solid var(--border); background: #111a30; padding: 5px 11px; border-radius: 999px; color: var(--muted); text-decoration: none; border-bottom: 1px solid var(--border); }
+  .ref-toc a:hover { color: #fff; border-color: #3d5488; }
+  .lesson-wrap h2 { scroll-margin-top: 20px; }
+  .snippet { margin: 14px 0 22px; }
+  .snippet .lbl { font-size: .72rem; font-weight: 800; letter-spacing: .7px; text-transform: uppercase; color: var(--accent2); margin-bottom: 6px; }
+  .see { font-size: .82rem; color: var(--muted); margin: -6px 0 12px; }
+  .see a { color: var(--accent2); border-bottom: 0; }
+  .see a:hover { color: #fff; }
+  .snippet pre { padding-top: 34px; }
+  @media print { .snippet pre { padding-top: 18px; } }
+</style>
+</head>
+<body class="lesson-body" data-course="python-modules-packages">
+
+<div class="lesson-wrap">
+
+  <span class="lesson-kicker">Reference · Cheat sheet</span>
+  <h1 class="lesson-title">Python Modules & Packages — Cheat Sheet</h1>
+  <p class="lesson-lede">
+    The whole course on one page. Every snippet links back to the lesson that
+    teaches it.
+  </p>
+
+  <div class="ref-toc">
+    <a href="#imports">Imports</a>
+    <a href="#packages">Packages</a>
+    <a href="#environments">Environments</a>
+    <a href="#together">Together</a>
+  </div>
+
+  <h2 id="imports"><span class="n">1</span>Imports</h2>
+
+  <div class="snippet">
+    <div class="lbl">A module is a file</div>
+    <pre><code># helpers.py  ->  importable as "helpers"
+def clean(rows):
+    return [r for r in rows if r]
+
+# main.py
+import helpers
+helpers.clean(rows)</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0001-module-is-a-file.html">Lesson 01 — A module is just a file</a>.</p>
+
+  <div class="snippet">
+    <div class="lbl">Three ways to import</div>
+    <pre><code>import helpers                 # module.attr
+from helpers import clean      # clean()
+from helpers import clean as c # c()</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0002-three-ways-to-import.html">Lesson 02 — Three ways to import</a>.</p>
+
+  <div class="snippet">
+    <div class="lbl">Where Python looks</div>
+    <pre><code>import sys
+print(sys.path)      # search order, script dir first
+print(sys.modules)   # cache of already-imported modules</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0003-the-import-search-path.html">Lesson 03 — Where Python looks for modules</a>.</p>
+
+  <h2 id="packages"><span class="n">2</span>Packages</h2>
+
+  <div class="snippet">
+    <div class="lbl">A package is a folder</div>
+    <pre><code>myapp/
+  __init__.py      # marks the folder as a package
+  models.py
+  utils.py
+
+import myapp.models</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0004-packages-and-init.html">Lesson 04 — Packages and __init__.py</a>.</p>
+
+  <div class="snippet">
+    <div class="lbl">Absolute vs relative</div>
+    <pre><code>from myapp import utils     # absolute — preferred
+from . import utils         # relative — same package
+from ..core import base     # relative — parent package</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0005-relative-and-absolute-imports.html">Lesson 05 — Relative vs absolute imports</a>.</p>
+
+  <div class="snippet">
+    <div class="lbl">The __main__ guard</div>
+    <pre><code>def main():
+    ...
+
+if __name__ == "__main__":   # only when run, not imported
+    main()</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0006-the-main-guard.html">Lesson 06 — The __main__ guard</a>.</p>
+
+  <h2 id="environments"><span class="n">3</span>Environments</h2>
+
+  <div class="snippet">
+    <div class="lbl">Create, activate, verify</div>
+    <pre><code>python -m venv .venv
+source .venv/bin/activate     # macOS / Linux
+# .venv\Scripts\activate      # Windows
+which python                  # must point inside .venv</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0007-virtual-environments.html">Lesson 07 — Virtual environments</a>.</p>
+
+  <div class="snippet">
+    <div class="lbl">Pin and rebuild</div>
+    <pre><code>pip install requests pandas
+pip freeze &gt; requirements.txt
+pip install -r requirements.txt
+
+# specifiers
+requests==2.32.3      # exact
+pandas&gt;=2.0,&lt;3.0     # range
+pytest                # any</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0008-installing-and-pinning.html">Lesson 08 — Installing and pinning dependencies</a>.</p>
+
+  <h2 id="together"><span class="n">4</span>Together</h2>
+
+  <div class="snippet">
+    <div class="lbl">The three traps</div>
+    <pre><code># 1. circular import  -> extract a third module
+# 2. shadowing        -> never name a file json.py
+# 3. star import      -> name the module instead
+from helpers import *   # don't</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0009-import-traps.html">Lesson 09 — Import traps</a>.</p>
+
+  <div class="snippet">
+    <div class="lbl">Ship a package</div>
+    <pre><code># pyproject.toml
+[project]
+name = "myapp"
+version = "0.1.0"
+dependencies = ["requests&gt;=2.28"]
+
+[project.scripts]
+myapp = "myapp.cli:main"
+
+# build
+python -m build
+pip install dist/myapp-0.1.0-py3-none-any.whl</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0010-shipping-a-package.html">Lesson 10 — Shipping a package</a>.</p>
+
+  <div class="lesson-foot">
+    <div class="links">
+      <a href="python-modules-packages-glossary.html">📖 Glossary</a>
+      <a href="../lessons/0001-module-is-a-file.html">Lesson 01</a>
+      <a href="../lessons/0010-shipping-a-package.html">Lesson 10</a>
+      <a href="../course.html">← Course map</a>
+      <a href="../../../index.html">All courses</a>
+    </div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script>
+  TeachLesson.init({ course: "python-modules-packages", lessons: window.TeachLessons || [] });
+</script>
+</body>
+</html>

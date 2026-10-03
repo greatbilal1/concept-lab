@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 06 — Evaluation Metrics: Accuracy, Precision, Recall, F1</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="machine-learning" data-lesson="6" data-lesson-id="evaluation-metrics-precision-recall-f1">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 06</span> · Metrics</span>
+
+  <h1 class="lesson-title">Evaluation Metrics: Accuracy, Precision, Recall, F1</h1>
+  <p class="lesson-lede">
+    Evaluating models beyond raw accuracy: Confusion Matrix, Precision, Recall, and the F1 Score for imbalanced datasets.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to evaluate machine learning models using precision, recall, and F1 scores.</span>
+    <span><b>Mission link</b> Mastering evaluation metrics: accuracy, precision, recall, f1 across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Evaluation Metrics: Accuracy, Precision, Recall, F1</h2>
+  <p>If a student scores 95% on an exam, they did well. But in machine learning, <strong>raw accuracy is often a dangerous lie</strong>. Consider a medical disease detection model where only 1 in 1,000 patients has the disease (0.1% prevalence).</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Evaluating models beyond raw accuracy: Confusion Matrix, Precision, Recall, and the F1 Score for imbalanced datasets.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Confusion Matrix</h2>
+  <p>A dumb model that always outputs <code>'Healthy'</code> without even looking at the patient achieves <strong>99.9% accuracy</strong>! Yet it has failed completely at its job: every sick patient goes untreated.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Precision vs Recall Dilemma</h2>
+  <p>To measure real performance on imbalanced data, we construct a <strong>Confusion Matrix</strong>:</p><ul><li><strong>True Positives (TP):</strong> Sick patients correctly identified as sick.</li><li><strong>False Positives (FP):</strong> Healthy patients mistakenly flagged as sick (Type I Error).</li><li><strong>False Negatives (FN):</strong> Sick patients mistakenly told they are healthy (Type II Error - Deadly!).</li><li><strong>True Negatives (TN):</strong> Healthy patients correctly identified as healthy.</li></ul><pre><code># The Real Metrics:
+# Precision: When model predicts Positive, how often is it right?
+# Precision = TP / (TP + FP)  (High precision = few false alarms)
+
+# Recall (Sensitivity): What % of all real Positives did we catch?
+# Recall = TP / (TP + FN)     (High recall = few missed cases!)
+
+# F1-Score: The Harmonic Mean of Precision and Recall:
+# F1 = 2 * (Precision * Recall) / (Precision + Recall)</code></pre><div class="callout"><p><strong>The Trade-off:</strong> In cancer detection, maximize <strong>Recall</strong> (never miss a sick patient). In spam filtering, prioritize <strong>Precision</strong> (never send an important invoice to spam).</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the evaluation metrics sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to evaluate machine learning models using precision, recall, and F1 scores.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where evaluation metrics: accuracy, precision, recall, f1 applies.</li>
+    <li>Author a unit test or verification script exercising evaluation metrics: accuracy, precision, recall, f1.</li>
+    <li>Document team architectural conventions regarding evaluation metrics: accuracy, precision, recall, f1.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Evaluation Metrics: Accuracy, Precision, Recall, F1.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Why is 'Accuracy' a dangerously misleading metric when evaluating fraud detection models where only 0.1% of transactions are fraudulent?",
+    a: ["A dummy model that blindly predicts 'Not Fraud' 100% of the time achieves 99.9% accuracy while catching zero fraud","Accuracy requires floating point math","Accuracy is forbidden in banking","Accuracy only works on images"],
+    c: 0,
+    why: "On highly imbalanced datasets, naive accuracy rewards predicting the majority class unconditionally."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Predicted Positive",
+            "lines": [
+                  "Actual Positive: True Positive (TP)",
+                  "Actual Negative: False Positive (FP) (False Alarm)"
+            ]
+      },
+      {
+            "title": "Predicted Negative",
+            "lines": [
+                  "Actual Positive: False Negative (FN) (Missed!)",
+                  "Actual Negative: True Negative (TN)"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Evaluation Metrics: Accuracy, Precision, Recall, F1",
+      "def execute_flow():",
+      "    # Evaluating models beyond raw accuracy: Confusion M...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Evaluation Metrics: Accuracy, Precision, Recall, F1"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "High Precision Priority"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "High Recall Priority"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "While {1} measures the fraction of real positives detected, {2} measures how many predicted positives were actually correct."
+],
+    blanks: [
+      {
+            "a": [
+                  "recall"
+            ],
+            "why": "Proportion of all true cases found (TP / (TP + FN))"
+      },
+      {
+            "a": [
+                  "precision"
+            ],
+            "why": "Accuracy of positive calls (TP / (TP + FP))"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the F1-Score in machine learning evaluation?",
+      a: ["The harmonic mean of precision and recall, balancing false alarms against missed detections in a single metric","The score of a Formula 1 racing car","The training speed of a neural network","The percentage of correct predictions overall"],
+      c: 0,
+      why: "The harmonic mean penalizes extreme imbalances between precision and recall."
+    },
+    {
+      q: "In airport security luggage screening, which metric should be prioritized?",
+      a: ["Recall: it is critical to catch 100% of weapons (low false negatives), even if some harmless bags are inspected manually","Precision: avoid inspecting harmless bags at all costs","Speed over accuracy","Minimizing battery consumption"],
+      c: 0,
+      why: "High recall ensures threats are not missed; false alarms are resolved by manual inspection."
+    },
+    {
+      q: "What does a False Positive represent in an automated copyright detection system?",
+      a: ["Original, legal content that was mistakenly flagged and blocked as copyright infringement","Infringing content that went undetected","A broken video file","A user logging out"],
+      c: 0,
+      why: "False Positives are false alarms: legitimate content incorrectly flagged as infringing."
+    },
+    {
+      q: "Why is the harmonic mean used for F1 instead of the simple arithmetic average?",
+      a: ["The harmonic mean heavily penalizes models where either precision or recall is close to zero, preventing misleading averages","Harmonic means run faster on the CPU","Arithmetic averages are illegal in statistics","Harmonic means convert text to numbers"],
+      c: 0,
+      why: "If a model has 0% recall and 100% precision, arithmetic mean is 50%, but harmonic F1 is 0%."
+    }
+  ]);
+</script>
+</body>
+</html>

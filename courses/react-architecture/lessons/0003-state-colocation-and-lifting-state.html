@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 03 — State co-location and lifting state</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="react-architecture" data-lesson="3" data-lesson-id="state-colocation-and-lifting-state">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 03</span> · State & The Render Cycle</span>
+
+  <h1 class="lesson-title">State co-location and lifting state</h1>
+  <p class="lesson-lede">
+    Where should state live? Master Kent C. Dodds' state co-location principle: keep state as close as possible to where it is used, and lift state only when shared.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Co-locate state at the lowest common ancestor in the component tree</span>
+    <span><b>Mission link</b> Prevents unnecessary top-level re-renders and bloated global state stores</span>
+  </div>
+
+  <h2><span class="n">1</span>The global state mistake</h2>
+  <p>A common beginner mistake is putting all state into a global store (Redux, Context, or top-level App). When a user types a single character into a search input, the entire <code>App</code> and its 50 child components re-render!</p><p>The golden rule of state architecture is <b>State Co-location</b>: <i>Keep state as close as possible to the component that actually renders or consumes it.</i> If only a modal dialog cares whether it is open, that state belongs inside the modal, not in global state. If two siblings need to share data, <b>lift state up only to their lowest common ancestor</b>.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Keep state as local as possible; lift state only to the lowest common ancestor that shares it.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>State placement decision tree</h2>
+  <p>How to decide where a state variable belongs in the component tree.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing state lifting</h2>
+  <p>Trace how lifting search state from an input to its parent enables a sibling list to filter items.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of state co-location.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can structure state cleanly across component trees, preventing bloated global stores and performance-draining re-renders.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit an existing component and move an unnecessarily lifted state variable back down into a child.</li>
+    <li>Refactor two sibling components to share state through their lowest common parent.</li>
+    <li>Explain why placing text input state in top-level App causes typing lag on large pages.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Kent C. Dodds: *State Colocation will make your React app faster* (kentcdodds.com).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "If Component A and Component B both need access to a shared 'selectedTab' state, where should that state live?",
+    a: ["In their lowest common parent ancestor component that renders both A and B","In global window storage","Duplicated separately in both Component A and Component B","Inside the database"],
+    c: 0,
+    why: "Lifting state to the lowest common ancestor allows both siblings to receive the state via props."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Used by 1 Component?",
+            "lines": [
+                  "Co-locate state locally!",
+                  "useState inside that single component"
+            ]
+      },
+      {
+            "title": "Shared by 2 Siblings?",
+            "lines": [
+                  "Lift state to Common Parent",
+                  "pass down as props & callbacks"
+            ]
+      },
+      {
+            "title": "Used by Entire App (Theme, Auth)?",
+            "lines": [
+                  "Use Context API at Root",
+                  "isolated dependency injection"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Parent: SearchPage",
+      "const [query, setQuery] = useState('');",
+      "# Sibling 1 (Input): <SearchInput value={query} onChange={setQuery} />",
+      "# Sibling 2 (List):  <ResultsList filterQuery={query} />",
+      "# Both siblings receive synchronized data from lowest common parent!"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "lifted_state": "query state co-located at lowest common ancestor (SearchPage)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "child_1": "SearchInput updates query via callback"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "child_2": "ResultsList receives fresh query as a prop and filters results"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Placing state as close as possible to where it is used is state <0>.",
+      "Moving state up to a shared parent component is <1> state up.",
+      "State shared by siblings lives in their lowest common <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "colocation",
+                  "co-location"
+            ],
+            "why": "State co-location keeps state local."
+      },
+      {
+            "a": [
+                  "lifting"
+            ],
+            "why": "Lifting state up shares data with siblings."
+      },
+      {
+            "a": [
+                  "ancestor",
+                  "parent"
+            ],
+            "why": "Lowest common ancestor is the optimal parent."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is 'State Co-location' in React architecture?",
+      a: ["The practice of keeping state as close as possible to the component that actually renders or consumes it","Storing state in database servers located in the same geographic city","Co-locating HTML and CSS in the same file","Running state on mobile phones"],
+      c: 0,
+      why: "Localizing state keeps components modular and prevents unnecessary re-rendering across unrelated trees."
+    },
+    {
+      q: "What happens when a top-level parent component re-renders due to a state update?",
+      a: ["By default, all of its child components down the entire tree will also re-render recursively","Only the parent re-renders; children are never re-rendered","The browser reloads the entire page from disk","The computer CPU turns off"],
+      c: 0,
+      why: "React re-renders entire child subtrees recursively when a parent state updates (unless memoized)."
+    },
+    {
+      q: "When is it appropriate to lift state up?",
+      a: ["When two or more sibling components need access to the exact same live state or need to coordinate changes","Whenever you create a new component","Only when using Redux","When a component has more than five lines of code"],
+      c: 0,
+      why: "Lifting state to the common parent allows sharing data across siblings via props."
+    },
+    {
+      q: "Why shouldn't modal open/close state be stored in a global Redux store for typical dialogs?",
+      a: ["It bloats global state and causes unnecessary top-level re-renders for a concern that is local to one screen feature","Redux forbids boolean values","Modals cannot read Redux state","It causes security vulnerabilities"],
+      c: 0,
+      why: "Ephemeral UI state belongs in local components, not global application-level stores."
+    }
+  ]);
+</script>
+</body>
+</html>

@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 07 — The Singleton pattern and why it is mostly an antipattern</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="design-patterns" data-lesson="7" data-lesson-id="the-singleton-pattern-and-why-it-is-mostly-an-antipattern">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 07</span> · Pattern Overuse & Real-World Craft</span>
+
+  <h1 class="lesson-title">The Singleton pattern and why it is mostly an antipattern</h1>
+  <p class="lesson-lede">
+    The most famous pattern is also the most abused. Discover the Singleton pattern, why it acts as a glorified global variable that breaks unit testing, and how to use it safely.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Evaluate Singleton trade-offs and replace global singletons with dependency injection</span>
+    <span><b>Mission link</b> Teaches critical evaluation of design patterns rather than dogmatic adoption</span>
+  </div>
+
+  <h2><span class="n">1</span>The dark side of the Singleton</h2>
+  <p>The <b>Singleton Pattern</b> ensures that a class has only one instance and provides a global access point to it: <code>Database.getInstance()</code>. It is the easiest pattern to understand, which is why beginners use it everywhere.</p><p>However, modern software engineering classifies Singleton as an <b>antipattern</b> in most cases. Why? <b>Because it is a glorified global variable!</b> It introduces hidden dependencies, creates tight coupling, and destroys automated unit testing: state leaks across tests, making tests order-dependent and flaky.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Singletons introduce hidden global state that breaks test isolation and tight-couples classes.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Singleton versus Dependency Injection</h2>
+  <p>Contrast the hidden coupling of global Singletons with the testable isolation of DI singletons.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing the thread-safe Double-Checked Locking trap</h2>
+  <p>Trace the historic complexity of implementing a thread-safe singleton in multi-threaded runtimes.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of Singleton trade-offs.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can evaluate when a singleton is truly necessary and refactor global singletons into testable, injected services.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit a global Singleton in your project and refactor it into an injected collaborator.</li>
+    <li>Demonstrate how two unit tests corrupt each other when sharing a mutable global singleton.</li>
+    <li>Explain the difference between a Singleton class and a Singleton lifetime in a DI container.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Miško Hevery: *Singletons are Pathological Liars* (Google Testing Blog, 2008).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Why do singletons cause automated unit tests to fail intermittently when tests run in random order?",
+    a: ["State modified by Test A lingers in the global singleton instance, polluting the environment for Test B","Unit test runners forbid the word Singleton","Singletons use too much hard drive space","Singletons cannot run in test environments"],
+    c: 0,
+    why: "Global mutable state persists across test executions, causing order-dependent test pollution."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Global Singleton (Antipattern)",
+            "lines": [
+                  "class UserService {",
+                  "  db = Database.getInstance()",
+                  "hidden coupling, global state, untestable!"
+            ]
+      },
+      {
+            "title": "DI Managed Singleton (Clean)",
+            "lines": [
+                  "class UserService(db) { ... }",
+                  "Container manages single instance lifetime",
+                  "pass MockDatabase() in tests effortlessly!"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Thread-safe Singleton requires complex locks:",
+      "class DatabaseSingleton:",
+      "    _instance = None; _lock = Lock()",
+      "    @classmethod",
+      "    def get_instance(cls):",
+      "        if not cls._instance: # First check without lock",
+      "            with cls._lock:   # Acquire lock",
+      "                if not cls._instance: cls._instance = cls() # Double check!",
+      "        return cls._instance"
+],
+    steps: [
+      {
+            "line": 2,
+            "vars": {
+                  "lock": "threading.Lock required to prevent race conditions"
+            }
+      },
+      {
+            "line": 5,
+            "vars": {
+                  "check_1": "avoids locking on repeat calls"
+            }
+      },
+      {
+            "line": 6,
+            "vars": {
+                  "double_check": "double-checked locking prevents duplicate instantiation"
+            }
+      },
+      {
+            "line": 8,
+            "vars": {
+                  "complexity": "massive boilerplate compared to simple dependency injection!"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The pattern ensuring a class has only one global instance is the <0> pattern.",
+      "Singletons harm unit testing because they introduce global mutable <1>.",
+      "Instead of a class enforcing its own singleton, let a <2> container manage its lifetime."
+],
+    blanks: [
+      {
+            "a": [
+                  "Singleton"
+            ],
+            "why": "Singleton restricts instantiation to one instance."
+      },
+      {
+            "a": [
+                  "state"
+            ],
+            "why": "Global mutable state breaks test isolation."
+      },
+      {
+            "a": [
+                  "DI",
+                  "dependency injection"
+            ],
+            "why": "Containers manage singletons without global access."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why did Google's testing expert Miško Hevery call Singletons 'Pathological Liars'?",
+      a: ["Constructors of classes using singletons hide their true dependencies, claiming to take zero arguments while secretly depending on global state","Singletons delete source code files","Singletons tell lies to the compiler","Singletons are not supported in Google Cloud"],
+      c: 0,
+      why: "Classes using singletons hide their collaborators, making dependencies invisible to callers."
+    },
+    {
+      q: "What is the difference between the Singleton pattern and a Singleton lifetime in a DI container?",
+      a: ["The pattern enforces global access via a static method (tight coupling); a DI container manages instance lifetime while keeping classes decoupled","They are completely identical","The pattern is for Java; DI lifetime is for Python","DI lifetime runs in the browser"],
+      c: 0,
+      why: "DI singletons keep classes testable: classes accept dependencies via constructor without knowing they are singletons."
+    },
+    {
+      q: "When is a Singleton pattern actually legitimate and acceptable?",
+      a: ["When representing a truly unique hardware device (like a printer spooler) or an immutable read-only logging facility with zero state mutation","For storing user shopping cart data","For every single service in the application","Never under any circumstances"],
+      c: 0,
+      why: "Immutable resources or true hardware singletons are legitimate candidates for single instances."
+    },
+    {
+      q: "What is the 'Null Object' pattern?",
+      a: ["A design pattern that provides a do-nothing object instead of null, eliminating tedious 'if (obj !== null)' checks","An error that happens when memory is full","A database primary key set to null","A technique to delete objects from memory"],
+      c: 0,
+      why: "Null Objects implement the interface with neutral/empty behavior, preventing NullPointerExceptions."
+    }
+  ]);
+</script>
+</body>
+</html>

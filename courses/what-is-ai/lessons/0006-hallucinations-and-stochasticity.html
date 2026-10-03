@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 06 — Hallucinations and Stochasticity Explained</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="what-is-ai" data-lesson="6" data-lesson-id="hallucinations-and-stochasticity">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 06</span> · Hallucinations</span>
+
+  <h1 class="lesson-title">Hallucinations and Stochasticity Explained</h1>
+  <p class="lesson-lede">
+    Why hallucinations are an inevitable feature of probabilistic language models, and how to minimize them.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You understand the statistical causes of hallucination and how to ground models in reality.</span>
+    <span><b>Mission link</b> Mastering hallucinations and stochasticity explained across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Hallucinations and Stochasticity Explained</h2>
+  <p>Many people assume <strong>hallucination</strong> is a temporary bug that will be fixed in the next model release. In reality, hallucination is an intrinsic property of autoregressive language models: <em>models do not look up facts; they sample probable continuations.</em></p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Why hallucinations are an inevitable feature of probabilistic language models, and how to minimize them.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Generation Mechanics</h2>
+  <p>Consider the prompt: <em>'The capital of France is...'</em> The model predicts <code>Paris</code> with 99.8% probability. It isn't 'checking an encyclopedia'; the token sequence 'The capital of France is Paris' appeared thousands of times in its training corpus.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Grounding Architecture</h2>
+  <p>When you ask a niche question where the training data is sparse (e.g. <em>'What did the court rule in Johnson v. Miller (2018)?'</em>), the model doesn't stop and say 'I don't know'. It continues sampling plausible-sounding legal text: citing real-sounding judges, statutes, and case numbers that never existed!</p><pre><code># The Hallucination Mechanism:
+Prompt: "What is the return type of boto3.s3.create_vault()?"
+Training data: create_vault does not exist in S3 (it's Glacier!).
+Model generation: It synthesizes a plausible dictionary response:
+{
+  "VaultArn": "arn:aws:s3:::...",  # COMPLETE HALLUCINATION!
+  "CreationDate": "2026-03-31"
+}</code></pre><p>To defeat hallucinations in production, you must <strong>Ground the Model</strong>:</p><ul><li><strong>Retrieval-Augmented Generation (RAG):</strong> Provide the authoritative reference text directly inside the prompt.</li><li><strong>Tool Verification:</strong> Let the model run code or query an API to verify its claims against reality.</li><li><strong>Temperature Zero:</strong> Minimize stochastic sampling variance.</li></ul><div class="callout"><p><strong>The Grounding Law:</strong> An ungrounded model is an imaginative poet. A grounded model with RAG and tools is a reliable assistant.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the hallucination sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You understand the statistical causes of hallucination and how to ground models in reality.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where hallucinations and stochasticity explained applies.</li>
+    <li>Author a unit test or verification script exercising hallucinations and stochasticity explained.</li>
+    <li>Document team architectural conventions regarding hallucinations and stochasticity explained.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Hallucinations and Stochasticity Explained.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Why do Large Language Models hallucinate false facts, nonexistent citations, or fake APIs?",
+    a: ["Models are trained to predict linguistically coherent text, not verify factual truth against an external database","Models are infected by computer viruses","The model's database crashed","Engineers deliberately program models to lie"],
+    c: 0,
+    why: "Language models optimize for plausible token continuation, not ontological truth."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "High Corpus Frequency",
+            "lines": [
+                  "'Capital of France is...'",
+                  "Paris = 99.8% probability",
+                  "Consistently accurate"
+            ]
+      },
+      {
+            "title": "Low Corpus Frequency",
+            "lines": [
+                  "Niche API or legal case",
+                  "Model samples plausible tokens",
+                  "Confidently invents fake facts!"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Hallucinations and Stochasticity Explained",
+      "def execute_flow():",
+      "    # Why hallucinations are an inevitable feature of pr...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Hallucinations and Stochasticity Explained"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Ungrounded Generation"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Grounded with RAG & Tools"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Hallucinations occur because language models optimize for plausible {1} sequences rather than retrieving verified {2}."
+],
+    blanks: [
+      {
+            "a": [
+                  "token"
+            ],
+            "why": "Text fragments and words"
+      },
+      {
+            "a": [
+                  "facts"
+            ],
+            "why": "Empirical truths in a database"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the primary difference between a web search engine and a language model?",
+      a: ["A search engine indexes and retrieves exact existing web documents; an LLM synthesizes new text token by token from statistical parameters","A search engine uses neural networks while an LLM uses SQL","Search engines are illegal in schools","LLMs run without internet"],
+      c: 0,
+      why: "Search engines retrieve existing source documents; LLMs generate new sequences statistically."
+    },
+    {
+      q: "How does Retrieval-Augmented Generation (RAG) dramatically reduce hallucinations?",
+      a: ["It injects verified, authoritative source documents directly into the prompt context for the model to cite","It deletes the model weights","It changes the model from Python to C","It makes the model run 10x faster"],
+      c: 0,
+      why: "RAG anchors model generation to real retrieved facts rather than ungrounded memory."
+    },
+    {
+      q: "What is 'stochasticity' in generative AI?",
+      a: ["Randomness and non-determinism in token sampling that produces different responses to identical prompts","A disease affecting computer memory","A type of database index","A security encryption cipher"],
+      c: 0,
+      why: "Stochasticity refers to probabilistic randomness in sampling outputs from a distribution."
+    },
+    {
+      q: "Why does setting temperature=0 reduce hallucinations on factual tasks?",
+      a: ["It forces the model to pick the single most probable token at every step (greedy decoding), eliminating random tail exploration","It turns off the neural network","It cools the computer processor","It removes all punctuation"],
+      c: 0,
+      why: "Greedy decoding always selects the highest-probability token, reducing erratic completions."
+    }
+  ]);
+</script>
+</body>
+</html>

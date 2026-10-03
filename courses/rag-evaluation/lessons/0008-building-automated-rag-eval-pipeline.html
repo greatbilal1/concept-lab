@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 08 — Building an Automated RAG Evaluation Pipeline</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="rag-evaluation" data-lesson="8" data-lesson-id="building-automated-rag-eval-pipeline">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 08</span> · Continuous RAG Evals</span>
+
+  <h1 class="lesson-title">Building an Automated RAG Evaluation Pipeline</h1>
+  <p class="lesson-lede">
+    Synthesizing RAG evaluation: building a production-grade CI/CD pipeline evaluating Context Recall, Faithfulness, and Answer Relevance.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You have completed the RAG Evaluation course.</span>
+    <span><b>Mission link</b> Mastering building an automated rag evaluation pipeline across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Building an Automated RAG Evaluation Pipeline</h2>
+  <p>We have explored the complete science of RAG Evaluation: the RAG Triad, Context Recall and Precision, Faithfulness, Ragas and TruLens frameworks, synthetic test generation, root cause triage, and benchmark experiment matrices.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Synthesizing RAG evaluation: building a production-grade CI/CD pipeline evaluating Context Recall, Faithfulness, and Answer Relevance.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Continuous RAG CI/CD Pipeline</h2>
+  <p>Now, we synthesize these into a <strong>Continuous Production RAG Evaluation Pipeline</strong>:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>From Hope to Mathematical Certainty</h2>
+  <ul><li><strong>1. Versioned Golden Dataset:</strong> A benchmark set of 100 diverse questions, contexts, and ground truths in `evals/rag_golden.jsonl`.</li><li><strong>2. Automated Test Runner:</strong> A Python script that queries the active RAG service, collects generated answers, and computes Ragas metrics.</li><li><strong>3. Multi-Metric Gate in CI:</strong> Evaluates three non-negotiable gates:<ul><li><em>Gate 1: Context Recall $\ge 0.90$</em> (Did retrieval find the facts?).</li><li><em>Gate 2: Faithfulness $\ge 0.95$</em> (Did the model avoid hallucinating?).</li><li><em>Gate 3: Answer Relevance $\ge 0.85$</em> (Did the model answer the question?).</li></ul></li><li><strong>4. Automated Report & Block:</strong> If any metric drops below threshold, CI exits with code `1`, blocking deployment and posting a diagnostic breakdown to GitHub!</li></ul><pre><code># Automated RAG CI Verification Script (verify_rag.py):
+async def verify_rag_pipeline():
+    results = await run_ragas_evaluation(dataset="evals/rag_golden.jsonl")
+    df = results.to_pandas()
+    
+    recall = df["context_recall"].mean()
+    faithfulness = df["faithfulness"].mean()
+    
+    print(f"Context Recall: {recall:.2f} | Faithfulness: {faithfulness:.2f}")
+    
+    if recall < 0.90 or faithfulness < 0.95:
+        print("CI GATE FAILED: RAG accuracy threshold breached!")
+        sys.exit(1) # Blocks merge in GitHub Actions!
+    print("CI GATE PASSED: Production release verified safe!")
+    sys.exit(0)</code></pre><div class="callout"><p><strong>The Final Engineering Victory:</strong> You have built an automated, self-defending RAG pipeline. You can refactor embeddings, tune chunking, and modify prompts with absolute mathematical confidence.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the continuous RAG evals sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You have completed the RAG Evaluation course.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where building an automated rag evaluation pipeline applies.</li>
+    <li>Author a unit test or verification script exercising building an automated rag evaluation pipeline.</li>
+    <li>Document team architectural conventions regarding building an automated rag evaluation pipeline.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Building an Automated RAG Evaluation Pipeline.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What automated quality gate should an engineering team enforce in CI before deploying a RAG pipeline update?",
+    a: ["Context Recall must exceed 90% and Faithfulness must exceed 95% across the golden benchmark suite","The code must be written in Latin","The prompt must contain 100 adjectives","The database must be restarted"],
+    c: 0,
+    why: "Enforcing hard quantitative thresholds on Recall (>=90%) and Faithfulness (>=95%) prevents production regressions."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1. Code / Prompt PR",
+            "lines": [
+                  "Developer updates chunking or prompt",
+                  "Triggers GitHub Actions CI runner"
+            ]
+      },
+      {
+            "title": "2. Ragas Evaluation",
+            "lines": [
+                  "Runs 100 golden cases against RAG",
+                  "Computes Recall, Faithfulness, Relevance"
+            ]
+      },
+      {
+            "title": "3. The Quality Gates",
+            "lines": [
+                  "Recall >= 0.90 AND Faithfulness >= 0.95",
+                  "Passes -> Deploy to production! Fail -> Block PR"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Building an Automated RAG Evaluation Pipeline",
+      "def execute_flow():",
+      "    # Synthesizing RAG evaluation: building a production...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Building an Automated RAG Evaluation Pipeline"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Amateur RAG"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Engineered RAG"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "An automated RAG evaluation pipeline enforces quantitative CI gates on context {1} and generation {2} to guarantee production quality."
+],
+    blanks: [
+      {
+            "a": [
+                  "recall"
+            ],
+            "why": "Retrieval completeness metric"
+      },
+      {
+            "a": [
+                  "faithfulness"
+            ],
+            "why": "Groundedness and zero-hallucination metric"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What exit code does the RAG verification script return when Faithfulness drops below the 0.95 threshold?",
+      a: ["Exit code 1, which fails the GitHub Actions workflow and blocks the pull request from merging","Exit code 0","Exit code 200","Exit code 404"],
+      c: 0,
+      why: "Non-zero exit codes signal failure to CI environments, preventing broken code from deploying."
+    },
+    {
+      q: "Why is running the RAG evaluation suite against a staging vector database recommended before production release?",
+      a: ["It tests real database query latency, real embedding generation, and real network connections in an isolated staging environment","It makes the database free","It turns off logging","It compiles Python into assembly"],
+      c: 0,
+      why: "Testing against real staging infrastructure catches network, indexing, and configuration anomalies."
+    },
+    {
+      q: "How does automated RAG evaluation protect a company against silent model provider updates?",
+      a: ["If a cloud provider updates its model weights and causes subtle formatting or grounding regressions, the nightly eval suite catches it immediately","It prevents the provider from updating","It sues the provider","It deletes the model"],
+      c: 0,
+      why: "Nightly evaluation runs detect upstream provider drift before customer complaints emerge."
+    },
+    {
+      q: "What is the ultimate mark of an expert RAG systems architect?",
+      a: ["Treating RAG as an instrumented, measurable pipeline with quantitative recall and faithfulness gates rather than a black-box prompt demo","Using the largest possible chunk size","Writing all code in one file","Refusing to measure metrics"],
+      c: 0,
+      why: "Scientific measurement, component isolation, and automated CI gates define engineering excellence."
+    }
+  ]);
+</script>
+</body>
+</html>

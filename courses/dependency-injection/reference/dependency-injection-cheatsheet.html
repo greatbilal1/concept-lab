@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dependency Injection — Cheat Sheet</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+<style>
+  .ref-toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0 8px; }
+  .ref-toc a { font-size: .8rem; border: 1px solid var(--border); background: #111a30; padding: 5px 11px; border-radius: 999px; color: var(--muted); text-decoration: none; border-bottom: 1px solid var(--border); }
+  .ref-toc a:hover { color: #fff; border-color: #3d5488; }
+  .lesson-wrap h2 { scroll-margin-top: 20px; }
+  .snippet { margin: 14px 0 22px; }
+  .snippet .lbl { font-size: .72rem; font-weight: 800; letter-spacing: .7px; text-transform: uppercase; color: var(--accent2); margin-bottom: 6px; }
+  .see { font-size: .82rem; color: var(--muted); margin: -6px 0 12px; }
+  .see a { color: var(--accent2); border-bottom: 0; }
+  .see a:hover { color: #fff; }
+  .snippet pre { padding-top: 34px; }
+  @media print { .snippet pre { padding-top: 18px; } }
+</style>
+</head>
+<body class="lesson-body" data-course="dependency-injection">
+
+<div class="lesson-wrap">
+
+  <span class="lesson-kicker">Reference · Cheat sheet</span>
+  <h1 class="lesson-title">Dependency Injection — Cheat Sheet</h1>
+  <p class="lesson-lede">
+    The whole course on one page. Every snippet links back to the lesson that
+    teaches it.
+  </p>
+
+  <div class="ref-toc">
+    <a href="#sec-1">Hardcoded vs Injected</a>
+    <a href="#sec-2">The Composition Root</a>
+    <a href="#sec-3">Service Lifecycles</a>
+    <a href="#sec-4">Test Doubles with DI</a>
+  </div>
+
+  <h2 id="sec-1"><span class="n">1</span>Hardcoded vs Injected</h2>
+  <div class="snippet">
+    <div class="lbl">The fundamental DI transition</div>
+    <pre><code>// BAD: Hardcoded dependency (coupled & untestable)
+class OrderService {
+  constructor() {
+    this.mailer = new SmtpMailer(); // tight coupling!
+  }
+}
+
+// GOOD: Injected collaborator (Pure DI)
+class OrderService {
+  constructor(mailer) {
+    this.mailer = mailer; // passed in from the outside!
+  }
+}</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0001-passing-collaborators-versus-hardcoded-new.html">Lesson 01 — Passing collaborators versus hardcoded 'new'</a>.</p>
+
+  <h2 id="sec-2"><span class="n">2</span>The Composition Root</h2>
+  <div class="snippet">
+    <div class="lbl">Where the object graph is wired</div>
+    <pre><code>// Wire the entire application in ONE place at entry point (main.js):
+const db = new PostgresDatabase(process.env.DATABASE_URL);
+const repo = new SqlOrderRepository(db);
+const mailer = new SendGridMailer(process.env.API_KEY);
+const service = new OrderService(repo, mailer);
+const controller = new OrderController(service);
+
+app.post('/orders', (req, res) =&gt; controller.handle(req, res));</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0003-the-composition-root-pattern.html">Lesson 03 — The Composition Root pattern</a>.</p>
+
+  <h2 id="sec-3"><span class="n">3</span>Service Lifecycles</h2>
+  <div class="snippet">
+    <div class="lbl">Transient, Scoped, and Singleton</div>
+    <pre><code>Transient:
+  A brand new instance is created every single time it is requested.
+Scoped:
+  Created once per HTTP request / transaction context, then disposed.
+Singleton:
+  Created once on application boot and shared across the entire runtime.</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0005-object-lifecycles-transient-scoped-singleton.html">Lesson 05 — Object lifecycles: transient, scoped, singleton</a>.</p>
+
+  <h2 id="sec-4"><span class="n">4</span>Test Doubles with DI</h2>
+  <div class="snippet">
+    <div class="lbl">Fakes, Stubs, and Mocks</div>
+    <pre><code>// Test using Fake in-memory collaborator in 1ms:
+class FakeMailer {
+  constructor() { this.sentMessages = []; }
+  send(to, msg) { this.sentMessages.push({ to, msg }); }
+}
+
+const fakeMailer = new FakeMailer();
+const service = new OrderService(fakeMailer);
+service.checkout(cart);
+assert.strictEqual(fakeMailer.sentMessages.length, 1);</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0007-testability-mocks-stubs-and-fakes.html">Lesson 07 — Testability: mocks, stubs, and fakes</a>.</p>
+
+  <div class="lesson-foot">
+    <div class="links">
+      <a href="dependency-injection-glossary.html">📖 Glossary</a>
+      <a href="../course.html">← Course map</a>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

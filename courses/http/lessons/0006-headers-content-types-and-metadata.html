@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 06 — Headers, content types, and metadata</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="http" data-lesson="6" data-lesson-id="headers-content-types-and-metadata">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 06</span> · Headers & Payloads</span>
+
+  <h1 class="lesson-title">Headers, content types, and metadata</h1>
+  <p class="lesson-lede">
+    Headers are the envelope of the web. Learn how Content-Type, Accept, Authorization, and CORS headers negotiate formats and secure communication.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Configure content negotiation and authentication headers for HTTP communications</span>
+    <span><b>Mission link</b> Ensures seamless interoperability between heterogeneous clients and servers</span>
+  </div>
+
+  <h2><span class="n">1</span>Content negotiation</h2>
+  <p>The internet connects computers running different operating systems, languages, and formats. How do a Python backend and an iOS client agree on data serialization?</p><p>Through <b>Content Negotiation</b> headers. The client sends <code>Accept: application/json</code> to specify what format it wants. The server replies with <code>Content-Type: application/json; charset=utf-8</code> to declare what format it delivered.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Accept declares what the client wants; Content-Type declares what the sender provided.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Essential header categories</h2>
+  <p>Categorize the standard headers that govern everyday web application traffic.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing compression negotiation</h2>
+  <p>Trace how Accept-Encoding negotiates gzip compression to reduce payload transfer size by 80%.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your recall of HTTP header mechanics.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can configure content negotiation, compression, and authentication headers cleanly across HTTP clients and servers.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Inspect the Accept-Encoding header sent by your browser in DevTools.</li>
+    <li>Send an Authorization header using curl -H 'Authorization: Bearer test123'.</li>
+    <li>Configure your server to compress responses with gzip.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    IETF RFC 9110: *HTTP Semantics*, Section 8: 'Header Fields'.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "A client sends POST data formatted as JSON. Which header must accompany the request?",
+    a: ["Content-Type: application/json","Accept: text/plain","Host: localhost","User-Agent: curl"],
+    c: 0,
+    why: "Content-Type informs the server parser how to deserialize incoming body bytes."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Representation",
+            "lines": [
+                  "Content-Type: application/json",
+                  "Content-Length: 128"
+            ]
+      },
+      {
+            "title": "Negotiation",
+            "lines": [
+                  "Accept: application/json",
+                  "Accept-Encoding: gzip, br"
+            ]
+      },
+      {
+            "title": "Authentication",
+            "lines": [
+                  "Authorization: Bearer <jwt_token>",
+                  "Cookie: session_id=xyz"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "Client: Accept-Encoding: gzip, br",
+      "Server compresses 100KB HTML down to 20KB using gzip",
+      "Server: Content-Encoding: gzip",
+      "Client transparently decompresses 20KB back into 100KB DOM"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "client_capabilities": "supports gzip and brotli"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "compression": "gzip applied to 100KB payload"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "header": "Content-Encoding: gzip attached"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "bandwidth_saved": "80% reduction in transferred bytes"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The header declaring payload format is Content-<0>.",
+      "The header expressing desired response format is <1>.",
+      "The header transmitting bearer authentication tokens is <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "Type"
+            ],
+            "why": "Content-Type specifies the MIME representation."
+      },
+      {
+            "a": [
+                  "Accept"
+            ],
+            "why": "Accept informs the server of supported formats."
+      },
+      {
+            "a": [
+                  "Authorization"
+            ],
+            "why": "Authorization carries credentials and Bearer tokens."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the difference between the Content-Type and Accept headers?",
+      a: ["Content-Type describes the data being sent; Accept describes the format desired in return","Content-Type is for text files; Accept is for image files","Content-Type is used by servers; Accept is used only by database engines","There is no difference between the two headers"],
+      c: 0,
+      why: "Content-Type defines current payload format; Accept negotiates return format."
+    },
+    {
+      q: "What does the 'Authorization: Bearer <token>' header convey?",
+      a: ["An access credential (such as a JWT token) granting the bearer permission to access the resource","The physical GPS coordinates of the mobile device","The serial number of the user computer monitor","A cryptographic signature verifying hardware chip temperature"],
+      c: 0,
+      why: "Bearer tokens grant API access to whoever possesses (bears) the token."
+    },
+    {
+      q: "What does Content-Encoding: gzip indicate on an HTTP response?",
+      a: ["The body payload bytes have been compressed using gzip and must be decompressed upon receipt","The file is a zip archive that must be saved to the desktop","The server has run out of uncompressed hard drive space","The response body is encrypted with proprietary algorithms"],
+      c: 0,
+      why: "Content-Encoding tells the client which decompression algorithm to apply to the body."
+    },
+    {
+      q: "What happens if a client sends 'Accept: application/json' but the server only has XML?",
+      a: ["The server may return status 406 Not Acceptable or provide XML with Content-Type: application/xml","The client computer hard drive crashes","The internet router reboots automatically","The server converts XML to JSON using AI"],
+      c: 0,
+      why: "RFC 9110 provides status 406 Not Acceptable when requested representations cannot be met."
+    }
+  ]);
+</script>
+</body>
+</html>

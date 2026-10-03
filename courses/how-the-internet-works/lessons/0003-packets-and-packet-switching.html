@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 03 — Packets and packet switching</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="how-the-internet-works" data-lesson="3" data-lesson-id="packets-and-packet-switching">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 03</span> · Packets & Routing</span>
+
+  <h1 class="lesson-title">Packets and packet switching</h1>
+  <p class="lesson-lede">
+    The internet doesn't send files; it chops files into thousands of bite-sized envelopes called packets. Learn how packet switching revolutionized communications.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Explain packet encapsulation, Maximum Transmission Unit (MTU), and fragmentation</span>
+    <span><b>Mission link</b> Explains how shared physical wires multiplex millions of concurrent streams</span>
+  </div>
+
+  <h2><span class="n">1</span>Circuit switching versus packet switching</h2>
+  <p>Old telephone networks used <b>circuit switching</b>: when you made a call, physical copper switches locked open a dedicated electrical wire between both phones for the entire duration. If nobody spoke, the wire sat completely idle and wasted.</p><p>The internet uses <b>packet switching</b>: your computer cuts data into small chunks (usually up to 1,500 bytes), prepends a header with source and destination IP addresses, and flings them onto the network. Millions of packets from different users share the same physical cable simultaneously.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Packet switching chops data into independent chunks that share physical wires efficiently.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Anatomy of an IP packet</h2>
+  <p>An IP packet consists of a structured binary header containing metadata, followed by the payload bytes.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing packet reassembly</h2>
+  <p>Trace how a 4,000-byte image is split into 3 packets and reassembled in order by the receiving computer.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of packet mechanics.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can visualize how files are shredded into packets, routed independently, and reassembled at their destination.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Check your network interface MTU using ifconfig or ip link.</li>
+    <li>Calculate how many 1,500-byte packets are required to transmit a 3 MB photo.</li>
+    <li>Inspect packet headers using a tool like tcpdump or Wireshark.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    W. Richard Stevens, *TCP/IP Illustrated, Volume 1*, Chapter 3: 'IP: Internet Protocol'.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is the standard Maximum Transmission Unit (MTU) size for typical Ethernet packets?",
+    a: ["1,500 bytes","1 gigabyte","64 bytes","10 megabytes"],
+    c: 0,
+    why: "Standard Ethernet specifies an MTU of 1,500 bytes per individual packet frame."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "IP Header (20 bytes)",
+            "lines": [
+                  "source IP, destination IP",
+                  "TTL, protocol, checksum"
+            ]
+      },
+      {
+            "title": "Transport Header",
+            "lines": [
+                  "TCP or UDP ports",
+                  "sequence numbers (20 bytes)"
+            ]
+      },
+      {
+            "title": "Payload Data",
+            "lines": [
+                  "HTTP request, image chunk",
+                  "up to ~1460 bytes of actual data"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "image_size = 4000 # bytes",
+      "packet_1 = {'seq': 0, 'len': 1460, 'data': 'chunk 1'}",
+      "packet_2 = {'seq': 1460, 'len': 1460, 'data': 'chunk 2'}",
+      "packet_3 = {'seq': 2920, 'len': 1080, 'data': 'chunk 3'}",
+      "# Receiver buffers all 3 packets and reassembles complete 4000-byte image"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "file": "4000-byte image"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "packet_1": "bytes 0-1459"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "packet_2": "bytes 1460-2919"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "packet_3": "bytes 2920-3999"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "state": "reassembled in memory into original image"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The maximum size of a packet on an Ethernet network is the <0>.",
+      "Chop-up of packets that exceed router size limits is <1>.",
+      "The metadata attached to the front of every packet is the <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "MTU"
+            ],
+            "why": "MTU stands for Maximum Transmission Unit."
+      },
+      {
+            "a": [
+                  "fragmentation"
+            ],
+            "why": "Fragmentation splits oversized packets into smaller units."
+      },
+      {
+            "a": [
+                  "header"
+            ],
+            "why": "Headers contain routing metadata, addresses, and checksums."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why is packet switching more efficient than circuit switching for internet data?",
+      a: ["It allows multiple users to interleave data across shared wires without reserving idle lines","It eliminates the need for computer routers entirely","It prevents packets from ever being lost or dropped","It encrypts all network traffic automatically"],
+      c: 0,
+      why: "Packet switching multiplexes capacity on demand so bandwidth is never wasted on silence."
+    },
+    {
+      q: "What does the Time to Live (TTL) field in an IP header prevent?",
+      a: ["Packets from circulating endlessly in infinite routing loops forever","Users from streaming video content for longer than sixty minutes","Computers from downloading files when battery power is low","Hackers from guessing server passwords"],
+      c: 0,
+      why: "Every router decrements TTL by 1; when TTL hits 0, the packet is discarded with an error."
+    },
+    {
+      q: "Can two packets belonging to the same web request take different geographic routes to the server?",
+      a: ["Yes, routers evaluate each packet independently based on real-time traffic conditions","No, all packets must travel sequentially through the exact same copper cable","No, packets are physically tied together with electrical wires","Only on Saturdays and Sundays"],
+      c: 0,
+      why: "Packet switching is connectionless at layer 3; routers route each packet along optimal current paths."
+    },
+    {
+      q: "What happens if a packet arrives corrupted with an invalid header checksum?",
+      a: ["The receiving router drops and discards the packet immediately","The router attempts to guess the missing bits using AI","The router shuts down and reboots automatically","The router forwards the damaged packet anyway"],
+      c: 0,
+      why: "Corrupted packets fail integrity checks and are discarded to avoid corrupting higher layers."
+    }
+  ]);
+</script>
+</body>
+</html>

@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 04 — Scope, lexical environment, and closures</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="javascript-fundamentals" data-lesson="4" data-lesson-id="scope-lexical-environment-and-closures">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 04</span> · Functions & Scope</span>
+
+  <h1 class="lesson-title">Scope, lexical environment, and closures</h1>
+  <p class="lesson-lede">
+    Closures are the secret weapon of JavaScript. Learn how functions remember the scope in which they were born, enabling private state and factory functions.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Explain and implement lexical closures for data encapsulation and state management</span>
+    <span><b>Mission link</b> The single most tested conceptual topic in professional JavaScript</span>
+  </div>
+
+  <h2><span class="n">1</span>Lexical scope and closures</h2>
+  <p>JavaScript uses <b>lexical scoping</b>: a function's scope is determined by where it is written in the physical source code, not where it is called. Inner functions have access to variables declared in their outer enclosing scopes.</p><p>A <b>closure</b> is formed when an inner function is returned or passed out of its parent scope, yet <i>retains access to the parent's variables</i>. Even though the parent function finished executing, its variables stay alive in memory because the inner function still references them.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    A closure is a function that remembers its outer lexical environment even after the parent returns.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The closure memory bubble</h2>
+  <p>Visualise how closures preserve encapsulated private variables from garbage collection.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing closure state persistence</h2>
+  <p>Trace how two separate closure instances maintain completely independent state variables.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your understanding of closure mechanics.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can explain and implement closures to encapsulate private state and construct function factories.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Implement a counter factory function that exposes increment and decrement methods.</li>
+    <li>Verify in DevTools Sources panel that the closure scope shows captured variables.</li>
+    <li>Explain why variables in closures are not cleaned up by garbage collection.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Kyle Simpson, *You Don't Know JS: Scope & Closures* (Chapter 7: 'Using Closures').
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "A function returns an inner function that increments an outer variable 'count'. What happens when the inner function is called twice?",
+    a: ["count increments from 1 to 2, preserving state across invocations","count resets to 0 on every call","A ReferenceError is thrown because the outer function already returned","The computer RAM is purged"],
+    c: 0,
+    why: "The closure maintains a persistent live reference to the enclosed outer variable."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Outer Scope: createCounter()",
+            "lines": [
+                  "let count = 0 (private state)",
+                  "returns inner function"
+            ]
+      },
+      {
+            "title": "Closure Retention",
+            "lines": [
+                  "inner function retains pointer to count",
+                  "garbage collector preserves count"
+            ]
+      },
+      {
+            "title": "Consumer",
+            "lines": [
+                  "counter() increments count",
+                  "count cannot be accessed directly from outside!"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "function makeAdder(x) { return y => x + y; }",
+      "const add5 = makeAdder(5);",
+      "const add10 = makeAdder(10);",
+      "add5(2);  # 5 + 2 = 7",
+      "add10(2); # 10 + 2 = 12 (independent state preserved!)"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "factory": "makeAdder defined"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "add5": "closure capturing x = 5"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "add10": "separate closure capturing x = 10"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "result_5": "7"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "result_10": "12 (each closure has its own environment)"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Scope determined by source code physical placement is <0> scope.",
+      "A function bundled with its lexical environment is a <1>.",
+      "Closures allow creating private variables without using <2> properties."
+],
+    blanks: [
+      {
+            "a": [
+                  "lexical"
+            ],
+            "why": "Lexical scope is resolved based on code structure."
+      },
+      {
+            "a": [
+                  "closure"
+            ],
+            "why": "Closures package functions with enclosed environment records."
+      },
+      {
+            "a": [
+                  "class",
+                  "object"
+            ],
+            "why": "Closures encapsulate private state in functions."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is a closure in JavaScript?",
+      a: ["A function that retains access to its lexical scope even when executed outside that scope","A method to close browser tabs using JavaScript code","An error that happens when an infinite loop runs","A syntax rule that requires semicolons at the end of every line"],
+      c: 0,
+      why: "A closure preserves access to outer variables across time and execution boundaries."
+    },
+    {
+      q: "Why isn't a local variable garbage collected when its parent function finishes executing if a closure exists?",
+      a: ["Because the inner closure function holds an active reference to the environment record","Because JavaScript never garbage collects numbers","Because the variable is saved permanently to the hard drive","Because the operating system freezes the memory"],
+      c: 0,
+      why: "Garbage collectors only free memory when zero reachable references remain."
+    },
+    {
+      q: "What is the primary practical use case for closures in software design?",
+      a: ["Data privacy and encapsulation (preventing direct external modification of state)","Making web pages download faster over Wi-Fi","Converting HTML into image formats","Translating variable names into binary numbers"],
+      c: 0,
+      why: "Closures encapsulate private state accessible only through returned getter/setter functions."
+    },
+    {
+      q: "Do two separate calls to a closure factory function share the same private variables?",
+      a: ["No, each invocation of the outer function creates a completely fresh, independent lexical environment","Yes, all closures share one global variable namespace","Only if they are given the same variable name","Yes, unless you reboot the computer"],
+      c: 0,
+      why: "Every function invocation allocates a distinct environment record in memory."
+    }
+  ]);
+</script>
+</body>
+</html>

@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 03 — Grounding by Construction: Constraining Search Spaces</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="hallucination-reliability" data-lesson="3" data-lesson-id="grounding-by-construction">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 03</span> · Grounding Design</span>
+
+  <h1 class="lesson-title">Grounding by Construction: Constraining Search Spaces</h1>
+  <p class="lesson-lede">
+    Eliminating hallucination vectors through architectural design: constrained search spaces, extractive selectors, and structured enums.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to design architectures that make hallucinations structurally impossible.</span>
+    <span><b>Mission link</b> Mastering grounding by construction: constraining search spaces across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Grounding by Construction: Constraining Search Spaces</h2>
+  <p>The most effective way to eliminate hallucinations is not to detect them after they happen; it is to <strong>make hallucinations structurally impossible</strong>. If you ask a model: <em>'What category does this transaction belong to?'</em> and let it emit free-form text, it will invent 50 creative new categories.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Eliminating hallucination vectors through architectural design: constrained search spaces, extractive selectors, and structured enums.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Free Generation vs Grounding by Construction</h2>
+  <p><strong>Grounding by Construction</strong> forces the model into bounded selection spaces:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>ID-Based Selection Pattern</h2>
+  <ul><li><strong>1. Constrained Enums (Pydantic / Zod):</strong> Never ask for a category as a raw string. Force the output into an enum: `category: Literal["travel", "meals", "software"]`. The constrained decoding grammar will physically block any other word from being generated!</li><li><strong>2. Extractive Reference IDs:</strong> When an agent selects a document or entity, provide valid IDs (`[ID_1, ID_2, ID_3]`) and require the model to return the ID: `selected_id: Literal["ID_1", "ID_2", "ID_3"]`. It cannot invent a nonexistent document!</li><li><strong>3. Masked Multiple-Choice Extraction:</strong> Turn open-ended generation into closed-vocabulary classification.</li></ul><pre><code># Grounding by Construction in Pydantic:
+class TransactionClassification(BaseModel):
+    # The model CANNOT hallucinate a category; it must choose from this exact list!
+    category: Literal["travel", "software_subscriptions", "office_supplies", "meals"]
+    # The model must select from the exact invoice IDs provided in context!
+    matched_invoice_id: Literal["INV-001", "INV-002", "INV-003", "NONE"]
+    confidence_score: float = Field(ge=0.0, le=1.0)</code></pre><div class="callout"><p><strong>The Architectural Triumph:</strong> When your output schemas enforce Literals and pre-validated IDs, the hallucination rate on entity references drops to <strong>EXACTLY ZERO PERCENT</strong>.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the grounding design sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to design architectures that make hallucinations structurally impossible.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where grounding by construction: constraining search spaces applies.</li>
+    <li>Author a unit test or verification script exercising grounding by construction: constraining search spaces.</li>
+    <li>Document team architectural conventions regarding grounding by construction: constraining search spaces.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Grounding by Construction: Constraining Search Spaces.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is 'Grounding by Construction' in software architecture?",
+    a: ["Designing system interfaces so the model is structurally constrained to selecting from valid existing entities rather than generating raw text","Constructing physical buildings for computers","Grounding electrical wires in data centers","Compiling code to machine language"],
+    c: 0,
+    why: "Grounding by construction eliminates hallucinations by restricting model outputs to pre-validated choices and IDs."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Free Generation (Vulnerable)",
+            "lines": [
+                  "category: str",
+                  "Model invents: 'work_lunch_snack'",
+                  "Downstream database crashes on invalid key"
+            ]
+      },
+      {
+            "title": "Grounding by Construction",
+            "lines": [
+                  "category: Literal['meals', 'travel']",
+                  "Grammar enforces approved enum",
+                  "Zero invalid values, 100% reliable"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Grounding by Construction: Constraining Search Spaces",
+      "def execute_flow():",
+      "    # Eliminating hallucination vectors through architec...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Grounding by Construction: Constraining Search Spaces"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Provided Options"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Constrained Model Response"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Grounding by construction eliminates hallucinations by replacing open-ended generation with constrained {1} and pre-validated reference {2}."
+],
+    blanks: [
+      {
+            "a": [
+                  "enums"
+            ],
+            "why": "Fixed categorical Literal choices"
+      },
+      {
+            "a": [
+                  "IDs"
+            ],
+            "why": "Specific reference identifiers like DOC_1"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why does using Pydantic's Literal['A', 'B', 'C'] eliminate hallucinations for categorical attributes?",
+      a: ["Constrained decoding masks out all vocabulary tokens that do not match the exact strings 'A', 'B', or 'C'","It speeds up Python","It deletes the other options","It runs without a CPU"],
+      c: 0,
+      why: "Grammar constraints enforce that only the specified literal tokens can be sampled."
+    },
+    {
+      q: "How can you prevent a customer support bot from inventing fake refund policy numbers?",
+      a: ["Provide candidate policies as numbered options and instruct the model to select the matching policy ID rather than reciting policy numbers","Ask the bot to be honest","Tell the bot not to lie","Turn off temperature"],
+      c: 0,
+      why: "Constraining the model to select pre-verified policy IDs eliminates fabricated policy numbers."
+    },
+    {
+      q: "What is an 'Extractive Selector' pattern in RAG?",
+      a: ["An architecture where the model selects the exact substring index or document ID from provided context rather than generating text from scratch","A tool for mining gold","A database query optimizer","An image extraction tool"],
+      c: 0,
+      why: "Extractive selection binds answers directly to verbatim spans in source documents."
+    },
+    {
+      q: "Can grounding by construction be applied to numerical calculations?",
+      a: ["Yes; require the model to emit function calls to a Python calculator tool rather than generating calculated numbers directly","No; math cannot be constrained","Only on Linux","Only if numbers are under 10"],
+      c: 0,
+      why: "Delegating calculations to tools guarantees exact deterministic math without hallucinations."
+    }
+  ]);
+</script>
+</body>
+</html>

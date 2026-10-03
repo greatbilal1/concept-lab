@@ -1,0 +1,3 @@
+# Mission — CI/CD & Automated Deployment
+
+Master the engineering discipline of Continuous Integration and Continuous Delivery (CI/CD). Embrace small-batch continuous delivery and DORA metrics, author declarative GitHub Actions workflows across jobs and steps, enforce automated quality gates with linters, static typing, and branch protection rules, scale testing across operating systems with matrix builds, slash pipeline runtimes with dependency caching and artifact sharing, deploy with zero downtime using Blue-Green and Canary releases, manage infrastructure declaratively with IaC and GitOps, and build automated production deployment pipelines.

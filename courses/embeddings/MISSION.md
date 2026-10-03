@@ -1,0 +1,3 @@
+# Mission — Embeddings Explained
+
+Master the geometry of meaning. Discover how continuous vector spaces encode human concepts, contrast sparse one-hot encodings with dense embeddings, navigate similarity metrics (Cosine, Dot Product, Euclidean), explore linear vector arithmetic, embed full documents with sentence transformers, align text and images with CLIP, visualize high-dimensional manifolds with UMAP, and leverage Matryoshka embeddings for production scale.

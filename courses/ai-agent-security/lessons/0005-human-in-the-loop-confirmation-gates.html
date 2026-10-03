@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 05 — Human-in-the-Loop Confirmation Gates for Dangerous Actions</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="ai-agent-security" data-lesson="5" data-lesson-id="human-in-the-loop-confirmation-gates">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 05</span> · Human Gates</span>
+
+  <h1 class="lesson-title">Human-in-the-Loop Confirmation Gates for Dangerous Actions</h1>
+  <p class="lesson-lede">
+    Balancing autonomy and safety: classifying action risk, pausing execution, human confirmation UI flows, and timeout handling.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to design human-in-the-loop confirmation gates and mitigate approval fatigue.</span>
+    <span><b>Mission link</b> Mastering human-in-the-loop confirmation gates for dangerous actions across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Human-in-the-Loop Confirmation Gates for Dangerous Actions</h2>
+  <p>Full autonomy is an engineering spectrum. For low-risk read operations (search, summarization, syntax checks), full autonomy is safe and efficient. But for high-risk actions—<strong>sending $10,000, deleting customer accounts, or pushing code to main</strong>—unconstrained autonomy is irresponsible.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Balancing autonomy and safety: classifying action risk, pausing execution, human confirmation UI flows, and timeout handling.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Three Action Risk Tiers</h2>
+  <p>The Action Risk Classification Matrix:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Human Approval UI Modal</h2>
+  <ul><li><strong>Tier 1: Read-Only Actions (Autonomous):</strong> `read_file`, `search_docs`, `check_weather`. Executes automatically with zero friction.</li><li><strong>Tier 2: Reversible Modifications (Autonomous with Logging):</strong> `create_draft_email`, `write_temp_file`. Executes automatically, but emits an audit log and allows easy user undo.</li><li><strong>Tier 3: High-Consequence / Irreversible (MANDATORY HUMAN GATE):</strong> `execute_payment`, `drop_table`, `merge_pull_request`, `send_broadcast_email`. <strong>Execution pauses immediately!</strong></li></ul><p>The Confirmation Protocol Flow:</p><pre><code># The Human Confirmation Flow in Python:
+async def execute_tool_call(tool_name: str, args: dict, user_session: Session):
+    if tool_name in HIGH_CONSEQUENCE_TOOLS:
+        # 1. Pause execution & generate structured approval ticket
+        approval_id = await create_approval_ticket(
+            user_id=user_session.user_id, tool=tool_name, payload=args
+        )
+        # 2. Emit UI prompt to user: "Agent wants to execute [PAYMENT: $500]. Approve?"
+        user_verdict = await wait_for_human_approval(approval_id, timeout_seconds=300)
+        
+        if user_verdict != "APPROVED":
+            raise ToolExecutionDeniedException("Action rejected by user!")
+            
+    # 3. Only executed after explicit human signature:
+    return await tool_registry.dispatch(tool_name, args)</code></pre><div class="callout"><p><strong>The Accountability Rule:</strong> High-risk real-world mutations must have a human name and timestamp attached in the audit log. An AI model cannot legally bear corporate liability.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the human gates sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to design human-in-the-loop confirmation gates and mitigate approval fatigue.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where human-in-the-loop confirmation gates for dangerous actions applies.</li>
+    <li>Author a unit test or verification script exercising human-in-the-loop confirmation gates for dangerous actions.</li>
+    <li>Document team architectural conventions regarding human-in-the-loop confirmation gates for dangerous actions.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Human-in-the-Loop Confirmation Gates for Dangerous Actions.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is a 'Human-in-the-Loop Confirmation Gate' in an autonomous agent architecture?",
+    a: ["A security checkpoint that pauses agent execution on high-consequence actions, requiring an authorized human to approve the specific payload before execution","A human writing the code for the agent","A human typing the prompt into chat","A CAPTCHA to verify human eyes"],
+    c: 0,
+    why: "Confirmation gates pause autonomous execution on high-risk actions until an authorized human reviews and approves the payload."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Tier 1: Read-Only (Autonomous)",
+            "lines": [
+                  "Search, read_file, inspect",
+                  "100% autonomous, zero friction"
+            ]
+      },
+      {
+            "title": "Tier 2: Reversible (Autonomous + Log)",
+            "lines": [
+                  "Create drafts, staging edits",
+                  "Autonomous execution with undo"
+            ]
+      },
+      {
+            "title": "Tier 3: High-Consequence (Human Gate)",
+            "lines": [
+                  "Payments, delete, deploy to prod",
+                  "Execution PAUSED until human signs off!"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Human-in-the-Loop Confirmation Gates for Dangerous Actions",
+      "def execute_flow():",
+      "    # Balancing autonomy and safety: classifying action ...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Human-in-the-Loop Confirmation Gates for Dangerous Actions"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Approval Request"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "High-consequence agent actions pause autonomous execution at human-in-the-loop {1} gates, requiring explicit user approval before state {2} occur."
+],
+    blanks: [
+      {
+            "a": [
+                  "confirmation"
+            ],
+            "why": "Approval verification checkpoint"
+      },
+      {
+            "a": [
+                  "mutations"
+            ],
+            "why": "Irreversible real-world changes"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What should an agent do when it reaches a tool classified as Tier 3 (High-Consequence)?",
+      a: ["Pause execution, format a clear human-readable approval summary with exact parameters, and wait for human confirmation","Execute the tool immediately","Delete the parameters","Retry 10 times in a loop"],
+      c: 0,
+      why: "Tier 3 actions require explicit human review and authorization before execution."
+    },
+    {
+      q: "What happens if a human user rejects the requested action in the confirmation modal?",
+      a: ["The tool call is cancelled, an execution denied error is returned to the agent loop, and the agent adapts its plan accordingly","The computer crashes","The agent executes the action anyway","The database is deleted"],
+      c: 0,
+      why: "Denial informs the agent of user refusal, allowing it to propose an alternative plan."
+    },
+    {
+      q: "Why is 'Create Draft Email' a better tool pattern than 'Send Email Directly' for autonomous assistants?",
+      a: ["Creating a draft is a reversible Tier 2 action allowing the user to review text before sending, avoiding unverified outbound communications","Drafts use fewer tokens","Drafts are faster to send","Drafts run without internet"],
+      c: 0,
+      why: "Draft creation decouples content synthesis from the irreversible external action of sending."
+    },
+    {
+      q: "What is the security risk of 'Approval Fatigue' in human-in-the-loop workflows?",
+      a: ["If an agent bombards users with dozens of low-risk confirmation popups, users begin clicking 'Approve' mindlessly without reading payloads","Users get tired and fall asleep","The computer monitor wears out","The battery drains faster"],
+      c: 0,
+      why: "Excessive low-value prompts cause users to rubber-stamp requests, defeating the purpose of security review."
+    }
+  ]);
+</script>
+</body>
+</html>

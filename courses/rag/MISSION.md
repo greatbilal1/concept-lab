@@ -1,0 +1,3 @@
+# Mission — Retrieval-Augmented Generation (RAG)
+
+Master the art of grounding language models in private, up-to-date knowledge. Separate parametric reasoning from external facts, build offline ingestion and online query pipelines, implement recursive character chunking with overlap, enrich records with metadata filters, execute nearest-neighbor vector search, construct strictly grounded prompt templates, enforce verifiable inline source citations, and diagnose retrieval vs generation failures.

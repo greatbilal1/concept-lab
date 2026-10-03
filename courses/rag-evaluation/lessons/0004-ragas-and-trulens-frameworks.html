@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 04 — The Ragas and TruLens Frameworks</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="rag-evaluation" data-lesson="4" data-lesson-id="ragas-and-trulens-frameworks">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 04</span> · Eval Frameworks</span>
+
+  <h1 class="lesson-title">The Ragas and TruLens Frameworks</h1>
+  <p class="lesson-lede">
+    Automating RAG evals: hands-on with Ragas and TruLens, metric computation, dataset structures, and dashboard analysis.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to use Ragas and TruLens to automate RAG pipeline evaluation.</span>
+    <span><b>Mission link</b> Mastering the ragas and trulens frameworks across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of The Ragas and TruLens Frameworks</h2>
+  <p>Writing custom evaluation scripts from scratch for every RAG project is repetitive. The open-source AI community created dedicated <strong>RAG Evaluation Frameworks</strong>, with <strong>Ragas</strong> (Retrieval Augmented Generation Assessment) and <strong>TruLens</strong> leading the industry.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Automating RAG evals: hands-on with Ragas and TruLens, metric computation, dataset structures, and dashboard analysis.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Ragas Dataset Schema</h2>
+  <p>The Ragas Evaluation Workflow:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>TruLens Feedback Functions</h2>
+  <ul><li><strong>1. Dataset Format:</strong> Ragas evaluates a standardized dataset containing four core columns: `question`, `contexts` (list of retrieved chunk strings), `answer` (generated response), and `ground_truth` (human reference).</li><li><strong>2. Metric Selection:</strong> Import the standard metrics: `faithfulness`, `answer_relevancy`, `context_precision`, `context_recall`.</li><li><strong>3. Automated Evaluation:</strong> Call `evaluate(dataset, metrics)`: Ragas orchestrates LLM grader calls, computes mathematical scores, and returns a pandas DataFrame of results!</li></ul><pre><code># Automated RAG Evaluation with Ragas in Python:
+from datasets import Dataset
+from ragas import evaluate
+from ragas.metrics import faithfulness, answer_relevancy, context_precision, context_recall
+
+# Prepare evaluation dataset:
+eval_data = {
+    "question": ["What is the refund policy window?"],
+    "contexts": [["All products can be returned within 30 days for a full refund."]],
+    "answer": ["You have 30 days to return products for a complete refund."],
+    "ground_truth": ["Customers can request a refund within 30 days of purchase."]
+}
+
+dataset = Dataset.from_dict(eval_data)
+
+# Run automated evaluation pipeline:
+results = evaluate(dataset, metrics=[faithfulness, answer_relevancy, context_recall])
+print(results.to_pandas()) # Outputs detailed scores per test case!</code></pre><div class="callout"><p><strong>CI Integration:</strong> Ragas exports clean pandas DataFrames, making it trivial to assert `results['faithfulness'].mean() > 0.95` in automated CI pipelines!</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the RAG frameworks sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to use Ragas and TruLens to automate RAG pipeline evaluation.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where the ragas and trulens frameworks applies.</li>
+    <li>Author a unit test or verification script exercising the ragas and trulens frameworks.</li>
+    <li>Document team architectural conventions regarding the ragas and trulens frameworks.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for The Ragas and TruLens Frameworks.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is the primary role of open-source frameworks like Ragas and TruLens in an AI engineering stack?",
+    a: ["To provide automated, standardized calculation of RAG Triad metrics (Context Precision, Recall, Faithfulness, Relevance) across datasets","To host vector databases in memory","To replace Python with C++","To design website logos"],
+    c: 0,
+    why: "Ragas and TruLens automate the computation of RAG Triad metrics across benchmark datasets."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "question (str)",
+            "lines": [
+                  "User query prompt",
+                  "e.g. 'How do I cancel?'"
+            ]
+      },
+      {
+            "title": "contexts (list[str])",
+            "lines": [
+                  "Array of retrieved chunks",
+                  "The factual evidence provided to model"
+            ]
+      },
+      {
+            "title": "answer (str)",
+            "lines": [
+                  "Generated model response",
+                  "Evaluated for faithfulness & relevance"
+            ]
+      },
+      {
+            "title": "ground_truth (str)",
+            "lines": [
+                  "Human verified baseline answer",
+                  "Evaluated for context recall"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing The Ragas and TruLens Frameworks",
+      "def execute_flow():",
+      "    # Automating RAG evals: hands-on with Ragas and TruL...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "The Ragas and TruLens Frameworks"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "TruLens Feedback Functions"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Frameworks like Ragas evaluate datasets with question, contexts, answer, and ground truth to compute automated {1} Triad {2}."
+],
+    blanks: [
+      {
+            "a": [
+                  "RAG"
+            ],
+            "why": "Retrieval-Augmented Generation"
+      },
+      {
+            "a": [
+                  "metrics"
+            ],
+            "why": "Quantitative scores like faithfulness"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What four fields are required in a dataset to compute the full suite of Ragas metrics?",
+      a: ["question, contexts (retrieved text), answer (generated text), and ground_truth","name, age, email, and password","latitude, longitude, altitude, and time","CPU, RAM, GPU, and disk"],
+      c: 0,
+      why: "These four fields provide all the necessary evidence to evaluate both retrieval and generation stages."
+    },
+    {
+      q: "What model does Ragas use by default as the underlying evaluator engine?",
+      a: ["A frontier LLM (e.g. GPT-4) configured with structured prompt rubrics via LangChain","A local regex engine","A random number generator","A biological neuron"],
+      c: 0,
+      why: "Ragas uses frontier models like GPT-4 to perform semantic claim extraction and verification."
+    },
+    {
+      q: "How does TruLens visualize evaluation results for engineering teams?",
+      a: ["Through an interactive local Streamlit dashboard displaying RAG Triad score distributions and drill-down trace views","Through a printed book","Via audio podcast","In a video game"],
+      c: 0,
+      why: "TruLens provides an interactive dashboard for exploring metrics, traces, and failure modes."
+    },
+    {
+      q: "Why is exporting Ragas results to a pandas DataFrame useful for CI/CD?",
+      a: ["It allows writing simple Python assertions (e.g. assert df('faithfulness').min() >= 0.90) to gate builds","It converts the data to HTML","It makes the database faster","It reduces GPU temperature"],
+      c: 0,
+      why: "DataFrame export integrates seamlessly with standard Python test runners and assertion libraries."
+    }
+  ]);
+</script>
+</body>
+</html>

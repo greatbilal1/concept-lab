@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 01 — The Object-Relational Impedance Mismatch</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="orms" data-lesson="1" data-lesson-id="the-object-relational-impedance-mismatch">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 01</span> · The Impedance Mismatch & Patterns</span>
+
+  <h1 class="lesson-title">The Object-Relational Impedance Mismatch</h1>
+  <p class="lesson-lede">
+    Why is mapping objects to tables so painful? Discover the Object-Relational Impedance Mismatch: relational sets versus object graphs, pointers, and inheritance.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Articulate the fundamental structural differences between relational sets and object graphs</span>
+    <span><b>Mission link</b> Explains why every ORM involves fundamental design trade-offs</span>
+  </div>
+
+  <h2><span class="n">1</span>Two different mental models</h2>
+  <p>Object-Oriented Programming (OOP) and Relational Databases (RDBMS) were designed for two completely different purposes based on different mathematical paradigms. This tension is known as the <b>Object-Relational Impedance Mismatch</b>.</p><p>Objects have <b>identity and memory pointers</b>; relational tables have <b>keys and values</b>. Objects use <b>encapsulation and inheritance</b>; relational databases use <b>normalization and foreign keys</b>. An ORM is a bridge over this chasm, but the bridge is never completely seamless.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    OOP deals with bidirectional pointer graphs; relational databases deal with normalized sets and foreign keys.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The core mismatches</h2>
+  <p>Examine the four fundamental fault lines between object models and relational schemas.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing pointer navigation versus SQL joins</h2>
+  <p>Trace how accessing an object property triggers an unexpected secondary network query.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of the impedance mismatch.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can identify the architectural boundaries between object models and relational tables and avoid naive mapping assumptions.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Map a class hierarchy (Vehicle -> Car, Truck) into relational table designs.</li>
+    <li>Observe how an ORM represents a many-to-many relationship using an entity collection.</li>
+    <li>Read Ted Neward's classic essay *The Vietnam of Computer Science*.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Ted Neward: *The Vietnam of Computer Science* (Neward & Associates, 2006).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "How does a standard relational database represent class inheritance (e.g. Employee extends Person)?",
+    a: ["Relational databases have no native concept of inheritance; tables must emulate it via single-table or joined-table patterns","Relational databases have native 'extends' keywords on tables","Inheritance is completely forbidden in database applications","Tables inherit columns automatically over Wi-Fi"],
+    c: 0,
+    why: "Relational theory has no concept of OOP subclassing; schemas must emulate it through design patterns."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Identity",
+            "lines": [
+                  "Objects: memory reference (a === b)",
+                  "Relational: primary key value (id = 42)"
+            ]
+      },
+      {
+            "title": "Navigation",
+            "lines": [
+                  "Objects: follow pointers (user.orders)",
+                  "Relational: declarative joins (JOIN ON)"
+            ]
+      },
+      {
+            "title": "Inheritance",
+            "lines": [
+                  "Objects: subclasses, polymorphism",
+                  "Relational: flat rectangular tables"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "user = session.get(User, 1); # Emits: SELECT * FROM users WHERE id = 1",
+      "# In memory, user.orders is an unloaded proxy pointer",
+      "print(user.orders); # Surprise! Accessing property triggers hidden query:",
+      "# Emits: SELECT * FROM orders WHERE user_id = 1"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "initial_fetch": "user object loaded from database"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "proxy_trap": "accessing property looks like reading memory, but executes network I/O"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "hidden_sql": "secondary SQL query executed implicitly behind the scenes"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The friction between objects and relational tables is the <0> mismatch.",
+      "The library bridging objects and database tables is an <1>.",
+      "Relational databases operate on mathematical <2> theory."
+],
+    blanks: [
+      {
+            "a": [
+                  "impedance"
+            ],
+            "why": "Impedance mismatch describes the paradigm clash."
+      },
+      {
+            "a": [
+                  "ORM"
+            ],
+            "why": "ORM stands for Object-Relational Mapping."
+      },
+      {
+            "a": [
+                  "set"
+            ],
+            "why": "Relational databases are grounded in mathematical set theory."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the 'Object-Relational Impedance Mismatch'?",
+      a: ["The fundamental conceptual difficulty of mapping object-oriented models (classes, references, inheritance) into relational tables (rows, columns, foreign keys)","A hardware failure when connecting database cables","An error that happens when an SQL query is too long","A security vulnerability in password hashing"],
+      c: 0,
+      why: "It describes the deep paradigm conflict between object-oriented programming and relational set theory."
+    },
+    {
+      q: "How does an ORM typically represent a 1:N relationship in an object model?",
+      a: ["The parent object holds an in-memory collection or list of child objects, such as user.orders","The parent object stores a foreign key integer","The parent object deletes the child objects","Objects cannot represent relationships"],
+      c: 0,
+      why: "OOP represents relationships as collections of references, contrasting with relational foreign keys."
+    },
+    {
+      q: "Why is 'lazy loading' dangerous if developers are unaware it is happening?",
+      a: ["Accessing a property in a loop unexpectedly fires hundreds of individual database network queries (N+1 problem)","Lazy loading deletes records from the database table","Lazy loading is forbidden by web browser security rules","It turns off database backups"],
+      c: 0,
+      why: "Property access looks like reading memory, hiding the fact that it is triggering database network calls."
+    },
+    {
+      q: "What is the 'Single Table Inheritance' pattern in ORM mapping?",
+      a: ["All subclasses in an inheritance hierarchy are stored in a single table, using a 'type' discriminator column","Every table in the database is merged into one gigantic table","Tables can only have a single row","Inheritance is handled by duplicating the database"],
+      c: 0,
+      why: "Single Table Inheritance stores all subclass fields in one table with a discriminator column."
+    }
+  ]);
+</script>
+</body>
+</html>

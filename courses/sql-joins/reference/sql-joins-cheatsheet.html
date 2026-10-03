@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SQL Joins & Query Thinking — Cheat Sheet</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+<style>
+  .ref-toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0 8px; }
+  .ref-toc a { font-size: .8rem; border: 1px solid var(--border); background: #111a30; padding: 5px 11px; border-radius: 999px; color: var(--muted); text-decoration: none; border-bottom: 1px solid var(--border); }
+  .ref-toc a:hover { color: #fff; border-color: #3d5488; }
+  .lesson-wrap h2 { scroll-margin-top: 20px; }
+  .snippet { margin: 14px 0 22px; }
+  .snippet .lbl { font-size: .72rem; font-weight: 800; letter-spacing: .7px; text-transform: uppercase; color: var(--accent2); margin-bottom: 6px; }
+  .see { font-size: .82rem; color: var(--muted); margin: -6px 0 12px; }
+  .see a { color: var(--accent2); border-bottom: 0; }
+  .see a:hover { color: #fff; }
+  .snippet pre { padding-top: 34px; }
+  @media print { .snippet pre { padding-top: 18px; } }
+</style>
+</head>
+<body class="lesson-body" data-course="sql-joins">
+
+<div class="lesson-wrap">
+
+  <span class="lesson-kicker">Reference · Cheat sheet</span>
+  <h1 class="lesson-title">SQL Joins & Query Thinking — Cheat Sheet</h1>
+  <p class="lesson-lede">
+    The whole course on one page. Every snippet links back to the lesson that
+    teaches it.
+  </p>
+
+  <div class="ref-toc">
+    <a href="#sec-1">Join Type Matrix</a>
+    <a href="#sec-2">Common Table Expressions (CTEs)</a>
+    <a href="#sec-3">Self-Joins & Hierarchies</a>
+    <a href="#sec-4">Window Functions</a>
+  </div>
+
+  <h2 id="sec-1"><span class="n">1</span>Join Type Matrix</h2>
+  <div class="snippet">
+    <div class="lbl">Visualizing set intersections</div>
+    <pre><code>-- INNER JOIN: Intersection only (both sides must match)
+SELECT * FROM users u INNER JOIN orders o ON u.id = o.user_id;
+
+-- LEFT JOIN: All users + matching orders (or NULLs if no orders)
+SELECT * FROM users u LEFT JOIN orders o ON u.id = o.user_id;
+
+-- FULL OUTER JOIN: All users + all orders (matched where possible)
+SELECT * FROM users u FULL OUTER JOIN orders o ON u.id = o.user_id;</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0002-inner-joins-versus-outer-joins.html">Lesson 02 — Inner joins versus outer joins</a>.</p>
+
+  <h2 id="sec-2"><span class="n">2</span>Common Table Expressions (CTEs)</h2>
+  <div class="snippet">
+    <div class="lbl">Readable multi-step queries</div>
+    <pre><code>WITH monthly_sales AS (
+  SELECT user_id, SUM(amount) AS total_spent
+  FROM orders
+  WHERE order_date &gt;= '2026-01-01'
+  GROUP BY user_id
+)
+SELECT u.name, COALESCE(ms.total_spent, 0) AS revenue
+FROM users u
+LEFT JOIN monthly_sales ms ON u.id = ms.user_id
+ORDER BY revenue DESC;</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0005-subqueries-and-common-table-expressions-ctes.html">Lesson 05 — Subqueries and Common Table Expressions (CTEs)</a>.</p>
+
+  <h2 id="sec-3"><span class="n">3</span>Self-Joins & Hierarchies</h2>
+  <div class="snippet">
+    <div class="lbl">Joining a table to itself</div>
+    <pre><code>-- Find each employee and their direct manager
+SELECT e.name AS employee, m.name AS manager
+FROM employees e
+LEFT JOIN employees m ON e.manager_id = m.id;</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0006-self-joins-and-hierarchical-trees.html">Lesson 06 — Self-joins and hierarchical trees</a>.</p>
+
+  <h2 id="sec-4"><span class="n">4</span>Window Functions</h2>
+  <div class="snippet">
+    <div class="lbl">Analytics without collapsing rows</div>
+    <pre><code>SELECT id, user_id, amount,
+  -- Running total per user
+  SUM(amount) OVER (PARTITION BY user_id ORDER BY order_date) AS running_total,
+  -- Order ranking per user
+  ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY amount DESC) AS spending_rank
+FROM orders;</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0008-window-functions-and-analytical-queries.html">Lesson 08 — Window functions and analytical queries</a>.</p>
+
+  <div class="lesson-foot">
+    <div class="links">
+      <a href="sql-joins-glossary.html">📖 Glossary</a>
+      <a href="../course.html">← Course map</a>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

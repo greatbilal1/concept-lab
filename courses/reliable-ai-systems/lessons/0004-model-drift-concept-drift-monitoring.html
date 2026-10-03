@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 04 — Model Drift and Concept Drift Monitoring in Production</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="reliable-ai-systems" data-lesson="4" data-lesson-id="model-drift-concept-drift-monitoring">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 04</span> · Drift Monitoring</span>
+
+  <h1 class="lesson-title">Model Drift and Concept Drift Monitoring in Production</h1>
+  <p class="lesson-lede">
+    Detecting silent degradation: Data Drift (input distribution shifts), Concept Drift (changing real-world ground truth), and embedding shift.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to monitor and detect data drift, concept drift, and upstream provider updates.</span>
+    <span><b>Mission link</b> Mastering model drift and concept drift monitoring in production across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Model Drift and Concept Drift Monitoring in Production</h2>
+  <p>A machine learning model deployed today will not perform with the same accuracy in two years. The world evolves constantly: new regulations pass, products change names, and user vocabularies shift. Without <strong>Drift Monitoring</strong>, your AI will slowly turn into a confident relic reciting obsolete facts.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Detecting silent degradation: Data Drift (input distribution shifts), Concept Drift (changing real-world ground truth), and embedding shift.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Data Drift vs Concept Drift</h2>
+  <p>The Three Dimensions of Production Drift:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Upstream Provider Drift</h2>
+  <ul><li><strong>1. Data Drift (Covariate Shift):</strong> The distribution of incoming user prompts changes: $P(X)$ shifts. E.g. A surge in non-English queries, new slang, or mobile voice transcripts with speech-to-text typos. Detectable via embedding distribution distance (Maximum Mean Discrepancy).</li><li><strong>2. Concept Drift:</strong> The relationship between inputs and ground-truth answers changes: $P(Y | X)$ shifts. E.g. <em>'What is our return policy?'</em> used to be 30 days, but company policy changed to 14 days yesterday. The model continues reciting 30 days!</li><li><strong>3. Upstream Provider Drift:</strong> Cloud vendors deploy quantized weights or subtle system prompt updates to models behind existing API names, altering output lengths or formatting behavior.</li></ul><pre><code># Monitoring Embedding Data Drift with Population Stability Index (PSI):
+def check_for_input_data_drift(current_week_embeddings, baseline_embeddings):
+    # Compute distance between centroid clusters
+    distance = wasserstein_distance(
+        current_week_embeddings.mean(axis=0), baseline_embeddings.mean(axis=0)
+    )
+    if distance > DRIFT_THRESHOLD:
+        alert_data_science_team("DATA DRIFT ALERT: User prompt distribution has shifted!")</code></pre><div class="callout"><p><strong>The Re-indexing Trigger:</strong> When concept drift occurs (company policy updates), trigger an automated pipeline to re-chunk and re-embed documentation immediately.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the drift monitoring sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to monitor and detect data drift, concept drift, and upstream provider updates.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where model drift and concept drift monitoring in production applies.</li>
+    <li>Author a unit test or verification script exercising model drift and concept drift monitoring in production.</li>
+    <li>Document team architectural conventions regarding model drift and concept drift monitoring in production.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Model Drift and Concept Drift Monitoring in Production.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is the difference between 'Data Drift' and 'Concept Drift' in production AI systems?",
+    a: ["Data Drift is when input prompts change (new user jargon/languages); Concept Drift is when the real-world truth changes (a new law changes tax rules)","They are identical terms","Data drift happens in hardware; concept drift in software","Drift only occurs in video games"],
+    c: 0,
+    why: "Data drift shifts input distributions; concept drift changes the relationship between inputs and correct real-world answers."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Data Drift (Input Shift)",
+            "lines": [
+                  "User phrasing changes: new slang, typos",
+                  "Model receives unfamiliar distribution",
+                  "Detected via embedding distance"
+            ]
+      },
+      {
+            "title": "Concept Drift (Truth Shift)",
+            "lines": [
+                  "Company policy changes: 30 -> 14 days",
+                  "Input is identical, but correct answer changed!",
+                  "Detected via golden eval benchmarks"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Model Drift and Concept Drift Monitoring in Production",
+      "def execute_flow():",
+      "    # Detecting silent degradation: Data Drift (input di...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Model Drift and Concept Drift Monitoring in Production"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Provider Updates Weights"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Production drift monitoring detects {1} drift when user prompt vocabularies shift, and {2} drift when real-world ground-truth facts change."
+],
+    blanks: [
+      {
+            "a": [
+                  "data"
+            ],
+            "why": "Input distribution changes"
+      },
+      {
+            "a": [
+                  "concept"
+            ],
+            "why": "Shifts in the underlying truth or rules"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What happens if a company updates its employee travel expense policy, but never updates its RAG vector database?",
+      a: ["Concept drift: the AI assistant will continue to recite obsolete reimbursement rules with high confidence, misinforming employees","The database catches fire","The model deletes the policy","The server crashes"],
+      c: 0,
+      why: "Outdated retrieval indexes cause models to generate answers based on obsolete facts."
+    },
+    {
+      q: "How can an engineering team detect Data Drift in user prompts automatically?",
+      a: ["By comparing the statistical distribution and clustering of weekly query embedding vectors against a baseline reference dataset","By reading every query manually","By asking the model if drift occurred","By checking computer clock speed"],
+      c: 0,
+      why: "Tracking embedding vector cluster centroids over time exposes distribution shifts mathematically."
+    },
+    {
+      q: "What is 'Upstream Provider Drift'?",
+      a: ["When an external LLM vendor silently updates model weights, optimizations, or safety filters, altering behavior on existing prompts","When the internet provider disconnects cables","When the computer hardware wears out","When software licenses expire"],
+      c: 0,
+      why: "Provider weight updates can alter formatting, verbosity, and reasoning on established prompts."
+    },
+    {
+      q: "What automated action should be triggered when an evaluation suite detects severe performance drift on production prompts?",
+      a: ["Alert the on-call engineering team, block automated deployments, and inspect failing test cases to update prompts or documentation","Ignore the alert","Delete the test cases","Shut down the company website"],
+      c: 0,
+      why: "Drift alerts require engineering review to adapt prompts, tools, or retrieval indexes to new realities."
+    }
+  ]);
+</script>
+</body>
+</html>

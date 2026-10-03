@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 02 — The Dependency Rule and Clean Architecture</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="backend-architecture" data-lesson="2" data-lesson-id="the-dependency-rule-and-clean-architecture">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 02</span> · Layers & Architectural Boundaries</span>
+
+  <h1 class="lesson-title">The Dependency Rule and Clean Architecture</h1>
+  <p class="lesson-lede">
+    High-level policy should not depend on low-level details. Master Robert C. Martin's Dependency Rule: why dependencies must strictly point inward toward business entities.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Apply the Dependency Rule to protect business entities from database and UI framework changes</span>
+    <span><b>Mission link</b> The core design principle of Clean Architecture and Onion Architecture</span>
+  </div>
+
+  <h2><span class="n">1</span>The inverted dependency flow</h2>
+  <p>In traditional layered architectures, business logic depends on the database: if you change your ORM, your business services break. Robert C. Martin's <b>Clean Architecture</b> inverts this.</p><p>At the center of Clean Architecture sit <b>Entities and Use Cases</b>. At the outer edge sit <b>Frameworks, Web Servers, and Databases</b>. The central <b>Dependency Rule</b> states: <i>Source code dependencies must point strictly INWARD. Nothing in an inner circle can know anything about an outer circle.</i></p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Source code dependencies must point inward: business rules never depend on databases or frameworks.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The concentric circles of Clean Architecture</h2>
+  <p>Observe how business logic is protected from outer technology churn.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing the inward dependency path</h2>
+  <p>Trace how dependency inversion allows high-level use cases to command repositories via interfaces.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of Clean Architecture principles.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can design systems where business logic remains pristine and testable, completely decoupled from database libraries.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit a business entity to ensure it contains zero ORM or framework imports.</li>
+    <li>Define an interface for a database repository inside your domain package.</li>
+    <li>Implement an in-memory mock repository to run fast unit tests without a database.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Robert C. Martin, *Clean Architecture: A Craftsman's Guide to Software Structure and Design* (Prentice Hall, 2017).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "In Clean Architecture, can a core business entity import the SQLAlchemy or Express library?",
+    a: ["No, core business entities must have zero dependencies on external frameworks or databases","Yes, entities must import all database drivers","Only in development environments","Yes, if the entity is written in TypeScript"],
+    c: 0,
+    why: "Inner concentric circles must remain completely ignorant of outer delivery and database mechanisms."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Inner: Entities & Use Cases",
+            "lines": [
+                  "pure business policies",
+                  "zero external dependencies",
+                  "independent of UI & DB!"
+            ]
+      },
+      {
+            "title": "Middle: Interface Adapters",
+            "lines": [
+                  "controllers, presenters, gateways",
+                  "converts data between formats"
+            ]
+      },
+      {
+            "title": "Outer: Frameworks & Drivers",
+            "lines": [
+                  "FastAPI, PostgreSQL, Redis, Web",
+                  "details that change frequently"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Core Use Case (Inward): defines interface UserRepository",
+      "class RegisterUserUseCase:",
+      "    def __init__(self, repo: UserRepository): self.repo = repo",
+      "    def execute(self, email): user = User(email); self.repo.save(user)",
+      "# Outer Infrastructure: implements PostgresUserRepository",
+      "# The database depends on the use case's interface, NOT vice-versa!"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "core_policy": "use case defines its own storage interface"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "decoupling": "receives repository via dependency injection"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "dependency_inversion": "Postgres adapter implements interface pointing INWARD"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The rule that code dependencies must only point inward is the <0> Rule.",
+      "The author who formalized Clean Architecture is Robert C. <1>.",
+      "In Clean Architecture, web frameworks and databases are considered interchangeable <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "Dependency"
+            ],
+            "why": "The Dependency Rule governs Clean Architecture."
+      },
+      {
+            "a": [
+                  "Martin"
+            ],
+            "why": "Uncle Bob (Robert C. Martin) authored Clean Architecture."
+      },
+      {
+            "a": [
+                  "details",
+                  "plugins"
+            ],
+            "why": "Frameworks and databases are low-level details."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the primary mandate of the Dependency Rule in Clean Architecture?",
+      a: ["Source code dependencies must point strictly inward toward higher-level business policies","Every function must have at least five dependencies","Databases must be installed before writing code","All dependencies must be downloaded from npm"],
+      c: 0,
+      why: "Inner layers know nothing about outer layers; dependencies point inward toward business rules."
+    },
+    {
+      q: "Why are frameworks and databases classified as 'details' in Clean Architecture?",
+      a: ["Because technology choices (Postgres vs Mongo, FastAPI vs Django) should be swappable without rewriting business rules","Because databases do not contain important information","Because frameworks are illegal in enterprise software","Because databases are only used for backups"],
+      c: 0,
+      why: "A good architecture defers technology decisions and treats delivery mechanisms as plugins."
+    },
+    {
+      q: "How does the Dependency Rule affect unit testing?",
+      a: ["Business use cases can be unit-tested in milliseconds in memory by passing mock repositories without running a real database","Unit testing is completely eliminated","Tests must run on production servers","Tests can only be executed once per week"],
+      c: 0,
+      why: "Decoupling business logic from databases allows fast, isolated, deterministic unit testing."
+    },
+    {
+      q: "What lives in the innermost core circle of Clean Architecture?",
+      a: ["Entities (Enterprise Business Rules) and Use Cases (Application Business Rules)","The PostgreSQL database driver","The HTTP router and controller functions","The CSS stylesheet files"],
+      c: 0,
+      why: "Entities and Use Cases embody pure business policies with zero external framework dependencies."
+    }
+  ]);
+</script>
+</body>
+</html>

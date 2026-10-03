@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 04 — Chunk Overlap and Metadata Tagging</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="rag" data-lesson="4" data-lesson-id="chunk-overlap-and-metadata-tagging">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 04</span> · Chunk Enrichment</span>
+
+  <h1 class="lesson-title">Chunk Overlap and Metadata Tagging</h1>
+  <p class="lesson-lede">
+    Preventing boundary blindness with chunk overlap (10-20%) and enriching chunks with structured metadata tags.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to configure chunk overlap and enrich vector records with structured metadata.</span>
+    <span><b>Mission link</b> Mastering chunk overlap and metadata tagging across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Chunk Overlap and Metadata Tagging</h2>
+  <p>Even with the best text splitters, boundaries must occur somewhere. If a vital fact spans the seam between Chunk 1 and Chunk 2, a query might fail to retrieve either chunk because the complete thought is divided. The simple, universal defense is <strong>Chunk Overlap</strong>.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Preventing boundary blindness with chunk overlap (10-20%) and enriching chunks with structured metadata tags.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Chunk Overlap Architecture</h2>
+  <p>By configuring a <strong>10% to 20% overlap</strong> (e.g. a 500-token chunk with a 50-token overlap), the ending of Chunk 1 is repeated at the beginning of Chunk 2:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Metadata-Enriched Document Chunk</h2>
+  <pre><code># The Overlapping Chunk Seam:
+# Chunk 1: [Tokens 0   -> 500]
+# Chunk 2: [Tokens 450 -> 950]  (Tokens 450-500 exist in BOTH chunks!)
+# Chunk 3: [Tokens 900 -> 1400] (Tokens 900-950 exist in BOTH chunks!)</code></pre><p>In addition to overlap, high-performance RAG enriches every chunk with <strong>Structured Metadata</strong>:</p><ul><li><strong>Document Provenance:</strong> `source: "docs/billing.md"`, `title: "Invoice API Guide"`.</li><li><strong>Hierarchy:</strong> `header: "Refund Calculations"`, `section_id: "3.2"`.</li><li><strong>Access Control & Filtering:</strong> `tenant_id: "org_42"`, `role: "admin"`, `updated_at: "2026-03-31"`.</li></ul><p>Metadata allows your vector database to perform <strong>Filtered Vector Search</strong>: <em>'Find chunks semantically similar to "refund", BUT ONLY where tenant_id == org_42 and role == admin.'</em></p><div class="callout"><p><strong>Security Law:</strong> Never rely on vector similarity alone for multi-tenant data isolation! Always filter by tenant_id using explicit database metadata filters.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the chunk enrichment sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to configure chunk overlap and enrich vector records with structured metadata.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where chunk overlap and metadata tagging applies.</li>
+    <li>Author a unit test or verification script exercising chunk overlap and metadata tagging.</li>
+    <li>Document team architectural conventions regarding chunk overlap and metadata tagging.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Chunk Overlap and Metadata Tagging.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Why is adding a 10% to 20% 'Chunk Overlap' between consecutive passages critical in RAG?",
+    a: ["It ensures that concepts, pronouns, and sentences spanning the boundary between two chunks are preserved in both chunks","It makes documents 10x longer","It reduces database storage costs","It translates text into French"],
+    c: 0,
+    why: "Overlap guarantees that boundary-spanning sentences and pronoun antecedents are captured completely."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Chunk 1 (Tokens 0-500)",
+            "lines": [
+                  "Contains first paragraph",
+                  "Ending 50 tokens overlap into Chunk 2"
+            ]
+      },
+      {
+            "title": "Overlapping Seam (Tokens 450-500)",
+            "lines": [
+                  "Repeated in both chunks",
+                  "Guarantees complete boundary thoughts"
+            ]
+      },
+      {
+            "title": "Chunk 2 (Tokens 450-950)",
+            "lines": [
+                  "Begins with overlapping context",
+                  "Maintains pronoun & entity continuity"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Chunk Overlap and Metadata Tagging",
+      "def execute_flow():",
+      "    # Preventing boundary blindness with chunk overlap (...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Chunk Overlap and Metadata Tagging"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Vector Embedding"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Payload & Metadata"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Chunk overlap preserves context across boundaries, while structured {1} enables hard filtering by tenant ID and access {2}."
+],
+    blanks: [
+      {
+            "a": [
+                  "metadata"
+            ],
+            "why": "Structured tags attached to chunks"
+      },
+      {
+            "a": [
+                  "permissions"
+            ],
+            "why": "Role-based access control rules"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the recommended percentage of overlap when chunking text for RAG?",
+      a: ["10% to 20% of the chunk size (e.g. 50 tokens overlap on a 500-token chunk)","100% overlap (every chunk is identical)","Zero overlap is always best","80% overlap"],
+      c: 0,
+      why: "10-20% overlap reliably preserves boundary context without causing excessive index bloat."
+    },
+    {
+      q: "Why is metadata filtering essential in multi-tenant SaaS applications using RAG?",
+      a: ["It mathematically guarantees that users can only retrieve chunks belonging to their own organization (preventing cross-tenant data leaks)","It speeds up Python","It encrypts the hard drive","It reduces electricity costs"],
+      c: 0,
+      why: "Metadata filtering enforces strict multi-tenant boundaries at the database query level."
+    },
+    {
+      q: "What metadata attribute helps users verify where an answer came from?",
+      a: ["The source file path, document title, and page number or URL","The CPU temperature","The database port number","The author's phone number"],
+      c: 0,
+      why: "Source paths and page numbers provide verifiable citation provenance."
+    },
+    {
+      q: "How does prepending the document title or section header to the chunk text improve embedding quality?",
+      a: ["It contextualizes the chunk's vector with global document topic information, preventing ambiguous chunks from floating in isolation","It makes the file smaller","It compiles the text","It turns off logging"],
+      c: 0,
+      why: "Adding section context anchors isolated paragraphs to their overarching document theme."
+    }
+  ]);
+</script>
+</body>
+</html>

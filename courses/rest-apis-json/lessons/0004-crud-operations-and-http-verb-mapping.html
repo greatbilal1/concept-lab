@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 04 — CRUD operations and HTTP verb mapping</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="rest-apis-json" data-lesson="4" data-lesson-id="crud-operations-and-http-verb-mapping">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 04</span> · JSON & Data Representations</span>
+
+  <h1 class="lesson-title">CRUD operations and HTTP verb mapping</h1>
+  <p class="lesson-lede">
+    How do database operations map to network requests? Learn how Create, Read, Update, and Delete map cleanly to POST, GET, PUT, PATCH, and DELETE.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Map database CRUD operations to standard RESTful HTTP methods and status responses</span>
+    <span><b>Mission link</b> The architectural bridge between database persistence and API endpoints</span>
+  </div>
+
+  <h2><span class="n">1</span>The CRUD to HTTP translation</h2>
+  <p>Database operations follow the CRUD acronym: <b>Create</b>, <b>Read</b>, <b>Update</b>, and <b>Delete</b>. In RESTful API design, these database operations map directly to standard HTTP methods.</p><p>Creating an item maps to <code>POST /resources</code> (returning <code>201 Created</code>). Reading maps to <code>GET</code>. Deleting maps to <code>DELETE</code> (returning <code>204 No Content</code>). Updating maps to either <code>PUT</code> (full replacement) or <code>PATCH</code> (partial field update).</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Map CRUD operations to standardized HTTP verbs and return matching 2xx status codes.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The CRUD mapping matrix</h2>
+  <p>Memorise the standard mapping between database actions, HTTP verbs, and responses.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing a complete CRUD lifecycle</h2>
+  <p>Trace an entity from creation through update and deletion over HTTP.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of CRUD HTTP mappings.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can implement clean REST endpoints covering all database CRUD requirements with standardized HTTP responses.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your API endpoints to ensure DELETE returns 204 No Content.</li>
+    <li>Add a Location header to all successful POST creation responses.</li>
+    <li>Verify that PUT requests replace the full resource entity while PATCH updates fields.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    IETF RFC 9110: *HTTP Semantics*, Section 9.3: 'Method Definitions'.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "When a POST request successfully creates a new user, what status code and header should the server return?",
+    a: ["Status 201 Created with a Location header pointing to the new user URI (e.g. /users/42)","Status 200 OK with an empty body","Status 204 No Content with a Refresh header","Status 301 Moved Permanently"],
+    c: 0,
+    why: "RFC 9110 specifies 201 Created paired with a Location header identifying the created resource."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Create (INSERT)",
+            "lines": [
+                  "POST /items",
+                  "Body: new item payload",
+                  "Response: 201 Created + Location"
+            ]
+      },
+      {
+            "title": "Read (SELECT)",
+            "lines": [
+                  "GET /items/:id",
+                  "Safe & Idempotent",
+                  "Response: 200 OK"
+            ]
+      },
+      {
+            "title": "Update (UPDATE)",
+            "lines": [
+                  "PATCH /items/:id (partial)",
+                  "PUT /items/:id (replace)",
+                  "Response: 200 OK"
+            ]
+      },
+      {
+            "title": "Delete (DELETE)",
+            "lines": [
+                  "DELETE /items/:id",
+                  "Idempotent",
+                  "Response: 204 No Content"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "POST /api/v1/notes {'title': 'Buy milk'} -> 201 Created (Location: /notes/101)",
+      "GET /api/v1/notes/101 -> 200 OK {'id': 101, 'title': 'Buy milk'}",
+      "PATCH /api/v1/notes/101 {'done': true} -> 200 OK (updated)",
+      "DELETE /api/v1/notes/101 -> 204 No Content (resource removed)"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "action": "Create: note #101 created"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "action": "Read: note fetched via ID"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "action": "Update: done field patched"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "action": "Delete: record deleted cleanly"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The HTTP status code for successful creation of a resource is <0>.",
+      "The header indicating the URI of a newly created resource is <1>.",
+      "The status code indicating successful deletion without a response body is <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "201"
+            ],
+            "why": "201 Created is the standard creation response."
+      },
+      {
+            "a": [
+                  "Location"
+            ],
+            "why": "The Location header points to the new resource."
+      },
+      {
+            "a": [
+                  "204"
+            ],
+            "why": "204 No Content indicates success with an empty body."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What header should accompany a '201 Created' response?",
+      a: ["Location: /api/v1/resources/:id","Content-Disposition: attachment","Server-Timing: total","Authorization: Bearer"],
+      c: 0,
+      why: "The Location header informs the client of the URI where the new resource lives."
+    },
+    {
+      q: "Why is 204 No Content preferred over 200 OK for successful DELETE operations?",
+      a: ["The resource was deleted, so returning no body payload is intuitive and saves network bandwidth","200 OK is illegal for DELETE requests in HTTP/2","204 encrypts the network packet","200 OK causes browsers to refresh the page automatically"],
+      c: 0,
+      why: "204 confirms successful deletion without transmitting redundant body bytes."
+    },
+    {
+      q: "How should an API respond if a client tries to DELETE a resource ID that does not exist?",
+      a: ["Return 404 Not Found (or 204 if treating delete as strictly idempotent state)","Return 500 Internal Server Error","Hang the connection for sixty seconds","Crash the database server"],
+      c: 0,
+      why: "404 Not Found signals the targeted item does not exist."
+    },
+    {
+      q: "What is an idempotency key in payment API POST requests?",
+      a: ["A client-generated UUID sent in headers so retried POST requests do not double-charge customers","A secret password known only to payment card companies","An encryption key that speeds up SQL queries","A tracking cookie used for marketing advertisements"],
+      c: 0,
+      why: "Idempotency keys let servers detect duplicate POST requests and return cached results."
+    }
+  ]);
+</script>
+</body>
+</html>

@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 04 — Cost Modeling: Input Tokens, Output Tokens, and Batch API</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="model-selection" data-lesson="4" data-lesson-id="cost-modeling-tokens-batch-api">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 04</span> · Cost Modeling</span>
+
+  <h1 class="lesson-title">Cost Modeling: Input Tokens, Output Tokens, and Batch API</h1>
+  <p class="lesson-lede">
+    Financial engineering for AI: building cost models, calculating blended unit costs, and leveraging Batch API discounts.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to build quantitative financial cost models for AI features.</span>
+    <span><b>Mission link</b> Mastering cost modeling: input tokens, output tokens, and batch api across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Cost Modeling: Input Tokens, Output Tokens, and Batch API</h2>
+  <p>Building an AI prototype is cheap; scaling it to 100,000 daily active users can bankrupt a startup if token economics are not modeled accurately. A naive calculation based on headline prices will miss the fact that <strong>output tokens are 3x to 5x more expensive</strong> and conversation history accumulates quadratically.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Financial engineering for AI: building cost models, calculating blended unit costs, and leveraging Batch API discounts.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Unit Cost Modeling Framework</h2>
+  <p>To construct a professional <strong>Unit Cost Model</strong>:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Batch API Economics</h2>
+  <ul><li><strong>1. Measure Input-to-Output Ratio ($R_{I/O}$):</strong> For search/RAG, inputs dominate ($10:1$ ratio: 2,000 input tokens, 200 output tokens). For code generation, outputs are heavier ($2:1$ ratio).</li><li><strong>2. Incorporate Prompt Caching:</strong> If your architecture uses static system prefixes, discount cached input tokens by 50-90%!</li><li><strong>3. Leverage Batch APIs for Asynchronous Workloads:</strong> If tasks do not require real-time responses (e.g. nightly code audits, bulk scraping summaries), use Batch APIs to get an immediate <strong>50% discount</strong> across the board.</li></ul><pre><code># Quantitative Cost Modeling in Python:
+def calculate_monthly_cost(daily_queries, input_toks, output_toks, in_price_m, out_price_m, cache_hit_rate=0.0):
+    # Apply 90% discount on cached inputs:
+    effective_in_price = (in_price_m * (1 - cache_hit_rate)) + (in_price_m * 0.10 * cache_hit_rate)
+    cost_per_query = (input_toks / 1e6 * effective_in_price) + (output_toks / 1e6 * out_price_m)
+    monthly_cost = daily_queries * cost_per_query * 30
+    return round(monthly_cost, 2)
+
+# Example: 50k queries/day, 4k input, 300 output with GPT-4o-mini (80% cache hit):
+# Monthly total: only $81.00! Scalable and sustainable!</code></pre><div class="callout"><p><strong>The Business Rule:</strong> Calculate unit cost per customer transaction before writing code. If an AI call costs $0.05 and your customer pays $0.02 per action, your business model is upside-down!</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the cost modeling sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to build quantitative financial cost models for AI features.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where cost modeling: input tokens, output tokens, and batch api applies.</li>
+    <li>Author a unit test or verification script exercising cost modeling: input tokens, output tokens, and batch api.</li>
+    <li>Document team architectural conventions regarding cost modeling: input tokens, output tokens, and batch api.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Cost Modeling: Input Tokens, Output Tokens, and Batch API.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is 'Blended Token Cost' when modeling the operating expenses of an AI feature?",
+    a: ["The weighted average cost per query incorporating both input tokens and higher-priced output tokens across real usage patterns","The price of electricity in blended energy grids","The cost of combining Python and JavaScript","The salary of software engineers"],
+    c: 0,
+    why: "Blended cost models calculate real-world unit expenses based on input-to-output ratios."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1. Measure Usage Profile",
+            "lines": [
+                  "Average input tokens per call",
+                  "Average output tokens per call",
+                  "Daily query volume"
+            ]
+      },
+      {
+            "title": "2. Apply Cost Reductions",
+            "lines": [
+                  "Prompt caching: up to 90% off input",
+                  "Batch API: 50% off total"
+            ]
+      },
+      {
+            "title": "3. Unit Economics Check",
+            "lines": [
+                  "Cost per transaction < Customer price",
+                  "Guarantees sustainable gross margins"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Cost Modeling: Input Tokens, Output Tokens, and Batch API",
+      "def execute_flow():",
+      "    # Financial engineering for AI: building cost models...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Cost Modeling: Input Tokens, Output Tokens, and Batch API"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Real-Time API (Standard)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Batch API (Asynchronous)"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Financial cost models calculate blended unit costs per query and leverage prompt {1} and {2} APIs to slash operating expenses."
+],
+    blanks: [
+      {
+            "a": [
+                  "caching"
+            ],
+            "why": "Discounts on repeated prompt prefixes"
+      },
+      {
+            "a": [
+                  "Batch"
+            ],
+            "why": "Asynchronous 50% discounted processing"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why is the Batch API an ideal choice for nightly code quality audits or PR summaries?",
+      a: ["Nightly tasks do not require sub-second latency and benefit from an automatic 50% cost discount","Batch APIs are only available at night","Batch APIs run on faster GPUs","Batch APIs write better code"],
+      c: 0,
+      why: "Asynchronous jobs tolerate 24-hour turnaround in exchange for substantial financial savings."
+    },
+    {
+      q: "What happens to the gross margins of a SaaS company if token usage grows faster than subscription revenue?",
+      a: ["Margins compress, and the company can lose money on every active customer (negative unit economics)","The company stock automatically increases","Cloud providers refund the difference","The software becomes free"],
+      c: 0,
+      why: "Uncapped AI usage without cost modeling leads to unsustainable negative gross margins."
+    },
+    {
+      q: "How does implementing semantic caching (caching previous prompt answers) reduce API bills?",
+      a: ["If a user asks a query semantically identical to a recent question, the cached answer is returned with zero API calls","It deletes the database cache","It makes models run without electricity","It compresses text into zip files"],
+      c: 0,
+      why: "Returning cached responses for frequent queries completely bypasses LLM inference costs."
+    },
+    {
+      q: "What is the primary driver of escalating costs in multi-turn chat applications?",
+      a: ["Re-sending the entire accumulated conversation history as input tokens on every subsequent turn","The cost of mouse clicks","The font used in the chat window","Internet service provider bandwidth"],
+      c: 0,
+      why: "Stateless APIs bill for all historical tokens retransmitted on every single message turn."
+    }
+  ]);
+</script>
+</body>
+</html>

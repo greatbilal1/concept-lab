@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 07 — Virtual environments</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="python-modules-packages" data-lesson="7" data-lesson-id="virtual-environments">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 07</span> · Environments</span>
+
+  <h1 class="lesson-title">Virtual environments</h1>
+  <p class="lesson-lede">
+    Two projects need two different versions of the same library. Without
+    environments that is impossible, and the failure is silent until it is not.
+    This lesson is about the one directory that fixes it.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Isolate a project's dependencies</span>
+    <span><b>Mission link</b> Reproducibility is a feature</span>
+  </div>
+
+  <h2><span class="n">1</span>The version collision</h2>
+
+  <p>
+    Project A needs <code>requests 2.28</code>. Project B needs
+    <code>requests 2.32</code>. If both install into the same interpreter, one of
+    them is wrong — and whichever installed last wins. The other project breaks,
+    often in a way that looks like a bug in your code.
+  </p>
+
+  <p>
+    A <b>virtual environment</b> solves this by giving each project its own
+    <code>site-packages</code> directory. Installing into one environment cannot
+    touch another, because they are different folders on disk.
+  </p>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>What is actually inside one</h2>
+
+  <p>
+    A virtual environment is not a copy of Python. It is a small directory holding
+    a link to the interpreter, its own package folder, and a few scripts that
+    activate it.
+  </p>
+
+  <div id="intro1"></div>
+
+  <p>
+    Because the interpreter is shared and only the packages are separate, creating
+    an environment is fast — a second or two, not a reinstall of Python.
+  </p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    An environment isolates <b>packages</b>, not the interpreter. That is why it is
+    cheap, and why it is the right tool for per-project dependency sets.
+  </div>
+
+  <h2><span class="n">3</span>Create, activate, verify</h2>
+
+  <p>
+    The workflow is three commands, and the third one is the one people skip:
+  </p>
+
+  <pre><code>python -m venv .venv          # create
+source .venv/bin/activate     # activate (macOS / Linux)
+# .venv\Scripts\activate      # activate (Windows)
+
+which python                  # verify: should point inside .venv
+pip install requests          # installs into THIS environment only</code></pre>
+
+  <p>
+    That <code>which python</code> check is worth making a habit. If it does not
+    print a path containing <code>.venv</code>, you are about to install into the
+    wrong place.
+  </p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Activation is just PATH editing</h2>
+
+  <p>
+    "Activating" sounds like magic. It is not. The activate script prepends the
+    environment's <code>bin</code> directory to your shell's <code>PATH</code>, so
+    that <code>python</code> and <code>pip</code> resolve to the environment's
+    copies first.
+  </p>
+
+  <div id="diagram1"></div>
+
+  <p>
+    That is why activation is per-shell: a new terminal does not inherit it. And it
+    is why <code>deactivate</code> is just a function that puts the old
+    <code>PATH</code> back.
+  </p>
+
+  <div class="note good">
+    <span class="note-label">Why this matters later</span>
+    Every deployment, every CI pipeline, every Dockerfile you will ever write
+    creates an environment and installs into it. The commands change slightly; the
+    concept is exactly this one. Get it right locally and the rest is translation.
+  </div>
+
+  <h2><span class="n">5</span>Check yourself</h2>
+
+  <p>
+    Answer from memory — do not scroll back up. Each option has the same number of
+    words, so nothing gives the answer away.
+  </p>
+
+  <div id="fill1"></div>
+  <div id="quiz"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>
+      You can now create an isolated environment, verify you are inside it, and
+      explain what activation actually does to your shell. No more "it works on my
+      machine" caused by a shared package folder.
+    </p>
+  </div>
+
+  <h2><span class="n">6</span>Do this next</h2>
+
+  <ol>
+    <li>
+      Create a <code>.venv</code> in a scratch folder, activate it, and run
+      <code>which python</code>. Then deactivate and run it again.
+    </li>
+    <li>
+      Install any small package inside the environment, then deactivate and try to
+      import it. Confirm it is gone from the global interpreter.
+    </li>
+    <li>
+      Add <code>.venv/</code> to a <code>.gitignore</code>. Environments are
+      rebuilt, never committed.
+    </li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Read the official
+    <a href="https://docs.python.org/3/library/venv.html">venv documentation</a>,
+    especially "Creating virtual environments", which covers the exact commands and
+    the platform differences.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher (me) anything — "what is conda then?",
+    "should .venv be committed?", "what is poetry doing differently?". There are no
+    bad questions here.
+  </div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  /* what is inside a venv */
+  TeachWidgets.introCards("#intro1", {
+    cards: [
+      { ico: "🔗", title: "Interpreter link", body: "A pointer to the Python you created it from." },
+      { ico: "📦", title: "Its own site-packages", body: "Where pip installs go — private to this project." },
+      { ico: "⚙️", title: "Activate scripts", body: "Shell scripts that put this environment first on PATH." }
+    ]
+  });
+
+  /* predict-then-reveal */
+  TeachWidgets.predict("#predict1", {
+    q: "You install `requests` inside a virtual environment. Where does it go?",
+    a: ["The global site packages", "That environment's folder", "The project source folder"],
+    c: 1,
+    why: "pip installs into the active environment's site-packages. The global interpreter is untouched, which is exactly the point."
+  });
+
+  /* step-through trace of the workflow */
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "python -m venv .venv",
+      "source .venv/bin/activate",
+      "which python",
+      "  -> /project/.venv/bin/python",
+      "pip install requests",
+      "  -> /project/.venv/lib/.../site-packages"
+    ],
+    steps: [
+      { line: 0, vars: { created: ".venv/" } },
+      { line: 1, vars: { path: ".venv/bin prepended" } },
+      { line: 2, vars: { checking: "which python" } },
+      { line: 3, vars: { resolved: ".venv/bin/python" } },
+      { line: 4, vars: { installing: "requests" } },
+      { line: 5, vars: { target: ".venv site-packages" } }
+    ]
+  });
+
+  /* activation is PATH editing */
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      { title: "Before", lines: ["PATH: /usr/bin", "python -> system"] },
+      { title: "activate", lines: ["prepend .venv/bin", "PATH edited"] },
+      { title: "After", lines: ["PATH: .venv/bin:...", "python -> .venv"] }
+    ]
+  });
+
+  /* recall from memory */
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — the workflow",
+    lines: [
+      "Create an environment: <code>python -m <0> .venv</code>",
+      "Activate it on macOS: <code>source .venv/bin/<1></code>",
+      "Verify with <code>which <2></code> — it should point inside .venv."
+    ],
+    blanks: [
+      { a: ["venv"], why: "The venv module creates virtual environments." },
+      { a: ["activate"], why: "The activate script prepends the environment's bin directory to PATH." },
+      { a: ["python"], why: "Checking which python confirms the environment is active." }
+    ]
+  });
+
+  /* the quiz — every option is exactly three words */
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What does a venv isolate?",
+      a: ["The Python interpreter itself", "The installed package set", "The project source files", "The operating system libraries"],
+      c: 1,
+      why: "A virtual environment gives each project its own site-packages, isolating installed packages."
+    },
+    {
+      q: "What does activate do?",
+      a: ["Copies the interpreter over", "Edits the shell PATH", "Installs the dependencies", "Creates the environment folder"],
+      c: 1,
+      why: "Activation prepends the environment's bin directory to PATH so python and pip resolve there first."
+    },
+    {
+      q: "How do you verify it?",
+      a: ["Run pip list globally", "Check which python", "Delete the environment", "Restart the terminal"],
+      c: 1,
+      why: "which python should print a path inside .venv when the environment is active."
+    },
+    {
+      q: "Should .venv be committed?",
+      a: ["Yes, always commit it", "No, rebuild it instead", "Only for small projects", "Only if it is empty"],
+      c: 1,
+      why: "Environments are rebuilt from a dependency list, so they are gitignored rather than committed."
+    }
+  ]);
+</script>
+</body>
+</html>

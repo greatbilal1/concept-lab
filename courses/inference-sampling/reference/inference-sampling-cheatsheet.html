@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inference, Temperature & Sampling — Cheat Sheet</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+<style>
+  .ref-toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0 8px; }
+  .ref-toc a { font-size: .8rem; border: 1px solid var(--border); background: #111a30; padding: 5px 11px; border-radius: 999px; color: var(--muted); text-decoration: none; border-bottom: 1px solid var(--border); }
+  .ref-toc a:hover { color: #fff; border-color: #3d5488; }
+  .lesson-wrap h2 { scroll-margin-top: 20px; }
+  .snippet { margin: 14px 0 22px; }
+  .snippet .lbl { font-size: .72rem; font-weight: 800; letter-spacing: .7px; text-transform: uppercase; color: var(--accent2); margin-bottom: 6px; }
+  .see { font-size: .82rem; color: var(--muted); margin: -6px 0 12px; }
+  .see a { color: var(--accent2); border-bottom: 0; }
+  .see a:hover { color: #fff; }
+  .snippet pre { padding-top: 34px; }
+  @media print { .snippet pre { padding-top: 18px; } }
+</style>
+</head>
+<body class="lesson-body" data-course="inference-sampling">
+
+<div class="lesson-wrap">
+
+  <span class="lesson-kicker">Reference · Cheat sheet</span>
+  <h1 class="lesson-title">Inference, Temperature & Sampling — Cheat Sheet</h1>
+  <p class="lesson-lede">
+    The whole course on one page. Every snippet links back to the lesson that
+    teaches it.
+  </p>
+
+  <div class="ref-toc">
+    <a href="#sec-1">Deterministic Coding Configuration</a>
+    <a href="#sec-2">Natural Conversational Configuration</a>
+    <a href="#sec-3">Stable Softmax with Temperature</a>
+    <a href="#sec-4">Top-P (Nucleus) Truncation Algorithm</a>
+  </div>
+
+  <h2 id="sec-1"><span class="n">1</span>Deterministic Coding Configuration</h2>
+  <div class="snippet">
+    <div class="lbl">Zero temperature for code & JSON</div>
+    <pre><code>response = client.chat.completions.create(
+    model="gpt-4o",
+    messages=[...],
+    temperature=0.0,       # Deterministic greedy decoding
+    top_p=1.0,
+    frequency_penalty=0.0, # Zero penalties to preserve syntax
+    presence_penalty=0.0,
+    seed=42
+)</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0008-choosing-sampling-parameters-tasks.html">Lesson 08 — Choosing Sampling Parameters for Code vs Creative Tasks</a>.</p>
+
+  <h2 id="sec-2"><span class="n">2</span>Natural Conversational Configuration</h2>
+  <div class="snippet">
+    <div class="lbl">Balanced coherence and diversity</div>
+    <pre><code>response = client.chat.completions.create(
+    model="gpt-4o",
+    messages=[...],
+    temperature=0.7,
+    top_p=0.9,
+    presence_penalty=0.1
+)</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0008-choosing-sampling-parameters-tasks.html">Lesson 08 — Choosing Sampling Parameters for Code vs Creative Tasks</a>.</p>
+
+  <h2 id="sec-3"><span class="n">3</span>Stable Softmax with Temperature</h2>
+  <div class="snippet">
+    <div class="lbl">NumPy implementation</div>
+    <pre><code>import numpy as np
+def stable_softmax(logits, temperature=1.0):
+    scaled = logits / max(temperature, 1e-5)
+    exp_s = np.exp(scaled - np.max(scaled))
+    return exp_s / np.sum(exp_s)</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0001-logits-and-softmax-probabilities.html">Lesson 01 — The Logits Vector and Softmax Probabilities</a>.</p>
+
+  <h2 id="sec-4"><span class="n">4</span>Top-P (Nucleus) Truncation Algorithm</h2>
+  <div class="snippet">
+    <div class="lbl">Cumulative mass filtering</div>
+    <pre><code>def top_p_filter(probs, p=0.9):
+    sorted_indices = np.argsort(probs)[::-1]
+    sorted_probs = probs[sorted_indices]
+    cum_probs = np.cumsum(sorted_probs)
+    # Keep tokens where previous cumulative sum is &lt; p:
+    cutoff = cum_probs &gt; p
+    cutoff[1:] = cutoff[:-1]
+    cutoff[0] = False
+    sorted_probs[cutoff] = 0.0
+    return sorted_probs / np.sum(sorted_probs)</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0005-top-p-nucleus-sampling.html">Lesson 05 — Top-P (Nucleus) Sampling: Dynamic Cumulative Probability</a>.</p>
+
+  <div class="lesson-foot">
+    <div class="links">
+      <a href="inference-sampling-glossary.html">📖 Glossary</a>
+      <a href="../course.html">← Course map</a>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Cost & Latency Engineering — Cheat Sheet</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+<style>
+  .ref-toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0 8px; }
+  .ref-toc a { font-size: .8rem; border: 1px solid var(--border); background: #111a30; padding: 5px 11px; border-radius: 999px; color: var(--muted); text-decoration: none; border-bottom: 1px solid var(--border); }
+  .ref-toc a:hover { color: #fff; border-color: #3d5488; }
+  .lesson-wrap h2 { scroll-margin-top: 20px; }
+  .snippet { margin: 14px 0 22px; }
+  .snippet .lbl { font-size: .72rem; font-weight: 800; letter-spacing: .7px; text-transform: uppercase; color: var(--accent2); margin-bottom: 6px; }
+  .see { font-size: .82rem; color: var(--muted); margin: -6px 0 12px; }
+  .see a { color: var(--accent2); border-bottom: 0; }
+  .see a:hover { color: #fff; }
+  .snippet pre { padding-top: 34px; }
+  @media print { .snippet pre { padding-top: 18px; } }
+</style>
+</head>
+<body class="lesson-body" data-course="ai-cost-latency">
+
+<div class="lesson-wrap">
+
+  <span class="lesson-kicker">Reference · Cheat sheet</span>
+  <h1 class="lesson-title">AI Cost & Latency Engineering — Cheat Sheet</h1>
+  <p class="lesson-lede">
+    The whole course on one page. Every snippet links back to the lesson that
+    teaches it.
+  </p>
+
+  <div class="ref-toc">
+    <a href="#sec-1">FastAPI Server-Sent Events Streaming</a>
+    <a href="#sec-2">Two-Tier Model Cascade Pattern</a>
+    <a href="#sec-3">Semantic Vector Cache Lookup</a>
+    <a href="#sec-4">vLLM OpenAI Server Launch</a>
+  </div>
+
+  <h2 id="sec-1"><span class="n">1</span>FastAPI Server-Sent Events Streaming</h2>
+  <div class="snippet">
+    <div class="lbl">Low-latency token streaming</div>
+    <pre><code>from fastapi.responses import StreamingResponse
+@app.post("/chat/stream")
+async def stream(prompt: str):
+    async def gen():
+        stream = await client.chat.completions.create(model="gpt-4o-mini", messages=[...], stream=True)
+        async for chunk in stream:
+            yield f"data: {json.dumps({'token': chunk.choices[0].delta.content or ''})}\n\n"
+    return StreamingResponse(gen(), media_type="text/event-stream")</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0005-streaming-architectures-optimistic-ui.html">Lesson 05 — Streaming Architectures and Optimistic UI Rendering</a>.</p>
+
+  <h2 id="sec-2"><span class="n">2</span>Two-Tier Model Cascade Pattern</h2>
+  <div class="snippet">
+    <div class="lbl">Cost-optimized routing fallback</div>
+    <pre><code># 1. Try fast cheap tier ($0.15/1M):
+res = await call_fast_model(prompt, max_tokens=150)
+if res.confidence &gt;= 0.90 and not res.expressed_doubt:
+    return res.text # 80% resolved here!
+# 2. Escalate remaining 20% to frontier tier ($5.00/1M):
+return await call_frontier_model(prompt, max_tokens=600)</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0007-dynamic-token-budgets-model-cascades.html">Lesson 07 — Dynamic Token Budgets and Model Cascades</a>.</p>
+
+  <h2 id="sec-3"><span class="n">3</span>Semantic Vector Cache Lookup</h2>
+  <div class="snippet">
+    <div class="lbl">15ms sub-cent response reuse</div>
+    <pre><code>vector = embed(query)
+match = await redis_vector.find_nearest(vector, threshold=0.96)
+if match:
+    return match.cached_response # 15ms cache hit!
+answer = await call_llm(query)
+await redis_vector.save(vector, answer, ttl=86400)
+return answer</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0003-semantic-caching-vector-databases.html">Lesson 03 — Semantic Caching with Vector Databases (GPTCache)</a>.</p>
+
+  <h2 id="sec-4"><span class="n">4</span>vLLM OpenAI Server Launch</h2>
+  <div class="snippet">
+    <div class="lbl">Continuous batching high-throughput serving</div>
+    <pre><code>python -m vllm.entrypoints.openai.api_server \
+    --model meta-llama/Llama-3.1-8B-Instruct \
+    --max-model-len 8192 \
+    --gpu-memory-utilization 0.95 \
+    --port 8000</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0006-request-batching-vllm-serving.html">Lesson 06 — Request Batching and High-Throughput Serving (vLLM)</a>.</p>
+
+  <div class="lesson-foot">
+    <div class="links">
+      <a href="ai-cost-latency-glossary.html">📖 Glossary</a>
+      <a href="../course.html">← Course map</a>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 07 — Disaster Recovery, Multi-Region Replication, and RPO/RTO</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="cloud-architecture" data-lesson="7" data-lesson-id="disaster-recovery-rpo-rto-multi-region">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 07</span> · Disaster Recovery</span>
+
+  <h1 class="lesson-title">Disaster Recovery, Multi-Region Replication, and RPO/RTO</h1>
+  <p class="lesson-lede">
+    Planning for catastrophe: Recovery Point Objective (RPO), Recovery Time Objective (RTO), backup strategies, and multi-region active-passive vs active-active.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to define RPO and RTO and architect disaster recovery strategies from Pilot Light to Active-Active.</span>
+    <span><b>Mission link</b> Mastering disaster recovery, multi-region replication, and rpo/rto across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Disaster Recovery, Multi-Region Replication, and RPO/RTO</h2>
+  <p>Disasters happen: cloud regions experience catastrophic fiber cuts, hurricanes knock out entire metropolitan power grids, or a corrupted migration script wipes out production tables. <strong>Disaster Recovery (DR)</strong> is the engineering science of surviving catastrophe with quantified guarantees.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Planning for catastrophe: Recovery Point Objective (RPO), Recovery Time Objective (RTO), backup strategies, and multi-region active-passive vs active-active.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Four Disaster Recovery Strategies</h2>
+  <p>The Twin Metrics of Disaster Recovery:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>RPO vs RTO Visualized</h2>
+  <ul><li><strong>1. Recovery Point Objective (RPO):</strong> The maximum acceptable age of files that must be recovered for normal operations. <em>'How many minutes of data loss can the business tolerate?'</em> (e.g. RPO = 5 minutes means you can lose at most 5 minutes of recent transactions).</li><li><strong>2. Recovery Time Objective (RTO):</strong> The maximum acceptable duration of time to restore service after a disaster. <em>'How long can the application be down?'</em> (e.g. RTO = 15 minutes means service must be online within a quarter hour).</li></ul><p>The Four Disaster Recovery Strategies:</p><ul><li><strong>1. Backup and Restore (Lowest Cost, High RPO/RTO):</strong> Nightly backups to S3 Glacier replicated to another region. RTO: Hours to days; RPO: Up to 24 hours.</li><li><strong>2. Pilot Light (Core Data Replicated, Minimal Compute):</strong> Database is replicated in real time to Region B. Compute instances sit stopped. On disaster, script boots VMs. RTO: 10-30 mins; RPO: Minutes.</li><li><strong>3. Warm Standby (Scaled-Down Fleet Running):</strong> A smaller scaled-down version of the production environment is always running in Region B. RTO: Minutes.</li><li><strong>4. Multi-Region Active-Active (Zero Downtime, Highest Cost):</strong> 100% full capacity running in both Region A and Region B simultaneously. RTO: Zero (instant failover); RPO: Real-time.</li></ul><pre><code># Disaster Recovery Strategy Comparison:
+# Strategy            | RPO (Data Loss)  | RTO (Downtime)   | Cost Multiple
+# ---------------------------------------------------------------------------
+# Backup & Restore    | 24 hours         | 24 hours         | 1.0x (Cheapest)
+# Pilot Light         | < 5 minutes      | 15 - 30 minutes  | 1.3x
+# Warm Standby        | Seconds          | < 5 minutes      | 1.6x
+# Multi-Region Active | Near Zero        | Sub-Second (0s)  | 2.2x (Most Expensive)</code></pre><div class="callout"><p><strong>The Business Decision:</strong> Never pick a DR strategy based on engineering vanity. RPO and RTO are business decisions determined by how many dollars per minute downtime costs the company.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the disaster recovery sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to define RPO and RTO and architect disaster recovery strategies from Pilot Light to Active-Active.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where disaster recovery, multi-region replication, and rpo/rto applies.</li>
+    <li>Author a unit test or verification script exercising disaster recovery, multi-region replication, and rpo/rto.</li>
+    <li>Document team architectural conventions regarding disaster recovery, multi-region replication, and rpo/rto.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Disaster Recovery, Multi-Region Replication, and RPO/RTO.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is the difference between RPO (Recovery Point Objective) and RTO (Recovery Time Objective)?",
+    a: ["RPO measures acceptable data loss in time (how much data can we lose?); RTO measures acceptable downtime (how long to restore service?)","RPO is for software; RTO is for hardware","RPO measures money; RTO measures employees","They are identical terms"],
+    c: 0,
+    why: "RPO defines maximum acceptable data loss; RTO defines maximum acceptable downtime before restoration."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1. Backup & Restore ($)",
+            "lines": [
+                  "Nightly backups to S3 cross-region",
+                  "RPO: 24h | RTO: Hours to days",
+                  "Best for: Non-critical internal tools"
+            ]
+      },
+      {
+            "title": "2. Pilot Light ($$)",
+            "lines": [
+                  "Real-time DB replication, compute offline",
+                  "RPO: Minutes | RTO: 15-30 mins",
+                  "Best for: Core business applications"
+            ]
+      },
+      {
+            "title": "3. Warm Standby ($$$)",
+            "lines": [
+                  "Scaled-down fleet running in Region B",
+                  "RPO: Seconds | RTO: < 5 mins"
+            ]
+      },
+      {
+            "title": "4. Multi-Region Active ($$$$)",
+            "lines": [
+                  "Full capacity running in both regions",
+                  "RPO: Real-time | RTO: Instant 0s failover!",
+                  "Best for: Financial banking & critical health"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Disaster Recovery, Multi-Region Replication, and RPO/RTO",
+      "def execute_flow():",
+      "    # Planning for catastrophe: Recovery Point Objective...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Disaster Recovery, Multi-Region Replication, and RPO/RTO"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Disaster Event Occurs at 14:00"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Disaster recovery planning evaluates {1} to bound acceptable data loss and {2} to bound acceptable downtime during catastrophic outages."
+],
+    blanks: [
+      {
+            "a": [
+                  "RPO"
+            ],
+            "why": "Recovery Point Objective"
+      },
+      {
+            "a": [
+                  "RTO"
+            ],
+            "why": "Recovery Time Objective"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "If a business requires that no more than 1 minute of customer transactions can ever be lost during a datacenter fire, what metric does this define?",
+      a: ["Recovery Point Objective (RPO) = 1 minute","Recovery Time Objective (RTO) = 1 minute","Maximum CPU load","Network throughput"],
+      c: 0,
+      why: "RPO measures the maximum acceptable backward time delta of lost data."
+    },
+    {
+      q: "What is the 'Pilot Light' disaster recovery strategy in cloud architecture?",
+      a: ["Continuously replicating live databases to a secondary cloud region while keeping application compute instances stopped until a disaster strikes","Lighting a gas stove","Running one small server forever","A flashlight in a data center"],
+      c: 0,
+      why: "Pilot light maintains synchronized data in the recovery region, spinning up compute only when disaster strikes."
+    },
+    {
+      q: "What makes 'Multi-Region Active-Active' the most complex and expensive disaster recovery strategy?",
+      a: ["It requires running duplicate infrastructure 24/7 across multiple regions and solving distributed cross-region database synchronization and write conflicts","It is illegal in Europe","It requires writing all code in assembly","It requires 100 physical offices"],
+      c: 0,
+      why: "Active-Active requires duplicate 24/7 compute costs and complex bi-directional cross-region data replication."
+    },
+    {
+      q: "How does cross-region S3 bucket replication support disaster recovery?",
+      a: ["It automatically copies uploaded objects asynchronously to an S3 bucket in a different geographic region, surviving whole-region outages","It compresses files to save disk space","It encrypts files with a password","It sends files via email"],
+      c: 0,
+      why: "Cross-region replication guarantees that data survives even if an entire cloud region is destroyed."
+    }
+  ]);
+</script>
+</body>
+</html>

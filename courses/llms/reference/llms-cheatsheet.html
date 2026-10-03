@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How LLMs Work — Cheat Sheet</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+<style>
+  .ref-toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0 8px; }
+  .ref-toc a { font-size: .8rem; border: 1px solid var(--border); background: #111a30; padding: 5px 11px; border-radius: 999px; color: var(--muted); text-decoration: none; border-bottom: 1px solid var(--border); }
+  .ref-toc a:hover { color: #fff; border-color: #3d5488; }
+  .lesson-wrap h2 { scroll-margin-top: 20px; }
+  .snippet { margin: 14px 0 22px; }
+  .snippet .lbl { font-size: .72rem; font-weight: 800; letter-spacing: .7px; text-transform: uppercase; color: var(--accent2); margin-bottom: 6px; }
+  .see { font-size: .82rem; color: var(--muted); margin: -6px 0 12px; }
+  .see a { color: var(--accent2); border-bottom: 0; }
+  .see a:hover { color: #fff; }
+  .snippet pre { padding-top: 34px; }
+  @media print { .snippet pre { padding-top: 18px; } }
+</style>
+</head>
+<body class="lesson-body" data-course="llms">
+
+<div class="lesson-wrap">
+
+  <span class="lesson-kicker">Reference · Cheat sheet</span>
+  <h1 class="lesson-title">How LLMs Work — Cheat Sheet</h1>
+  <p class="lesson-lede">
+    The whole course on one page. Every snippet links back to the lesson that
+    teaches it.
+  </p>
+
+  <div class="ref-toc">
+    <a href="#sec-1">Tokenization Inspection with Tiktoken</a>
+    <a href="#sec-2">Chinchilla Compute-Optimal Ratio</a>
+    <a href="#sec-3">ChatML Prompt Formatting</a>
+    <a href="#sec-4">DPO Loss Tuple Structure</a>
+  </div>
+
+  <h2 id="sec-1"><span class="n">1</span>Tokenization Inspection with Tiktoken</h2>
+  <div class="snippet">
+    <div class="lbl">Analyzing token sequences</div>
+    <pre><code>import tiktoken
+enc = tiktoken.get_encoding("cl100k_base")
+tokens = enc.encode("Hello world!")
+print(tokens)  # [9906, 1917, 0]
+print([enc.decode([t]) for t in tokens])</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0003-tokenization-bpe-sentencepiece.html">Lesson 03 — Tokenization: Byte-Pair Encoding (BPE) and SentencePiece</a>.</p>
+
+  <h2 id="sec-2"><span class="n">2</span>Chinchilla Compute-Optimal Ratio</h2>
+  <div class="snippet">
+    <div class="lbl">Optimal parameter vs data scaling</div>
+    <pre><code># Optimal rule: Tokens ≈ 20 * Parameters
+# 8B Parameters   -&gt; 160 Billion Tokens (Minimum)
+# 70B Parameters  -&gt; 1.4 Trillion Tokens (Minimum)
+# Over-training (e.g. 15T on 8B) pays off in cheap inference!</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0004-emergent-capabilities-scaling-laws.html">Lesson 04 — Emergent Capabilities and Scaling Laws</a>.</p>
+
+  <h2 id="sec-3"><span class="n">3</span>ChatML Prompt Formatting</h2>
+  <div class="snippet">
+    <div class="lbl">Special token conversational boundaries</div>
+    <pre><code>&lt;|im_start|&gt;system
+You are an expert Python engineer.&lt;|im_end|&gt;
+&lt;|im_start|&gt;user
+Write a binary search function.&lt;|im_end|&gt;
+&lt;|im_start|&gt;assistant
+def binary_search(arr, target): ...&lt;|im_end|&gt;</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0005-supervised-fine-tuning-sft.html">Lesson 05 — Supervised Fine-Tuning (SFT): From Completion to Assistant</a>.</p>
+
+  <h2 id="sec-4"><span class="n">4</span>DPO Loss Tuple Structure</h2>
+  <div class="snippet">
+    <div class="lbl">Direct preference dataset format</div>
+    <pre><code>dpo_example = {
+    "prompt": "Explain recursion concisely.",
+    "chosen": "A function calling itself with a base case.",
+    "rejected": "Recursion is very cool and you should use it... (fluff)"
+}</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0006-alignment-rlhf-and-dpo.html">Lesson 06 — Alignment: RLHF and Direct Preference Optimization (DPO)</a>.</p>
+
+  <div class="lesson-foot">
+    <div class="links">
+      <a href="llms-glossary.html">📖 Glossary</a>
+      <a href="../course.html">← Course map</a>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

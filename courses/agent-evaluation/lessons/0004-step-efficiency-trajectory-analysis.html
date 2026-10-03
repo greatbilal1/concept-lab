@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 04 — Step Efficiency and Trajectory Analysis</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="agent-evaluation" data-lesson="4" data-lesson-id="step-efficiency-trajectory-analysis">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 04</span> · Trajectory Analysis</span>
+
+  <h1 class="lesson-title">Step Efficiency and Trajectory Analysis</h1>
+  <p class="lesson-lede">
+    Analyzing agent efficiency: Step Count, Redundant Action Rate, trajectory diff analysis, and the Cost-to-Solution curve.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to analyze agent trajectories, measure step efficiency, and eliminate redundant actions.</span>
+    <span><b>Mission link</b> Mastering step efficiency and trajectory analysis across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Step Efficiency and Trajectory Analysis</h2>
+  <p>Two different agents can both successfully solve a bug. Agent 1 inspects the traceback, edits the file, and runs the test (3 steps). Agent 2 runs 8 irrelevant file searches, reads 4 unrelated files, makes 3 syntax errors, reverts them, and finally fixes the bug (18 steps).</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Analyzing agent efficiency: Step Count, Redundant Action Rate, trajectory diff analysis, and the Cost-to-Solution curve.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Efficient vs Meandering Trajectory</h2>
+  <p>Both agents get a checkmark for task success, but Agent 2 cost <strong>6x more money</strong>, took <strong>5x longer</strong>, and was one turn away from hallucinating an unrelated bug. <strong>Trajectory Analysis</strong> evaluates the efficiency and elegance of the path taken.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Redundant Action Detection</h2>
+  <p>Key Trajectory Metrics:</p><ul><li><strong>1. Step Count to Solution ($S$):</strong> Total number of tool turns executed before task completion.</li><li><strong>2. Redundant Action Rate:</strong> The percentage of tool calls that repeated previous actions, read the same file twice without edits, or failed with syntax errors.</li><li><strong>3. Search Efficiency:</strong> Did the agent locate the relevant file in 1-2 targeted searches, or did it list 15 directories blindly?</li><li><strong>4. Cost-to-Solution ($C$):</strong> Total dollar cost of tokens consumed across the full trajectory.</li></ul><pre><code># Trajectory Efficiency Scorecard:
+# Agent A: Steps: 4  | Cost: $0.06 | Redundant Actions: 0%  (HIGH EFFICIENCY)
+# Agent B: Steps: 19 | Cost: $0.42 | Redundant Actions: 42% (LOW EFFICIENCY - Thrashing!)</code></pre><div class="callout"><p><strong>The Trajectory Law:</strong> A shorter trajectory has a smaller blast radius. Every extra tool call is an opportunity for an error to derail the task.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the trajectory analysis sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to analyze agent trajectories, measure step efficiency, and eliminate redundant actions.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where step efficiency and trajectory analysis applies.</li>
+    <li>Author a unit test or verification script exercising step efficiency and trajectory analysis.</li>
+    <li>Document team architectural conventions regarding step efficiency and trajectory analysis.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Step Efficiency and Trajectory Analysis.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Why is 'Step Efficiency' an important evaluation metric alongside raw task success?",
+    a: ["An agent that solves a task in 4 focused steps is vastly cheaper, faster, and less prone to side-effect bugs than one taking 25 meandering steps","More steps consume less electricity","Step count has no effect on cost","Long trajectories run faster"],
+    c: 0,
+    why: "Fewer steps mean lower token consumption, faster turnaround, and minimal risk of unintended side-effect bugs."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Agent A: Direct Trajectory (4 Steps)",
+            "lines": [
+                  "grep_search -> read_file -> edit -> pytest",
+                  "Time: 12s, Cost: $0.04, Zero wasted actions"
+            ]
+      },
+      {
+            "title": "Agent B: Meandering Path (18 Steps)",
+            "lines": [
+                  "list_dir -> read_wrong_file -> failed_edit -> retry...",
+                  "Time: 75s, Cost: $0.38, High cognitive drag"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Step Efficiency and Trajectory Analysis",
+      "def execute_flow():",
+      "    # Analyzing agent efficiency: Step Count, Redundant ...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Step Efficiency and Trajectory Analysis"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Duplicate File Reads"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Circular Edits"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Trajectory analysis evaluates agent efficiency by measuring step count, cost-to-solution, and the percentage of {1} or wasteful tool {2}."
+],
+    blanks: [
+      {
+            "a": [
+                  "redundant"
+            ],
+            "why": "Unnecessary repeated actions"
+      },
+      {
+            "a": [
+                  "actions"
+            ],
+            "why": "Tool invocations"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is a 'Redundant Tool Action' in an agent trajectory?",
+      a: ["Reading the same unchanged file multiple times or repeating an identical search query that provides no new information","A tool that runs in parallel","A tool with a backup server","A tool written in C"],
+      c: 0,
+      why: "Repeated reads of unchanged state burn tokens without advancing task progress."
+    },
+    {
+      q: "Why does an agent with high step count have a higher probability of catastrophic failure?",
+      a: ["Each extra step adds noise to the context window and provides another statistical opportunity for a hallucinated or destructive edit","The computer processor wears out","The internet gets slower","Tokens expire after 10 steps"],
+      c: 0,
+      why: "Longer trajectories increase the compounding probability of fatal mistakes."
+    },
+    {
+      q: "How can you steer an agent toward shorter, more efficient trajectories?",
+      a: ["Provide concise repository maps, clear golden reference files, and explicit instructions to formulate targeted searches","Limit the internet speed","Write prompts in uppercase","Delete all tools except one"],
+      c: 0,
+      why: "Repository maps and clear guidance eliminate blind, exploratory wandering."
+    },
+    {
+      q: "What metric balances task success with operational cost across an evaluation suite?",
+      a: ["Cost-per-Resolved-Task: Total token expenditure divided by the number of successfully resolved tasks","Lines of code per second","Word count of the prompt","Monitor refresh rate"],
+      c: 0,
+      why: "Cost-per-resolved-task measures true operational financial efficiency."
+    }
+  ]);
+</script>
+</body>
+</html>

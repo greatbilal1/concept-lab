@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 03 — Anatomy of an HTTP response</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="http" data-lesson="3" data-lesson-id="anatomy-of-an-http-response">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 03</span> · The Request-Response Cycle</span>
+
+  <h1 class="lesson-title">Anatomy of an HTTP response</h1>
+  <p class="lesson-lede">
+    When the server replies, it sends a status line, headers, and the payload. Learn how to decode status lines and inspect response headers.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Parse raw HTTP response messages and extract status codes and metadata</span>
+    <span><b>Mission link</b> Essential for debugging API failures and verifying server replies</span>
+  </div>
+
+  <h2><span class="n">1</span>The structure of an HTTP response</h2>
+  <p>Just like a request, an HTTP response message is divided into three distinct segments: the <b>Status Line</b>, the <b>Response Headers</b>, and the <b>Response Body</b>.</p><p>The status line contains three tokens: the protocol version (<code>HTTP/1.1</code>), a three-digit integer status code (<code>200</code>), and a human-readable reason phrase (<code>OK</code>). Headers convey metadata like content type, date, caching rules, and server identity.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    A response begins with a status line, followed by headers, a blank line, and the data payload.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The response message layout</h2>
+  <p>Inspect the raw plaintext structure of an HTTP/1.1 response returning an HTML document.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing response parsing in a browser</h2>
+  <p>Trace how a browser parser processes a status line and headers before rendering the body.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of response message anatomy.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can dissect raw HTTP responses and instantly evaluate status codes, content encodings, and headers.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Fetch headers from a website using curl -I https://example.com.</li>
+    <li>Verify that the status line contains HTTP/2 or HTTP/1.1 and 200 OK.</li>
+    <li>Inspect the Content-Type header to see the MIME format.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    IETF RFC 9112: *HTTP/1.1*, Section 3: 'Response'.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What part of an HTTP response indicates to the browser that an error occurred?",
+    a: ["The three-digit status code in the status line (e.g. 404 or 500)","The color of the text in the response body","The brand name of the server operating system","The font size used in the HTML markup"],
+    c: 0,
+    why: "Status codes in the 4xx (client error) and 5xx (server error) ranges signal failure conditions."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Status Line",
+            "lines": [
+                  "HTTP/1.1 200 OK",
+                  "version + status code + reason"
+            ]
+      },
+      {
+            "title": "Response Headers",
+            "lines": [
+                  "Content-Type: text/html",
+                  "Server: nginx/1.24",
+                  "Content-Length: 104"
+            ]
+      },
+      {
+            "title": "Response Body",
+            "lines": [
+                  "<!DOCTYPE html><html>...",
+                  "the actual payload delivered"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "HTTP/1.1 200 OK",
+      "Date: Sat, 03 Oct 2026 12:00:00 GMT",
+      "Content-Type: text/html; charset=UTF-8",
+      "Content-Length: 45",
+      "",
+      "<html><body><h1>Hello World</h1></body></html>"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "status": "200 OK (success)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "parser_mode": "HTML parser activated with UTF-8 encoding"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "bytes_expected": "45 bytes"
+            }
+      },
+      {
+            "line": 5,
+            "vars": {
+                  "render": "DOM tree constructed and displayed"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The first line of an HTTP response is the <0> line.",
+      "The 3-digit number indicating the outcome of a request is the <1> code.",
+      "The human-readable phrase accompanying status 200 is <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "status"
+            ],
+            "why": "The status line begins every HTTP response."
+      },
+      {
+            "a": [
+                  "status"
+            ],
+            "why": "The status code conveys success, redirect, or error."
+      },
+      {
+            "a": [
+                  "OK"
+            ],
+            "why": "200 OK is the standard success status."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What are the three parts of an HTTP status line?",
+      a: ["HTTP Version, 3-digit Status Code, and Reason Phrase","Domain Name, Port Number, and Timestamp","Username, Password, and Session Token","Header Name, Header Value, and Checksum"],
+      c: 0,
+      why: "Example: 'HTTP/1.1 404 Not Found' contains version, numeric code, and textual reason."
+    },
+    {
+      q: "Which header tells the client software how to parse and interpret the response body?",
+      a: ["Content-Type","User-Agent","Host","Accept-Encoding"],
+      c: 0,
+      why: "Content-Type specifies the MIME type (e.g. application/json, text/html, image/png)."
+    },
+    {
+      q: "What does status code 204 No Content indicate?",
+      a: ["The request was successful, but the server deliberately returns an empty body","The requested resource was permanently deleted from disk","The web server has crashed due to memory exhaustion","The client needs to enter credit card billing information"],
+      c: 0,
+      why: "204 signals successful processing where no response body is needed (e.g. in DELETE actions)."
+    },
+    {
+      q: "What separates the response headers from the response body payload?",
+      a: ["A single empty blank line (CRLF CRLF)","A series of exclamation marks (!!!)","A JSON closing curly brace (})","An end-of-file byte marker"],
+      c: 0,
+      why: "In standard HTTP protocol framing, an empty blank line separates headers from body."
+    }
+  ]);
+</script>
+</body>
+</html>

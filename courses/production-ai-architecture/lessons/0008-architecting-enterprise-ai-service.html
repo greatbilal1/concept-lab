@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 08 — Architecting an Enterprise AI Service from Scratch</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="production-ai-architecture" data-lesson="8" data-lesson-id="architecting-enterprise-ai-service">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 08</span> · Enterprise Architecture</span>
+
+  <h1 class="lesson-title">Architecting an Enterprise AI Service from Scratch</h1>
+  <p class="lesson-lede">
+    Synthesizing production architecture: building an end-to-end platform with gateways, queues, streaming, sessions, and multi-tenancy.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You have completed the Production AI Architecture course.</span>
+    <span><b>Mission link</b> Mastering architecting an enterprise ai service from scratch across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Architecting an Enterprise AI Service from Scratch</h2>
+  <p>We have explored the complete blueprint of Production AI Architecture: decoupled platform subsystems, asynchronous job queues (Celery/BullMQ), stateful real-time streaming (SSE/WebSockets), distributed session storage (Redis/Postgres), multi-dimensional rate limiting, multi-tenant data isolation, and hybrid deployment topologies.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Synthesizing production architecture: building an end-to-end platform with gateways, queues, streaming, sessions, and multi-tenancy.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Complete Enterprise AI Architecture</h2>
+  <p>Now, we synthesize these into a <strong>Complete End-to-End Enterprise AI Service</strong>:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Scale-Ready Invariants</h2>
+  <ul><li><strong>1. Ingress & Security Gateway:</strong> Authenticates JWT, enforces tenant TPM/RPM limits, and scrubs PII.</li><li><strong>2. Dual-Execution Pipeline:</strong><ul><li><em>Path A (Interactive Chat):</em> Dispatched to SSE streaming proxy with client-disconnect cancellation.</li><li><em>Path B (Heavy Workflows):</em> Enqueued to Celery/BullMQ workers; returns HTTP 202 Accepted.</li></ul></li><li><strong>3. Multi-Tenant Data Layer:</strong> Vector database queries enforce hard `tenant_id` metadata isolation; PostgreSQL manages immutable session history with Row-Level Security.</li><li><strong>4. Observability & Auditing:</strong> Emits OpenTelemetry traces, token costs, and safety metrics to Langfuse and Prometheus.</li></ul><pre><code># The Complete Enterprise Service Specification (FastAPI Architecture):
+@app.post("/api/v1/ai/execute")
+async def enterprise_ai_service(request: AIRequest, user: User = Depends(auth_user)):
+    # 1. Enforce Multi-Tenant Quotas & Rate Limits in Redis
+    await rate_limiter.check_tpm_limit(user.tenant_id, estimated_tokens=request.tokens)
+    
+    # 2. Branch: Interactive Streaming vs Async Background
+    if request.mode == "STREAMING":
+        return StreamingResponse(
+            sse_stream_pipeline(request.prompt, user.tenant_id),
+            media_type="text/event-stream"
+        )
+    else:
+        job = task_queue.enqueue("heavy_ai_workflow", request.payload, tenant=user.tenant_id)
+        return {"job_id": job.id, "status": "ACCEPTED", "check_url": f"/jobs/{job.id}"}, 202</code></pre><div class="callout"><p><strong>The Final Engineering Standard:</strong> You have built an enterprise-grade AI architecture. It is resilient, decoupled, scalable, secure, and ready to power mission-critical production workloads.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the enterprise architecture sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You have completed the Production AI Architecture course.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where architecting an enterprise ai service from scratch applies.</li>
+    <li>Author a unit test or verification script exercising architecting an enterprise ai service from scratch.</li>
+    <li>Document team architectural conventions regarding architecting an enterprise ai service from scratch.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Architecting an Enterprise AI Service from Scratch.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What architectural principle ensures that an enterprise AI service can scale from 100 to 1,000,000 users without refactoring?",
+    a: ["Stateless decoupled microservices: gateway rate limiting, async job queues, persistent session caching, and multi-tenant data partitioning","Writing all code in one massive 50,000-line file","Running on a single giant desktop computer","Refusing to use databases"],
+    c: 0,
+    why: "Decoupled stateless services, async queues, distributed session caching, and multi-tenant partitioning guarantee horizontal scalability."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1. Ingress Gateway",
+            "lines": [
+                  "JWT Auth, Tenant TPM/RPM Limit, PII Scrubbing"
+            ]
+      },
+      {
+            "title": "2. Dual Execution Path",
+            "lines": [
+                  "Path A: SSE Streaming Proxy (Chat)",
+                  "Path B: Async Job Queue (Heavy Tasks, 202 Accepted)"
+            ]
+      },
+      {
+            "title": "3. Isolated Data Tier",
+            "lines": [
+                  "Redis Session Window + Postgres Audit Trail",
+                  "Vector DB with hard tenant_id partitioning"
+            ]
+      },
+      {
+            "title": "4. Observability",
+            "lines": [
+                  "Langfuse Traces, OTel Metrics, Cost Auditing"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Architecting an Enterprise AI Service from Scratch",
+      "def execute_flow():",
+      "    # Synthesizing production architecture: building an ...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Architecting an Enterprise AI Service from Scratch"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Stateless App Nodes"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Zero Cross-Tenant Risk"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "An enterprise AI platform scales seamlessly by combining API gateway rate limiting, async job queues for heavy tasks, streaming {1} for chat, and strict multi-tenant {2} isolation."
+],
+    blanks: [
+      {
+            "a": [
+                  "SSE"
+            ],
+            "why": "Server-Sent Events streaming"
+      },
+      {
+            "a": [
+                  "data"
+            ],
+            "why": "Customer records and vectors"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the primary benefit of the dual-execution path (streaming for chat, job queue for heavy tasks)?",
+      a: ["It delivers instantaneous sub-second streaming for interactive users while isolating heavy multi-minute workflows in scalable background worker pools","It makes servers free","It requires no programming","It runs on paper"],
+      c: 0,
+      why: "Workload bifurcation matches communication protocols and infrastructure to specific operational needs."
+    },
+    {
+      q: "How does the platform prevent a single customer from exceeding their contractual monthly budget?",
+      a: ["The ingress gateway atomically increments and checks tenant spend in Redis, blocking requests when limits are breached","The company sends an invoice by mail","The model asks the user for cash","The server shuts down"],
+      c: 0,
+      why: "Pre-flight checks in Redis stop over-budget calls before API costs are incurred."
+    },
+    {
+      q: "Why is multi-tenant metadata filtering in vector databases non-negotiable for enterprise B2B SaaS?",
+      a: ["It mathematically guarantees that no customer's search queries can ever retrieve another customer's private documents or data","It reduces GPU temperature","It is required by Python syntax","It makes vectors smaller"],
+      c: 0,
+      why: "Hard metadata partitioning is the foundational security boundary preventing cross-tenant data leaks."
+    },
+    {
+      q: "What is the ultimate mark of an enterprise AI systems architect?",
+      a: ["Designing systems that treat AI as a decoupled, observable, reliable, and cost-governed component of modern distributed software","Writing the longest system prompt","Using the most expensive model for every query","Deploying prototypes directly to production without testing"],
+      c: 0,
+      why: "Architectural decoupling, reliability engineering, and cost governance define enterprise systems excellence."
+    }
+  ]);
+</script>
+</body>
+</html>

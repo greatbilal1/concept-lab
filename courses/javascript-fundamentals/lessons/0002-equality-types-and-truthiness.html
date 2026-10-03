@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 02 — Equality, types, and truthiness</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="javascript-fundamentals" data-lesson="2" data-lesson-id="equality-types-and-truthiness">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 02</span> · Primitives & Variables</span>
+
+  <h1 class="lesson-title">Equality, types, and truthiness</h1>
+  <p class="lesson-lede">
+    Why does '[] == ![]' evaluate to true? Master the strict equality operator (===), the 8 falsy values, and the rules of type coercion.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Predict equality and truthiness outcomes using strict comparison rules</span>
+    <span><b>Mission link</b> Eliminates frustrating conditional bugs caused by implicit coercion</span>
+  </div>
+
+  <h2><span class="n">1</span>Strict equality versus loose equality</h2>
+  <p>JavaScript has two equality operators: <b>strict equality</b> (<code>===</code>) and <b>loose equality</b> (<code>==</code>). Loose equality tries to be 'helpful' by coercing different types: <code>'5' == 5</code> evaluates to true.</p><p>This coercion creates bizarre edge cases: <code>0 == ''</code> is true, and <code>false == '0'</code> is true. In professional modern code, <b>always use strict equality (===)</b>, which never coerces types and checks both type and value.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Always use strict equality (===); never rely on loose equality (==) coercion.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The complete list of 8 falsy values</h2>
+  <p>In JavaScript, every value is either truthy or falsy. Memorise the only eight falsy values in the entire language.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing truthiness in conditionals</h2>
+  <p>Trace how common objects and strings evaluate inside an if statement condition.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your recall of truthiness and equality rules.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can navigate JavaScript conditionals with certainty, knowing the exact 8 falsy values and avoiding loose equality traps.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit an existing codebase and replace all == with ===.</li>
+    <li>Check what Boolean([]) and Boolean({}) return in your browser console.</li>
+    <li>Use the nullish coalescing operator (??) to provide defaults without treating 0 as false.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Kyle Simpson, *You Don't Know JS: Types & Grammar* (Chapter 4: 'Coercion').
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What does 'null === undefined' evaluate to versus 'null == undefined'?",
+    a: ["null === undefined is false; null == undefined is true","Both evaluate to true","Both evaluate to false","null === undefined throws a syntax error"],
+    c: 0,
+    why: "Strict equality sees different types (null vs undefined); loose equality treats them as loosely equal."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Boolean & Numbers",
+            "lines": [
+                  "false",
+                  "0, -0, 0n (BigInt)",
+                  "NaN (Not-a-Number)"
+            ]
+      },
+      {
+            "title": "Strings & Emptiness",
+            "lines": [
+                  "'' (empty string)",
+                  "null",
+                  "undefined"
+            ]
+      },
+      {
+            "title": "Everything Else = TRUTHY!",
+            "lines": [
+                  "[] (empty array is truthy!)",
+                  "{} (empty object is truthy!)",
+                  "'0', 'false' (non-empty strings)"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "if ([]) { console.log('Empty array is TRUTHY!') }",
+      "if ({}) { console.log('Empty object is TRUTHY!') }",
+      "if ('') { console.log('This line NEVER runs (falsy)') }",
+      "if (0)  { console.log('This line NEVER runs (falsy)') }"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "check_array": "[] is an object reference -> TRUTHY"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "check_object": "{} is an object reference -> TRUTHY"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "check_empty_str": "'' has length 0 -> FALSY"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "check_zero": "0 numeric zero -> FALSY"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The equality operator that checks type and value without coercion is <0>.",
+      "An empty array [] evaluates in a Boolean context to <1>.",
+      "The special number value representing an invalid mathematical result is <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "===",
+                  "strict equality"
+            ],
+            "why": "=== checks both type and value strictly."
+      },
+      {
+            "a": [
+                  "truthy",
+                  "true"
+            ],
+            "why": "All objects, including empty arrays and objects, are truthy."
+      },
+      {
+            "a": [
+                  "NaN"
+            ],
+            "why": "NaN stands for Not-a-Number."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What does the expression 'Boolean([])' evaluate to?",
+      a: ["true, because all objects and arrays are truthy in JavaScript regardless of their length","false, because the array has zero elements","undefined","NaN"],
+      c: 0,
+      why: "All objects (including arrays and plain objects) are truthy, even when empty."
+    },
+    {
+      q: "How does the nullish coalescing operator (??) differ from logical OR (||)?",
+      a: ["?? only falls back on null or undefined; || falls back on ANY falsy value (like 0 or '')","?? works on numbers; || works on strings","?? compiles into a loop","There is no difference between ?? and ||"],
+      c: 0,
+      why: "Nullish coalescing (??) prevents valid values like 0 or empty string from being overridden."
+    },
+    {
+      q: "What does 'typeof null' return in JavaScript?",
+      a: ["'object' (a historical 1995 engine bug preserved for backwards compatibility)","'null'","'undefined'","'boolean'"],
+      c: 0,
+      why: "A famous legacy bug in the original JS engine type tag implementation returns 'object'."
+    },
+    {
+      q: "Which of the following is NOT one of the 8 falsy values?",
+      a: ["'0' (a string containing the digit zero)","0 (the number zero)","NaN","undefined"],
+      c: 0,
+      why: "Any string with length > 0 is truthy, so '0' is truthy while 0 is falsy."
+    }
+  ]);
+</script>
+</body>
+</html>

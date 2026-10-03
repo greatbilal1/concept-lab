@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 03 — Configuration and environment files</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="software-project-structure" data-lesson="3" data-lesson-id="configuration-and-environment-files">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 03</span> · Configuration & Secrets</span>
+
+  <h1 class="lesson-title">Configuration and environment files</h1>
+  <p class="lesson-lede">
+    Code is identical across environments; configuration varies. Master the Twelve-Factor principle of keeping secrets and runtime configs strictly in the environment.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Separate runtime configuration and secrets from source code using environment variables</span>
+    <span><b>Mission link</b> Prevents catastrophic secret leaks and configuration drift</span>
+  </div>
+
+  <h2><span class="n">1</span>The Twelve-Factor config rule</h2>
+  <p>A litmus test for clean configuration: <i>Could your entire codebase be made open source tomorrow without leaking a single secret or database credential?</i></p><p>If the answer is no, you have hardcoded configuration in your code. The Twelve-Factor App methodology mandates that all configuration that varies between deploys (staging, production, development) must be stored in <b>environment variables</b>.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Never commit credentials or environment-specific URLs into version control; inject them via the environment.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The .env and .env.example pattern</h2>
+  <p>Use a committed template (.env.example) to document required keys, paired with an untracked local file (.env) for real values.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing configuration loading</h2>
+  <p>Trace how an application loads configuration from the environment with sensible fallback defaults.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of environment configuration principles.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can architect applications whose source code contains zero hardcoded credentials or environment assumptions.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your repo for hardcoded passwords or API keys using git grep.</li>
+    <li>Add .env to your root .gitignore file immediately.</li>
+    <li>Create a .env.example file listing all required configuration keys.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Adam Wiggins, *The Twelve-Factor App* — Factor III: 'Config: Store config in the environment' (12factor.net/config).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Why should .env files containing API keys never be committed to git?",
+    a: ["Git will permanently record the secrets in history, exposing them to anyone with repo access","Git cannot process files that begin with a period","The file will automatically delete all git branches","The operating system will revoke your user account permissions"],
+    c: 0,
+    why: "Git history is immutable: once a secret is committed, it is compromised even if deleted in a later commit."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": ".env.example (Committed)",
+            "lines": [
+                  "DB_HOST=localhost",
+                  "API_KEY=your_key_here",
+                  "documents required variables"
+            ]
+      },
+      {
+            "title": ".env (Gitignored)",
+            "lines": [
+                  "DB_HOST=db.internal.net",
+                  "API_KEY=sk_live_99812",
+                  "local development values only"
+            ]
+      },
+      {
+            "title": "Production (Injected)",
+            "lines": [
+                  "Kubernetes / Docker secrets",
+                  "Cloud environment manager"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "import os",
+      "PORT = int(os.environ.get('PORT', 8080))",
+      "DB_URL = os.environ['DATABASE_URL'] # raises KeyError if missing",
+      "# Config loaded safely without hardcoded secrets"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "module": "os loaded"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "port": "8080 (fallback default)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "db_url": "postgres://prod-db:5432/app"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Configuration that varies between deploys belongs in <0> variables.",
+      "The committed template showing required environment keys is .env.<1>.",
+      "The methodology defining cloud application architecture rules is <2>-Factor."
+],
+    blanks: [
+      {
+            "a": [
+                  "environment"
+            ],
+            "why": "Environment variables keep config separate from code."
+      },
+      {
+            "a": [
+                  "example",
+                  "sample"
+            ],
+            "why": ".env.example documents keys without exposing secrets."
+      },
+      {
+            "a": [
+                  "Twelve",
+                  "12"
+            ],
+            "why": "The Twelve-Factor App defines configuration best practices."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the primary rule of Factor III in the Twelve-Factor App methodology?",
+      a: ["Store all configuration that varies across deploys in environment variables","Hardcode database credentials directly inside the main application file","Store passwords in plain text JSON files committed to git","Recompile the application binary for every different server"],
+      c: 0,
+      why: "Environment variables decouple code from deployment targets and prevent credential leaks."
+    },
+    {
+      q: "What should you do if an API secret key is accidentally committed to a public repository?",
+      a: ["Revoke and rotate the secret immediately at the provider, then rewrite git history","Add a comment in the next commit asking people not to use the key","Rename the file and delete the repository locally","Turn off your computer and wait for the secret to expire"],
+      c: 0,
+      why: "Committed secrets must be considered compromised instantly; revocation is the only safe response."
+    },
+    {
+      q: "What is the purpose of committing a '.env.example' file?",
+      a: ["To document all required environment variable names with placeholder dummy values","To automatically log into production servers during CI runs","To encrypt source code before deployment to servers","To increase local download speeds for team members"],
+      c: 0,
+      why: ".env.example serves as a contract showing developers what keys must be supplied locally."
+    },
+    {
+      q: "How should an application handle a missing mandatory configuration variable on boot?",
+      a: ["Fail fast immediately with a clear diagnostic error message during startup","Silently invent a random database connection string and continue running","Print a warning to a hidden file and continue in an infected state","Format the hard drive to prevent security breaches"],
+      c: 0,
+      why: "Failing fast on startup prevents the system from running with invalid or missing dependencies."
+    }
+  ]);
+</script>
+</body>
+</html>

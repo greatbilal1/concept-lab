@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 06 — Learning Rates, Batch Sizes, and Optimization</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="neural-networks" data-lesson="6" data-lesson-id="learning-rates-batch-sizes">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 06</span> · Hyperparameters</span>
+
+  <h1 class="lesson-title">Learning Rates, Batch Sizes, and Optimization</h1>
+  <p class="lesson-lede">
+    Tuning the critical training levers: Learning Rate schedules, warmup, Batch Size scaling, and AdamW optimization.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to tune learning rates, batch sizes, and modern AdamW optimizers.</span>
+    <span><b>Mission link</b> Mastering learning rates, batch sizes, and optimization across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Learning Rates, Batch Sizes, and Optimization</h2>
+  <p>Configuring a neural network training run requires tuning three critical hyperparameters that govern whether training converges smoothly or diverges into numerical chaos (NaN loss):</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Tuning the critical training levers: Learning Rate schedules, warmup, Batch Size scaling, and AdamW optimization.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Cosine Learning Rate Schedule</h2>
+  <ul><li><strong>1. Learning Rate (LR):</strong> The single most critical hyperparameter. Modern training uses <strong>Learning Rate Schedulers</strong>: starting with a <strong>Warmup Phase</strong> (gradually increasing LR from zero to prevent gradient shock), followed by <strong>Cosine Decay</strong> (gradually decreasing LR to allow fine-grained convergence in the valley floor).</li><li><strong>2. Batch Size:</strong> The number of training examples processed before each gradient update (typically 32, 64, 512, or thousands in LLMs). Larger batch sizes provide cleaner, less noisy gradient estimates and saturate GPU parallel cores, but require proportionally higher learning rates (Linear Scaling Rule: $\text{LR} \propto \text{Batch Size}$).</li><li><strong>3. The AdamW Optimizer:</strong> The gold standard in modern deep learning. Adam tracks adaptive per-parameter momentum, and AdamW fixes weight decay regularization so it correctly decouples from adaptive step sizes.</li></ul>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Batch Size Trade-off</h2>
+  <pre><code># The Modern Training Hyperparameter Schedule:
+# 1. Warmup:    Steps 0 -> 2,000:       LR ramps 0.0 -> 3e-4 (Gentle start)
+# 2. Cosine:    Steps 2,000 -> 100,000: LR decays 3e-4 -> 1e-5 (Fine settling)
+# Optimizer:    AdamW(lr=3e-4, betas=(0.9, 0.95), weight_decay=0.1)</code></pre><div class="callout"><p><strong>The Golden Default:</strong> For transformers and modern deep networks, `AdamW` with a learning rate of `3e-4` (`0.0003`) and cosine warmup/decay is the universal starting baseline.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the hyperparameter sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to tune learning rates, batch sizes, and modern AdamW optimizers.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where learning rates, batch sizes, and optimization applies.</li>
+    <li>Author a unit test or verification script exercising learning rates, batch sizes, and optimization.</li>
+    <li>Document team architectural conventions regarding learning rates, batch sizes, and optimization.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Learning Rates, Batch Sizes, and Optimization.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What happens if a model begins training with a very large learning rate without a 'Warmup' phase?",
+    a: ["Early random gradients can take catastrophic leaps that destabilize weights and cause training to diverge immediately","The model trains in 5 seconds","The model achieves 100% accuracy","The computer fan stops spinning"],
+    c: 0,
+    why: "Learning rate warmup protects initial random weights from destructive gradient shock."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Warmup (0 -> 2k steps)",
+            "lines": [
+                  "Ramp LR from 0 to 3e-4",
+                  "Protects random weights from shock"
+            ]
+      },
+      {
+            "title": "Cosine Decay (2k -> 100k)",
+            "lines": [
+                  "Smooth decay toward zero",
+                  "Allows fine settling in optimal valley"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Learning Rates, Batch Sizes, and Optimization",
+      "def execute_flow():",
+      "    # Tuning the critical training levers: Learning Rate...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Learning Rates, Batch Sizes, and Optimization"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Small Batch (32)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Large Batch (4,096)"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Modern deep learning stabilizes training using learning rate {1} to ramp up step size, followed by {2} decay to settle into minima."
+],
+    blanks: [
+      {
+            "a": [
+                  "warmup"
+            ],
+            "why": "Gradual initial increase in learning rate"
+      },
+      {
+            "a": [
+                  "cosine"
+            ],
+            "why": "Smooth trigonometric decay schedule"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the primary difference between standard Adam and AdamW?",
+      a: ["AdamW decouples weight decay from the gradient update step, ensuring L2 regularization behaves correctly with adaptive learning rates","AdamW is written in C++","AdamW only runs on Windows","AdamW disables momentum"],
+      c: 0,
+      why: "Loshchilov & Hutter (2017) proved decoupling weight decay from gradient updates restores true regularization in AdamW."
+    },
+    {
+      q: "What is the 'Linear Scaling Rule' for batch size?",
+      a: ["When you increase batch size by factor K, you should scale the learning rate by factor K to maintain comparable update dynamics","Batch sizes must be prime numbers","Batch size equals the number of GPUs","Learning rate must always be 1.0"],
+      c: 0,
+      why: "Larger batches produce less noisy gradients, allowing proportionately larger gradient steps."
+    },
+    {
+      q: "What symptom indicates that your learning rate is too small?",
+      a: ["The loss decreases agonizingly slowly over thousands of steps, requiring excessive time and compute to converge","The loss jumps to NaN immediately","The computer runs out of memory","The model achieves 100% accuracy in 1 step"],
+      c: 0,
+      why: "Extremely small learning rates make tiny steps, stalling training progress."
+    },
+    {
+      q: "What is 'Gradient Clipping' and why is it used during training?",
+      a: ["An optimization safeguard that caps the maximum norm of the gradient vector, preventing exploding gradients from destabilizing weights","Cutting files in half","Deleting old git branches","Formatting code"],
+      c: 0,
+      why: "Gradient clipping clamps gradient norms to a maximum threshold (e.g. 1.0), preventing exploding updates."
+    }
+  ]);
+</script>
+</body>
+</html>

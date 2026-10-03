@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 04 — Building Your First MCP Server (FastMCP / Node.js)</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="mcp" data-lesson="4" data-lesson-id="building-your-first-mcp-server">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 04</span> · Server Development</span>
+
+  <h1 class="lesson-title">Building Your First MCP Server (FastMCP / Node.js)</h1>
+  <p class="lesson-lede">
+    Authoring an MCP server from scratch: using FastMCP in Python, defining tools, handling arguments, and stdio execution.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to author and run a functional MCP server using FastMCP.</span>
+    <span><b>Mission link</b> Mastering building your first mcp server (fastmcp / node.js) across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Building Your First MCP Server (FastMCP / Node.js)</h2>
+  <p>Writing raw JSON-RPC string parsers by hand is tedious. The developer ecosystem created <strong>FastMCP</strong> (in Python) and the official <strong>@modelcontextprotocol/sdk</strong> (in TypeScript), making server development feel like writing a standard web API.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Authoring an MCP server from scratch: using FastMCP in Python, defining tools, handling arguments, and stdio execution.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>FastMCP Server Pipeline</h2>
+  <p>A Complete FastMCP Server in 15 Lines of Python:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Testing with the MCP Inspector</h2>
+  <pre><code># server.py — An MCP Server for System Diagnostics
+from mcp.server.fastmcp import FastMCP
+import psutil
+
+# 1. Initialize FastMCP Server instance
+mcp = FastMCP("SystemMonitor")
+
+# 2. Expose a Tool using @mcp.tool()
+@mcp.tool()
+def get_system_metrics() -> dict:
+    """Retrieve current CPU usage percentage and memory utilization."""
+    return {
+        "cpu_percent": psutil.cpu_percent(interval=1),
+        "memory_used_gb": round(psutil.virtual_memory().used / (1024**3), 2),
+        "memory_percent": psutil.virtual_memory().percent
+    }
+
+# 3. Run with stdio transport
+if __name__ == "__main__":
+    mcp.run(transport="stdio")</code></pre><p>That is the entire server! FastMCP inspects the function signature, generates the JSON Schema for parameters and returns, handles the JSON-RPC initialization handshake, and serves requests over standard input/output (`stdio`).</p><div class="callout"><p><strong>The stdio Transport:</strong> When running locally, the client launches your script as a subprocess (`python server.py`) and communicates by sending JSON lines over stdin and reading responses from stdout.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the MCP server development sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to author and run a functional MCP server using FastMCP.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where building your first mcp server (fastmcp / node.js) applies.</li>
+    <li>Author a unit test or verification script exercising building your first mcp server (fastmcp / node.js).</li>
+    <li>Document team architectural conventions regarding building your first mcp server (fastmcp / node.js).</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Building Your First MCP Server (FastMCP / Node.js).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "How does FastMCP (in Python) turn a standard Python function into an MCP-compliant tool?",
+    a: ["Using the @mcp.tool() decorator, which automatically extracts docstrings and parameter type hints into an MCP tool schema","By converting Python into C++","By registering the function with Google","By compiling the script into a binary executable"],
+    c: 0,
+    why: "FastMCP uses function decorators and type hints to generate MCP schemas automatically."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "@mcp.tool() Decorator",
+            "lines": [
+                  "Extracts docstring as tool description",
+                  "Compiles Pydantic type hints to JSON Schema"
+            ]
+      },
+      {
+            "title": "stdio Transport Loop",
+            "lines": [
+                  "Reads JSON-RPC request from stdin",
+                  "Executes get_system_metrics()",
+                  "Writes JSON-RPC response to stdout"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Building Your First MCP Server (FastMCP / Node.js)",
+      "def execute_flow():",
+      "    # Authoring an MCP server from scratch: using FastMC...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Building Your First MCP Server (FastMCP / Node.js)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "npx @modelcontextprotocol/inspector"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "FastMCP authoring uses the @mcp.tool() decorator to compile Python functions and docstrings into an MCP tool served over {1} transport."
+],
+    blanks: [
+      {
+            "a": [
+                  "stdio"
+            ],
+            "why": "Standard input and output communication"
+      },
+      {
+            "a": [
+                  "Python"
+            ],
+            "why": "The programming language used by FastMCP"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What transport mechanism is most commonly used for local desktop MCP servers (like Claude Desktop)?",
+      a: ["stdio (standard input and standard output pipes between processes)","HTTP/3 over public internet","Email attachments","USB serial cables"],
+      c: 0,
+      why: "stdio provides fast, secure local inter-process communication without opening network ports."
+    },
+    {
+      q: "What official developer tool allows engineers to test and debug MCP servers in a web browser interface?",
+      a: ["The MCP Inspector (npx @modelcontextprotocol/inspector)","Photoshop","Git bash","Chrome DevTools only"],
+      c: 0,
+      why: "The MCP Inspector is the official browser-based test harness for inspecting MCP servers."
+    },
+    {
+      q: "Why must an MCP server communicating over stdio NEVER print stray debug messages using plain print()?",
+      a: ["Stray text on stdout corrupts the JSON-RPC message stream; all logging must be written to stderr or via protocol log events","print() is illegal in Python","stdout is encrypted","It causes hard drives to overheat"],
+      c: 0,
+      why: "stdout is reserved strictly for JSON-RPC messages; stray prints break the client's JSON parser."
+    },
+    {
+      q: "What programming languages have official or prominent community MCP SDKs?",
+      a: ["TypeScript/Node.js, Python, Kotlin, and Go","Only assembly language","Only PHP 4","Only Fortran"],
+      c: 0,
+      why: "Official SDKs exist in TypeScript and Python, with community implementations across Go, Kotlin, and Rust."
+    }
+  ]);
+</script>
+</body>
+</html>

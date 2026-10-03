@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 06 — Partial indexes and covering indexes</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="database-indexes-performance" data-lesson="6" data-lesson-id="partial-indexes-and-covering-indexes">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 06</span> · Composite Indexes & Sizing</span>
+
+  <h1 class="lesson-title">Partial indexes and covering indexes</h1>
+  <p class="lesson-lede">
+    Why index 10 million inactive rows when you only query the 5,000 active ones? Master Partial Indexes to save 90% of disk space, and Covering Indexes (INCLUDE) for index-only scans.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Design lightweight partial indexes and covering indexes with INCLUDE clauses</span>
+    <span><b>Mission link</b> Dramatically reduces index storage size and enables lightning-fast Index-Only scans</span>
+  </div>
+
+  <h2><span class="n">1</span>Partial indexes: indexing only what matters</h2>
+  <p>In many systems, data is skewed: 99% of orders are 'completed' or 'archived', and only 1% are 'pending' or 'failed'. If your application only queries active orders, creating an index on the entire table wastes hundreds of megabytes of RAM on rows you never search for.</p><p>A <b>Partial Index</b> includes a <code>WHERE</code> clause: <code>CREATE INDEX idx_pending ON orders(created_at) WHERE status = 'pending';</code>. The index contains only the 1% of rows that match! It is tiny, fits entirely in CPU cache, and is updated only when pending orders change.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Partial indexes index only rows matching a WHERE condition, saving massive disk space and write overhead.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Covering indexes with INCLUDE</h2>
+  <p>How the INCLUDE clause stores non-search payload columns in leaf nodes to unlock Index-Only Scans.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing a partial index query</h2>
+  <p>Trace how the query planner selects a tiny partial index to answer an unread notification query.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of advanced indexing techniques.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can author compact partial indexes and covering indexes that achieve maximum query speed with minimum storage footprint.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Create a partial index for active/unpaid records in your database.</li>
+    <li>Create a covering index using CREATE INDEX ... INCLUDE (col) to trigger an Index-Only Scan.</li>
+    <li>Verify in EXPLAIN that the plan node reports 'Index Only Scan'.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    PostgreSQL Documentation: *Partial Indexes* (postgresql.org/docs/current/indexes-partial.html).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is the size benefit of a partial index on a table where 95% of rows are archived?",
+    a: ["The partial index is approximately 95% smaller than a full index on the table","The partial index takes up twice as much space","Partial indexes do not take up any space on disk","The table size is doubled"],
+    c: 0,
+    why: "A partial index only stores keys for rows meeting the predicate (5% of the table)."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Standard Index (email)",
+            "lines": [
+                  "B-tree search key: email",
+                  "must fetch name from heap file (2 reads)"
+            ]
+      },
+      {
+            "title": "Covering Index (email) INCLUDE (name)",
+            "lines": [
+                  "B-tree search key: email",
+                  "payload: name stored in leaf node",
+                  "Index-Only Scan: ZERO heap reads!"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "CREATE INDEX idx_unread ON notifications(user_id) WHERE read = false;",
+      "SELECT * FROM notifications WHERE user_id = 42 AND read = false;"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "partial_index": "indexes only unread notifications (5,000 rows out of 5 million)"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "query_match": "WHERE clause matches index predicate exactly"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "plan": "Index Scan using idx_unread; finishes in 0.02ms"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "An index built with a WHERE filter clause is a <0> index.",
+      "An index containing all columns needed by a query is a <1> index.",
+      "The clause adding payload columns to leaf nodes without indexing is <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "partial"
+            ],
+            "why": "Partial indexes filter which rows are indexed."
+      },
+      {
+            "a": [
+                  "covering"
+            ],
+            "why": "Covering indexes satisfy queries entirely from leaf nodes."
+      },
+      {
+            "a": [
+                  "INCLUDE"
+            ],
+            "why": "The INCLUDE clause appends payload columns to index leaf pages."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What happens if a query's WHERE clause does NOT match the partial index's WHERE predicate?",
+      a: ["The query planner cannot use the partial index and falls back to another index or sequential scan","The query throws a syntax error","The database automatically rebuilds the index","The query returns incorrect data"],
+      c: 0,
+      why: "A partial index can only be used if the query predicate is guaranteed to be a subset of the index predicate."
+    },
+    {
+      q: "What is the primary benefit of the 'INCLUDE' clause in PostgreSQL covering indexes?",
+      a: ["It stores payload columns in leaf nodes without adding them to the B-tree search key, enabling Index-Only Scans with less overhead","It encrypts the payload columns with AES-256","It converts text columns into integer numbers","It removes the need for primary keys"],
+      c: 0,
+      why: "INCLUDE columns are stored only on leaf pages and are not part of the B-tree ordering hierarchy."
+    },
+    {
+      q: "Why are partial unique indexes useful for soft-deleted tables?",
+      a: ["They allow 'UNIQUE(email) WHERE deleted_at IS NULL', allowing users to re-register deleted emails while preventing active duplicates","They delete old emails automatically","They compress email addresses into 4 bytes","They prevent spam emails from being sent"],
+      c: 0,
+      why: "Partial unique indexes enforce uniqueness strictly among active non-deleted records."
+    },
+    {
+      q: "Do partial indexes impose a write penalty when inserting rows that do NOT match the index predicate?",
+      a: ["No, the database skips updating the partial index entirely for rows that do not match the WHERE clause","Yes, partial indexes must be updated on every single insert in the table","Only on Monday mornings","Yes, if the table has more than 10 columns"],
+      c: 0,
+      why: "If an inserted row fails the partial index predicate, zero index pages are modified, saving write I/O."
+    }
+  ]);
+</script>
+</body>
+</html>

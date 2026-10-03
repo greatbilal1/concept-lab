@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 01 — Inside the LLM Black Box: Why Logs Are Not Enough</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="llm-observability" data-lesson="1" data-lesson-id="inside-the-llm-black-box">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 01</span> · Observability Need</span>
+
+  <h1 class="lesson-title">Inside the LLM Black Box: Why Logs Are Not Enough</h1>
+  <p class="lesson-lede">
+    Why traditional server logs fail for AI systems: non-deterministic execution, multi-hop agent chains, and hidden costs.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You understand the limitations of traditional logs and the necessity of hierarchical tracing.</span>
+    <span><b>Mission link</b> Mastering inside the llm black box: why logs are not enough across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Inside the LLM Black Box: Why Logs Are Not Enough</h2>
+  <p>In traditional web development, a server log is simple: an HTTP request hits <code>/api/users</code>, a database query runs, and status 200 is logged. If an error occurs, the stack trace points to line 42. But in an AI application or autonomous agent, the execution is a <strong>probabilistic, multi-hop black box</strong>.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Why traditional server logs fail for AI systems: non-deterministic execution, multi-hop agent chains, and hidden costs.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Flat Logs vs Hierarchical Traces</h2>
+  <p>Why traditional flat logs fail for AI:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Latency Attribution Breakdown</h2>
+  <ul><li><strong>Hierarchical Multi-Hop Execution:</strong> A single user question might trigger a RAG retrieval step, an intent classifier call, two parallel tool executions, and a final synthesis call. Flat logs scatter these across thousands of unrelated lines!</li><li><strong>Hidden Token Economics:</strong> Did an innocuous prompt change increase token consumption by 400%? Flat logs don't track token burn or dollar costs.</li><li><strong>Latency Attribution:</strong> When a request takes 8 seconds, where was the time spent? (Pre-fill? Vector DB? Tool execution? Model decoding?).</li></ul><pre><code># Traditional Flat Log (Useless): 
+[INFO] 14:22:01 - Processing user request
+[INFO] 14:22:03 - Querying database
+[INFO] 14:22:08 - Request finished in 7.2s
+# Why did it take 7.2s? Which model was called? How many tokens? We have zero clue!
+
+# Modern Hierarchical LLM Trace:
+# Trace: UserSupportWorkflow (7.2s, $0.042)
+# ├── Span: EmbedQuery (45ms, 12 tokens, text-embedding-3-small)
+# ├── Span: ChromaVectorSearch (18ms, 3 chunks retrieved)
+# ├── Span: ToolDispatch: get_order (180ms, database query)
+# └── Span: LLM Synthesis (6.9s, 1,420 prompt tokens, 280 completion tokens, gpt-4o)</code></pre><div class="callout"><p><strong>The Core Truth:</strong> You cannot optimize latency, control costs, or debug failures without hierarchical tracing that captures every span of execution.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the observability need sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You understand the limitations of traditional logs and the necessity of hierarchical tracing.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where inside the llm black box: why logs are not enough applies.</li>
+    <li>Author a unit test or verification script exercising inside the llm black box: why logs are not enough.</li>
+    <li>Document team architectural conventions regarding inside the llm black box: why logs are not enough.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Inside the LLM Black Box: Why Logs Are Not Enough.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Why is traditional line-by-line server logging (e.g. stdout text prints) inadequate for debugging LLM applications?",
+    a: ["LLM applications involve non-deterministic model reasoning, multi-turn tool loops, and token costs that require structured hierarchical traces","Server logs cannot print words","Traditional logs are forbidden by AI providers","LLM calls run without servers"],
+    c: 0,
+    why: "Traditional flat logs cannot represent the hierarchical tree of prompts, tool calls, token costs, and model reasoning."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Flat Server Logs (Opaque)",
+            "lines": [
+                  "Scattered text prints in stdout",
+                  "Zero cost tracking, hidden latency",
+                  "Impossible to reconstruct multi-agent flow"
+            ]
+      },
+      {
+            "title": "Hierarchical Trace (Transparent)",
+            "lines": [
+                  "Root trace with nested child spans",
+                  "Exact token counts, dollar costs, & latency",
+                  "Complete visibility into every tool & prompt"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Inside the LLM Black Box: Why Logs Are Not Enough",
+      "def execute_flow():",
+      "    # Why traditional server logs fail for AI systems: n...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Inside the LLM Black Box: Why Logs Are Not Enough"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Total Latency: 8.0s"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Vector Search: 0.1s"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "step": "Model Decoding: 7.9s"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Traditional flat logs fail for AI applications because multi-hop agent execution demands structured hierarchical {1} that track tokens, costs, and {2}."
+],
+    blanks: [
+      {
+            "a": [
+                  "traces"
+            ],
+            "why": "Parent-child execution trees"
+      },
+      {
+            "a": [
+                  "latency"
+            ],
+            "why": "Time taken across each span"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is a 'Trace' in distributed observability?",
+      a: ["A complete end-to-end representation of a single request's journey across all services, models, and tools from input to output","A line of code in Python","A drawing of a computer","A git commit hash"],
+      c: 0,
+      why: "A trace tracks the complete lifecycle of a request as it passes through a distributed system."
+    },
+    {
+      q: "What is a 'Span' within an observability trace?",
+      a: ["A single timed unit of work (e.g. an individual tool call, database query, or LLM invocation) within the larger trace tree","The distance between two monitors","A type of memory chip","A database index"],
+      c: 0,
+      why: "Spans represent individual nested steps with start times, end times, and metadata within a trace."
+    },
+    {
+      q: "Why is tracking token consumption per span critical for cost management?",
+      a: ["It identifies exactly which prompt, model, or intermediate tool call is responsible for driving up API expenses","It speeds up Python","Tokens cannot be tracked without spans","It makes models run for free"],
+      c: 0,
+      why: "Per-span token accounting attributes financial cost directly to specific architectural components."
+    },
+    {
+      q: "How does latency attribution help an engineer optimize a slow RAG application?",
+      a: ["It reveals whether slowness is caused by vector database indexing, network transit, or model token decoding","It makes the network cable faster","It converts Python to C++","It deletes slow documents"],
+      c: 0,
+      why: "Measuring individual span durations pinpoints the exact component causing user-facing delays."
+    }
+  ]);
+</script>
+</body>
+</html>

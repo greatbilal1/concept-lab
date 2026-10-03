@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 02 — async def versus def in FastAPI</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="fastapi" data-lesson="2" data-lesson-id="async-def-versus-def-in-fastapi">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 02</span> · FastAPI & Pydantic Foundations</span>
+
+  <h1 class="lesson-title">async def versus def in FastAPI</h1>
+  <p class="lesson-lede">
+    Should your path operation be 'async def' or normal 'def'? Discover the thread pool magic of FastAPI: when async accelerates I/O, and when normal def prevents blocking.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Choose appropriately between 'async def' and 'def' path operations to avoid thread starvation</span>
+    <span><b>Mission link</b> Prevents catastrophic thread pool blocking in asynchronous Python backends</span>
+  </div>
+
+  <h2><span class="n">1</span>The two execution lanes of FastAPI</h2>
+  <p>FastAPI supports both <code>async def</code> and traditional synchronous <code>def</code> endpoints. But how does it run both on the same server?</p><p>When you declare <code>async def</code>, FastAPI executes the function directly on the <b>Main Event Loop</b>. If you write slow, blocking code (like <code>time.sleep()</code> or synchronous database queries) inside an <code>async def</code>, <b>you freeze the entire server!</b> When you declare normal <code>def</code>, FastAPI runs the function inside an external <b>Threadpool</b>, preventing blocking.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Use async def for non-blocking awaitable I/O; use normal def for blocking synchronous libraries.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The execution decision rule</h2>
+  <p>Understand when to use async def versus when to use standard def.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing thread pool routing</h2>
+  <p>Trace how FastAPI automatically routes def versus async def path operations.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of async function execution.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can choose between async def and def with certainty, ensuring your backend never accidentally blocks the event loop.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Benchmark the concurrency of an async def endpoint versus a def endpoint in FastAPI.</li>
+    <li>Replace a blocking time.sleep() with await asyncio.sleep().</li>
+    <li>Explain why synchronous ORMs (like legacy Django ORM) should use normal def in FastAPI.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Sebastián Ramírez, *FastAPI Documentation: Concurrency and async / await* (fastapi.tiangolo.com/async/).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What happens to a FastAPI server if you run 'time.sleep(5)' inside an 'async def' route handler?",
+    a: ["The main event loop is frozen for 5 seconds, blocking all other concurrent users from receiving responses","FastAPI automatically moves time.sleep to a background thread","The sleep is converted to asyncio.sleep","The server crashes immediately"],
+    c: 0,
+    why: "Blocking synchronous calls inside async def freeze the single-threaded event loop."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "async def (Event Loop)",
+            "lines": [
+                  "use for: await httpx, await async_db",
+                  "blazing fast non-blocking concurrency",
+                  "NEVER run blocking synchronous code here!"
+            ]
+      },
+      {
+            "title": "def (Worker Threadpool)",
+            "lines": [
+                  "use for: synchronous DB (requests, psycopg2)",
+                  "CPU-intensive calculations",
+                  "runs in separate background thread safely"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Route 1: Async I/O (Async Event Loop)",
+      "@app.get('/async')",
+      "async def get_async(): await asyncio.sleep(1); return {'ok': True}",
+      "# Route 2: Synchronous I/O (ThreadPool)",
+      "@app.get('/sync')",
+      "def get_sync(): time.sleep(1); return {'ok': True} # safely offloaded to thread!"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "async_route": "runs directly on main asyncio event loop"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "sync_route": "FastAPI detects normal 'def' -> dispatches to anyio threadpool"
+            }
+      },
+      {
+            "line": 5,
+            "vars": {
+                  "non_blocking": "event loop remains responsive to other traffic during sync sleep"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Non-blocking coroutine endpoints are declared with <0> def.",
+      "Blocking synchronous endpoints declared with def run in a <1>pool.",
+      "To pause an async function without blocking the event loop, use asyncio.<2>()."
+],
+    blanks: [
+      {
+            "a": [
+                  "async"
+            ],
+            "why": "async def defines coroutine functions."
+      },
+      {
+            "a": [
+                  "thread",
+                  "worker"
+            ],
+            "why": "FastAPI dispatches def functions to a worker threadpool."
+      },
+      {
+            "a": [
+                  "sleep"
+            ],
+            "why": "asyncio.sleep yields execution back to the loop."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "When should you declare a FastAPI endpoint with 'async def'?",
+      a: ["When you are using asynchronous libraries and can use the 'await' keyword (e.g. asyncpg, httpx)","For every single function in the entire application without exception","Only when the function does not return any data","Only on Windows operating systems"],
+      c: 0,
+      why: "async def is appropriate when you have awaitable non-blocking I/O calls."
+    },
+    {
+      q: "What does FastAPI do under the hood when you define an endpoint with standard 'def' (no async)?",
+      a: ["It runs the function in an external worker threadpool so blocking operations do not freeze the main event loop","It rewrites the function in C++","It rejects the request with an error","It disables all validation"],
+      c: 0,
+      why: "FastAPI offloads standard def routes to anyio worker threadpools automatically."
+    },
+    {
+      q: "What happens if you run a CPU-intensive calculation (like image processing) directly inside 'async def'?",
+      a: ["It blocks the main event loop, preventing all other incoming requests from being processed while the calculation runs","It runs across all CPU cores in parallel","The calculation finishes in zero seconds","The server automatically creates a thread"],
+      c: 0,
+      why: "CPU-bound tasks block the thread; they must be offloaded to worker threads or processes."
+    },
+    {
+      q: "What library powers FastAPI's underlying asynchronous web server capabilities?",
+      a: ["Starlette (a lightweight ASGI framework/toolkit)","Django","Flask","jQuery"],
+      c: 0,
+      why: "FastAPI is built directly on top of Starlette for routing and HTTP handling."
+    }
+  ]);
+</script>
+</body>
+</html>

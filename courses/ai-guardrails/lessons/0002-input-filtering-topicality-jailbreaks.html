@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 02 — Input Filtering: Topicality, Jailbreaks, and PII Scrubbing</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="ai-guardrails" data-lesson="2" data-lesson-id="input-filtering-topicality-jailbreaks">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 02</span> · Input Filters</span>
+
+  <h1 class="lesson-title">Input Filtering: Topicality, Jailbreaks, and PII Scrubbing</h1>
+  <p class="lesson-lede">
+    Perimeter defense: semantic topicality classifiers, jailbreak detectors (Llama Guard), and PII masking.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to enforce topicality, block jailbreaks, and scrub PII at the input perimeter.</span>
+    <span><b>Mission link</b> Mastering input filtering: topicality, jailbreaks, and pii scrubbing across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Input Filtering: Topicality, Jailbreaks, and PII Scrubbing</h2>
+  <p>When an enterprise deploys a banking support assistant, it must help customers check account balances and dispute transactions. It should <strong>not</strong> write essays about political elections, debug Python code, or play fantasy roleplaying games. Allowing scope drift creates brand liability and wastes compute.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Perimeter defense: semantic topicality classifiers, jailbreak detectors (Llama Guard), and PII masking.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Three Input Filter Gates</h2>
+  <p>Three core layers of <strong>Input Filtering</strong>:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Topicality Centroid Matching</h2>
+  <ul><li><strong>1. Semantic Topicality Classifiers:</strong> Fast embedding similarity or lightweight text classifiers (SetFit, RoBERTa) that classify queries as IN_SCOPE or OUT_OF_SCOPE in under 15ms.</li><li><strong>2. Jailbreak & Prompt Injection Detectors:</strong> Specialized safety models (e.g. Meta's Llama Guard 3) trained to detect attempts to override system prompts, roleplay as unrestricted personas (DAN), or extract confidential instructions.</li><li><strong>3. Ingress PII Scrubbing:</strong> Detecting phone numbers, credit card tokens, and Social Security numbers and redacting them with placeholders before storage.</li></ul><pre><code># Topicality & Jailbreak Gate in Python:
+async def screen_input_query(user_query: str) -> bool:
+    # 1. Fast topicality check
+    topic_score = cosine_similarity(embed(user_query), bank_domain_centroid)
+    if topic_score < 0.65:
+        raise GuardrailViolation("Query out of scope for banking assistant.")
+        
+    # 2. Safety & Jailbreak screening via Llama Guard
+    safety_verdict = await llama_guard.classify(user_query)
+    if safety_verdict["is_unsafe"]:
+        raise GuardrailViolation(f"Unsafe input: {safety_verdict['violation_category']}")
+        
+    return True # Clean input passed!</code></pre><div class="callout"><p><strong>The Cost of Out-of-Scope:</strong> Every off-topic conversation costs real GPU money. Rejecting out-of-scope banter at the perimeter slashes token costs by up to 25%.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the input filtering sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to enforce topicality, block jailbreaks, and scrub PII at the input perimeter.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where input filtering: topicality, jailbreaks, and pii scrubbing applies.</li>
+    <li>Author a unit test or verification script exercising input filtering: topicality, jailbreaks, and pii scrubbing.</li>
+    <li>Document team architectural conventions regarding input filtering: topicality, jailbreaks, and pii scrubbing.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Input Filtering: Topicality, Jailbreaks, and PII Scrubbing.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is 'Topicality Filtering' in enterprise AI assistants?",
+    a: ["Ensuring the user's query is relevant to the application's intended domain (e.g. banking) and rejecting unrelated topics (e.g. poetry)","Filtering text by font style","Checking the time of day","Deleting old user messages"],
+    c: 0,
+    why: "Topicality filters enforce business scope, preventing conversational drift into unrelated or controversial topics."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1. PII Scrubbing (Regex / Presidio)",
+            "lines": [
+                  "Masks SSNs, emails, phone numbers",
+                  "100% compliant before prompt ingestion"
+            ]
+      },
+      {
+            "title": "2. Topicality Classifier (Embeddings)",
+            "lines": [
+                  "Verifies query is relevant to domain",
+                  "Blocks off-topic chit-chat"
+            ]
+      },
+      {
+            "title": "3. Jailbreak Detector (Llama Guard)",
+            "lines": [
+                  "Identifies DAN jailbreaks & prompt overrides",
+                  "Neutralizes adversarial attacks"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Input Filtering: Topicality, Jailbreaks, and PII Scrubbing",
+      "def execute_flow():",
+      "    # Perimeter defense: semantic topicality classifiers...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Input Filtering: Topicality, Jailbreaks, and PII Scrubbing"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "User: 'Check my checking balance'"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "User: 'Write a poem about Napoleon'"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Input guardrails screen incoming prompts using semantic {1} classifiers to enforce domain boundaries and {2} detectors to block prompt injection attacks."
+],
+    blanks: [
+      {
+            "a": [
+                  "topicality"
+            ],
+            "why": "Ensuring queries are within domain scope"
+      },
+      {
+            "a": [
+                  "jailbreak"
+            ],
+            "why": "Adversarial system prompt override attacks"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is 'Llama Guard' developed by Meta?",
+      a: ["An open-weights safety classifier fine-tuned to detect safety risks and prompt injection attacks in conversations","A physical security robot","A brand of computer cases","A database backup tool"],
+      c: 0,
+      why: "Llama Guard is an open-source classifier designed specifically for human-AI safety evaluation."
+    },
+    {
+      q: "Why is embedding centroid similarity an efficient technique for topicality filtering?",
+      a: ["It computes cosine distance against pre-calculated domain vectors in microseconds without requiring a frontier LLM call","It deletes off-topic files","It requires zero memory","It runs on paper"],
+      c: 0,
+      why: "Vector distance calculations are blazingly fast and run locally with minimal compute overhead."
+    },
+    {
+      q: "What is a 'DAN' (Do Anything Now) prompt injection attack?",
+      a: ["An adversarial jailbreak prompt instructing the model to roleplay as an unrestricted persona that ignores all safety guidelines","A friendly greeting","A software license","A database query"],
+      c: 0,
+      why: "DAN prompts attempt to bypass safety constraints through fictional roleplay."
+    },
+    {
+      q: "How should an enterprise assistant respond when a query is flagged as out-of-scope?",
+      a: ["Politely decline with a clear explanation of what the assistant can and cannot help with","Insult the user","Crash the browser","Report the user to police"],
+      c: 0,
+      why: "Helpful, transparent refusals maintain professional customer experience while enforcing boundaries."
+    }
+  ]);
+</script>
+</body>
+</html>

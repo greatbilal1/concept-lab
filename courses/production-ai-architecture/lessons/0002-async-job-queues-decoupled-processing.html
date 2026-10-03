@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 02 — Async Job Queues and Decoupled Processing (Celery, BullMQ)</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="production-ai-architecture" data-lesson="2" data-lesson-id="async-job-queues-decoupled-processing">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 02</span> · Job Queues</span>
+
+  <h1 class="lesson-title">Async Job Queues and Decoupled Processing (Celery, BullMQ)</h1>
+  <p class="lesson-lede">
+    Handling heavy AI workloads: task queues (Celery, BullMQ, Temporal), polling vs webhooks, worker autoscaling, and idempotency.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to decouple heavy AI workflows using asynchronous job queues and worker pools.</span>
+    <span><b>Mission link</b> Mastering async job queues and decoupled processing (celery, bullmq) across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Async Job Queues and Decoupled Processing (Celery, BullMQ)</h2>
+  <p>When an autonomous agent runs a 12-step refactoring workflow or indexes a 200-page financial PDF, execution can easily take <strong>2 to 5 minutes</strong>. If you run this inside a standard HTTP POST request, client browsers, load balancers, and Cloudflare will aggressively terminate the connection with a <code>524 Gateway Timeout</code>.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Handling heavy AI workloads: task queues (Celery, BullMQ, Temporal), polling vs webhooks, worker autoscaling, and idempotency.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Async Job Queue Lifecycle</h2>
+  <p>The <strong>Asynchronous Job Queue Pattern</strong> solves this cleanly:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Worker Autoscaling</h2>
+  <ul><li><strong>1. Immediate Job Submission:</strong> The client sends `POST /api/v1/agent/run`. The API gateway enqueues the job into Redis/BullMQ and immediately returns HTTP 202 Accepted: <code>{"job_id": "job_8492", "status": "QUEUED"}</code> in <strong>under 20ms</strong>!</li><li><strong>2. Distributed Worker Pool:</strong> An autoscale pool of Celery or BullMQ worker containers pops jobs from the queue and executes the agent steps independently.</li><li><strong>3. Progress Tracking & Webhooks:</strong> Workers update job progress in Redis (e.g. `progress: 45%`). The client receives live updates via WebSockets, polling, or an automated webhook callback on completion.</li><li><strong>4. Worker Autoscaling:</strong> Scale worker containers up or down dynamically based on queue depth!</li></ul><pre><code># The Asynchronous Job Queue Pattern in FastAPI + Celery:
+@app.post("/api/v1/documents/index", status_code=202)
+async def submit_indexing_job(payload: IndexRequest):
+    # Enqueue task in Celery background queue
+    task = process_large_pdf.delay(payload.document_url, payload.tenant_id)
+    # Return 202 immediately to release the HTTP connection!
+    return {"task_id": task.id, "status": "ACCEPTED", "check_url": f"/api/v1/tasks/{task.id}"}</code></pre><div class="callout"><p><strong>The 202 Pattern:</strong> Any AI operation expected to take more than 5 seconds should immediately return HTTP 202 Accepted with a job handle.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the job queue sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to decouple heavy AI workflows using asynchronous job queues and worker pools.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where async job queues and decoupled processing (celery, bullmq) applies.</li>
+    <li>Author a unit test or verification script exercising async job queues and decoupled processing (celery, bullmq).</li>
+    <li>Document team architectural conventions regarding async job queues and decoupled processing (celery, bullmq).</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Async Job Queues and Decoupled Processing (Celery, BullMQ).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Why must multi-step agent tasks and large PDF document indexing be dispatched to an asynchronous job queue?",
+    a: ["Multi-step agent tasks can take several minutes to complete, far exceeding standard HTTP request timeout limits (30-60s)","Web browsers refuse to read PDFs","Job queues make models run for free","Python cannot run without a queue"],
+    c: 0,
+    why: "Asynchronous job queues manage long-running tasks safely beyond the boundary of HTTP request timeouts."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1. Client Submits Task",
+            "lines": [
+                  "POST /api/agent/run",
+                  "Gateway enqueues task in Redis",
+                  "Returns HTTP 202 + job_id in 20ms!"
+            ]
+      },
+      {
+            "title": "2. Worker Pool Executes",
+            "lines": [
+                  "Background worker claims job",
+                  "Runs 10-step agent loop safely",
+                  "Updates progress: 20%, 50%, 80%..."
+            ]
+      },
+      {
+            "title": "3. Completion Notification",
+            "lines": [
+                  "Worker saves result in PostgreSQL",
+                  "Emits WebSocket event or webhook callback"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Async Job Queues and Decoupled Processing (Celery, BullMQ)",
+      "def execute_flow():",
+      "    # Handling heavy AI workloads: task queues (Celery, ...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Async Job Queues and Decoupled Processing (Celery, BullMQ)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Queue Depth: 5 jobs"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Queue Surge: 500 jobs"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Long-running AI workloads use asynchronous job queues to return HTTP {1} Accepted immediately while distributed {2} execute multi-step workflows."
+],
+    blanks: [
+      {
+            "a": [
+                  "202"
+            ],
+            "why": "HTTP status code for accepted async tasks"
+      },
+      {
+            "a": [
+                  "workers"
+            ],
+            "why": "Background compute task processors"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What HTTP status code is standardly returned when an asynchronous task is successfully enqueued for background processing?",
+      a: ["HTTP 202 Accepted","HTTP 200 OK","HTTP 404 Not Found","HTTP 301 Moved Permanently"],
+      c: 0,
+      why: "HTTP 202 Accepted explicitly communicates that the request has been received and queued but not yet completed."
+    },
+    {
+      q: "How does decoupling agent execution into background workers protect web servers from crashing?",
+      a: ["Web servers handle lightweight HTTP routing in milliseconds, while heavy CPU and memory-intensive agent loops run on isolated worker instances","It deletes all error logs","It makes servers run without electricity","It turns off the internet"],
+      c: 0,
+      why: "Process isolation prevents resource-intensive agent tasks from depleting web server memory and connections."
+    },
+    {
+      q: "What is 'KEDA' (Kubernetes Event-driven Autoscaling) in AI worker architectures?",
+      a: ["A Kubernetes autoscaler that scales background worker pods up or down dynamically based on the number of pending jobs in the queue","A new computer programming language","A brand of graphics card","A database query language"],
+      c: 0,
+      why: "KEDA scales Kubernetes worker pods proportionally to queue depth, ensuring capacity matches demand."
+    },
+    {
+      q: "How does a webhook notify the client when a long background AI job completes?",
+      a: ["The worker makes an automated HTTP POST request to a client-specified callback URL containing the completed payload","The worker sends a physical letter","The worker calls the user on the telephone","The worker restarts the client's laptop"],
+      c: 0,
+      why: "Webhooks provide asynchronous push notifications to client systems upon task completion."
+    }
+  ]);
+</script>
+</body>
+</html>

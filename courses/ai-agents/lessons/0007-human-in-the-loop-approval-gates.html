@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 07 — Human-in-the-Loop Approval and Steering Gates</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="ai-agents" data-lesson="7" data-lesson-id="human-in-the-loop-approval-gates">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 07</span> · Human-in-the-Loop</span>
+
+  <h1 class="lesson-title">Human-in-the-Loop Approval and Steering Gates</h1>
+  <p class="lesson-lede">
+    Human-in-the-loop patterns: interruptible workflows, approval gates for high-consequence tools, and dynamic human steering.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to implement interruptible workflows and human approval gates.</span>
+    <span><b>Mission link</b> Mastering human-in-the-loop approval and steering gates across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Human-in-the-Loop Approval and Steering Gates</h2>
+  <p>Full autonomy is not appropriate for all tasks. When an agent is about to execute a high-consequence action—such as executing a database migration, charging a credit card, or sending an external email—the system must pause and consult the <strong>Pilot in Command</strong>.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Human-in-the-loop patterns: interruptible workflows, approval gates for high-consequence tools, and dynamic human steering.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Interruptible Workflow Architecture</h2>
+  <p>Modern agent frameworks (like LangGraph) implement <strong>Interruptible Workflows</strong>:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Human Steering Actions</h2>
+  <ul><li><strong>1. The Interrupt Gate:</strong> The agent pauses execution before calling a high-risk tool. The complete state (pending tool call, parameters, context) is saved to a persistent database checkpoint.</li><li><strong>2. Human Notification:</strong> The application presents a review UI to the human: <em>'The agent proposes to run `DROP COLUMN legacy_status`. Approve or Reject?'</em></li><li><strong>3. Human Steering:</strong> The human can: (a) <strong>Approve</strong> (tool executes); (b) <strong>Reject</strong> (sends rejection explanation back to agent); or (c) <strong>Steer</strong> (human edits the proposed arguments directly!).</li><li><strong>4. Seamless Resume:</strong> Upon human submission, the agent resumes execution from the exact checkpoint without losing any memory!</li></ul><pre><code># The Interrupt Pattern in LangGraph:
+# Define node with breakpoint:
+workflow = StateGraph(AgentState)
+workflow.add_node("execute_tool", tool_node)
+# Set human approval breakpoint BEFORE dangerous tools:
+app = workflow.compile(checkpointer=MemorySaver(), interrupt_before=["execute_tool"])</code></pre><div class="callout"><p><strong>The Confidence Rule:</strong> Human-in-the-loop gates transform AI from a scary black box into a trustworthy assistant that does the heavy typing while keeping humans in charge of critical decisions.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the human approval sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to implement interruptible workflows and human approval gates.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where human-in-the-loop approval and steering gates applies.</li>
+    <li>Author a unit test or verification script exercising human-in-the-loop approval and steering gates.</li>
+    <li>Document team architectural conventions regarding human-in-the-loop approval and steering gates.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Human-in-the-Loop Approval and Steering Gates.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Why is 'Interruptibility' a fundamental requirement in production AI agent frameworks?",
+    a: ["It allows the workflow to pause execution safely, request human approval or input, and resume with updated state","It makes Python run faster","It is a feature in video players","It shuts down the server"],
+    c: 0,
+    why: "Interruptibility allows agents to pause before risky actions, wait for human review, and resume without losing state."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1. Agent Prepares Action",
+            "lines": [
+                  "Prepares: refund_payment($500)",
+                  "High-consequence write action"
+            ]
+      },
+      {
+            "title": "2. Interrupt Gate Tripped",
+            "lines": [
+                  "Workflow pauses execution safely",
+                  "State checkpointed to PostgreSQL"
+            ]
+      },
+      {
+            "title": "3. Human Review UI",
+            "lines": [
+                  "Presents approval dialog to engineer",
+                  "Engineer reviews parameters & context"
+            ]
+      },
+      {
+            "title": "4. Resume Execution",
+            "lines": [
+                  "Approved -> Tool executes",
+                  "Agent continues seamlessly"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Human-in-the-Loop Approval and Steering Gates",
+      "def execute_flow():",
+      "    # Human-in-the-loop patterns: interruptible workflow...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Human-in-the-Loop Approval and Steering Gates"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Approve"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Reject with Feedback"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "step": "Edit Arguments"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Interruptible agent workflows pause execution before high-consequence actions, saving state to a {1} and resuming upon {2} approval."
+],
+    blanks: [
+      {
+            "a": [
+                  "checkpoint"
+            ],
+            "why": "Persistent state snapshot"
+      },
+      {
+            "a": [
+                  "human"
+            ],
+            "why": "Accountable developer sign-off"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What happens to the agent's memory and working context while waiting at a human approval gate?",
+      a: ["It is serialized and preserved in a persistent database checkpoint, ready to resume exactly where it paused","It is deleted after 5 minutes","It is printed to paper","It is erased from RAM"],
+      c: 0,
+      why: "Persistent state checkpoints allow workflows to pause for hours or days without losing context."
+    },
+    {
+      q: "Why is 'Reject with Feedback' more powerful than a simple binary cancel button?",
+      a: ["It allows the human to explain WHY the action was rejected, giving the agent the guidance needed to choose a better path","It deletes the agent","It restarts the computer","It reboots the router"],
+      c: 0,
+      why: "Human feedback explains the constraint or policy violation, allowing the agent to course-correct."
+    },
+    {
+      q: "What type of operations should ALWAYS trigger a mandatory human approval gate?",
+      a: ["Destructive database migrations, production deployments, financial transactions, and sending external communications","Reading a file","Formatting code with Prettier","Listing files in a directory"],
+      c: 0,
+      why: "Irreversible real-world operations carry severe blast radius consequences requiring human sign-off."
+    },
+    {
+      q: "How does human steering improve trust when deploying autonomous agents in enterprise teams?",
+      a: ["Teams feel secure knowing that the agent cannot execute critical actions without explicit human verification and oversight","It allows developers to stop writing software","It turns off all computer monitors","It makes cloud servers free"],
+      c: 0,
+      why: "Approval gates provide safety rails that make adopting autonomous workflows palatable to management."
+    }
+  ]);
+</script>
+</body>
+</html>

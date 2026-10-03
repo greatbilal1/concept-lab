@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 07 — Middleware, CORS, and request state</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="fastapi" data-lesson="7" data-lesson-id="middleware-cors-and-request-state">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 07</span> · Async Lifecycle & Background Tasks</span>
+
+  <h1 class="lesson-title">Middleware, CORS, and request state</h1>
+  <p class="lesson-lede">
+    Inspect and modify every request that touches your server. Master FastAPI middleware: adding CORS headers, timing requests, and attaching context to request.state.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Implement custom async middleware for logging, timing, and CORS configuration</span>
+    <span><b>Mission link</b> Enables cross-cutting concerns to execute across every single application request</span>
+  </div>
+
+  <h2><span class="n">1</span>The middleware onion</h2>
+  <p>A <b>Middleware</b> is a function that wraps around every request entering and leaving your application. It acts like the layers of an onion: it processes the request <i>before</i> it reaches the route handler, and modifies the response <i>after</i> the route completes.</p><p>Middleware handles cross-cutting concerns: measuring request execution time (<code>X-Process-Time</code>), generating correlation IDs, and configuring <code>CORSMiddleware</code> to allow browser frontend communication.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Middleware executes before every request and after every response, wrapping the entire application.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The middleware lifecycle</h2>
+  <p>Visualise how requests traverse the middleware pipeline down to the router and back up.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing timing middleware execution</h2>
+  <p>Trace how a custom timing middleware adds execution metrics to response headers.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of middleware mechanics.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can build custom async middleware to time requests, inject correlation headers, and configure CORS security.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Add CORSMiddleware to a FastAPI app allowing origins: ['http://localhost:3000'].</li>
+    <li>Implement a custom timing middleware that attaches an X-Process-Time header.</li>
+    <li>Store a request ID in request.state.request_id and access it inside a route.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Sebastián Ramírez, *FastAPI Documentation: Middleware* (fastapi.tiangolo.com/tutorial/middleware/).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What happens if a middleware function executes code before and after 'call_next(request)'?",
+    a: ["The code before runs on the incoming request; 'call_next' runs the route; code after runs on the outgoing response","The route is executed twice","The response is cancelled","The middleware runs in a separate thread"],
+    c: 0,
+    why: "call_next(request) passes control inward to the route, returning the response object for modification."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Incoming Request",
+            "lines": [
+                  "HTTP request enters server",
+                  "CORSMiddleware checks Origin"
+            ]
+      },
+      {
+            "title": "Custom Timing Middleware",
+            "lines": [
+                  "start_time = time.perf_counter()",
+                  "response = await call_next(request)"
+            ]
+      },
+      {
+            "title": "Outgoing Response",
+            "lines": [
+                  "response.headers['X-Process-Time'] = ms",
+                  "response delivered to client"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "@app.middleware('http')",
+      "async def add_process_time(request: Request, call_next):",
+      "    start = time.perf_counter()",
+      "    response = await call_next(request) # route handler runs here",
+      "    duration = time.perf_counter() - start",
+      "    response.headers['X-Process-Time'] = str(duration)",
+      "    return response"
+],
+    steps: [
+      {
+            "line": 2,
+            "vars": {
+                  "timer_start": "high-resolution timer started"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "route_execution": "request processed by matching path operation"
+            }
+      },
+      {
+            "line": 5,
+            "vars": {
+                  "header_appended": "X-Process-Time header attached to outgoing response"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The decorator registering custom HTTP middleware is @app.<0>('http').",
+      "The callback function passing the request down to the route is <1>_next.",
+      "The built-in middleware configuring cross-origin permissions is <2>Middleware."
+],
+    blanks: [
+      {
+            "a": [
+                  "middleware"
+            ],
+            "why": "@app.middleware('http') registers HTTP middleware."
+      },
+      {
+            "a": [
+                  "call"
+            ],
+            "why": "call_next(request) executes downstream handlers."
+      },
+      {
+            "a": [
+                  "CORS"
+            ],
+            "why": "CORSMiddleware manages cross-origin headers."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What does 'await call_next(request)' do inside a FastAPI middleware function?",
+      a: ["Passes the request to the matching path operation and returns the resulting Response object","Calls the next middleware in a separate operating system process","Restarts the FastAPI server","Cancels the request and returns status 400"],
+      c: 0,
+      why: "call_next dispatches the request through subsequent middleware and routes to produce the response."
+    },
+    {
+      q: "How do you store temporary request-scoped data (like a request ID) to access later in a route handler?",
+      a: ["Attach it to request.state (e.g. request.state.request_id = uuid4())","Save it to a global variable in main.py","Write it to a file on the server desktop","Store it in the computer BIOS"],
+      c: 0,
+      why: "request.state is a dedicated state container scoped strictly to the current request lifecycle."
+    },
+    {
+      q: "Where in the application execution order does middleware run relative to dependencies?",
+      a: ["Middleware runs BEFORE any dependencies are evaluated, and AFTER the response is generated","Middleware runs after the route function completes only","Middleware runs inside the database engine","Middleware only runs on failed requests"],
+      c: 0,
+      why: "Middleware is the outer shell of the application; it wraps around dependencies and routes."
+    },
+    {
+      q: "What is the recommended middleware for enabling frontend single-page apps to call a FastAPI backend?",
+      a: ["CORSMiddleware from fastapi.middleware.cors","GZipMiddleware","HTTPSRedirectMiddleware","TrustedHostMiddleware"],
+      c: 0,
+      why: "CORSMiddleware handles Origin headers and preflight OPTIONS checks natively."
+    }
+  ]);
+</script>
+</body>
+</html>

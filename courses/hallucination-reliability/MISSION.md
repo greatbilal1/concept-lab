@@ -1,0 +1,3 @@
+# Mission — Hallucination & Reliability Engineering
+
+Master the science of engineering factual reliability into generative AI systems. Understand the cognitive and statistical mechanics of hallucinations, detect confabulations using Natural Language Inference (NLI) and semantic entropy, design architectures that make hallucinations structurally impossible, build generator-verifier fact-checking pipelines, author defensive quotes-first prompts, establish human verification interfaces for high-consequence domains, and implement defense-in-depth reliability architectures.

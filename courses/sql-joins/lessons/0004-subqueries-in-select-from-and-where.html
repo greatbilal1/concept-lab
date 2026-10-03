@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 04 — Subqueries in SELECT, FROM, and WHERE</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="sql-joins" data-lesson="4" data-lesson-id="subqueries-in-select-from-and-where">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 04</span> · Subqueries & CTEs</span>
+
+  <h1 class="lesson-title">Subqueries in SELECT, FROM, and WHERE</h1>
+  <p class="lesson-lede">
+    A query inside a query. Learn how scalar subqueries, table-derived subqueries, and correlated subqueries allow you to solve multi-stage questions in a single query.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Compose scalar, derived-table, and correlated subqueries without performance traps</span>
+    <span><b>Mission link</b> Expands query thinking beyond flat single-table lookups</span>
+  </div>
+
+  <h2><span class="n">1</span>Queries inside queries</h2>
+  <p>A <b>Subquery</b> is an SQL query nested inside another query. Depending on where it is placed, a subquery serves different roles:</p><p><b>In WHERE:</b> Filters by computed values (e.g. <code>WHERE price > (SELECT AVG(price) FROM products)</code>). <b>In FROM:</b> Acts as an on-the-fly temporary table (a <i>derived table</i>). <b>In SELECT:</b> Calculates a single scalar value per output row.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Subqueries nest queries inside SELECT, FROM, or WHERE clauses to solve multi-step problems.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Subquery placement taxonomy</h2>
+  <p>Understand where subqueries can appear in an SQL statement.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing a scalar subquery filter</h2>
+  <p>Trace how the database calculates the average price once, then filters expensive products.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of subquery types.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can write nested queries to solve multi-stage questions and understand correlated subquery trade-offs.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Find all employees who earn more than the company average using a subquery in WHERE.</li>
+    <li>Query a derived table in FROM using an alias: FROM (SELECT ...) AS temp.</li>
+    <li>Explain why correlated subqueries can be slow on large tables.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Alan Beaulieu, *Learning SQL*, Chapter 9: 'Subqueries'.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is a 'scalar subquery'?",
+    a: ["A subquery that returns exactly one row and one column (a single atomic value)","A subquery that scales across ten database servers","A subquery that returns a million rows","A query written in Python"],
+    c: 0,
+    why: "Scalar subqueries produce a single scalar value that can be used in comparisons or SELECT expressions."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "WHERE Clause",
+            "lines": [
+                  "WHERE price > (SELECT AVG...)",
+                  "scalar comparison filter"
+            ]
+      },
+      {
+            "title": "FROM Clause (Derived)",
+            "lines": [
+                  "FROM (SELECT user_id, COUNT(*) ...) sub",
+                  "treats query output as a table"
+            ]
+      },
+      {
+            "title": "Correlated Subquery",
+            "lines": [
+                  "WHERE salary > (SELECT AVG... WHERE dept = o.dept)",
+                  "evaluates once per outer row"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "SELECT title, price",
+      "FROM products",
+      "WHERE price > (SELECT AVG(price) FROM products); # Subquery evaluates to $45.00"
+],
+    steps: [
+      {
+            "line": 2,
+            "vars": {
+                  "subquery": "SELECT AVG(price) evaluates to 45.00"
+            }
+      },
+      {
+            "line": 0,
+            "vars": {
+                  "outer_query": "SELECT title, price WHERE price > 45.00"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "output": "returns all products with above-average price"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "A subquery returning exactly one single value is a <0> subquery.",
+      "A subquery in the FROM clause acts as a <1> table.",
+      "A subquery referencing a column from the outer query is a <2> subquery."
+],
+    blanks: [
+      {
+            "a": [
+                  "scalar"
+            ],
+            "why": "Scalar subqueries return a single cell value."
+      },
+      {
+            "a": [
+                  "derived"
+            ],
+            "why": "Derived tables exist in the FROM clause."
+      },
+      {
+            "a": [
+                  "correlated"
+            ],
+            "why": "Correlated subqueries depend on outer row values."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the performance danger of a 'correlated subquery' on a 1-million-row table?",
+      a: ["The subquery executes repeatedly once for every single row in the outer table (up to 1 million executions)","It deletes the query cache","It turns off database indexes","It causes SQL syntax to become invalid"],
+      c: 0,
+      why: "Correlated subqueries depend on outer row values, forcing row-by-row re-evaluation."
+    },
+    {
+      q: "Must a derived table in a FROM clause be given an alias in standard SQL?",
+      a: ["Yes, every subquery in a FROM clause must be assigned a table alias (e.g. FROM (...) AS sub)","No, aliases are completely optional in FROM clauses","Only if the subquery returns more than 100 rows","Only on SQLite"],
+      c: 0,
+      why: "The SQL standard mandates that all derived relations in FROM have an explicit alias."
+    },
+    {
+      q: "What happens if a scalar subquery in SELECT returns more than one row at runtime?",
+      a: ["The database throws a runtime error: 'subquery returned more than one row'","It concatenates all the rows into a string","It randomly picks the first row and continues","It returns NULL"],
+      c: 0,
+      why: "Scalar subqueries must guarantee at most one row and column; multiple rows trigger a fatal error."
+    },
+    {
+      q: "What does the 'EXISTS' operator do with a subquery?",
+      a: ["Returns true as soon as the subquery finds at least one matching row, short-circuiting immediately","Calculates the total size of the subquery in bytes","Verifies if the table exists on disk","Encrypts the subquery text"],
+      c: 0,
+      why: "EXISTS tests for the presence of rows and short-circuits as soon as the first match is found."
+    }
+  ]);
+</script>
+</body>
+</html>

@@ -1,0 +1,3 @@
+# Mission — Machine Learning Explained
+
+Master the core principles and mathematics of machine learning. Frame ML as function approximation, partition datasets to prevent data leakage, quantify error with MSE and cross-entropy, navigate loss landscapes with gradient descent, control the bias-variance trade-off with regularization, evaluate models with precision and recall, and choose between gradient boosted trees and deep learning.

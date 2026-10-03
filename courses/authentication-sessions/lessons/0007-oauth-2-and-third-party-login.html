@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 07 — OAuth 2.0 and third-party login</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="authentication-sessions" data-lesson="7" data-lesson-id="oauth-2-and-third-party-login">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 07</span> · OAuth & Modern Authentication</span>
+
+  <h1 class="lesson-title">OAuth 2.0 and third-party login</h1>
+  <p class="lesson-lede">
+    How does 'Sign in with Google' or 'Log in with GitHub' work without sharing your password? Master the OAuth 2.0 Authorization Code flow with PKCE.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Trace and implement the OAuth 2.0 Authorization Code flow with PKCE</span>
+    <span><b>Mission link</b> The global standard for delegated authorization and federated identity</span>
+  </div>
+
+  <h2><span class="n">1</span>Delegated authorization without password sharing</h2>
+  <p>In the early web, if you wanted an app to print your contacts, you had to type your email password directly into that third-party app! This was catastrophic for security.</p><p><b>OAuth 2.0</b> solved this by introducing <b>delegated authorization</b>. The user logs in directly with the identity provider (Google, GitHub), and grants the client app limited permission (scopes). The provider issues an access token to the app without ever revealing the user's password.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    OAuth 2.0 allows users to grant apps scoped access to resources without sharing credentials.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Authorization Code Flow with PKCE</h2>
+  <p>Follow the 5-step flow used by modern web and mobile applications.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing the PKCE cryptographic verification</h2>
+  <p>Trace how Proof Key for Code Exchange (PKCE) prevents intercepted authorization codes from being redeemed.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of OAuth 2.0 components.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can implement OAuth 2.0 social logins using the secure Authorization Code flow with PKCE.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Register a developer application on GitHub or Google to obtain a client ID.</li>
+    <li>Implement a local callback handler that exchanges an authorization code for a token.</li>
+    <li>Inspect the ID token (OIDC) returned during a Google sign-in flow.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    IETF RFC 7636: *Proof Key for Code Exchange by OAuth Public Clients (PKCE)*.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "In an OAuth 2.0 flow, does the third-party client application ever see the user's password?",
+    a: ["No, the user authenticates directly with the authorization server; the client app only receives a token","Yes, the client app stores the password in its database","Only if the user logs in from a mobile phone","Yes, but it is encrypted in Base64"],
+    c: 0,
+    why: "OAuth ensures credentials are entered solely on the trusted identity provider's domain."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1. Client -> /authorize",
+            "lines": [
+                  "sends client_id, scopes, and code_challenge",
+                  "redirects user browser to Google"
+            ]
+      },
+      {
+            "title": "2. User Approves",
+            "lines": [
+                  "user logs in at Google & consents",
+                  "Google redirects back with authorization code"
+            ]
+      },
+      {
+            "title": "3. Exchange Code (/token)",
+            "lines": [
+                  "client sends code + code_verifier",
+                  "Google verifies PKCE hash & returns access token!"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Step 1: Client generates random 'code_verifier'",
+      "# Step 2: Client computes code_challenge = SHA256(code_verifier)",
+      "# Step 3: Client exchanges code + code_verifier at /token",
+      "# Step 4: Auth server verifies SHA256(verifier) == challenge",
+      "# An attacker who intercepted the code lacks the verifier and is rejected!"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "verifier": "high-entropy secret string created locally"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "challenge": "SHA-256 hash sent over public browser redirect"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "verification": "server checks secret matches hash sent in step 2"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "security": "intercepted authorization code is useless without verifier"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The open standard for delegated authorization is OAuth <0>.",
+      "The security extension protecting public clients from code interception is <1>.",
+      "The identity protocol built on top of OAuth 2.0 is OpenID <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "2.0",
+                  "2"
+            ],
+            "why": "OAuth 2.0 is the modern authorization standard."
+      },
+      {
+            "a": [
+                  "PKCE"
+            ],
+            "why": "Proof Key for Code Exchange secures public clients."
+      },
+      {
+            "a": [
+                  "Connect",
+                  "OIDC"
+            ],
+            "why": "OpenID Connect adds user identity profiles to OAuth."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the primary role of PKCE (Proof Key for Code Exchange) in OAuth 2.0?",
+      a: ["To prevent attackers from redeeming intercepted authorization codes on public clients that lack client secrets","To encrypt the user's password with public key cryptography","To speed up the network connection to the identity provider","To bypass user consent dialogs"],
+      c: 0,
+      why: "PKCE binds the authorization code to the original client that created the challenge."
+    },
+    {
+      q: "What is the difference between OAuth 2.0 and OpenID Connect (OIDC)?",
+      a: ["OAuth 2.0 is for authorization (accessing APIs); OpenID Connect is an identity layer for authentication (signing in)","OAuth is for mobile apps; OIDC is for desktop computers","OAuth uses XML; OIDC uses JSON","There is no difference between them"],
+      c: 0,
+      why: "OIDC extends OAuth 2.0 by providing an ID token (JWT) containing authenticated user profile details."
+    },
+    {
+      q: "What is an OAuth 'scope'?",
+      a: ["A parameter specifying the specific permissions requested by the application (e.g. read:user, repo)","The physical geographic country where the user is located","The screen size of the user's smartphone","The speed of the database query"],
+      c: 0,
+      why: "Scopes limit what data and actions an access token can perform on user resources."
+    },
+    {
+      q: "Why shouldn't single-page apps (SPAs) store a hardcoded 'client_secret' in their frontend code?",
+      a: ["Frontend JavaScript is public; anyone can open browser DevTools and extract the secret","Because client secrets exceed maximum string length limits in JavaScript","Browsers reject files that contain the word secret","It violates domain registration agreements"],
+      c: 0,
+      why: "Public clients cannot keep secrets; PKCE was created specifically to eliminate client secrets for SPAs."
+    }
+  ]);
+</script>
+</body>
+</html>

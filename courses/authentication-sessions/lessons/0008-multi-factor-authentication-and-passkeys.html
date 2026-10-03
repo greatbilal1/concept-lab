@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 08 — Multi-factor authentication and passkeys</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="authentication-sessions" data-lesson="8" data-lesson-id="multi-factor-authentication-and-passkeys">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 08</span> · OAuth & Modern Authentication</span>
+
+  <h1 class="lesson-title">Multi-factor authentication and passkeys</h1>
+  <p class="lesson-lede">
+    Passwords are dying. Explore the modern authentication horizon: Time-based One-Time Passwords (TOTP), SMS vulnerabilities, WebAuthn, and biometric passkeys.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Implement TOTP two-factor verification and explain FIDO2/WebAuthn passkeys</span>
+    <span><b>Mission link</b> The cutting-edge standard for phishing-resistant web authentication</span>
+  </div>
+
+  <h2><span class="n">1</span>The three authentication factors</h2>
+  <p>Authentication factors are divided into three categories: <b>Something you know</b> (password, PIN), <b>Something you have</b> (authenticator app, hardware YubiKey), and <b>Something you are</b> (biometric fingerprint, Face ID).</p><p>Multi-Factor Authentication (MFA) requires two distinct categories. Passwords alone are vulnerable to phishing and breaches; pairing a password with a <b>Time-based One-Time Password (TOTP)</b> or a cryptographic <b>Passkey (WebAuthn)</b> stops 99% of automated account takeovers.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    MFA requires two different factor types; WebAuthn passkeys eliminate passwords entirely.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>How TOTP calculates 6-digit codes</h2>
+  <p>TOTP (RFC 6238) hashes a shared secret with the current Unix timestamp rounded to 30 seconds.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing WebAuthn passkey authentication</h2>
+  <p>Trace how a biometric fingerprint unlocks a local private key to sign a server challenge without sending passwords.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of modern authentication mechanisms.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can implement TOTP two-factor authentication and explain the phishing-resistant architecture of WebAuthn passkeys.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Generate a TOTP QR code using a library like speakeasy or pyotp.</li>
+    <li>Scan the QR code with your phone authenticator app and verify an incoming code.</li>
+    <li>Test WebAuthn passkey creation in your browser using webauthn.io.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    IETF RFC 6238: *TOTP: Time-Based One-Time Password Algorithm*.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Why is SMS text-message two-factor authentication considered inferior to an Authenticator app (TOTP)?",
+    a: ["SMS is vulnerable to SIM-swapping attacks and carrier interception; TOTP runs offline on your device","SMS text messages can only be sent on weekdays","SMS uses too much internet bandwidth","Phones cannot receive SMS messages outside their home country"],
+    c: 0,
+    why: "SIM-swapping allows criminals to divert text messages; TOTP math runs locally on the phone."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Shared Secret",
+            "lines": [
+                  "scanned via QR code at setup",
+                  "stored securely on server and phone"
+            ]
+      },
+      {
+            "title": "Current Time Step",
+            "lines": [
+                  "Math.floor(Date.now() / 30000)",
+                  "changes every 30 seconds"
+            ]
+      },
+      {
+            "title": "HMAC Hash -> 6 Digits",
+            "lines": [
+                  "HMAC-SHA1(secret, timeStep)",
+                  "generates matching 6-digit code!"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "Server sends: random cryptographic challenge",
+      "Browser prompts: user touches Touch ID / Face ID",
+      "Device hardware unlocks private key, signs challenge",
+      "Browser sends: signed signature back to server",
+      "Server verifies with public key -> Authenticated with zero passwords transmitted!"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "challenge": "random nonce from server"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "biometric": "biometrics verify user locally in secure enclave"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "signature": "private key never leaves device hardware"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "verified": "server confirms signature mathematically; phishing impossible"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The algorithm used by Google Authenticator for 30-second codes is <0>.",
+      "The W3C standard for browser biometric authentication is Web<1>.",
+      "Cryptographic credentials that replace passwords are <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "TOTP"
+            ],
+            "why": "TOTP stands for Time-based One-Time Password."
+      },
+      {
+            "a": [
+                  "Authn"
+            ],
+            "why": "WebAuthn enables passwordless biometric authentication."
+      },
+      {
+            "a": [
+                  "passkeys"
+            ],
+            "why": "Passkeys use FIDO2/WebAuthn public-key credentials."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "How does an authenticator app (like Google Authenticator) generate the correct 6-digit code without internet access?",
+      a: ["It hashes the shared secret with the current Unix timestamp locally on the device","It receives radio broadcasts from cell towers","It guesses random numbers that match the server by luck","The app stores 1 million pre-generated codes in local memory"],
+      c: 0,
+      why: "Both phone and server know the shared secret and the current 30-second time window."
+    },
+    {
+      q: "Why are WebAuthn passkeys completely immune to phishing attacks?",
+      a: ["The browser binds the cryptographic signature to the exact domain origin, so fake sites cannot solicit signatures for real sites","Passkeys only work when the user is physically inside their home","Passkeys cannot be used on desktop computers","Passkeys require government clearance to create"],
+      c: 0,
+      why: "The browser validates the domain origin cryptographically before signing the challenge."
+    },
+    {
+      q: "What does FIDO2 / WebAuthn use to store private keys on consumer devices?",
+      a: ["Hardware Secure Enclaves or Trusted Platform Modules (TPM) that prevent private keys from being extracted","A plain text file on the desktop","An unencrypted cookie","The browser local history cache"],
+      c: 0,
+      why: "Hardware secure enclaves isolate private keys so malware cannot export them."
+    },
+    {
+      q: "What happens if a user's clock is 40 seconds off when using TOTP authentication?",
+      a: ["The generated code may fail unless the server allows a clock drift window (typically +/- 1 step)","The phone battery discharges immediately","The account is permanently deleted","The authenticator app crashes"],
+      c: 0,
+      why: "TOTP servers usually check the current time step and adjacent steps to tolerate minor clock drift."
+    }
+  ]);
+</script>
+</body>
+</html>

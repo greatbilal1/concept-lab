@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 04 — Container Networking: Port Mapping, Bridge Networks, and DNS</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="docker-containers" data-lesson="4" data-lesson-id="container-networking-bridge-dns-ports">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 04</span> · Container Networking</span>
+
+  <h1 class="lesson-title">Container Networking: Port Mapping, Bridge Networks, and DNS</h1>
+  <p class="lesson-lede">
+    Inter-container communication: port publishing (`-p host:container`), user-defined bridge networks, container DNS resolution, and network isolation.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to configure Docker bridge networks, port publishing, and internal DNS resolution.</span>
+    <span><b>Mission link</b> Mastering container networking: port mapping, bridge networks, and dns across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Container Networking: Port Mapping, Bridge Networks, and DNS</h2>
+  <p>Containers operate with their own isolated network namespaces, virtual network interfaces (`eth0`), and private IP routing tables. Understanding how packets travel between your host, external clients, and sibling containers is foundational to distributed systems.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Inter-container communication: port publishing (`-p host:container`), user-defined bridge networks, container DNS resolution, and network isolation.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Container DNS Resolution Flow</h2>
+  <p>The Core Mechanics of <strong>Container Networking</strong>:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Public Ingress vs Private Backend</h2>
+  <ul><li><strong>1. Port Mapping (`-p 8080:80`):</strong> Connects the host to the container. The host listens on port `8080` and uses iptables/NAT to forward packets into port `80` inside the container. <em>Never expose internal databases to the host!</em></li><li><strong>2. User-Defined Bridge Networks:</strong> When you create a custom bridge (`docker network create app-net`), Docker isolates all attached containers from external traffic.</li><li><strong>3. Embedded Container DNS:</strong> On a user-defined network, Docker runs an internal DNS server (`127.0.0.11`). Your Python app connects to PostgreSQL simply using the hostname: <code>db = connect("postgres://user:pass@postgres_db:5432/app")</code>! Zero hardcoded IPs!</li><li><strong>4. Complete Network Isolation:</strong> Containers on `network-frontend` cannot physically route packets to containers on `network-backend` unless a container is explicitly attached to both!</li></ul><pre><code># Container Networking in Action (CLI):
+# 1. Create isolated internal bridge network
+docker network create internal-tier
+
+# 2. Launch database (Notice: NO -p port mapping! NOT exposed to internet!)
+docker run -d --name db_service --network internal-tier postgres:16-alpine
+
+# 3. Launch backend API on same network (Resolves db_service via internal DNS!)
+docker run -d -p 8000:8000 --name api_service --network internal-tier \
+    -e DATABASE_URL="postgres://db_service:5432/prod" my-api:latest
+# API is reachable from host on port 8000, but database is 100% private!</code></pre><div class="callout"><p><strong>The Exposure Rule:</strong> Only publish ports (`-p`) on internet-facing ingress containers. Internal microservices, caches, and databases should communicate exclusively over internal Docker bridge networks without host port exposure.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the container networking sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to configure Docker bridge networks, port publishing, and internal DNS resolution.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where container networking: port mapping, bridge networks, and dns applies.</li>
+    <li>Author a unit test or verification script exercising container networking: port mapping, bridge networks, and dns.</li>
+    <li>Document team architectural conventions regarding container networking: port mapping, bridge networks, and dns.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Container Networking: Port Mapping, Bridge Networks, and DNS.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "How do containers on the same user-defined Docker bridge network discover and communicate with each other?",
+    a: ["Docker provides an automatic internal DNS resolver that maps container names (e.g. 'postgres' or 'backend') directly to their internal IP addresses","Containers send physical radio signals","Containers must hardcode each other's MAC addresses","Containers communicate through browser cookies"],
+    c: 0,
+    why: "Docker's embedded DNS server enables automatic service discovery by container name on user-defined bridge networks."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Backend API Container",
+            "lines": [
+                  "Connects to host: 'db_service:5432'",
+                  "Queries embedded DNS (127.0.0.11)"
+            ]
+      },
+      {
+            "title": "Docker Embedded DNS",
+            "lines": [
+                  "Resolves 'db_service' -> 172.18.0.3",
+                  "Routes packet across internal bridge"
+            ]
+      },
+      {
+            "title": "PostgreSQL Container",
+            "lines": [
+                  "Receives query safely on private IP",
+                  "Zero ports exposed to public host!"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Container Networking: Port Mapping, Bridge Networks, and DNS",
+      "def execute_flow():",
+      "    # Inter-container communication: port publishing (`-...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Container Networking: Port Mapping, Bridge Networks, and DNS"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Internet -> Host:8000 -> API Container"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "API Container -> Database Container"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Docker user-defined bridge networks provide automatic service discovery by container name using embedded {1}, allowing private communication without host {2} mapping."
+],
+    blanks: [
+      {
+            "a": [
+                  "DNS"
+            ],
+            "why": "Domain Name System resolution"
+      },
+      {
+            "a": [
+                  "port"
+            ],
+            "why": "Host-to-container port publishing (-p)"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the difference between '-p 8080:80' and '--expose 80' in Docker?",
+      a: ["-p 8080:80 binds host port 8080 and forwards external traffic into container port 80; --expose 80 is purely documentation and opens no host ports","-p is for Python; expose is for Java","--expose publishes to the entire internet","They are identical flags"],
+      c: 0,
+      why: "-p creates active iptables port forwarding on the host; EXPOSE is advisory metadata."
+    },
+    {
+      q: "Why is automatic DNS resolution by container name NOT supported on Docker's default 'bridge' network?",
+      a: ["Docker legacy design only enables embedded DNS resolution on custom 'user-defined' bridge networks for security and isolation","Default bridges cannot use IP addresses","Default bridges run without memory","DNS is illegal on default bridges"],
+      c: 0,
+      why: "Automatic DNS resolution requires creating a user-defined bridge network (or using Docker Compose)."
+    },
+    {
+      q: "Why should database containers in production environments avoid using '-p 5432:5432' host port publishing?",
+      a: ["Publishing the port binds the database to host network interfaces, potentially exposing it to the public internet or local network attackers","It slows down database queries","Postgres refuses to run with -p","It consumes too much bandwidth"],
+      c: 0,
+      why: "Databases should communicate over internal container networks, keeping host ports closed."
+    },
+    {
+      q: "What special IP address does Docker assign to its embedded internal DNS resolver inside containers?",
+      a: ["127.0.0.11","8.8.8.8","1.1.1.1","192.168.1.1"],
+      c: 0,
+      why: "Docker's embedded DNS server listens on loopback address 127.0.0.11 inside container namespaces."
+    }
+  ]);
+</script>
+</body>
+</html>

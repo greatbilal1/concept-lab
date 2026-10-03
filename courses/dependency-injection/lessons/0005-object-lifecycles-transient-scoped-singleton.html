@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 05 — Object lifecycles: transient, scoped, singleton</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="dependency-injection" data-lesson="5" data-lesson-id="object-lifecycles-transient-scoped-singleton">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 05</span> · Containers & Lifecycles</span>
+
+  <h1 class="lesson-title">Object lifecycles: transient, scoped, singleton</h1>
+  <p class="lesson-lede">
+    When should an object be created, and when should it die? Master the three fundamental DI lifecycles: Transient (new every time), Scoped (per request), and Singleton (forever).
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Select and configure appropriate object lifecycles in dependency injection containers</span>
+    <span><b>Mission link</b> Prevents memory leaks, stale state, and concurrency bugs in backend services</span>
+  </div>
+
+  <h2><span class="n">1</span>The three lifecycle tiers</h2>
+  <p>When an IoC container or dependency system creates an object, it must decide how long that instance should live. There are three standard <b>Lifecycles</b>:</p><p><b>1. Transient:</b> A brand new instance is created every single time it is requested. <b>2. Scoped:</b> Created once per bounded context (typically once per incoming HTTP request) and shared among all components handling that request. <b>3. Singleton:</b> Created once when the server boots and shared globally across all requests for the entire life of the process.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Transient creates new every time; Scoped lives for one HTTP request; Singleton lives forever.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The lifecycle comparison matrix</h2>
+  <p>Understand the lifespan and use cases for the three container lifecycles.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing scoped lifecycle disposal</h2>
+  <p>Trace how a scoped database session is created on request arrival and cleanly disposed upon completion.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of object lifecycles.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can configure object lifecycles with precision, ensuring thread safety and preventing memory leaks.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit the services in your application and identify which are Singletons versus Scoped.</li>
+    <li>Ensure your database sessions are strictly Scoped to the HTTP request.</li>
+    <li>Configure an in-memory cache as a thread-safe Singleton.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Mark Seemann & Steven van Deursen, *Dependency Injection Principles, Practices, and Patterns*, Chapter 8: 'Object Lifetime'.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What lifecycle should a database transaction session (e.g. SQLAlchemy AsyncSession) have in a web API?",
+    a: ["Scoped (created once per incoming HTTP request, shared by all services, and closed on response)","Singleton (shared across all concurrent users forever)","Transient (created anew on every single function call)","It should never be closed"],
+    c: 0,
+    why: "Database sessions must be isolated to a single HTTP request context to avoid sharing transactions across users."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Transient",
+            "lines": [
+                  "lifetime: single injection",
+                  "use for: lightweight stateless helpers",
+                  "new instance every call!"
+            ]
+      },
+      {
+            "title": "Scoped",
+            "lines": [
+                  "lifetime: single HTTP request",
+                  "use for: DB sessions, current user context",
+                  "disposed upon request completion!"
+            ]
+      },
+      {
+            "title": "Singleton",
+            "lines": [
+                  "lifetime: entire application runtime",
+                  "use for: thread-safe pools, config, caches",
+                  "created once on boot!"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Request 1 arrives -> Scope 1 created:",
+      "session_1 = get_scoped_db() # Instance A created",
+      "# Request 2 arrives concurrently -> Scope 2 created:",
+      "session_2 = get_scoped_db() # Instance B created (isolated from Request 1!)",
+      "# Request 1 finishes -> Scope 1 disposed (Instance A closed!)"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "req_1": "HTTP Request 1 enters server"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "instance_a": "Scope 1 allocates dedicated database session A"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "instance_b": "Scope 2 allocates dedicated database session B (zero crosstalk!)"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "teardown": "Scope 1 ends; Session A committed and closed cleanly"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "An object instantiated anew on every single injection has a <0> lifecycle.",
+      "An object shared within a single HTTP request has a <1> lifecycle.",
+      "An object instantiated once and shared for the entire application life is a <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "transient"
+            ],
+            "why": "Transient creates a new instance on every call."
+      },
+      {
+            "a": [
+                  "scoped"
+            ],
+            "why": "Scoped instances are bound to request contexts."
+      },
+      {
+            "a": [
+                  "singleton"
+            ],
+            "why": "Singletons live for the entire process duration."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What danger occurs if a database session is configured as a global Singleton across a multi-user web app?",
+      a: ["Concurrent user requests will attempt to use the same database transaction simultaneously, causing race conditions, thread crashes, and data corruption","The database server deletes all tables","The computer CPU temperature drops to absolute zero","Singletons cannot connect to database servers"],
+      c: 0,
+      why: "Database sessions are not thread-safe; sharing one across concurrent users corrupts transactions."
+    },
+    {
+      q: "When is a Singleton lifecycle appropriate in a backend application?",
+      a: ["For stateless services, immutable configuration settings, or thread-safe shared connection pools (like a Redis client pool)","For storing user shopping carts","For user passwords","Singletons should never be used under any circumstances"],
+      c: 0,
+      why: "Immutable configurations and thread-safe resource pools are ideal Singletons."
+    },
+    {
+      q: "What is a 'Scoped' lifecycle in web frameworks like ASP.NET or FastAPI?",
+      a: ["An object is created when an HTTP request begins, shared across all components handling that request, and disposed when the response is sent","An object that only works inside a telescope","A variable that is visible only on mobile screens","A temporary file on the desktop"],
+      c: 0,
+      why: "Scoped binds an object's lifetime strictly to the lifecycle of a single HTTP transaction."
+    },
+    {
+      q: "What happens if a Transient service is injected into three different classes during a single request?",
+      a: ["Three completely separate instances of the service are created in memory","Only one instance is created","An error is thrown","The service is deleted"],
+      c: 0,
+      why: "Transient services are never reused; each injection request receives a brand new instance."
+    }
+  ]);
+</script>
+</body>
+</html>

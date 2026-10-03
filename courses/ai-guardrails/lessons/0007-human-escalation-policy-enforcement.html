@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 07 — Human Escalation and Policy Enforcement Loops</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="ai-guardrails" data-lesson="7" data-lesson-id="human-escalation-policy-enforcement">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 07</span> · Human Escalation</span>
+
+  <h1 class="lesson-title">Human Escalation and Policy Enforcement Loops</h1>
+  <p class="lesson-lede">
+    Managing guardrail breaches: graceful degradations, security incident logging, and human-in-the-loop escalation gates.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to design graceful refusals, audit trails, and human escalation protocols.</span>
+    <span><b>Mission link</b> Mastering human escalation and policy enforcement loops across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Human Escalation and Policy Enforcement Loops</h2>
+  <p>Guardrails are not just passive filters; they are the <strong>Sensory Organs of your Security Operations Center (SOC)</strong>. When a guardrail triggers, how your system responds defines whether the event is an orderly security mitigation or a customer support disaster.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Managing guardrail breaches: graceful degradations, security incident logging, and human-in-the-loop escalation gates.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Three-Phase Escalation Protocol</h2>
+  <p>The Three-Phase Escalation Protocol:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Closing the Security Loop</h2>
+  <ul><li><strong>1. Graceful In-Session Degradation:</strong> Deliver a calm, professional refusal that does not leak internal policy details: <em>'I cannot fulfill this request as it involves sensitive account modifications. Let me connect you with a specialist.'</em></li><li><strong>2. Telemetry & Security Incident Logging:</strong> Emit a structured security audit event containing `session_id`, `user_id`, `guardrail_type`, `adversarial_score`, and the sanitized prompt text to Datadog or Splunk.</li><li><strong>3. Seamless Human-in-the-Loop Handoff:</strong> Package the full conversation history, summarize the customer's intent, and route the ticket directly to a human support agent's Zendesk or Salesforce queue with priority!</li></ul><pre><code># Human Escalation Protocol in Python:
+async def handle_guardrail_breach(session_id, user_id, violation):
+    # 1. Emit security metric & log audit trail
+    security_logger.error("GUARDRAIL_BREACH", extra={
+        "user": user_id, "type": violation.rule_name, "score": violation.confidence
+    })
+    
+    # 2. Trigger human escalation ticket
+    ticket_id = await helpdesk.create_priority_ticket(
+        user_id=user_id, reason=f"Automated AI Escalation: {violation.rule_name}"
+    )
+    
+    # 3. Return professional handoff message
+    return {
+        "response": "For your security, I have transferred this request to our senior support team. "
+                    f"Ticket #{ticket_id} has been created for you.",
+        "status": "ESCALATED_TO_HUMAN"
+    }</code></pre><div class="callout"><p><strong>The De-escalation Rule:</strong> Never argue with the user when a guardrail triggers. Apologize calmly and escalate immediately to a human professional.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the human escalation sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to design graceful refusals, audit trails, and human escalation protocols.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where human escalation and policy enforcement loops applies.</li>
+    <li>Author a unit test or verification script exercising human escalation and policy enforcement loops.</li>
+    <li>Document team architectural conventions regarding human escalation and policy enforcement loops.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Human Escalation and Policy Enforcement Loops.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What should happen when an enterprise AI system detects a high-confidence guardrail violation or security breach?",
+    a: ["Log the incident to a security dashboard, terminate the automated execution, and seamlessly escalate the customer to a human agent","Delete the user's hard drive","Crash the entire server cluster","Ignore the violation and continue"],
+    c: 0,
+    why: "Policy violations should trigger security logging, graceful refusal, and seamless escalation to human oversight."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1. Graceful Refusal",
+            "lines": [
+                  "Calm, polite, non-revealing response",
+                  "Avoids leaking internal system prompt details"
+            ]
+      },
+      {
+            "title": "2. Security Telemetry",
+            "lines": [
+                  "Logs audit record to SOC / Datadog",
+                  "Tracks IP, user ID, & threat score"
+            ]
+      },
+      {
+            "title": "3. Human Escalation",
+            "lines": [
+                  "Creates priority Zendesk ticket",
+                  "Human agent resolves customer need safely"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Human Escalation and Policy Enforcement Loops",
+      "def execute_flow():",
+      "    # Managing guardrail breaches: graceful degradations...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Human Escalation and Policy Enforcement Loops"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Incident Logged"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "When a guardrail violation occurs, systems execute graceful refusals, emit security {1} records, and trigger seamless {2} to human operators."
+],
+    blanks: [
+      {
+            "a": [
+                  "audit"
+            ],
+            "why": "Compliance and security event logging"
+      },
+      {
+            "a": [
+                  "escalation"
+            ],
+            "why": "Routing ticket to human specialist"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why should an automated refusal message avoid detailing the exact security rule that triggered the block?",
+      a: ["Detailed rejection messages give adversaries clues to probe and engineer workarounds around specific filter boundaries","It uses too many characters","Refusal messages are copyrighted","It causes compiler errors"],
+      c: 0,
+      why: "Vague, polite refusals prevent attackers from mapping the exact internal parameters of security filters."
+    },
+    {
+      q: "What information should be passed to the human agent when an AI conversation escalates?",
+      a: ["A concise summary of the conversation, the customer's intent, and the specific reason why the AI handed off the session","The AI's source code","The user's computer IP only","Nothing"],
+      c: 0,
+      why: "Context handoff enables the human specialist to resolve the customer's problem without making them repeat themselves."
+    },
+    {
+      q: "How does logging guardrail breaches to a Security Information and Event Management (SIEM) system help protect the enterprise?",
+      a: ["It allows security analysts to detect coordinated injection attacks, identify abusive user accounts, and patch emerging vulnerabilities","It speeds up internet downloads","It deletes old accounts","It turns off the firewall"],
+      c: 0,
+      why: "SIEM integration provides enterprise-wide visibility into coordinated adversarial attack campaigns."
+    },
+    {
+      q: "What is the primary customer experience goal during a guardrail escalation?",
+      a: ["Maintaining trust and minimizing user frustration by ensuring a smooth, helpful transition to human assistance","Convincing the user they are wrong","Disconnecting the user","Charging the user a penalty fee"],
+      c: 0,
+      why: "Helpful human handoffs transform a potential point of failure into a high-trust customer service moment."
+    }
+  ]);
+</script>
+</body>
+</html>

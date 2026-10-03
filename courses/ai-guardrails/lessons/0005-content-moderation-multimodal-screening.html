@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 05 — Content Moderation APIs and Multi-Modal Screening</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="ai-guardrails" data-lesson="5" data-lesson-id="content-moderation-multimodal-screening">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 05</span> · Moderation APIs</span>
+
+  <h1 class="lesson-title">Content Moderation APIs and Multi-Modal Screening</h1>
+  <p class="lesson-lede">
+    Specialized moderation: OpenAI Moderation API, AWS Rekognition, multi-modal image/text screening, and latency trade-offs.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to integrate hosted moderation APIs and multi-modal screening pipelines.</span>
+    <span><b>Mission link</b> Mastering content moderation apis and multi-modal screening across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Content Moderation APIs and Multi-Modal Screening</h2>
+  <p>While custom domain guardrails handle topicality and JSON schemas, detecting severe policy violations (hate speech, self-harm, sexual violence, harassment) requires large dedicated safety models. Building and maintaining these safety classifiers internally is expensive.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Specialized moderation: OpenAI Moderation API, AWS Rekognition, multi-modal image/text screening, and latency trade-offs.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Hosted Moderation Categorization</h2>
+  <p><strong>Hosted Content Moderation APIs</strong> provide dedicated safety classification:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Parallel Asynchronous Screening</h2>
+  <ul><li><strong>1. OpenAI Moderation API (Free & Fast):</strong> The `/v1/moderations` endpoint is completely free of charge! It evaluates text across 11 distinct harm categories and returns category scores and binary flags in under 75ms.</li><li><strong>2. Multi-Modal Image Screening (AWS Rekognition / Google Vision):</strong> In multi-modal applications where users upload images or documents, text guardrails are blind. Image classifiers scan for explicit imagery, weapon detection, and optical character recognition (OCR) prompt injections!</li><li><strong>3. Asynchronous vs Synchronous Moderation:</strong> For streaming chat, run moderation <em>in parallel</em> with token generation. If moderation flags a violation mid-stream, abort the WebSocket connection immediately!</li></ul><pre><code># OpenAI Free Moderation Screening in Python:
+async def is_content_safe(user_text: str) -> bool:
+    response = await client.moderations.create(input=user_text)
+    results = response.results[0]
+    
+    if results.flagged:
+        violated_categories = [k for k, v in results.categories.model_dump().items() if v]
+        logger.warning(f"Content flagged for: {violated_categories}")
+        return False # Trigger safe canned rejection!
+    return True</code></pre><div class="callout"><p><strong>The Parallel Streaming Pattern:</strong> In streaming applications, stream tokens to the user while running the moderation check asynchronously. If flagged, terminate the stream and purge the UI.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the content moderation sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to integrate hosted moderation APIs and multi-modal screening pipelines.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where content moderation apis and multi-modal screening applies.</li>
+    <li>Author a unit test or verification script exercising content moderation apis and multi-modal screening.</li>
+    <li>Document team architectural conventions regarding content moderation apis and multi-modal screening.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Content Moderation APIs and Multi-Modal Screening.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Why do developers use OpenAI's free Moderation API (/v1/moderations) alongside custom guardrails?",
+    a: ["It provides a free, highly calibrated multi-category classifier (hate, violence, self-harm, sexual) with sub-100ms latency","It writes blog posts","It downloads movies","It changes computer passwords"],
+    c: 0,
+    why: "The Moderation API offers free, high-speed multi-category classification for severe policy violations."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "OpenAI /v1/moderations (Free)",
+            "lines": [
+                  "Hate, Harassment, Self-Harm, Violence",
+                  "Latency: ~60ms, Cost: $0.00, Highly calibrated"
+            ]
+      },
+      {
+            "title": "Multi-Modal Image Screening",
+            "lines": [
+                  "Detects explicit images & weapons",
+                  "OCR scans text inside images for prompt injection"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Content Moderation APIs and Multi-Modal Screening",
+      "def execute_flow():",
+      "    # Specialized moderation: OpenAI Moderation API, AWS...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Content Moderation APIs and Multi-Modal Screening"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "User Query Arrives"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "If Flagged (0.1% cases)"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Hosted content moderation endpoints provide zero-cost classification across harm categories, while multi-modal screeners use OCR to detect prompt {1} hidden in uploaded {2}."
+],
+    blanks: [
+      {
+            "a": [
+                  "injections"
+            ],
+            "why": "Malicious override instructions"
+      },
+      {
+            "a": [
+                  "images"
+            ],
+            "why": "Visual picture files and attachments"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the financial cost of using OpenAI's /v1/moderations API endpoint?",
+      a: ["It is completely free of charge to developers using the OpenAI platform","It costs $1.00 per query","It costs $50 per month","It requires purchasing hardware"],
+      c: 0,
+      why: "OpenAI provides its Moderation endpoint for free to encourage safety across applications."
+    },
+    {
+      q: "Why is Optical Character Recognition (OCR) essential when screening multi-modal image uploads?",
+      a: ["Attackers frequently screenshot malicious prompt injection text into an image to bypass pure text filters","To make images load faster","To edit image colors","To translate images to audio"],
+      c: 0,
+      why: "OCR extracts text rendered inside images, allowing text guardrails to inspect visual inputs."
+    },
+    {
+      q: "How does parallel asynchronous moderation avoid slowing down user experience?",
+      a: ["Tokens begin streaming immediately while moderation runs concurrently in the background, only aborting if a flag is raised","It makes internet connections 10x faster","It eliminates the need for servers","It skips moderation completely"],
+      c: 0,
+      why: "Running moderation concurrently prevents adding upfront latency to token generation."
+    },
+    {
+      q: "What should an application do if an image upload contains violent or explicit content?",
+      a: ["Reject the upload immediately at the API gateway and return an explicit policy violation message to the user","Send the image to all users","Save the image to the public website","Shut down the database"],
+      c: 0,
+      why: "Perimeter rejection prevents harmful visual content from entering application workflows."
+    }
+  ]);
+</script>
+</body>
+</html>

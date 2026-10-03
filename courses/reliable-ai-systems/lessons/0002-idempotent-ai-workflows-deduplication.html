@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 02 — Designing Idempotent AI Workflows and Deduplication</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="reliable-ai-systems" data-lesson="2" data-lesson-id="idempotent-ai-workflows-deduplication">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 02</span> · Idempotency</span>
+
+  <h1 class="lesson-title">Designing Idempotent AI Workflows and Deduplication</h1>
+  <p class="lesson-lede">
+    Stateful safety: idempotency keys, duplicate request prevention, safe retry loops, and preventing double-billing in agent actions.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to design idempotent tools and deduplication workflows for safe AI retries.</span>
+    <span><b>Mission link</b> Mastering designing idempotent ai workflows and deduplication across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Designing Idempotent AI Workflows and Deduplication</h2>
+  <p>Network requests fail. If an agent calls a payment tool to charge a customer $50, and the network drops during the response, the agent might say: <em>'The tool timed out. Let me retry the charge!'</em> Without idempotency, <strong>the customer gets billed $100</strong>.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Stateful safety: idempotency keys, duplicate request prevention, safe retry loops, and preventing double-billing in agent actions.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Idempotency Key Shield</h2>
+  <p><strong>Idempotent Workflow Design</strong> prevents catastrophic duplicate actions:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Dangerous Non-Idempotent vs Idempotent</h2>
+  <ul><li><strong>1. Idempotency Keys:</strong> Every side-effect action generates a deterministic UUID based on session and step: <code>key = hash(session_id, step_number, tool_name)</code>.</li><li><strong>2. Atomic Check-and-Set:</strong> Before executing a tool, store the idempotency key in Redis with status `PENDING`. If another thread or retry attempts the same key, reject it or return the previous result!</li><li><strong>3. Transactional Outbox Pattern:</strong> In multi-step agent chains, record database mutations and outbound API events in an atomic database transaction before dispatching them.</li><li><strong>4. Safe Retry Semantics:</strong> Retrying an idempotent tool 5 times is completely safe because the payment gateway or email server sees the same key and returns the original transaction receipt!</li></ul><pre><code># Enforcing Idempotency in Agent Tools (Stripe Pattern):
+async def execute_agent_refund(order_id: str, amount_cents: int, step_id: str):
+    # Generate deterministic idempotency key for this exact agent step:
+    idempotency_key = f"refund_{order_id}_{step_id}"
+    
+    # Send request with idempotency key
+    response = await payment_gateway.refund(
+        order_id=order_id,
+        amount=amount_cents,
+        idempotency_key=idempotency_key # Gateway guarantees single execution!
+    )
+    return response</code></pre><div class="callout"><p><strong>The Agent Financial Rule:</strong> Any agent tool that mutates state, charges money, or sends external communications must require an <code>idempotency_key</code> parameter.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the idempotency sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to design idempotent tools and deduplication workflows for safe AI retries.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where designing idempotent ai workflows and deduplication applies.</li>
+    <li>Author a unit test or verification script exercising designing idempotent ai workflows and deduplication.</li>
+    <li>Document team architectural conventions regarding designing idempotent ai workflows and deduplication.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Designing Idempotent AI Workflows and Deduplication.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What does it mean for an AI agent tool action (e.g. 'charge_credit_card' or 'send_email') to be 'Idempotent'?",
+    a: ["Executing the action multiple times with the same idempotency key produces the exact same result as executing it once, preventing duplicate side effects","The action runs twice as fast","The action uses no electricity","The action cannot be reversed"],
+    c: 0,
+    why: "Idempotency guarantees that retrying an operation will not trigger dangerous duplicate side effects like double charges."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1. Agent Calls Action",
+            "lines": [
+                  "refund(order='102', key='ref_102_s4')",
+                  "Payment gateway executes refund"
+            ]
+      },
+      {
+            "title": "2. Network Drops Timeout",
+            "lines": [
+                  "Agent does not receive receipt",
+                  "Agent initiates automatic retry"
+            ]
+      },
+      {
+            "title": "3. Gateway Detects Key",
+            "lines": [
+                  "Key 'ref_102_s4' already executed!",
+                  "Returns original receipt, ZERO double charge!"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Designing Idempotent AI Workflows and Deduplication",
+      "def execute_flow():",
+      "    # Stateful safety: idempotency keys, duplicate reque...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Designing Idempotent AI Workflows and Deduplication"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Non-Idempotent Tool"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Idempotent Tool"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Idempotent agent actions use deterministic {1} keys to guarantee that automated retries cannot cause duplicate {2} or double charges."
+],
+    blanks: [
+      {
+            "a": [
+                  "idempotency"
+            ],
+            "why": "Unique deduplication keys"
+      },
+      {
+            "a": [
+                  "side-effects"
+            ],
+            "why": "Unintended secondary mutations"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What happens if a non-idempotent tool for sending customer emails is called within an automated retry loop?",
+      a: ["If a network timeout occurs during response delivery, the retry will cause the customer to receive multiple duplicate emails","The email is deleted","The server runs faster","The internet disconnects"],
+      c: 0,
+      why: "Without idempotency, retries re-trigger the external side effect, sending duplicate emails."
+    },
+    {
+      q: "How is a deterministic idempotency key standardly constructed for an agent step?",
+      a: ["By hashing the session identifier, the step sequence number, and the tool name (e.g. hash(session_id, step_num))","By generating a random number every time","By using the current second on the clock","By asking the user for their name"],
+      c: 0,
+      why: "Deterministic keys stay identical on retry of the same step, enabling duplicate detection."
+    },
+    {
+      q: "Where should active idempotency keys be cached for fast atomic deduplication in high-throughput backends?",
+      a: ["Redis (using SETNX or atomic key expiration)","A local text file","Browser cookies","A PDF document"],
+      c: 0,
+      why: "Redis SETNX provides atomic test-and-set operations ideal for deduplicating in-flight requests."
+    },
+    {
+      q: "Why is idempotency a prerequisite for building reliable autonomous self-healing agent loops?",
+      a: ["It allows agents to safely retry failed operations without fear of corrupting databases or charging customers twice","It makes models smarter","It compiles Python into C","It eliminates the need for software engineering"],
+      c: 0,
+      why: "Safe retries require that repeating an operation causes zero unintended side effects."
+    }
+  ]);
+</script>
+</body>
+</html>

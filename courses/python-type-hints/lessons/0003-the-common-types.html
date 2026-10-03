@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 03 — The common types</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="python-type-hints" data-lesson="3" data-lesson-id="the-common-types">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 03</span> · Annotations</span>
+
+  <h1 class="lesson-title">The common types</h1>
+  <p class="lesson-lede">
+    Ninety percent of annotations use a handful of names. Learn those first, and
+    learn when <code>Any</code> is the honest answer.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Reach for the right type name</span>
+    <span><b>Mission link</b> Vocabulary before syntax</span>
+  </div>
+
+  <h2><span class="n">1</span>The scalars</h2>
+
+  <p>
+    Four built-in types cover most values you will annotate:
+  </p>
+
+  <pre><code>name: str = "Ada"
+age: int = 36
+ratio: float = 0.75
+active: bool = True</code></pre>
+
+  <p>
+    Note that <code>bool</code> is a subtype of <code>int</code> in Python — a
+    quirk worth knowing, because it means a checker will accept <code>True</code>
+    where an <code>int</code> is expected.
+  </p>
+
+  <div id="intro1"></div>
+
+  <h2><span class="n">2</span>None and NoneType</h2>
+
+  <p>
+    <code>None</code> has its own type, and in annotations you simply write
+    <code>None</code>:
+  </p>
+
+  <pre><code>def find(name: str) -> str | None:
+    ...</code></pre>
+
+  <p>
+    That return annotation says "a string, or nothing found". It is the single most
+    common annotation in real code, because most lookups can fail.
+  </p>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">3</span>Any versus object</h2>
+
+  <p>
+    <code>Any</code> switches checking off for that value. <code>object</code> is
+    the opposite: it accepts every value but lets you do almost nothing with it
+    without narrowing first.
+  </p>
+
+  <div id="diagram1"></div>
+
+  <p>
+    Reach for <code>Any</code> when you genuinely cannot say more — for example at
+    a boundary with untyped third-party code. Reach for <code>object</code> when
+    you mean "anything, but I will check before using it".
+  </p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Choosing honestly</h2>
+
+  <p>
+    The temptation is to annotate everything as <code>Any</code> to silence the
+    checker. That works, and it throws away the entire benefit. An <code>Any</code>
+    is a small admission of defeat; use it deliberately, not by default.
+  </p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    <code>Any</code> disables checking. <code>object</code> keeps checking but
+    demands narrowing. Prefer <code>object</code> when you can.
+  </div>
+
+  <h2><span class="n">5</span>Check yourself</h2>
+
+  <p>
+    Answer from memory — do not scroll back up. Each option has the same number of
+    words, so nothing gives the answer away.
+  </p>
+
+  <div id="fill1"></div>
+  <div id="quiz"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>
+      You can name the four scalar types, write <code>None</code> in a return
+      annotation, and explain the difference between <code>Any</code> and
+      <code>object</code>.
+    </p>
+  </div>
+
+  <h2><span class="n">6</span>Do this next</h2>
+
+  <ol>
+    <li>Find every <code>Any</code> in a codebase you know and ask if it is honest.</li>
+    <li>Replace one <code>Any</code> with a real type or with <code>object</code>.</li>
+    <li>Annotate a lookup function that can fail with <code>| None</code>.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Read the
+    <a href="https://docs.python.org/3/library/typing.html">typing module docs</a>
+    sections on <code>Any</code> and the built-in types.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher (me) anything — "why is bool an
+    int?", "when is Any acceptable?", "what about Decimal?". There are no bad
+    questions here.
+  </div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  /* the scalar types */
+  TeachWidgets.introCards("#intro1", {
+    cards: [
+      { ico: "🔤", title: "str", body: "Text, always a sequence of characters." },
+      { ico: "🔢", title: "int", body: "Whole numbers of unlimited size." },
+      { ico: "📐", title: "float", body: "Floating-point numbers, with rounding." },
+      { ico: "✅", title: "bool", body: "True or False, and a subtype of int." }
+    ]
+  });
+
+  /* predict-then-reveal */
+  TeachWidgets.predict("#predict1", {
+    q: "A lookup may find nothing. What return annotation is honest?",
+    a: ["-> str", "-> str | None", "-> Any"],
+    c: 1,
+    why: "`str | None` says the function returns a string or nothing, which is exactly what a failing lookup does."
+  });
+
+  /* Any vs object */
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      { title: "Any", lines: ["checking disabled", "use deliberately"] },
+      { title: "object", lines: ["accepts everything", "narrow before use"] }
+    ]
+  });
+
+  /* step-through trace */
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "def find(name: str) -> str | None:",
+      "  return table.get(name)",
+      "found = find(\"Ada\")",
+      "if found is not None:",
+      "  print(found.upper())"
+    ],
+    steps: [
+      { line: 0, vars: { name: "str", returns: "str | None" } },
+      { line: 1, vars: { body: "dict lookup" } },
+      { line: 2, vars: { found: "str | None" } },
+      { line: 3, vars: { found: "str (narrowed)" } },
+      { line: 4, vars: { call: "safe" } }
+    ]
+  });
+
+  /* recall from memory */
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — common types",
+    lines: [
+      "The type that disables checking is <0>",
+      "The type that accepts everything is <1>",
+      "A failing lookup returns <2>"
+    ],
+    blanks: [
+      { a: ["Any"], why: "Any switches the checker off for that value." },
+      { a: ["object"], why: "object accepts every value but requires narrowing." },
+      { a: ["None"], why: "A lookup that finds nothing returns None." }
+    ]
+  });
+
+  /* the quiz — every option is exactly three words */
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Which type disables checking?",
+      a: ["The object type", "The Any type", "The None type", "The bool type"],
+      c: 1,
+      why: "Any tells the checker to stop analysing that value entirely."
+    },
+    {
+      q: "Which type accepts everything?",
+      a: ["The Any type", "The object type", "The str type", "The int type"],
+      c: 1,
+      why: "object accepts every value, but you must narrow before using it."
+    },
+    {
+      q: "What is bool a subtype of?",
+      a: ["The str type", "The int type", "The float type", "The object type"],
+      c: 1,
+      why: "bool is a subtype of int in Python, so True is accepted where int is expected."
+    },
+    {
+      q: "When is Any acceptable?",
+      a: ["Never in any code", "At true boundaries", "For every variable", "Only in tests"],
+      c: 1,
+      why: "Any is honest at genuine boundaries such as untyped third-party data, and should be narrowed soon after."
+    }
+  ]);
+</script>
+</body>
+</html>

@@ -1,0 +1,3 @@
+# Mission — AI Cost & Latency Engineering
+
+Engineer high-performance, cost-effective production AI systems. Understand pre-fill compute versus decoding memory bandwidth, leverage prompt caching KV-reuse for 90% discounts, deploy semantic vector caches for sub-20ms hits, accelerate decoding with speculative drafter models, conquer perceived latency with Server-Sent Events, achieve massive serving throughput with vLLM PagedAttention, dynamically budget tokens with model cascades, and architect low-latency AI pipelines.

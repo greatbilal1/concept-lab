@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 04 — Managing project dependencies</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="software-project-structure" data-lesson="4" data-lesson-id="managing-project-dependencies">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 04</span> · Configuration & Secrets</span>
+
+  <h1 class="lesson-title">Managing project dependencies</h1>
+  <p class="lesson-lede">
+    Dependencies change under your feet unless locked down. Learn the difference between abstract manifests and concrete lockfiles for reproducible builds.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Differentiate manifests and lockfiles to achieve 100% reproducible builds</span>
+    <span><b>Mission link</b> Eliminates 'works on my machine' dependency failures</span>
+  </div>
+
+  <h2><span class="n">1</span>Manifests versus lockfiles</h2>
+  <p>A dependency management system has two distinct jobs handled by two separate files. The <b>manifest</b> (e.g. <code>pyproject.toml</code> or <code>package.json</code>) defines your abstract requirements: <i>'I need FastAPI version 0.100 or newer.'</i></p><p>The <b>lockfile</b> (e.g. <code>poetry.lock</code> or <code>package-lock.json</code>) records the concrete, exact resolution: <i>'FastAPI 0.104.1 with sha256 checksum abc... and Pydantic 2.4.2.'</i></p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Manifests declare what you want; lockfiles record the exact cryptographic resolution of what was installed.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The dependency lifecycle</h2>
+  <p>Understand how dependency tools resolve abstract ranges into pinned, verifiable packages.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing lockfile verification</h2>
+  <p>Trace how a package manager validates downloaded packages against cryptographic hashes in the lockfile.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Confirm your understanding of dependency files.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can configure dependency specifications that guarantee deterministic, identical builds across any machine.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Inspect the lockfile in your project and observe the pinned version numbers and hashes.</li>
+    <li>Run a clean install using npm ci or poetry install --sync.</li>
+    <li>Verify that your lockfile is committed to git version control.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Yehuda Katz, *Clarifying the Roles of the .lock File* (yehudakatz.com).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Should the lockfile (poetry.lock, package-lock.json) be committed to version control for an application?",
+    a: ["Yes, committing the lockfile ensures identical builds across all machines and CI","No, lockfiles should always be added to .gitignore","Only if the project has more than 50 dependencies","Lockfiles are only generated on Windows operating systems"],
+    c: 0,
+    why: "Committing lockfiles guarantees that every developer and CI runner installs identical package versions."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Developer declares",
+            "lines": [
+                  "requests >= 2.28",
+                  "inside manifest file"
+            ]
+      },
+      {
+            "title": "Resolver computes",
+            "lines": [
+                  "solves dependency graph",
+                  "writes exact hashes to lockfile"
+            ]
+      },
+      {
+            "title": "CI / Production installs",
+            "lines": [
+                  "installs from lockfile only",
+                  "identical bytes everywhere"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# package.json declares 'express': '^4.18.0'",
+      "# package-lock.json pins 'express': '4.18.2' (integrity: sha512-xyz...)",
+      "npm ci              # clean install from lockfile only",
+      "# Verification: downloaded archive matches sha512 hash exactly"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "abstract_spec": "^4.18.0"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "pinned_spec": "4.18.2 with sha512 hash"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "mode": "deterministic CI install"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "status": "integrity verified; build reproducible"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "A human-edited file declaring dependency requirements is a <0>.",
+      "A machine-generated file recording exact pinned versions is a <1>.",
+      "An isolated environment for project dependencies is a <2> environment."
+],
+    blanks: [
+      {
+            "a": [
+                  "manifest"
+            ],
+            "why": "Manifests define high-level dependency constraints."
+      },
+      {
+            "a": [
+                  "lockfile"
+            ],
+            "why": "Lockfiles record exact pinned versions and hashes."
+      },
+      {
+            "a": [
+                  "virtual"
+            ],
+            "why": "Virtual environments prevent dependency collisions across projects."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the main danger of omitting lockfiles from version control in application projects?",
+      a: ["Different developers and CI servers will resolve different dependency versions, causing unpredictable failures","The computer will run out of hard drive space during compilation","Git will refuse to push commits to remote repositories","All source code comments will be automatically deleted"],
+      c: 0,
+      why: "Without lockfiles, a new package release can silently break builds on other machines."
+    },
+    {
+      q: "What is the difference between 'npm install' and 'npm ci'?",
+      a: ["'npm ci' installs strictly from package-lock.json without modifying it; 'npm install' may update the lockfile","'npm ci' compiles C++ binaries; 'npm install' only installs JavaScript","'npm ci' only works when disconnected from the internet","There is no difference between npm install and npm ci"],
+      c: 0,
+      why: "npm ci guarantees reproducible, non-mutating installs for continuous integration."
+    },
+    {
+      q: "Why do lockfiles include cryptographic hash checksums for each package?",
+      a: ["To verify that the downloaded package bytes have not been tampered with or corrupted","To encrypt the package files so developers cannot read them","To speed up the internet download speed of npm servers","To convert package source code into WebAssembly binaries"],
+      c: 0,
+      why: "Integrity hashes guard against man-in-the-middle attacks and altered upstream packages."
+    },
+    {
+      q: "What is a virtual environment in Python or Node.js tooling?",
+      a: ["An isolated folder containing dependencies specific to a single project","A cloud virtual machine running in an Amazon Web Services data center","A web browser emulator used for testing visual CSS layout","A simulated CPU architecture that interprets machine code"],
+      c: 0,
+      why: "Virtual environments prevent conflicting package versions from interfering across projects."
+    }
+  ]);
+</script>
+</body>
+</html>

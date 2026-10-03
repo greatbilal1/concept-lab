@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 07 — The client-server model</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="how-the-internet-works" data-lesson="7" data-lesson-id="the-client-server-model">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 07</span> · Global Infrastructure & Clients</span>
+
+  <h1 class="lesson-title">The client-server model</h1>
+  <p class="lesson-lede">
+    How do billions of phones and laptops talk to cloud servers behind home routers? Learn about the client-server architecture, NAT gateways, and private addressing.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Explain Network Address Translation (NAT) and the asymmetric client-server paradigm</span>
+    <span><b>Mission link</b> Explains how home devices communicate bidirectionally with public internet services</span>
+  </div>
+
+  <h2><span class="n">1</span>The asymmetric web</h2>
+  <p>The dominant architecture of the internet is the <b>client-server model</b>. Servers have public, static IP addresses and run continuously, waiting to accept incoming connections. Clients (laptops, phones) have private, dynamic IP addresses and initiate requests when needed.</p><p>Because IPv4 addresses are scarce, almost all home and office devices sit behind a <b>NAT (Network Address Translation)</b> gateway. Your home router shares a single public IP address across dozens of private phones, TVs, and laptops.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Clients initiate connections from behind private NATs; servers listen on stable public addresses.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>How Network Address Translation (NAT) works</h2>
+  <p>Understand how a home router rewrites packet headers so multiple private devices share one public IP address.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing a NAT state table session</h2>
+  <p>Trace how an outbound HTTP request creates a temporary entry in the router's NAT table.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your understanding of NAT and the client-server relationship.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can explain how NAT gateways enable private residential devices to communicate seamlessly across the public internet.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Compare your computer local IP (e.g. 192.168.x.x) with your public IP shown on whatismyip.com.</li>
+    <li>Check your home router configuration interface to view active NAT connections.</li>
+    <li>Explain to a peer why hosting a web server from home requires port forwarding.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    IETF RFC 3022: *Traditional IP Network Address Translator (Traditional NAT)*.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Can an outside computer on the public internet initiate a connection directly to your laptop on home Wi-Fi?",
+    a: ["No, by default your home router's NAT firewall drops unsolicited inbound packets","Yes, all computers on the internet can connect directly to each other without restriction","Only if your laptop is manufactured by the same company as the server","Yes, but only between midnight and 6:00 AM"],
+    c: 0,
+    why: "NAT only forwards incoming packets that match outbound state table connections you initiated."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Laptop (192.168.1.5:4000)",
+            "lines": [
+                  "sends packet to web server",
+                  "private local IP address"
+            ]
+      },
+      {
+            "title": "Home NAT Router (203.0.113.1)",
+            "lines": [
+                  "rewrites source to 203.0.113.1:61000",
+                  "records mapping in NAT state table"
+            ]
+      },
+      {
+            "title": "Web Server (142.250.190.46)",
+            "lines": [
+                  "replies to public IP 203.0.113.1:61000",
+                  "router translates back to 192.168.1.5"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Laptop sends request to 93.184.216.34:80",
+      "# NAT table entry created: (192.168.1.5:51234 <-> 203.0.113.1:62000)",
+      "# Response arrives from 93.184.216.34:80 directed to 203.0.113.1:62000",
+      "# Router translates destination back to 192.168.1.5:51234"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "internal_src": "192.168.1.5:51234"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "nat_translation": "masqueraded as public 203.0.113.1:62000"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "external_reply": "arrives at router public interface"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "delivered": "delivered seamlessly to laptop internal IP"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The system that shares one public IP among multiple local devices is <0>.",
+      "An address starting with 192.168 or 10.0 is a <1> IP address.",
+      "Configuring a router to forward incoming traffic on a port to an internal machine is port <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "NAT"
+            ],
+            "why": "NAT stands for Network Address Translation."
+      },
+      {
+            "a": [
+                  "private"
+            ],
+            "why": "Private IP addresses are not routeable on the public internet."
+      },
+      {
+            "a": [
+                  "forwarding"
+            ],
+            "why": "Port forwarding maps public router ports to internal LAN IPs."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the primary function of Network Address Translation (NAT)?",
+      a: ["To allow multiple devices with private local IPs to share a single public IP address","To convert audio files into MP3 format across the web","To translate English domain names into Spanish and French","To encrypt all outgoing traffic using public key infrastructure"],
+      c: 0,
+      why: "NAT maps local private network sockets to external public IP and port numbers."
+    },
+    {
+      q: "Why can you access web servers from home, but web servers cannot initiate connections to your laptop?",
+      a: ["Your home router only routes incoming packets that match an active outbound session in its NAT table","Laptops do not have network interface cards capable of receiving data","Web browsers refuse to accept incoming connections for legal reasons","Internet cables only transmit electricity in one physical direction"],
+      c: 0,
+      why: "NAT firewalls reject unsolicited inbound packets that lack an existing outbound session entry."
+    },
+    {
+      q: "What is port forwarding on a home router?",
+      a: ["A rule instructing the router to forward unsolicited incoming traffic on a port to a specific internal private IP","A setting that speeds up the computer processor clock rate","A technique to delete unwanted emails automatically","A tool that converts wireless signals into fiber optic light"],
+      c: 0,
+      why: "Port forwarding punches a hole in NAT to expose an internal server to public traffic."
+    },
+    {
+      q: "In the client-server model, which entity initiates the communication channel?",
+      a: ["The client always initiates the request to the listening server","The server randomly initiates requests to random client laptops","The internet service provider initiates all requests every minute","The domain name registrar initiates the connection"],
+      c: 0,
+      why: "Clients drive interactions by initiating requests; servers listen passively for connections."
+    }
+  ]);
+</script>
+</body>
+</html>

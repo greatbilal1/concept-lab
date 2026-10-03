@@ -1,0 +1,3 @@
+# Mission — Cybersecurity Fundamentals
+
+Master the essential engineering principles of modern cybersecurity. Think like an adversary to analyze attack surfaces, balance the CIA triad (Confidentiality, Integrity, Availability), systematically model threats using Microsoft's STRIDE framework, disentangle Authentication from Authorization (RBAC and ABAC), apply cryptographic primitives (hashing, symmetric AES-GCM, and asymmetric public-key ciphers), implement Zero Trust network architectures with mTLS, and design multi-layered defense-in-depth systems.

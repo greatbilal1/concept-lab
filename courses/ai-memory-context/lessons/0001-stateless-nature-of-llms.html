@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 01 — The Stateless Nature of LLMs: Why Models Forget</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="ai-memory-context" data-lesson="1" data-lesson-id="stateless-nature-of-llms">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 01</span> · Stateless Nature</span>
+
+  <h1 class="lesson-title">The Stateless Nature of LLMs: Why Models Forget</h1>
+  <p class="lesson-lede">
+    Why foundation models have zero native memory: each API call is completely stateless and independent.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You understand the stateless physics of LLMs and why memory is an application responsibility.</span>
+    <span><b>Mission link</b> Mastering the stateless nature of llms: why models forget across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of The Stateless Nature of LLMs: Why Models Forget</h2>
+  <p>When you chat with ChatGPT, Claude, or a coding assistant, it feels like speaking with a human who remembers past sentences. This conversational continuity is an illusion. Under the hood, <strong>Large Language Models are completely stateless</strong>.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Why foundation models have zero native memory: each API call is completely stateless and independent.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Stateless Execution Model</h2>
+  <p>Every API call to an LLM is an independent, isolated mathematical evaluation: $y = f(x; W)$. The server allocates GPU resources, computes tokens, and terminates the request. It holds zero memory of who you are, what you asked thirty seconds ago, or what it generated previously.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Memory as an Application Layer</h2>
+  <p>To create the experience of memory, the <strong>host application</strong> must store conversation turns in an external database and resend the entire message history on every single request:</p><pre><code># The Stateless API Illusion:
+# Turn 1: Client sends ["Hello, my name is Alice"]
+# Model generates: "Hello Alice!"
+
+# Turn 2: Client MUST send BOTH turns:
+# [
+#   {"role": "user", "content": "Hello, my name is Alice"},
+#   {"role": "assistant", "content": "Hello Alice!"},
+#   {"role": "user", "content": "What is my name?"}
+# ]
+# Model reads context and generates: "Your name is Alice!"</code></pre><div class="callout"><p><strong>The Architectural Truth:</strong> Memory does not live in the model; memory lives in your application's data stores, caches, and prompt orchestration pipelines.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the stateless nature sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You understand the stateless physics of LLMs and why memory is an application responsibility.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where the stateless nature of llms: why models forget applies.</li>
+    <li>Author a unit test or verification script exercising the stateless nature of llms: why models forget.</li>
+    <li>Document team architectural conventions regarding the stateless nature of llms: why models forget.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for The Stateless Nature of LLMs: Why Models Forget.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Why does a language model completely forget what you told it in the previous message unless conversation history is resent?",
+    a: ["LLM APIs are stateless HTTP functions that do not retain state between requests; all context must be passed in the prompt array","The model's hard drive is erased every minute","Models have artificial amnesia programmed as a safety feature","The internet disconnects after each turn"],
+    c: 0,
+    why: "Language model APIs are stateless function calls: memory is an application-level illusion created by re-sending history."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Request 1 (Turn 1)",
+            "lines": [
+                  "User: 'My name is Alice'",
+                  "Model outputs: 'Hello Alice!'",
+                  "Process terminates -> Memory erased"
+            ]
+      },
+      {
+            "title": "Request 2 (Turn 2)",
+            "lines": [
+                  "App re-sends Turn 1 + Turn 2",
+                  "Model evaluates full array",
+                  "Generates: 'Your name is Alice!'"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing The Stateless Nature of LLMs: Why Models Forget",
+      "def execute_flow():",
+      "    # Why foundation models have zero native memory: eac...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "The Stateless Nature of LLMs: Why Models Forget"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Application State Store"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Prompt Assembly"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Language models are completely {1}, meaning memory must be maintained by the host application in an external {2} and resent on each turn."
+],
+    blanks: [
+      {
+            "a": [
+                  "stateless"
+            ],
+            "why": "Holding no internal session state"
+      },
+      {
+            "a": [
+                  "database"
+            ],
+            "why": "Storage layer like PostgreSQL or Redis"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What happens if a chat client sends only the latest user message without preceding history to an LLM API?",
+      a: ["The model responds without any context of past turns, treating the message as a brand-new, isolated conversation","The API throws an error","The server reboots","The user account is deleted"],
+      c: 0,
+      why: "Without history in the prompt, the stateless model has no awareness of prior messages."
+    },
+    {
+      q: "Where does conversational memory physically reside in an enterprise AI system?",
+      a: ["In the application's backend database (e.g. Redis, PostgreSQL) and the assembled prompt array","Inside the neural network GPU registers permanently","On the public internet","Inside the user's monitor"],
+      c: 0,
+      why: "Persistent state is stored in databases and injected into prompts by the application layer."
+    },
+    {
+      q: "Why does sending full conversation history become problematic in long-running chats?",
+      a: ["Token counts accumulate on every turn, increasing API latency, costs, and eventually hitting context window limits","The model gets bored","The text turns into numbers","It violates git history rules"],
+      c: 0,
+      why: "Resending full history scales input token volume quadratically over time."
+    },
+    {
+      q: "What engineering discipline manages how history is stored, pruned, and injected into prompts?",
+      a: ["AI Memory & Context Engineering","Physical Database Soldering","Graphic Design","Kernel Compilation"],
+      c: 0,
+      why: "Context engineering governs the selection and reduction of conversational memory."
+    }
+  ]);
+</script>
+</body>
+</html>

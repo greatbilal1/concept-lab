@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 07 — Dual-LLM Architectures: Decoupled Controller and Reader</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="prompt-injection" data-lesson="7" data-lesson-id="dual-llm-controller-reader-architecture">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 07</span> · Dual-LLM</span>
+
+  <h1 class="lesson-title">Dual-LLM Architectures: Decoupled Controller and Reader</h1>
+  <p class="lesson-lede">
+    Architectural isolation: the Privileged Controller and the Unprivileged Reader (Simon Willison's Dual-LLM pattern).
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to architect provably isolated Dual-LLM systems to neutralize indirect prompt injection.</span>
+    <span><b>Mission link</b> Mastering dual-llm architectures: decoupled controller and reader across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Dual-LLM Architectures: Decoupled Controller and Reader</h2>
+  <p>Prompt injection exists because an untrusted piece of text has the power to instruct a model that possesses tools. Security researcher Simon Willison proposed the ultimate architectural solution: <strong>The Dual-LLM Pattern (Privileged Controller vs Unprivileged Reader)</strong>.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Architectural isolation: the Privileged Controller and the Unprivileged Reader (Simon Willison's Dual-LLM pattern).
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Dual-LLM Architecture</h2>
+  <p>How the Dual-LLM Architecture works:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Neutralizing the Attack</h2>
+  <ul><li><strong>1. The Privileged Controller (Has Tools, Sees Zero Untrusted Data):</strong> The Controller coordinates the workflow and has access to sensitive tools (send email, query database). It <strong>NEVER directly reads raw web pages, emails, or PDFs!</strong></li><li><strong>2. The Unprivileged Reader (Reads Untrusted Data, Has Zero Tools):</strong> When a web page or PDF must be read, it is sent to the Reader model. The Reader has <strong>ZERO tools and ZERO execution permissions</strong>. It cannot call an API, access a database, or connect to the internet.</li><li><strong>3. Sanitized Structured Data Transfer:</strong> The Reader extracts strictly structured, typed data (e.g. JSON with title, date, key facts) and passes it back to the Controller. Even if the Reader is completely hijacked by prompt injection, <strong>it has no tools to execute the attack!</strong></li></ul><pre><code># The Dual-LLM Execution Flow:
+[User Prompt] ──> [Privileged Controller (Has Tools: email, database)]
+                         │
+                         │ (Commands Reader to ingest document)
+                         ▼
+                  [Unprivileged Reader (NO TOOLS! Isolated Sandbox)]
+                         │ (Ingests poisoned PDF containing prompt injection)
+                         │ (Injection attempts to hijack... BUT READER HAS NO TOOLS!)
+                         ▼
+                  [Emits Clean JSON Summary: {"revenue": 100, "expenses": 40}]
+                         │
+                         ▼
+[Privileged Controller receives pure data, executes safe tools, delivers to user!]</code></pre><div class="callout"><p><strong>The Architectural Separation of Privilege:</strong> You cannot be hacked by an instruction if the model that reads it has no hands to touch the world.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the Dual-LLM sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to architect provably isolated Dual-LLM systems to neutralize indirect prompt injection.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where dual-llm architectures: decoupled controller and reader applies.</li>
+    <li>Author a unit test or verification script exercising dual-llm architectures: decoupled controller and reader.</li>
+    <li>Document team architectural conventions regarding dual-llm architectures: decoupled controller and reader.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Dual-LLM Architectures: Decoupled Controller and Reader.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is the core principle of the 'Dual-LLM Architecture' for preventing indirect prompt injection?",
+    a: ["Separating the system into two models: an unprivileged 'Reader' that digests untrusted data, and a privileged 'Controller' with tools that never sees untrusted text directly","Running two copies of ChatGPT at the same time","Using two monitors to write prompts","A model that speaks two languages"],
+    c: 0,
+    why: "The Dual-LLM pattern isolates untrusted data in an unprivileged reader with zero tools, protecting the privileged controller."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Privileged Controller",
+            "lines": [
+                  "Possesses tools: Database, Email, Shell",
+                  "NEVER touches untrusted raw text directly",
+                  "Orchestrates workflow safely"
+            ]
+      },
+      {
+            "title": "Unprivileged Reader",
+            "lines": [
+                  "Reads untrusted web pages, PDFs, & emails",
+                  "ZERO tools, ZERO network egress, zero permissions",
+                  "Emits strictly typed JSON data only!"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Dual-LLM Architectures: Decoupled Controller and Reader",
+      "def execute_flow():",
+      "    # Architectural isolation: the Privileged Controller...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Dual-LLM Architectures: Decoupled Controller and Reader"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Poisoned PDF in Reader"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The Dual-LLM architecture separates execution by using an unprivileged {1} with zero tools to digest untrusted data, protecting the privileged {2}."
+],
+    blanks: [
+      {
+            "a": [
+                  "Reader"
+            ],
+            "why": "Model that ingests untrusted text without tools"
+      },
+      {
+            "a": [
+                  "Controller"
+            ],
+            "why": "Orchestrating model with access to tools"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why is the Unprivileged Reader model in a Dual-LLM architecture immune to causing real-world damage even if it gets hijacked?",
+      a: ["It has no access to tools, functions, APIs, or internet egress; even if hijacked, it has no mechanism to execute actions or exfiltrate data","The reader model is encrypted","The reader model cannot speak English","The reader model runs in the cloud"],
+      c: 0,
+      why: "Without tools or network egress, a hijacked model cannot take external actions."
+    },
+    {
+      q: "What data format should the Unprivileged Reader emit back to the Privileged Controller?",
+      a: ["Strictly typed, validated JSON structures containing extracted facts rather than free-form conversational instruction text","Raw HTML markup","A shell script","An audio file"],
+      c: 0,
+      why: "Strict JSON formats prevent free-form conversational text from carrying injected commands to the controller."
+    },
+    {
+      q: "What rule governs what the Privileged Controller model is allowed to read in a Dual-LLM design?",
+      a: ["The Controller must never read raw untrusted external text directly; it only receives sanitized structured extractions from the Reader","The Controller can read anything","The Controller cannot read user prompts","The Controller only reads binary"],
+      c: 0,
+      why: "Keeping raw external text out of the Controller preserves its instruction integrity."
+    },
+    {
+      q: "Who originally formalized the 'Dual-LLM Pattern' for AI application security?",
+      a: ["Simon Willison","Linus Torvalds","Steve Jobs","Bill Gates"],
+      c: 0,
+      why: "Simon Willison pioneered and popularized the Dual-LLM architecture for indirect prompt injection defense."
+    }
+  ]);
+</script>
+</body>
+</html>

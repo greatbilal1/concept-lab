@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 05 — Retrieving the Top-K Chunks with Vector Similarity</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="rag" data-lesson="5" data-lesson-id="retrieving-top-k-chunks">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 05</span> · Vector Retrieval</span>
+
+  <h1 class="lesson-title">Retrieving the Top-K Chunks with Vector Similarity</h1>
+  <p class="lesson-lede">
+    Executing vector search: embedding the query, cosine similarity search, setting K thresholds, and similarity cutoffs.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to execute vector similarity queries and filter top-K candidates effectively.</span>
+    <span><b>Mission link</b> Mastering retrieving the top-k chunks with vector similarity across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Retrieving the Top-K Chunks with Vector Similarity</h2>
+  <p>Once your documents are chunked, embedded, and stored in a vector database, the runtime retrieval phase begins. When a user asks: <em>'How do I cancel my annual subscription and get a refund?'</em>, the system executes <strong>Nearest-Neighbor Semantic Search</strong>.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Executing vector search: embedding the query, cosine similarity search, setting K thresholds, and similarity cutoffs.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Vector Search Nearest Neighbors</h2>
+  <p>The Retrieval Step-by-Step Execution:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Similarity Score Filtering</h2>
+  <ul><li><strong>1. Embed the User Query:</strong> Pass the query string through the exact same embedding model used during ingestion: $\vec{v}_{query} = \text{embed}(text)$.</li><li><strong>2. Execute Nearest-Neighbor Search:</strong> Compute the cosine similarity between $\vec{v}_{query}$ and millions of stored chunk vectors using an Approximate Nearest Neighbor (ANN) index (e.g. HNSW).</li><li><strong>3. Apply Similarity Score Threshold:</strong> Filter out irrelevant junk! If a chunk has a similarity score below a confidence threshold (e.g. $&lt; 0.70$), discard it.</li><li><strong>4. Return Top-K Candidates:</strong> Return the top $K$ highest-scoring chunks (typically $K=3$ to $5$) with their source metadata.</li></ul><pre><code># Querying ChromaDB / pgvector in Python:
+query_text = "How do I process a refund for order ORD-412?"
+
+# Query the vector collection for the Top 3 most similar chunks:
+results = collection.query(
+    query_texts=[query_text],
+    n_results=3,
+    where={"tenant_id": current_user.tenant_id} # Metadata filter!
+)
+
+for i, doc in enumerate(results['documents'][0]):
+    score = results['distances'][0][i]
+    print(f"Chunk {i+1} (Score: {score:.3f}): {doc[:100]}...")</code></pre><div class="callout"><p><strong>The Score Cutoff:</strong> Always inspect similarity scores! If your top match has a cosine similarity of only 0.45, that means your database contains ZERO relevant information. Don't send garbage to the LLM!</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the vector retrieval sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to execute vector similarity queries and filter top-K candidates effectively.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where retrieving the top-k chunks with vector similarity applies.</li>
+    <li>Author a unit test or verification script exercising retrieving the top-k chunks with vector similarity.</li>
+    <li>Document team architectural conventions regarding retrieving the top-k chunks with vector similarity.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Retrieving the Top-K Chunks with Vector Similarity.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "How does a vector database find the most relevant document chunks for a user's query?",
+    a: ["It embeds the query into a vector and finds the K stored document vectors with the highest cosine similarity (nearest neighbors)","It searches alphabetically by first letter","It scans the database using regular expressions","It generates random chunks"],
+    c: 0,
+    why: "Vector search converts the query into a vector and retrieves the nearest neighbors in embedding space."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "User Query Vector",
+            "lines": [
+                  "v_query = embed('How to refund?')",
+                  "Coordinates in 1,536D space"
+            ]
+      },
+      {
+            "title": "Nearest Neighbor Search",
+            "lines": [
+                  "Scans HNSW index in 2ms",
+                  "Finds 3 closest document vectors"
+            ]
+      },
+      {
+            "title": "Top-3 Chunks Retrieved",
+            "lines": [
+                  "Chunk 1: Refund policy (Score: 0.92)",
+                  "Chunk 2: Billing FAQ (Score: 0.88)",
+                  "Chunk 3: Payment gateways (Score: 0.81)"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Retrieving the Top-K Chunks with Vector Similarity",
+      "def execute_flow():",
+      "    # Executing vector search: embedding the query, cosi...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Retrieving the Top-K Chunks with Vector Similarity"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "High Match (Score > 0.75)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Poor Match (Score < 0.65)"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Vector retrieval embeds the user query and searches the index for the top {1} nearest neighbors whose cosine similarity exceeds the {2} threshold."
+],
+    blanks: [
+      {
+            "a": [
+                  "K"
+            ],
+            "why": "Number of candidate chunks (e.g. top 3)"
+      },
+      {
+            "a": [
+                  "score"
+            ],
+            "why": "Minimum similarity cutoff threshold"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What happens if you set Top-K too high (e.g. K=50) in a RAG prompt?",
+      a: ["You flood the model context window with low-relevance noise, increasing token costs and diluting attention on the real answer","The database catches fire","The query runs 100x faster","The model achieves 100% precision"],
+      c: 0,
+      why: "High K introduces irrelevant chunks that distract model attention and increase cost."
+    },
+    {
+      q: "What is the typical value for K in standard document RAG systems?",
+      a: ["Between 3 and 7 chunks","Exactly 1,000 chunks","500 chunks","0 chunks"],
+      c: 0,
+      why: "3 to 7 chunks provide sufficient evidence without saturating context capacity."
+    },
+    {
+      q: "What should the system do if all retrieved chunks have very low similarity scores (e.g. < 0.50)?",
+      a: ["Conclude that the knowledge base lacks relevant data and inform the user honestly, rather than prompting the model with irrelevant text","Send all chunks anyway and hope for the best","Delete the knowledge base","Restart the server"],
+      c: 0,
+      why: "Filtering on score cutoffs prevents hallucination when no relevant information exists."
+    },
+    {
+      q: "How fast does an Approximate Nearest Neighbor (ANN) index like HNSW search across 1 million vectors?",
+      a: ["Sub-millisecond to a few milliseconds (typically 1-5ms)","Over 2 hours","10 minutes","100 seconds"],
+      c: 0,
+      why: "Graph-based ANN indexes like HNSW search million-scale vector collections in single-digit milliseconds."
+    }
+  ]);
+</script>
+</body>
+</html>

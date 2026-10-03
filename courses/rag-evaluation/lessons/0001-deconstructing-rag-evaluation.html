@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 01 — Deconstructing RAG Evaluation: Retrieval vs Generation</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="rag-evaluation" data-lesson="1" data-lesson-id="deconstructing-rag-evaluation">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 01</span> · RAG Triad</span>
+
+  <h1 class="lesson-title">Deconstructing RAG Evaluation: Retrieval vs Generation</h1>
+  <p class="lesson-lede">
+    Bifurcating RAG evaluation: why measuring Retrieval (Context Recall/Precision) separately from Generation (Faithfulness/Relevance) is mandatory.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You understand the necessity of bifurcating retrieval evaluation from generation evaluation.</span>
+    <span><b>Mission link</b> Mastering deconstructing rag evaluation: retrieval vs generation across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Deconstructing RAG Evaluation: Retrieval vs Generation</h2>
+  <p>When a user asks: <em>'What is our return policy for damaged electronics?'</em>, and the RAG system produces a wrong answer, where did the pipeline fail?</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Bifurcating RAG evaluation: why measuring Retrieval (Context Recall/Precision) separately from Generation (Faithfulness/Relevance) is mandatory.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The RAG Triad Framework</h2>
+  <ul><li><strong>Scenario A:</strong> The vector database fetched articles about 'clothing returns'. The LLM read them and accurately stated that electronics were not mentioned. (<strong>Retrieval Failure!</strong> The LLM did its job; the search engine failed).</li><li><strong>Scenario B:</strong> The vector database fetched the exact 'Electronics Return Policy' document. But the LLM got confused and hallucinated that electronics cannot be returned. (<strong>Generation Failure!</strong> The search engine succeeded; the LLM failed).</li></ul>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Root Cause Bifurcation</h2>
+  <p>If you only measure the final output text, you cannot diagnose whether to tune your <strong>chunking and embedding models</strong> (Retrieval) or tune your <strong>prompts and model tier</strong> (Generation).</p><p>The <strong>RAG Triad</strong> establishes three independent mathematical pillars:</p><ul><li><strong>1. Context Relevance / Precision:</strong> Did we retrieve only relevant chunks, or did we drag in 80% noise?</li><li><strong>2. Groundedness / Faithfulness:</strong> Is every statement in the generated answer supported by the retrieved context? (Zero hallucination).</li><li><strong>3. Answer Relevance:</strong> Does the generated answer directly address the user's original question?</li></ul><div class="callout"><p><strong>The Golden Diagnostic:</strong> Never evaluate an end-to-end RAG system as a single black box. Measure Context Recall, Faithfulness, and Answer Relevance as separate quantitative gauges.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the RAG evaluation sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You understand the necessity of bifurcating retrieval evaluation from generation evaluation.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where deconstructing rag evaluation: retrieval vs generation applies.</li>
+    <li>Author a unit test or verification script exercising deconstructing rag evaluation: retrieval vs generation.</li>
+    <li>Document team architectural conventions regarding deconstructing rag evaluation: retrieval vs generation.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Deconstructing RAG Evaluation: Retrieval vs Generation.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Why must RAG systems evaluate Retrieval and Generation as two completely separate stages?",
+    a: ["A failure in the final answer can be caused either by the database fetching the wrong documents, or the LLM misinterpreting good documents; diagnosing the root cause requires separate metrics","Retrieval uses C++ while generation uses Python","They run on different days of the week","They are evaluated by different government agencies"],
+    c: 0,
+    why: "Evaluating retrieval and generation separately pinpoints whether errors stem from search or synthesis."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1. Context Relevance",
+            "lines": [
+                  "User Query <-> Retrieved Context",
+                  "Did vector search find clean signal?"
+            ]
+      },
+      {
+            "title": "2. Faithfulness (Groundedness)",
+            "lines": [
+                  "Retrieved Context <-> Generated Answer",
+                  "Are all claims supported by context?"
+            ]
+      },
+      {
+            "title": "3. Answer Relevance",
+            "lines": [
+                  "User Query <-> Generated Answer",
+                  "Did the model actually answer the prompt?"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Deconstructing RAG Evaluation: Retrieval vs Generation",
+      "def execute_flow():",
+      "    # Bifurcating RAG evaluation: why measuring Retrieva...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Deconstructing RAG Evaluation: Retrieval vs Generation"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Retrieval Miss"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Generation Miss"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The RAG triad evaluates retrieval quality through context {1} and generation quality through answer {2} and faithfulness."
+],
+    blanks: [
+      {
+            "a": [
+                  "precision"
+            ],
+            "why": "Proportion of retrieved chunks that are relevant"
+      },
+      {
+            "a": [
+                  "relevance"
+            ],
+            "why": "How directly the response answers the query"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is 'Faithfulness' (or Groundedness) in RAG evaluation?",
+      a: ["The percentage of factual claims in the generated response that can be mathematically verified and deduced from the retrieved context","The model's religious beliefs","How loyal the user is to the company","The speed of the network connection"],
+      c: 0,
+      why: "Faithfulness measures whether the model restricted itself purely to retrieved facts."
+    },
+    {
+      q: "What is 'Answer Relevance' in RAG evaluation?",
+      a: ["A metric evaluating whether the generated response directly addresses the user's specific question, regardless of whether it cited docs","How long the answer is","How many adjectives were used","The font of the text"],
+      c: 0,
+      why: "Answer relevance checks if the model actually resolved the user's underlying intent."
+    },
+    {
+      q: "If a RAG system has 100% Faithfulness but 20% Answer Relevance, what is going wrong?",
+      a: ["The model is reciting facts from the documents accurately, but those facts do not answer what the user actually asked","The database is deleted","The model is hallucinating everything","The computer processor is offline"],
+      c: 0,
+      why: "High faithfulness with low relevance indicates the model is quoting irrelevant document facts."
+    },
+    {
+      q: "How does separating retrieval metrics from generation metrics save engineering time?",
+      a: ["Engineers know immediately whether to spend time tuning vector search and chunking or tuning prompts and model parameters","It writes code without a keyboard","It eliminates the need for testing","It reduces GPU temperature"],
+      c: 0,
+      why: "Component isolation prevents wasting prompt engineering effort on retrieval failures."
+    }
+  ]);
+</script>
+</body>
+</html>

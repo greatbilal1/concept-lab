@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 02 — Durability: Write-Ahead Logs (WAL) and recovery</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="transactions-data-integrity" data-lesson="2" data-lesson-id="durability-wal-and-crash-recovery">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 02</span> · The ACID Properties</span>
+
+  <h1 class="lesson-title">Durability: Write-Ahead Logs (WAL) and recovery</h1>
+  <p class="lesson-lede">
+    How does a database guarantee data is safe without waiting for slow random disk writes? Master the Write-Ahead Log (WAL), checkpoints, and crash recovery.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Explain how Write-Ahead Logging (WAL) and fsync ensure durability with high performance</span>
+    <span><b>Mission link</b> The low-level storage mechanism that makes ACID durability physically possible</span>
+  </div>
+
+  <h2><span class="n">1</span>The disk I/O bottleneck</h2>
+  <p>Modifying a table requires writing to random 8KB disk pages in the table heap and updating several B-tree indexes across disk. If the database waited for every random disk seek before returning <code>COMMIT</code>, writes would slow to a crawl (100 writes/sec).</p><p>Instead, relational databases use a <b>Write-Ahead Log (WAL)</b>. Before touching any table data pages, changes are appended sequentially to a single append-only log file. Sequential disk writes are blazing fast (thousands per second). Once the log record is flushed with <code>fsync</code>, the commit is durable!</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    WAL appends changes sequentially to a log first; table data pages are updated lazily in memory.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The WAL and Checkpoint cycle</h2>
+  <p>How memory buffers, WAL logs, and periodic checkpoints coordinate crash resilience.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing crash recovery replay</h2>
+  <p>Trace how a database recovers after a sudden power loss by replaying the Write-Ahead Log.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of database crash recovery.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can explain the physics of Write-Ahead Logging, checkpoints, and how databases recover instantly from sudden power failure.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Locate the pg_wal directory in a local PostgreSQL installation.</li>
+    <li>Check checkpoint configuration settings (checkpoint_timeout, max_wal_size) in postgresql.conf.</li>
+    <li>Explain why setting fsync=off in production is dangerous.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    C. Mohan et al., *ARIES: A Transaction Recovery Method Supporting Fine-Granularity Locking* (ACM Transactions on Database Systems, 1992).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "If the server power cord is pulled 1 millisecond AFTER a COMMIT returns success, is data lost?",
+    a: ["No, because the commit was written and flushed to the Write-Ahead Log before returning success","Yes, all unwritten data in RAM is permanently lost","Only half the data is preserved","The database will refuse to start up again"],
+    c: 0,
+    why: "A COMMIT only confirms success after the WAL entry has been flushed to physical non-volatile disk."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1. Append to WAL",
+            "lines": [
+                  "sequential append to WAL file",
+                  "flushed to disk via fsync -> COMMIT!"
+            ]
+      },
+      {
+            "title": "2. Dirty Pages in RAM",
+            "lines": [
+                  "table pages modified in buffer cache",
+                  "heap file on disk not touched yet!"
+            ]
+      },
+      {
+            "title": "3. Checkpoint Flush",
+            "lines": [
+                  "periodic background flush",
+                  "syncs dirty RAM pages to heap on disk"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Sudden server reboot after power outage!",
+      "Engine boot: checks last clean checkpoint record on disk",
+      "Engine replaying WAL: finds committed transactions since checkpoint",
+      "Engine executes REDO: applies missing changes to table heap pages",
+      "# Recovery complete in 2 seconds: zero committed data lost!"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "state": "recovering from unclean shutdown"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "anchor": "locates last clean checkpoint timestamp"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "replay": "scans WAL forward, finding committed transactions"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "restored": "all committed writes recovered; database opens for traffic"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The sequential append-only log ensuring durability is the Write-<0> Log.",
+      "The acronym WAL stands for Write-Ahead <1>.",
+      "The OS call ensuring bytes are physically flushed to non-volatile disk is <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "Ahead"
+            ],
+            "why": "Write-Ahead Logging writes logs before data pages."
+      },
+      {
+            "a": [
+                  "Log",
+                  "Logging"
+            ],
+            "why": "WAL stands for Write-Ahead Logging."
+      },
+      {
+            "a": [
+                  "fsync"
+            ],
+            "why": "fsync flushes disk controller cache buffers to storage."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the core principle of Write-Ahead Logging (WAL)?",
+      a: ["Log records describing a change must be flushed to non-volatile disk BEFORE the actual table data pages are written","Logs must be written in alphabetical order","Logs are only written once per month","Logs are stored in the client web browser"],
+      c: 0,
+      why: "Flushing the log first ensures that if a crash occurs while writing table pages, changes can be replayed."
+    },
+    {
+      q: "What is a database 'checkpoint'?",
+      a: ["A periodic event where all dirty data pages in memory buffers are flushed to disk, advancing the recovery point","A security scanner that checks user passwords","A tool that deletes old database tables","A checkpoint where users are logged out"],
+      c: 0,
+      why: "Checkpoints bound recovery time by syncing memory pages, allowing old WAL logs to be recycled."
+    },
+    {
+      q: "Why is 'fsync' critical for database durability?",
+      a: ["Modern hard drives hold data in volatile volatile write caches; fsync forces bytes to physical storage media","It speeds up network data downloads","It encrypts database tables with TLS","It turns off the computer cooling fans"],
+      c: 0,
+      why: "Without fsync, drive write caches lose data on power failure even if the OS reported success."
+    },
+    {
+      q: "What would happen if you set 'fsync = off' in a production database?",
+      a: ["Write throughput would skyrocket, but any sudden power outage or OS crash would result in catastrophic unrecoverable data corruption","The database would immediately shut down and refuse to run","All SQL queries would throw syntax errors","The database would automatically back up to Google Drive"],
+      c: 0,
+      why: "Disabling fsync leaves writes in volatile drive cache, guaranteeing corruption on power loss."
+    }
+  ]);
+</script>
+</body>
+</html>

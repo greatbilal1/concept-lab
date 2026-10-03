@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 06 — Transport Layers: stdio vs Server-Sent Events (SSE)</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="mcp" data-lesson="6" data-lesson-id="transport-layers-stdio-vs-sse">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 06</span> · Transports</span>
+
+  <h1 class="lesson-title">Transport Layers: stdio vs Server-Sent Events (SSE)</h1>
+  <p class="lesson-lede">
+    Transport protocols: local standard I/O (stdio) vs remote HTTP Server-Sent Events (SSE) for distributed deployments.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You understand the architectural differences and trade-offs between stdio and SSE transport layers.</span>
+    <span><b>Mission link</b> Mastering transport layers: stdio vs server-sent events (sse) across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Transport Layers: stdio vs Server-Sent Events (SSE)</h2>
+  <p>The Model Context Protocol defines a clean separation between the <strong>message format</strong> (JSON-RPC 2.0) and the <strong>transport mechanism</strong> that delivers those bytes. The MCP specification defines two official transport standards:</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Transport protocols: local standard I/O (stdio) vs remote HTTP Server-Sent Events (SSE) for distributed deployments.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>stdio vs SSE Transport Comparison</h2>
+  <ul><li><strong>1. `stdio` (Standard Input/Output):</strong> The client launches the server as a local child subprocess on the same machine. Messages are exchanged over stdin/stdout pipes. <em>Best for:</em> Desktop apps, local development, extreme speed, zero network ports, maximum security.</li><li><strong>2. `SSE` (Server-Sent Events over HTTP):</strong> The server runs as a standalone HTTP web server (often in a Docker container or cloud Kubernetes cluster). The client connects over HTTP: the server streams events via an SSE endpoint (`/sse`), and the client sends requests via HTTP POST (`/messages`). <em>Best for:</em> Enterprise shared microservices, cloud deployments, and multi-user systems.</li></ul>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>SSE Communication Flow</h2>
+  <pre><code># The Transport Architecture Comparison:
+# STDIO (Local Subprocess):
+# [Client Host] === stdin/stdout pipes ===> [Local Server Process]
+# (Fast, secure, same machine, zero open network ports!)
+#
+# SSE (Remote HTTP Network):
+# [Client Host] --- HTTP POST (/messages) ---> [Remote Web Server]
+# [Client Host] <--- text/event-stream (/sse) - [Remote Web Server]
+# (Networked, distributed, cross-machine, cloud-hosted!)</code></pre><div class="callout"><p><strong>The Transport Rule:</strong> Use `stdio` for personal tools and desktop IDEs. Use `SSE` when hosting a shared enterprise tool (like internal corporate databases) across a remote network.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the transport layers sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You understand the architectural differences and trade-offs between stdio and SSE transport layers.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where transport layers: stdio vs server-sent events (sse) applies.</li>
+    <li>Author a unit test or verification script exercising transport layers: stdio vs server-sent events (sse).</li>
+    <li>Document team architectural conventions regarding transport layers: stdio vs server-sent events (sse).</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Transport Layers: stdio vs Server-Sent Events (SSE).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "When should an MCP architecture use the HTTP with Server-Sent Events (SSE) transport instead of the default stdio transport?",
+    a: ["When the MCP Server runs on a remote cloud server or separate host machine across a network from the client","When the client runs on a laptop","When the server has no internet access","stdio is obsolete and should never be used"],
+    c: 0,
+    why: "SSE enables distributed networking across machines; stdio is strictly for local same-machine subprocesses."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "stdio Transport (Local Pipes)",
+            "lines": [
+                  "Client launches child process directly",
+                  "stdin / stdout pipe communication",
+                  "Ultra-fast, zero ports, 100% private to laptop"
+            ]
+      },
+      {
+            "title": "SSE Transport (Remote HTTP)",
+            "lines": [
+                  "Runs as independent web service",
+                  "text/event-stream + HTTP POST endpoints",
+                  "Distributed across cloud networks & VPCs"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Transport Layers: stdio vs Server-Sent Events (SSE)",
+      "def execute_flow():",
+      "    # Transport protocols: local standard I/O (stdio) vs...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Transport Layers: stdio vs Server-Sent Events (SSE)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Client connects to /sse"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Client sends HTTP POST"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "While stdio transport connects local subprocesses over standard I/O pipes, {1} transport enables distributed networking across remote {2} servers."
+],
+    blanks: [
+      {
+            "a": [
+                  "SSE"
+            ],
+            "why": "Server-Sent Events over HTTP"
+      },
+      {
+            "a": [
+                  "cloud"
+            ],
+            "why": "Remote hosted web infrastructure"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What two HTTP endpoints are typically provided by an MCP server running on SSE transport?",
+      a: ["An SSE streaming endpoint (e.g. /sse) for server-to-client events, and an HTTP POST endpoint (e.g. /messages) for client requests","A login page and a logout page","An image gallery and a video player","An FTP server and a DNS server"],
+      c: 0,
+      why: "SSE streams responses to the client, while POST delivers client requests to the server."
+    },
+    {
+      q: "Why is stdio transport considered naturally more secure for local desktop tools?",
+      a: ["It does not bind to any network ports or IP addresses, making it completely inaccessible to external network attackers","It encrypts the computer screen","It runs without a CPU","It deletes all network cards"],
+      c: 0,
+      why: "stdio uses local OS process pipes, eliminating network exposure and port sniffing."
+    },
+    {
+      q: "What happens if a network interruption drops an active SSE transport connection?",
+      a: ["The client attempts to reconnect using standard HTTP/SSE reconnection protocols and resumes event streaming","The computer hard drive is formatted","The database is deleted","The server must be reinstalled"],
+      c: 0,
+      why: "SSE includes built-in HTTP reconnection semantics to recover from transient network drops."
+    },
+    {
+      q: "How does Docker facilitate deploying remote MCP servers with SSE transport?",
+      a: ["It packages the server, dependencies, and environment into a portable container that can be deployed to AWS or Kubernetes","It turns off the internet","It converts Python to HTML","It makes servers run on batteries"],
+      c: 0,
+      why: "Containers package dependencies and expose clean HTTP/SSE endpoints for remote deployment."
+    }
+  ]);
+</script>
+</body>
+</html>

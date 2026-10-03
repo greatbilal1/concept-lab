@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 01 — The Anatomy of a Production AI Platform</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="production-ai-architecture" data-lesson="1" data-lesson-id="anatomy-production-ai-platform">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 01</span> · Platform Anatomy</span>
+
+  <h1 class="lesson-title">The Anatomy of a Production AI Platform</h1>
+  <p class="lesson-lede">
+    Deconstructing the enterprise AI stack: API gateways, job queues, vector retrieval, streaming servers, and telemetry stores.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You understand the decoupled subsystems of a production enterprise AI platform.</span>
+    <span><b>Mission link</b> Mastering the anatomy of a production ai platform across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of The Anatomy of a Production AI Platform</h2>
+  <p>A tutorial script looks like this: an HTTP request hits a web server, the web server calls `openai.ChatCompletion.create()` in a blocking loop for 10 seconds, and returns JSON. In production with 10,000 concurrent users, this naive design collapses in minutes: web worker threads starve, connection pools exhaust, and users encounter HTTP 504 Gateway Timeouts.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Deconstructing the enterprise AI stack: API gateways, job queues, vector retrieval, streaming servers, and telemetry stores.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Prototype vs Production Architecture</h2>
+  <p>A <strong>Production Enterprise AI Platform</strong> decouples generation across specialized tiers:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>The Core Subsystems</h2>
+  <ul><li><strong>1. Ingress & Rate-Limiting Gateway (Kong / Envoy / FastAPI):</strong> Terminates SSL, verifies JWT user identity, scrubs PII, and enforces token bucket rate limits in Redis.</li><li><strong>2. Decoupled Asynchronous Job Queues (Celery / BullMQ / Redis):</strong> Long-running agent tasks and batch document embeddings are queued as async background jobs with progress webhooks.</li><li><strong>3. Stateful Real-Time Streaming Gateway:</strong> Handles WebSockets and Server-Sent Events (SSE) connections efficiently without blocking core application threads.</li><li><strong>4. Distributed State & Memory Store (PostgreSQL & Redis):</strong> Stores conversation histories, vector index caches, and tenant usage quotas.</li><li><strong>5. Telemetry & Governance Layer:</strong> Ingests OpenTelemetry traces, audits costs, and monitors safety via Langfuse.</li></ul><pre><code># The Enterprise AI System Architecture:
+[Web / Mobile Clients] 
+        │ (HTTPS / WSS)
+        ▼
+[API & Guardrail Gateway] <──> [Redis: Rate Limits & Quotas]
+        │
+   ┌────┴──────────────────────────┐
+   │ Fast Interactive Streaming    │ Long-Running Background Tasks
+   ▼                               ▼
+[Streaming Proxy (SSE)]      [Async Queue: BullMQ / Celery]
+   │                               │
+   ▼                               ▼
+[Model Router & LLM APIs]    [Agent Workers & Document Pipelines]
+   │                               │
+   └───────────────┬───────────────┘
+                   ▼
+   [PostgreSQL & Redis Session Memory] + [Langfuse Tracing]</code></pre><div class="callout"><p><strong>The Core Law of Production AI:</strong> Never perform long-running model inference inside synchronous web request threads. Decouple fast streaming from async batch execution.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the platform anatomy sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You understand the decoupled subsystems of a production enterprise AI platform.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where the anatomy of a production ai platform applies.</li>
+    <li>Author a unit test or verification script exercising the anatomy of a production ai platform.</li>
+    <li>Document team architectural conventions regarding the anatomy of a production ai platform.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for The Anatomy of a Production AI Platform.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What distinguishes a production-grade enterprise AI architecture from a simple prototype script?",
+    a: ["Decoupled async job queues, stateful streaming proxies, multi-tenant isolation, rate-limiting gateways, and distributed telemetry","It is written in Python rather than JavaScript","It uses more expensive monitors","It runs without a database"],
+    c: 0,
+    why: "Production platforms decouple slow AI generation from web backends using job queues, streaming proxies, and rate limiters."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Naive Prototype (Collapses at Scale)",
+            "lines": [
+                  "Web request blocks on 10s LLM call",
+                  "Worker threads starve immediately",
+                  "Single timeout crashes entire backend"
+            ]
+      },
+      {
+            "title": "Decoupled Production Architecture",
+            "lines": [
+                  "Gateway manages rate limits & auth",
+                  "Streaming proxy handles SSE cleanly",
+                  "Async queues process long agent workflows"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing The Anatomy of a Production AI Platform",
+      "def execute_flow():",
+      "    # Deconstructing the enterprise AI stack: API gatewa...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "The Anatomy of a Production AI Platform"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Ingress Tier"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Execution Tier"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "step": "State & Telemetry"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Production AI platforms achieve high scalability by decoupling synchronous web requests from model generation using async {1} queues and stateful {2} proxies."
+],
+    blanks: [
+      {
+            "a": [
+                  "job"
+            ],
+            "why": "Background worker task queues"
+      },
+      {
+            "a": [
+                  "streaming"
+            ],
+            "why": "SSE and WebSocket connections"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What happens if a web server executes a 15-second LLM call inside a synchronous HTTP request thread under high concurrency?",
+      a: ["Web server worker threads are quickly exhausted, causing subsequent incoming user requests to queue and time out with HTTP 504 errors","The computer hard drive fills up","The model weights update automatically","The internet speed doubles"],
+      c: 0,
+      why: "Synchronous blocking on slow external API calls starves web server thread pools."
+    },
+    {
+      q: "What component in a production AI architecture is responsible for tracking user token budgets and rate limits?",
+      a: ["An in-memory store like Redis integrated into the API gateway","The browser cookies","A text file in Git","The computer monitor"],
+      c: 0,
+      why: "Redis provides atomic, high-speed incrementing for rate limits and tenant token budgets."
+    },
+    {
+      q: "Why is separating long-running background tasks (like document indexing) from interactive chat essential?",
+      a: ["Heavy indexing jobs can run for minutes without blocking the low-latency streaming infrastructure required by interactive chat users","Document indexing is illegal on chat servers","Chat users do not use databases","Indexing requires no compute"],
+      c: 0,
+      why: "Workload isolation prevents heavy batch processes from degrading interactive user latency."
+    },
+    {
+      q: "What standard protocol is preferred for real-time one-way token streaming to web clients?",
+      a: ["Server-Sent Events (SSE)","FTP file transfer","SMTP email protocol","Raw TCP packets"],
+      c: 0,
+      why: "SSE provides lightweight, persistent HTTP streaming with automatic reconnection."
+    }
+  ]);
+</script>
+</body>
+</html>

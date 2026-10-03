@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 04 — Agent Handoffs and Communication Protocols</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="multi-agent-systems" data-lesson="4" data-lesson-id="agent-handoffs-communication-protocols">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 04</span> · Agent Handoffs</span>
+
+  <h1 class="lesson-title">Agent Handoffs and Communication Protocols</h1>
+  <p class="lesson-lede">
+    Engineering clean agent-to-agent handoffs: structured transfer payloads, context sanitization, and preventing telephone games.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to design structured communication protocols and lossless agent handoffs.</span>
+    <span><b>Mission link</b> Mastering agent handoffs and communication protocols across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Agent Handoffs and Communication Protocols</h2>
+  <p>When Agent A finishes a task and transfers control to Agent B, how should data be passed? If you pass raw chat logs, Agent B receives 40 turns of Agent A's internal debugging confusion. If you ask Agent A to summarize in free-form prose, critical details get lost in the <strong>Telephone Game</strong>.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Engineering clean agent-to-agent handoffs: structured transfer payloads, context sanitization, and preventing telephone games.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Telephone Game vs Structured Handoff</h2>
+  <p>Professional multi-agent systems use <strong>Structured Handoff Protocols</strong>:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Context Sanitization at Handoff</h2>
+  <ul><li><strong>1. Structured Handoff Artifacts:</strong> Agents communicate via strictly-typed data payloads (Pydantic schemas), not chatty prose.</li><li><strong>2. Context Sanitization:</strong> When handing off, prune Agent A's noisy intermediate tool calls! Pass only the clean <em>Artifact</em> (the code diff or spec) to Agent B.</li><li><strong>3. Explicit Transfer Functions:</strong> In swarm architectures (OpenAI Swarm), handoffs are implemented as special tool calls: `transfer_to_coder_agent(blueprint=...)`.</li></ul><pre><code># Structured Agent Handoff Payload (Pydantic):
+class ArchitectHandoffPayload(BaseModel):
+    feature_name: str
+    affected_files: list[str]
+    architectural_invariants: list[str]
+    step_by_step_tasks: list[str]
+    verification_command: str
+
+# Agent A invokes the transfer tool:
+transfer_to_coder(
+    payload=ArchitectHandoffPayload(
+        feature_name="User Avatars",
+        affected_files=["src/models.py", "src/routes.py"],
+        architectural_invariants=["Max avatar size is 2MB", "Must store locally"],
+        step_by_step_tasks=["Add avatar_url column", "Implement POST /avatar"],
+        verification_command="pytest tests/test_avatar.py"
+    )
+)</code></pre><div class="callout"><p><strong>The Handoff Law:</strong> Never pass unstructured conversational history between agents. Pass structured, validated artifacts.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the agent handoffs sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to design structured communication protocols and lossless agent handoffs.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where agent handoffs and communication protocols applies.</li>
+    <li>Author a unit test or verification script exercising agent handoffs and communication protocols.</li>
+    <li>Document team architectural conventions regarding agent handoffs and communication protocols.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Agent Handoffs and Communication Protocols.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is the 'Telephone Game' failure mode in multi-agent communication?",
+    a: ["Information degrades, distorts, or drops critical details as it is repeatedly passed and summarized across multiple agent hops","Agents calling each other on landline phones","A bug in the audio driver","An internet routing failure"],
+    c: 0,
+    why: "Successive summaries across multiple agents degrade fidelity, losing critical constraints like the children's game of telephone."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Unstructured Prose Handoff (Lossy)",
+            "lines": [
+                  "Agent A writes chatty summary",
+                  "Agent B misinterprets subtle rule",
+                  "Agent C acts on distorted premise (Failure!)"
+            ]
+      },
+      {
+            "title": "Structured Schema Payload (Lossless)",
+            "lines": [
+                  "ArchitectHandoffPayload (Pydantic)",
+                  "Exact file paths, invariants, & test command",
+                  "100% fidelity across all agent hops"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Agent Handoffs and Communication Protocols",
+      "def execute_flow():",
+      "    # Engineering clean agent-to-agent handoffs: structu...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Agent Handoffs and Communication Protocols"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Agent A Context (80k tokens)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Sanitized Handoff (400 tokens)"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Structured handoff protocols eliminate the telephone game by passing strictly-typed {1} payloads and sanitizing intermediate tool {2}."
+],
+    blanks: [
+      {
+            "a": [
+                  "artifact"
+            ],
+            "why": "Validated Pydantic or JSON contracts"
+      },
+      {
+            "a": [
+                  "noise"
+            ],
+            "why": "Verbose logs and failed exploratory turns"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why should Agent B NOT inherit the full raw conversational history of Agent A upon handoff?",
+      a: ["Inheriting raw history floods Agent B's context window with Agent A's trial-and-error noise, degrading reasoning focus","The API throws an error","Agents cannot read other agents' words","History is deleted upon handoff"],
+      c: 0,
+      why: "Passing raw history pollutes context budgets; passing clean artifacts preserves high signal density."
+    },
+    {
+      q: "What is an 'Agent Transfer Tool' in swarm frameworks like OpenAI Swarm?",
+      a: ["A function call that returns the instance of another specialized agent, transferring conversation execution directly to it","A tool for moving files between hard drives","A tool for transferring money","A git push command"],
+      c: 0,
+      why: "Transfer tools allow agents to execute dynamic handoffs to peer agents cleanly."
+    },
+    {
+      q: "What should happen if an agent receives a malformed or incomplete handoff payload from a peer agent?",
+      a: ["Reject the handoff and return a validation error to the sending agent with instructions to complete missing fields","Guess the missing data","Crash the host process","Delete the project"],
+      c: 0,
+      why: "Validating handoffs at the boundary ensures downstream agents never operate on incomplete specifications."
+    },
+    {
+      q: "How does defining an explicit verification_command in the handoff payload empower the receiving QA agent?",
+      a: ["The QA agent knows the exact command to execute to prove the coder agent's work met specifications","It turns off the terminal","It makes the test pass automatically","It compiles Python to C"],
+      c: 0,
+      why: "Including verification commands establishes clear objective proof requirements for the receiving agent."
+    }
+  ]);
+</script>
+</body>
+</html>

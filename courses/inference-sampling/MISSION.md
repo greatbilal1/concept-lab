@@ -1,0 +1,3 @@
+# Mission — Inference, Temperature & Sampling
+
+Master the final mile of text generation. Understand how raw logits transform into Softmax probabilities, explore the precision and repetition risks of greedy decoding, control distribution entropy with temperature, truncate long tails with Top-K and dynamic Top-P (Nucleus) sampling, eliminate repetitive phrase ruts with frequency and presence penalties, achieve reproducible test runs with random seeds, and select optimal sampling recipes across software engineering tasks.

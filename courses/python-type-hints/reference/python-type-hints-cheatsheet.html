@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python Type Hints — Cheat Sheet</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+<style>
+  .ref-toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0 8px; }
+  .ref-toc a { font-size: .8rem; border: 1px solid var(--border); background: #111a30; padding: 5px 11px; border-radius: 999px; color: var(--muted); text-decoration: none; border-bottom: 1px solid var(--border); }
+  .ref-toc a:hover { color: #fff; border-color: #3d5488; }
+  .lesson-wrap h2 { scroll-margin-top: 20px; }
+  .snippet { margin: 14px 0 22px; }
+  .snippet .lbl { font-size: .72rem; font-weight: 800; letter-spacing: .7px; text-transform: uppercase; color: var(--accent2); margin-bottom: 6px; }
+  .see { font-size: .82rem; color: var(--muted); margin: -6px 0 12px; }
+  .see a { color: var(--accent2); border-bottom: 0; }
+  .see a:hover { color: #fff; }
+  .snippet pre { padding-top: 34px; }
+  @media print { .snippet pre { padding-top: 18px; } }
+</style>
+</head>
+<body class="lesson-body" data-course="python-type-hints">
+
+<div class="lesson-wrap">
+
+  <span class="lesson-kicker">Reference · Cheat sheet</span>
+  <h1 class="lesson-title">Python Type Hints — Cheat Sheet</h1>
+  <p class="lesson-lede">
+    The whole course on one page. Every snippet links back to the lesson that
+    teaches it.
+  </p>
+
+  <div class="ref-toc">
+    <a href="#annotations">Annotations</a>
+    <a href="#generics">Generics</a>
+    <a href="#checking">Checking</a>
+    <a href="#together">Together</a>
+  </div>
+
+  <h2 id="annotations"><span class="n">1</span>Annotations</h2>
+
+  <div class="snippet">
+    <div class="lbl">The three positions</div>
+    <pre><code>def area(w: float, h: float) -> float:   # parameter, return
+    return w * h
+
+total: int = 0        # variable
+pending: str          # declared, not assigned</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0002-annotating-variables-and-functions.html">Lesson 02 — Annotating variables and functions</a>.</p>
+
+  <div class="snippet">
+    <div class="lbl">Common scalar types</div>
+    <pre><code>name: str = "Ada"
+age: int = 36
+ratio: float = 0.75
+active: bool = True     # bool is a subtype of int</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0003-the-common-types.html">Lesson 03 — The common types</a>.</p>
+
+  <div class="snippet">
+    <div class="lbl">Unions and Optional</div>
+    <pre><code>def find(name: str) -> str | None: ...   # modern pipe
+def find(name: str) -> Optional[str]: ...  # same thing
+
+def parse(v: str | int) -> int: ...      # any number of types</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0004-optional-and-union.html">Lesson 04 — Optional and Union</a>.</p>
+
+  <h2 id="generics"><span class="n">2</span>Generics</h2>
+
+  <div class="snippet">
+    <div class="lbl">Collections carry their contents</div>
+    <pre><code>names: list[str] = ["Ada"]
+ages: dict[str, int] = {"Ada": 36}
+tags: set[str] = {"python"}
+point: tuple[float, float] = (1.0, 2.0)
+many: tuple[int, ...] = (1, 2, 3)</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0005-collections-and-generics.html">Lesson 05 — Collections and generics</a>.</p>
+
+  <div class="snippet">
+    <div class="lbl">TypeVar links positions</div>
+    <pre><code>T = TypeVar("T")
+
+def first(items: list[T]) -> T:
+    return items[0]</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0005-collections-and-generics.html">Lesson 05 — Collections and generics</a>.</p>
+
+  <div class="snippet">
+    <div class="lbl">Aliases, NewType, Literal, TypedDict</div>
+    <pre><code>UserId = int                       # alias: a nickname
+UserId = NewType("UserId", int)    # distinct type, no cost
+Mode = Literal["read", "write"]    # exact values only
+
+class Row(TypedDict):
+    name: str
+    age: int</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0006-type-aliases-and-newtype.html">Lesson 06 — Type aliases and NewType</a>.</p>
+
+  <div class="snippet">
+    <div class="lbl">Protocols and Callables</div>
+    <pre><code>class Sized(Protocol):
+    def __len__(self) -> int: ...
+
+def apply(f: Callable[[int], str], n: int) -> str:
+    return f(n)</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0007-protocols-and-callables.html">Lesson 07 — Protocols and Callables</a>.</p>
+
+  <h2 id="checking"><span class="n">3</span>Checking</h2>
+
+  <div class="snippet">
+    <div class="lbl">Run a checker</div>
+    <pre><code>pip install mypy
+mypy src/
+
+# src/app.py:12: error: Argument 1 to "greet" has
+# incompatible type "int"; expected "str"  [arg-type]</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0008-static-checking-with-mypy.html">Lesson 08 — Static checking with mypy</a>.</p>
+
+  <div class="snippet">
+    <div class="lbl">Annotations are stored</div>
+    <pre><code>def greet(name: str) -> str: ...
+greet.__annotations__
+# {'name': &lt;class 'str'&gt;, 'return': &lt;class 'str'&gt;}
+
+class Node:
+    def next(self) -> "Node": ...   # forward reference
+
+from __future__ import annotations   # all lazy strings</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0009-annotations-at-runtime.html">Lesson 09 — Annotations at runtime</a>.</p>
+
+  <h2 id="together"><span class="n">4</span>Together</h2>
+
+  <div class="snippet">
+    <div class="lbl">Adoption order</div>
+    <pre><code>1. annotate the boundaries (public functions, handlers)
+2. run a checker, record the error count as baseline
+3. tighten strictness one flag at a time
+4. stop where annotations stop catching real mistakes</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0010-typing-in-a-real-project.html">Lesson 10 — Typing in a real project</a>.</p>
+
+  <div class="snippet">
+    <div class="lbl">Any vs object</div>
+    <pre><code>x: Any      # checking disabled — use deliberately
+y: object   # accepts everything — narrow before use</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0003-the-common-types.html">Lesson 03 — The common types</a>.</p>
+
+  <div class="lesson-foot">
+    <div class="links">
+      <a href="python-type-hints-glossary.html">📖 Glossary</a>
+      <a href="../course.html">← Course map</a>
+    </div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script>
+  TeachLesson.init({ course: "python-type-hints", lessons: window.TeachLessons || [] });
+</script>
+</body>
+</html>

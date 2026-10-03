@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 03 — The four ANSI isolation levels</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="transactions-data-integrity" data-lesson="3" data-lesson-id="the-four-ansi-isolation-levels">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 03</span> · Isolation Levels & Anomalies</span>
+
+  <h1 class="lesson-title">The four ANSI isolation levels</h1>
+  <p class="lesson-lede">
+    What happens when two people book the last airline seat at the exact same millisecond? Explore the four ANSI isolation levels and the concurrency anomalies they prevent.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Select between Read Committed, Repeatable Read, and Serializable isolation levels</span>
+    <span><b>Mission link</b> Prevents race conditions and dirty reads in multi-user concurrent applications</span>
+  </div>
+
+  <h2><span class="n">1</span>The spectrum of isolation</h2>
+  <p>The 'I' in ACID stands for <b>Isolation</b>: ideally, every transaction should execute as if it were the only transaction in the universe (<b>Serializable</b>). But perfect isolation is computationally expensive and reduces throughput.</p><p>To balance performance with correctness, ANSI SQL defined four standard <b>Isolation Levels</b>: <b>Read Uncommitted</b>, <b>Read Committed</b> (industry default), <b>Repeatable Read</b>, and <b>Serializable</b>. Higher levels prevent more concurrency anomalies at the expense of concurrency.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Higher isolation levels prevent concurrency anomalies at the expense of throughput and locking.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The anomaly and isolation matrix</h2>
+  <p>Memorise which concurrency anomalies are prevented by each ANSI isolation level.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing a Non-Repeatable Read anomaly</h2>
+  <p>Trace how a row's value changes between two identical SELECT queries under Read Committed.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of ANSI isolation levels.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can evaluate concurrency requirements and configure appropriate transaction isolation levels for sensitive workflows.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Check your current database isolation level using SHOW transaction_isolation.</li>
+    <li>Set transaction isolation level using SET TRANSACTION ISOLATION LEVEL REPEATABLE READ.</li>
+    <li>Demonstrate a non-repeatable read across two concurrent psql terminal sessions.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    ANSI/ISO SQL-92 Standard: *Transaction Isolation Levels* & Berenson et al., *A Critique of ANSI SQL Isolation Levels* (SIGMOD, 1995).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is the default transaction isolation level in PostgreSQL and most enterprise databases?",
+    a: ["Read Committed (transactions only see data that has already been committed)","Read Uncommitted (dirty reads allowed)","Serializable (perfect isolation)","Repeatable Read"],
+    c: 0,
+    why: "Read Committed is the default in PostgreSQL, SQL Server, and Oracle, balancing safety and speed."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Read Uncommitted",
+            "lines": [
+                  "vulnerable to Dirty Reads",
+                  "rarely used in production"
+            ]
+      },
+      {
+            "title": "Read Committed (Default)",
+            "lines": [
+                  "prevents Dirty Reads",
+                  "vulnerable to Non-Repeatable Reads & Phantoms"
+            ]
+      },
+      {
+            "title": "Repeatable Read",
+            "lines": [
+                  "prevents Dirty & Non-Repeatable Reads",
+                  "consistent snapshot view"
+            ]
+      },
+      {
+            "title": "Serializable (Strict)",
+            "lines": [
+                  "prevents ALL anomalies including Phantoms",
+                  "transactions execute as if in serial order!"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Transaction 1: SELECT balance FROM accounts WHERE id = 1; -> returns $100",
+      "# Transaction 2 (concurrent): UPDATE accounts SET balance = $50 WHERE id = 1; COMMIT;",
+      "# Transaction 1: SELECT balance FROM accounts WHERE id = 1; -> returns $50!",
+      "# Anomaly: The same query returned two different values in the same transaction!"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "tx1_first_read": "balance = $100"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "tx2_mutation": "concurrent update committed"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "tx1_second_read": "balance = $50 (non-repeatable read occurred)"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Reading uncommitted data written by another transaction is a <0> read.",
+      "The default isolation level in PostgreSQL is Read <1>.",
+      "The strictest isolation level preventing all anomalies is <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "dirty"
+            ],
+            "why": "Dirty reads expose uncommitted changes."
+      },
+      {
+            "a": [
+                  "Committed"
+            ],
+            "why": "Read Committed guarantees seeing only committed data."
+      },
+      {
+            "a": [
+                  "Serializable"
+            ],
+            "why": "Serializable simulates serial execution order."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is a 'Dirty Read' in database concurrency?",
+      a: ["A transaction reads uncommitted data written by another active transaction that might later be rolled back","A query that contains syntax errors","A read from a hard drive with bad sectors","A query that returns more than 100 rows"],
+      c: 0,
+      why: "If Transaction B reads Transaction A's uncommitted write, and A rolls back, B acted on phantom data."
+    },
+    {
+      q: "How does 'Repeatable Read' isolation prevent non-repeatable reads?",
+      a: ["It creates a consistent snapshot of the database at transaction start; all queries see the database frozen at that instant","It locks the entire database against all other users","It prevents other users from logging in","It caches queries in the client web browser"],
+      c: 0,
+      why: "Snapshot isolation guarantees that re-reading a row returns the exact same snapshot version."
+    },
+    {
+      q: "What error does PostgreSQL throw if two concurrent transactions conflict under Serializable isolation?",
+      a: ["ERROR: could not serialize access due to read/write dependencies (40001 serialization_failure)","FATAL: Database corrupted","A NullPointerException","The query hangs forever"],
+      c: 0,
+      why: "Serializable engines abort one of the conflicting transactions, requiring the application to retry."
+    },
+    {
+      q: "Why isn't 'Serializable' used as the default isolation level everywhere if it is the safest?",
+      a: ["It incurs significant performance overhead, higher abort rates, and requires application-level retry logic","Because Serializable was removed from modern SQL standards","Because it can only store text, not numbers","Because it only works on single-core computers"],
+      c: 0,
+      why: "High abort rates and dependency tracking overhead make Serializable overkill for routine read traffic."
+    }
+  ]);
+</script>
+</body>
+</html>

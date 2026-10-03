@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 02 — Architecture of the Model Context Protocol (MCP)</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="mcp" data-lesson="2" data-lesson-id="mcp-client-server-architecture">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 02</span> · MCP Architecture</span>
+
+  <h1 class="lesson-title">Architecture of the Model Context Protocol (MCP)</h1>
+  <p class="lesson-lede">
+    Inside MCP: Client-Host-Server architecture, JSON-RPC 2.0 communication, and capability negotiation.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You understand the client-host-server architecture and JSON-RPC protocol of MCP.</span>
+    <span><b>Mission link</b> Mastering architecture of the model context protocol (mcp) across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Architecture of the Model Context Protocol (MCP)</h2>
+  <p>The Model Context Protocol is built on a clean, decoupled <strong>Client-Server Architecture</strong> using the established <strong>JSON-RPC 2.0</strong> specification for bi-directional message exchange.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Inside MCP: Client-Host-Server architecture, JSON-RPC 2.0 communication, and capability negotiation.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The MCP Architecture Triad</h2>
+  <p>The three core participants in an MCP system:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>JSON-RPC 2.0 Message Structure</h2>
+  <ul><li><strong>1. The MCP Host (The AI Application):</strong> The user-facing program (e.g. Claude Desktop, Cursor, VS Code, or an autonomous CLI agent) that orchestrates language models and UI interactions.</li><li><strong>2. The MCP Client:</strong> A protocol adapter living inside the Host that establishes 1-to-1 connections with individual MCP servers, handles capability negotiation, and manages security permissions.</li><li><strong>3. The MCP Server:</strong> A lightweight program that exposes external data, local files, or tools. It does not run an LLM; it is an ordinary software service that speaks JSON-RPC!</li></ul><pre><code># The MCP JSON-RPC 2.0 Handshake (Client -> Server):
+# Request:
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "initialize",
+  "params": {
+    "protocolVersion": "2024-11-05",
+    "capabilities": {"roots": {"listChanged": true}},
+    "clientInfo": {"name": "ClaudeDesktop", "version": "1.0.0"}
+  }
+}
+# Server responds with its declared capabilities: [tools, resources, prompts]!</code></pre><p>During the <code>initialize</code> handshake, the client and server negotiate protocol versions and capabilities, establishing a secure, standardized communication channel.</p><div class="callout"><p><strong>The Independence Seam:</strong> An MCP server does not need an internet connection or an API key; it can run locally on your laptop communicating via standard I/O (stdio).</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the MCP architecture sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You understand the client-host-server architecture and JSON-RPC protocol of MCP.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where architecture of the model context protocol (mcp) applies.</li>
+    <li>Author a unit test or verification script exercising architecture of the model context protocol (mcp).</li>
+    <li>Document team architectural conventions regarding architecture of the model context protocol (mcp).</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Architecture of the Model Context Protocol (MCP).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What standard messaging protocol powers the communication between MCP Clients and MCP Servers?",
+    a: ["JSON-RPC 2.0","SOAP XML","Binary Protobuf","Raw plain text without format"],
+    c: 0,
+    why: "MCP uses JSON-RPC 2.0 as its foundational transport format for requests, responses, and notifications."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1. MCP Host (Application)",
+            "lines": [
+                  "Claude Desktop, Cursor, Copilot",
+                  "Coordinates LLM reasoning & UI"
+            ]
+      },
+      {
+            "title": "2. MCP Client (Adapter)",
+            "lines": [
+                  "Internal protocol client",
+                  "Connects to servers via stdio / SSE"
+            ]
+      },
+      {
+            "title": "3. MCP Server (Data & Tools)",
+            "lines": [
+                  "Exposes PostgreSQL, GitHub, Filesystem",
+                  "Lightweight program, zero LLM needed!"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Architecture of the Model Context Protocol (MCP)",
+      "def execute_flow():",
+      "    # Inside MCP: Client-Host-Server architecture, JSON-...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Architecture of the Model Context Protocol (MCP)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Request Envelope"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Response Envelope"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "MCP uses {1} message envelopes over a client-server architecture where lightweight servers expose tools to AI host {2}."
+],
+    blanks: [
+      {
+            "a": [
+                  "JSON-RPC 2.0"
+            ],
+            "why": "Standardized remote procedure call format"
+      },
+      {
+            "a": [
+                  "applications"
+            ],
+            "why": "Clients like Claude Desktop or Cursor"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Does an MCP Server contain a Large Language Model inside it?",
+      a: ["No; an MCP Server is a standard software program that exposes tools and data; the LLM lives in the client host application","Yes; every MCP server has a 70B model inside","Yes; an MCP server is an AI model","It only contains neural networks"],
+      c: 0,
+      why: "MCP servers are deterministic software programs that provide data and actions to external models."
+    },
+    {
+      q: "What is the purpose of the 'initialize' method in the MCP specification?",
+      a: ["To establish protocol version parity, negotiate supported capabilities, and exchange client/server metadata","To format the hard drive","To start training an LLM","To buy cloud credits"],
+      c: 0,
+      why: "Initialization negotiates capabilities and protocol versions between client and server."
+    },
+    {
+      q: "Can a single MCP Host connect to multiple MCP Servers simultaneously?",
+      a: ["Yes; an application like Claude Desktop can connect to dozens of independent MCP servers (GitHub, Postgres, Slack) concurrently","No; only 1 server connection is permitted","Only on Linux","Only if servers share code"],
+      c: 0,
+      why: "MCP clients aggregate tools and resources across multiple independent servers simultaneously."
+    },
+    {
+      q: "What happens if an MCP Server crashes while handling a request?",
+      a: ["The client receives a connection error or process exit signal and can restart the server or report failure to the user","The host computer shuts down","The database is deleted","The internet disconnects"],
+      c: 0,
+      why: "Client-server isolation prevents server crashes from crashing the host application."
+    }
+  ]);
+</script>
+</body>
+</html>

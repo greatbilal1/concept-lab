@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 07 — Formulating and testing hypotheses</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="debugging-code" data-lesson="7" data-lesson-id="formulating-and-testing-hypotheses">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 07</span> · Root Cause & Prevention</span>
+
+  <h1 class="lesson-title">Formulating and testing hypotheses</h1>
+  <p class="lesson-lede">
+    Do not touch the code until you have a theory you can test. Learn to frame hypotheses that can be proven false, and design experiments that deliver clean answers.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Formulate crisp, falsifiable hypotheses before writing any bug fixes</span>
+    <span><b>Mission link</b> Prevents confirmation bias and wild code changes</span>
+  </div>
+
+  <h2><span class="n">1</span>The nature of a good hypothesis</h2>
+  <p>A vague idea like 'something is wrong with the database' is not a hypothesis. A hypothesis is a specific statement about cause and effect: <i>'If the user submits an empty string, the sanitizer returns None instead of an empty string, causing the downstream template to raise TypeError.'</i></p><p>Notice that this hypothesis makes a concrete prediction. You can design an experiment to test that exact condition in isolation.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    A hypothesis must be specific enough that an experiment can decisively prove it false.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Testing one variable at a time</h2>
+  <p>If you change three things at once and the bug disappears, you do not know which change fixed it — or whether you introduced two new bugs. Always alter one independent variable at a time.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Hypothesis validation in action</h2>
+  <p>Trace how a developer tests the theory that an off-by-one error exists in a slice boundary.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Review the rules of rigorous hypothesis formation.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can formulate explicit, falsifiable hypotheses that cut straight to the causal mechanism behind any bug.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Write out a one-sentence hypothesis in 'If... then...' format for an open defect.</li>
+    <li>Design an experiment that would disprove your hypothesis if it were incorrect.</li>
+    <li>Verify your hypothesis with the experiment before editing source code.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Karl Popper, *The Logic of Scientific Discovery* (Chapter 1 on Falsifiability applied to software diagnostics).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Which of the following represents a falsifiable debugging hypothesis?",
+    a: ["The code has bad architecture and needs complete refactoring","Passing a negative price causes calculate_tax to return a negative float","Computers are inherently unreliable on Monday mornings","Our software dependencies contain too many third-party bugs"],
+    c: 1,
+    why: "Passing a negative price makes a specific, testable prediction with an exact falsifiable outcome."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Hypothesis",
+            "lines": [
+                  "identify suspect variable",
+                  "predict outcome"
+            ]
+      },
+      {
+            "title": "Control",
+            "lines": [
+                  "keep other inputs fixed",
+                  "isolate single difference"
+            ]
+      },
+      {
+            "title": "Result",
+            "lines": [
+                  "confirmed: fix defect",
+                  "refuted: formulate new theory"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Hypothesis: items[0:3] omits the 4th item because slice upper bounds are exclusive",
+      "items = ['a', 'b', 'c', 'd']",
+      "subset = items[0:3]",
+      "assert len(subset) == 3  # prediction confirmed: 'd' was excluded"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "items": "['a', 'b', 'c', 'd']"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "subset": "['a', 'b', 'c']"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "len_subset": "3",
+                  "confirmed": "true"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the missing terms",
+    lines: [
+      "A scientific hypothesis must be capable of being proven <0>.",
+      "When running an experiment, you should only change one <1>.",
+      "Accepting only evidence that supports your preferred theory is <2> bias."
+],
+    blanks: [
+      {
+            "a": [
+                  "false",
+                  "falsified"
+            ],
+            "why": "Falsifiability is the core requirement of any scientific statement."
+      },
+      {
+            "a": [
+                  "variable"
+            ],
+            "why": "Changing one variable at a time ensures you isolate the true causal factor."
+      },
+      {
+            "a": [
+                  "confirmation"
+            ],
+            "why": "Confirmation bias tempts engineers to ignore contradictory data."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What defines a falsifiable hypothesis in software debugging?",
+      a: ["A statement that can be definitively disproven by a targeted experiment","A statement that every senior engineer agrees with unanimously","An error report generated automatically by the operating system kernel","A comment written inside unit test files explaining business logic"],
+      c: 0,
+      why: "If an experiment cannot disprove the theory, the theory cannot be reliably verified."
+    },
+    {
+      q: "Why must you only change one variable at a time during an experiment?",
+      a: ["Because modern compilers can only process one file change per minute","To ensure you know exactly which change caused the difference in outcome","To prevent git repositories from exceeding allowed file size limits","Because CPU registers can only store one variable at a time"],
+      c: 1,
+      why: "Altering multiple variables conflates causes and makes conclusions invalid."
+    },
+    {
+      q: "What should you do when your experiment refutes your hypothesis?",
+      a: ["Change the experimental results so your hypothesis appears correct","Discard the hypothesis and formulate a new one based on new evidence","Force commit the change to production anyway and monitor alerts","Stop working and assume the defect is an impossible mystery"],
+      c: 1,
+      why: "Refutation is progress: you have eliminated a false possibility and learned new facts."
+    },
+    {
+      q: "Which cognitive trap leads developers to overlook true bug causes?",
+      a: ["Confirmation bias towards their own initial assumptions","Excessive reliance on automated unit test suites","Reading tracebacks from bottom to top too quickly","Using binary search instead of sequential reading"],
+      c: 0,
+      why: "Confirmation bias causes developers to only notice data that supports their pet theory."
+    }
+  ]);
+</script>
+</body>
+</html>

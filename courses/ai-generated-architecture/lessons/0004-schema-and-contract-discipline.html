@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 04 — Schema and Contract Discipline</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="ai-generated-architecture" data-lesson="4" data-lesson-id="schema-and-contract-discipline">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 04</span> · Contracts</span>
+
+  <h1 class="lesson-title">Schema and Contract Discipline</h1>
+  <p class="lesson-lede">
+    Enforcing schema discipline: Pydantic, Zod, OpenAPI, and database migration contracts.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to enforce schema and contract discipline across AI contributions.</span>
+    <span><b>Mission link</b> Mastering schema and contract discipline across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Schema and Contract Discipline</h2>
+  <p>Dynamic, loosely typed dictionaries (`dict` in Python, plain `object` in JavaScript) are the enemy of AI-generated architecture. When data flows through a system as unstructured dictionaries, agents will guess property names: one file uses `user_id`, another uses `userId`, and a third uses `uid`.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Enforcing schema discipline: Pydantic, Zod, OpenAPI, and database migration contracts.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Schema Discipline vs Raw Dictionaries</h2>
+  <p><strong>Schema Discipline</strong> anchors system contracts using strongly-typed data validation libraries (Pydantic, Zod, Marshmallow):</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Boundary Validation Gate</h2>
+  <ul><li><strong>Explicit Attributes & Types:</strong> Every field is declared with strict types, defaults, and validation constraints.</li><li><strong>Runtime Parsing & Validation:</strong> Invalid data is rejected at the API boundary before reaching domain logic.</li><li><strong>Automatic Serialization:</strong> Enforces consistent JSON keys and casing (e.g. `camelCase` aliases for frontend consumption).</li><li><strong>OpenAPI Documentation:</strong> Auto-generates living API schemas that client agents can inspect.</li></ul><pre><code># Strict Schema Contract (Pydantic v2)
+class UserCreateRequest(BaseModel):
+    model_config = ConfigDict(strict=True, extra="forbid")
+
+    email: EmailStr
+    full_name: str = Field(min_length=2, max_length=100)
+    tier: Literal["free", "pro", "enterprise"] = "free"
+    # extra='forbid' guarantees agents cannot pass unapproved random fields!</code></pre><div class="callout"><p><strong>Extra Protection:</strong> Use `extra="forbid"` in Pydantic. This immediately raises a validation error if an agent attempts to pass hallucinated or unrecognized fields!</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the schema discipline sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to enforce schema and contract discipline across AI contributions.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where schema and contract discipline applies.</li>
+    <li>Author a unit test or verification script exercising schema and contract discipline.</li>
+    <li>Document team architectural conventions regarding schema and contract discipline.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Schema and Contract Discipline.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Why are strict schemas (like Pydantic v2 or Zod) essential when working with AI coding agents?",
+    a: ["They provide machine-enforceable contracts that validate data shapes at runtime and prevent silent property mutations","They make Python run in web browsers","They reduce database storage by 90%","They turn off compiler warnings"],
+    c: 0,
+    why: "Schemas provide concrete type and validation contracts that catch invalid data before it corrupts application state."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Raw Dictionaries (Chaos)",
+            "lines": [
+                  "{'user_id': 123} vs {'uid': 123}",
+                  "No validation, silent type mismatches",
+                  "Runtime crashes in downstream modules"
+            ]
+      },
+      {
+            "title": "Strict Schemas (Pydantic/Zod)",
+            "lines": [
+                  "Explicit UserCreateRequest schema",
+                  "extra='forbid' blocks hallucinated fields",
+                  "100% deterministic type safety"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Schema and Contract Discipline",
+      "def execute_flow():",
+      "    # Enforcing schema discipline: Pydantic, Zod, OpenAP...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Schema and Contract Discipline"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Incoming JSON"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Schema Validation"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "step": "Clean Domain"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Strict schemas provide machine-enforceable {1} that reject unexpected fields and guarantee {2} safety across modules."
+],
+    blanks: [
+      {
+            "a": [
+                  "contracts"
+            ],
+            "why": "Explicit interface agreements"
+      },
+      {
+            "a": [
+                  "type"
+            ],
+            "why": "Data shape and validation integrity"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What does the 'extra=\"forbid\"' setting do in a Pydantic model?",
+      a: ["It raises a validation error if the input payload contains any unexpected fields not declared in the schema","It forbids other developers from editing the file","It blocks network traffic","It deletes the database"],
+      c: 0,
+      why: "extra='forbid' prevents agents and callers from passing unexpected or hallucinated properties."
+    },
+    {
+      q: "Why are strongly typed schemas better for agents than raw dictionaries?",
+      a: ["Schemas provide unambiguous autocomplete, exact field names, and type requirements that models can read directly","Dictionaries take 10x more RAM","Python cannot parse dictionaries","Dictionaries are deprecated"],
+      c: 0,
+      why: "Typed schemas eliminate guessing around dictionary keys and expected data types."
+    },
+    {
+      q: "How does OpenAPI schema generation benefit an AI-assisted engineering team?",
+      a: ["It provides an authoritative machine-readable contract that frontend and backend agents can use to stay in sync","It writes code without a human","It makes servers run in parallel","It replaces the database"],
+      c: 0,
+      why: "OpenAPI contracts ensure frontend and backend developers and agents share an authoritative specification."
+    },
+    {
+      q: "What should happen when an external client sends invalid data to an API endpoint?",
+      a: ["The schema validator rejects the request immediately with an informative 4xx error before reaching domain logic","The server crashes with an uncaught 500 error","The server silently ignores the error and saves nulls","The server reboots"],
+      c: 0,
+      why: "Validating at the boundary protects inner domain layers from malformed data."
+    }
+  ]);
+</script>
+</body>
+</html>

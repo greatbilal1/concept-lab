@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 02 — The Core Agent Loop: Read, Plan, Act, Observe</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="ai-coding-agents" data-lesson="2" data-lesson-id="core-agent-loop">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 02</span> · Agent Loop</span>
+
+  <h1 class="lesson-title">The Core Agent Loop: Read, Plan, Act, Observe</h1>
+  <p class="lesson-lede">
+    The four foundational states of every coding agent: Read state, Plan actions, Act with tools, and Observe results.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You understand the mechanics of the Read-Plan-Act-Observe agent loop.</span>
+    <span><b>Mission link</b> Mastering the core agent loop: read, plan, act, observe across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of The Core Agent Loop: Read, Plan, Act, Observe</h2>
+  <p>Every modern coding agent (GitHub Copilot Agent mode, Claude Code, Cursor, Codex Agent) is built on a variant of the classic <strong>ReAct (Reason + Act) loop</strong>. In a coding environment, this loop takes a concrete four-phase shape:</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    The four foundational states of every coding agent: Read state, Plan actions, Act with tools, and Observe results.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Four-Phase Agent Loop</h2>
+  <ul><li><strong>1. READ:</strong> The agent inspects its environment: reading the prompt, exploring files, searching symbols, and loading memory.</li><li><strong>2. PLAN:</strong> The agent reasons over its observations, formulating an actionable next step or breaking down a larger task.</li><li><strong>3. ACT:</strong> The agent issues a structured tool call: replace_string_in_file, create_file, or run_in_terminal.</li><li><strong>4. OBSERVE:</strong> The environment executes the tool and returns the result (stdout, exit code, diff, or error message) directly into the agent's context.</li></ul>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Handling a Failed Observation</h2>
+  <pre><code># The ReAct Iteration Loop in JSON
+{
+  "thought": "I need to check why test_checkout fails. I will run pytest.",
+  "tool_call": {
+    "name": "run_in_terminal",
+    "arguments": {"command": "pytest tests/test_checkout.py"}
+  }
+}
+# Environment returns observation:
+# stdout: "FAILED: KeyError: 'discount_code' at line 45"
+# Agent next thought: "The dictionary is missing 'discount_code'. I will edit line 45."</code></pre><p>This cycle repeats until the agent satisfies all criteria or determines it needs human clarification.</p><div class="callout"><p><strong>Key Insight:</strong> The intelligence of an agent is not just the model weights; it is the quality of the loop that connects thought to action and observation.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Fill in the four agent loop phases</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You understand the mechanics of the Read-Plan-Act-Observe agent loop.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where the core agent loop: read, plan, act, observe applies.</li>
+    <li>Author a unit test or verification script exercising the core agent loop: read, plan, act, observe.</li>
+    <li>Document team architectural conventions regarding the core agent loop: read, plan, act, observe.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for The Core Agent Loop: Read, Plan, Act, Observe.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What happens if an agent skips the 'Observe' step after executing a file edit?",
+    a: ["It cannot detect whether the edit succeeded, broke syntax, or introduced unintended formatting errors","The operating system refuses to save the file","The file is permanently locked","The LLM context window doubles in size"],
+    c: 0,
+    why: "Without observing tool results, the agent acts blindly without feedback from the environment."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1. Read",
+            "lines": [
+                  "Inspect files & repo state",
+                  "Gather context & symptoms"
+            ]
+      },
+      {
+            "title": "2. Plan",
+            "lines": [
+                  "Synthesize information",
+                  "Formulate next concrete action"
+            ]
+      },
+      {
+            "title": "3. Act",
+            "lines": [
+                  "Invoke tool call",
+                  "Apply edit or run command"
+            ]
+      },
+      {
+            "title": "4. Observe",
+            "lines": [
+                  "Read tool output & diff",
+                  "Confirm success or pivot"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing The Core Agent Loop: Read, Plan, Act, Observe",
+      "def execute_flow():",
+      "    # The four foundational states of every coding agent...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "The Core Agent Loop: Read, Plan, Act, Observe"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Action: Apply Edit"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Observation: Error"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "step": "Recovery Loop"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The agent loop consists of: {1} context, {2} next steps, {3} using tools, and {4} execution outputs."
+],
+    blanks: [
+      {
+            "a": [
+                  "read"
+            ],
+            "why": "Gathering repository state"
+      },
+      {
+            "a": [
+                  "plan"
+            ],
+            "why": "Formulating next action"
+      },
+      {
+            "a": [
+                  "act"
+            ],
+            "why": "Executing tool calls"
+      },
+      {
+            "a": [
+                  "observe"
+            ],
+            "why": "Evaluating tool results"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What does ReAct stand for in AI agent research?",
+      a: ["Reasoning and Acting: interleaving chain-of-thought reasoning with environmental tool actions","React.js frontend framework","Reactive programming with streams","Real-time Action controller"],
+      c: 0,
+      why: "ReAct combines verbal reasoning traces with concrete actions and environmental observations."
+    },
+    {
+      q: "Why is the 'Plan' step critical before taking an action?",
+      a: ["It prevents the agent from thrashing with random trial-and-error edits and aligns actions with goals","It allows the CPU to enter power-saving mode","It encrypts the conversation history","It prevents the model from generating text"],
+      c: 0,
+      why: "Deliberate planning helps the model decompose complex goals into coherent sequential steps."
+    },
+    {
+      q: "What constitutes an 'Observation' in a coding agent?",
+      a: ["The stdout, stderr, exit code, or file diff returned by the IDE or operating system after a tool executes","A comment written by another developer","A screenshot of the desktop","The user reading the screen"],
+      c: 0,
+      why: "Observations are the environmental feedback returned to the model following an action."
+    },
+    {
+      q: "When does the agent decide to terminate its loop?",
+      a: ["When its planning step determines that all acceptance criteria are met, or when it requires user input","When the computer is shut down","After exactly three iterations","When the context window is completely full"],
+      c: 0,
+      why: "Agents evaluate goal completion based on tests passing and criteria fulfillment."
+    }
+  ]);
+</script>
+</body>
+</html>

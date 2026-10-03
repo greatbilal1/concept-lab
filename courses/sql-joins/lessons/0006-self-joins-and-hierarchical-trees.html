@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 06 — Self-joins and hierarchical trees</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="sql-joins" data-lesson="6" data-lesson-id="self-joins-and-hierarchical-trees">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 06</span> · Subqueries & CTEs</span>
+
+  <h1 class="lesson-title">Self-joins and hierarchical trees</h1>
+  <p class="lesson-lede">
+    How do you query a table that points to itself? Master self-joins to find managers and employees, and recursive CTEs to traverse nested categories of arbitrary depth.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Query hierarchical organizational charts and category trees using self-joins and recursive CTEs</span>
+    <span><b>Mission link</b> Enables modeling and querying of parent-child trees and category hierarchies</span>
+  </div>
+
+  <h2><span class="n">1</span>A table that references itself</h2>
+  <p>In an organization, managers are also employees. In an e-commerce catalog, parent categories contain child categories. Instead of creating two identical tables, relational design uses a <b>self-referential foreign key</b>: <code>employees.manager_id</code> references <code>employees.id</code>.</p><p>To query employee and manager names together, you perform a <b>Self-Join</b>: joining the <code>employees</code> table to itself using two distinct aliases (<code>employees e LEFT JOIN employees m ON e.manager_id = m.id</code>).</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    A self-join pairs a table with itself using distinct aliases to model parent-child hierarchies.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Self-join architecture</h2>
+  <p>Observe how two logical roles are extracted from a single physical table.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing a recursive CTE category tree</h2>
+  <p>Trace how a recursive CTE traverses a category tree from root down to leaf products.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of self-joins and recursive queries.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can model and query parent-child hierarchies and traverse nested tree structures using recursive CTEs.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Write a self-join query finding employees and their managers using LEFT JOIN.</li>
+    <li>Create a category hierarchy table with parent_id foreign key.</li>
+    <li>Write a WITH RECURSIVE query to calculate the depth of each category.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    PostgreSQL Documentation: *Recursive Queries* (postgresql.org/docs/current/queries-with.html#QUERIES-WITH-RECURSIVE).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Why MUST you use distinct table aliases (like 'e' and 'm') when performing a self-join?",
+    a: ["The database engine needs to distinguish which instance of the table you are referencing in the ON and SELECT clauses","SQL keywords must be abbreviated to one letter","Aliases are required to enable database encryption","Without aliases, all employee records are deleted"],
+    c: 0,
+    why: "Aliases differentiate the two logical roles (employee vs manager) of the same physical table."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Physical Table: employees",
+            "lines": [
+                  "id, name, manager_id",
+                  "Ada (id 1, mgr null), Bob (id 2, mgr 1)"
+            ]
+      },
+      {
+            "title": "Alias e (Employee)",
+            "lines": [
+                  "reads subordinate employee row",
+                  "e.name = 'Bob'"
+            ]
+      },
+      {
+            "title": "Alias m (Manager)",
+            "lines": [
+                  "reads supervisor row",
+                  "m.name = 'Ada'"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "WITH RECURSIVE category_tree AS (",
+      "    # Anchor member: select root category (Electronics)",
+      "    SELECT id, name, parent_id, 1 AS depth FROM categories WHERE parent_id IS NULL",
+      "    UNION ALL",
+      "    # Recursive member: join children to previous level",
+      "    SELECT c.id, c.name, c.parent_id, ct.depth + 1",
+      "    FROM categories c JOIN category_tree ct ON c.parent_id = ct.id",
+      ")",
+      "SELECT * FROM category_tree;"
+],
+    steps: [
+      {
+            "line": 2,
+            "vars": {
+                  "level_1": "Electronics (depth 1)"
+            }
+      },
+      {
+            "line": 5,
+            "vars": {
+                  "level_2": "Computers, Audio (depth 2)"
+            }
+      },
+      {
+            "line": 5,
+            "vars": {
+                  "level_3": "Laptops, Accessories (depth 3)"
+            }
+      },
+      {
+            "line": 7,
+            "vars": {
+                  "output": "complete tree returned in hierarchical depth order"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Joining a table to itself using two aliases is a <0>-join.",
+      "The keyword enabling a CTE to traverse hierarchical trees is WITH <1>.",
+      "The non-recursive starting query in a recursive CTE is the <2> member."
+],
+    blanks: [
+      {
+            "a": [
+                  "self"
+            ],
+            "why": "Self-joins connect a table to itself."
+      },
+      {
+            "a": [
+                  "RECURSIVE"
+            ],
+            "why": "WITH RECURSIVE enables iterative tree traversal."
+      },
+      {
+            "a": [
+                  "anchor"
+            ],
+            "why": "The anchor query establishes the tree base level."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why should you use a LEFT JOIN rather than an INNER JOIN when pairing employees with their managers?",
+      a: ["The CEO / top-level executive has manager_id = NULL; an INNER JOIN would drop the CEO from the results!","Because self-joins do not support INNER JOIN","Because managers cannot be employees","To prevent the server from running out of memory"],
+      c: 0,
+      why: "The root of a hierarchy has no parent (NULL); an INNER JOIN drops the root record."
+    },
+    {
+      q: "What are the two parts of a recursive CTE?",
+      a: ["An Anchor member (base query) and a Recursive member, combined with UNION ALL","A SELECT statement and an UPDATE statement","A PRIMARY KEY and a FOREIGN KEY","A header and a footer"],
+      c: 0,
+      why: "The anchor establishes initial rows; the recursive member joins iteratively until empty."
+    },
+    {
+      q: "What prevents a recursive CTE from running into an infinite loop on cyclic data?",
+      a: ["A cycle detection condition (or depth limit / UNION instead of UNION ALL)","The database limits all queries to 5 milliseconds","The computer CPU automatically cuts power","Cyclic data is physically impossible to store in SQL"],
+      c: 0,
+      why: "If child points back to parent in a cycle, recursive queries loop infinitely unless guarded by depth."
+    },
+    {
+      q: "What data model uses a self-referential foreign key?",
+      a: ["Adjacency List model (each node stores a pointer to its immediate parent)","Flat file model","Key-value document model","Spreadsheet grid model"],
+      c: 0,
+      why: "Adjacency lists store parent_id on the record itself, representing tree graphs cleanly."
+    }
+  ]);
+</script>
+</body>
+</html>

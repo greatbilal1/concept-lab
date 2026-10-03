@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 03 — Quantization Explained: FP16, INT8, INT4 (GGUF, AWQ, EXL2)</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="local-vs-cloud-models" data-lesson="3" data-lesson-id="quantization-explained-gguf-awq">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 03</span> · Quantization</span>
+
+  <h1 class="lesson-title">Quantization Explained: FP16, INT8, INT4 (GGUF, AWQ, EXL2)</h1>
+  <p class="lesson-lede">
+    The magic of weight quantization: mapping continuous floats to 4-bit integers, GGUF formats, and AWQ/EXL2 algorithms.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You understand the mathematics, formats, and accuracy trade-offs of model quantization.</span>
+    <span><b>Mission link</b> Mastering quantization explained: fp16, int8, int4 (gguf, awq, exl2) across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Quantization Explained: FP16, INT8, INT4 (GGUF, AWQ, EXL2)</h2>
+  <p>To a classical computer programmer, taking a 16-bit floating point number (with 65,536 possible values) and squashing it into a 4-bit integer (which can only represent 16 distinct values: 0 to 15) sounds insane. Surely the code will break!</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    The magic of weight quantization: mapping continuous floats to 4-bit integers, GGUF formats, and AWQ/EXL2 algorithms.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Quantization Precision Hierarchy</h2>
+  <p>Yet in deep learning, <strong>4-bit Quantization</strong> retains virtually 98% of full-precision capability. Why? Because neural networks are biologically inspired, highly distributed, and resilient to noise. Individual weights matter less than the collective geometric pattern.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>AWQ: Protecting Salient Weights</h2>
+  <p>How Quantization Works (Linear Mapping):</p><ul><li><strong>Block Scaling:</strong> Take a small block of 32 or 64 weights. Find the minimum ($W_{min}$) and maximum ($W_{max}$).</li><li><strong>Scale & Zero-Point:</strong> Compute a scale factor $S = (W_{max} - W_{min}) / 15$.</li><li><strong>Integer Quantization:</strong> Map each continuous float to the closest integer from 0 to 15: $Q = \text{round}((W - W_{min}) / S)$.</li><li><strong>Dequantize during math:</strong> Multiply by $S$ during the forward pass to recover the approximate original value.</li></ul><p>Modern Quantization Formats & Algorithms:</p><ul><li><strong>GGUF (llama.cpp):</strong> The universal file format for CPU and Apple Silicon inference. Self-contained, portable single-file container (`model-q4_k_m.gguf`).</li><li><strong>AWQ (Activation-aware Weight Quantization):</strong> Identifies the top 1% most important weights ('salient weights') and protects them from aggressive quantization.</li><li><strong>EXL2 (ExLlamaV2):</strong> State-of-the-art variable-bit quantization optimized for NVIDIA GPUs.</li></ul><pre><code># The Quantization Trade-off Spectrum:
+# FP16 (16-bit): 100% Accuracy baseline | 140 GB VRAM | 1.0x Memory
+# Q8_0 (8-bit):   99.9% Accuracy        |  70 GB VRAM | 0.5x Memory
+# Q4_K_M (4-bit): 98.2% Accuracy (SWEET SPOT!) | 40 GB VRAM | 0.28x Memory
+# Q2_K (2-bit):   Severe brain damage! Accuracy collapses. (Avoid!)</code></pre><div class="callout"><p><strong>The Golden Quant:</strong> `Q4_K_M` (4-bit medium) is the universal industry sweet spot: it saves 72% VRAM with nearly imperceptible degradation in coding or reasoning quality.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the quantization sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You understand the mathematics, formats, and accuracy trade-offs of model quantization.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where quantization explained: fp16, int8, int4 (gguf, awq, exl2) applies.</li>
+    <li>Author a unit test or verification script exercising quantization explained: fp16, int8, int4 (gguf, awq, exl2).</li>
+    <li>Document team architectural conventions regarding quantization explained: fp16, int8, int4 (gguf, awq, exl2).</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Quantization Explained: FP16, INT8, INT4 (GGUF, AWQ, EXL2).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "How can a neural network lose 75% of its precision (from FP16 down to 4-bit integers) and retain over 98% of its intelligence?",
+    a: ["Neural network weights are over-parameterized and robust; weights within a layer cluster closely and can be represented by scale factors and small integer bins","The missing precision is stored on the internet","4-bit math is faster than 16-bit math","The model re-learns missing weights during generation"],
+    c: 0,
+    why: "Neural representations are noise-tolerant; scale-and-offset mapping preserves essential weight geometry."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "FP16 (Full Precision)",
+            "lines": [
+                  "16 bits per weight",
+                  "100% baseline accuracy",
+                  "Massive VRAM footprint"
+            ]
+      },
+      {
+            "title": "Q4_K_M (4-bit Sweet Spot)",
+            "lines": [
+                  "4 bits per weight",
+                  "98.2% accuracy retained",
+                  "72% VRAM reduction (Runs locally!)"
+            ]
+      },
+      {
+            "title": "Q2_K (2-bit Over-Quantized)",
+            "lines": [
+                  "2 bits per weight",
+                  "Severe perplexity degradation",
+                  "Hallucinates gibberish (Avoid)"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Quantization Explained: FP16, INT8, INT4 (GGUF, AWQ, EXL2)",
+      "def execute_flow():",
+      "    # The magic of weight quantization: mapping continuo...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Quantization Explained: FP16, INT8, INT4 (GGUF, AWQ, EXL2)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Uniform Quantization"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Activation-Aware (AWQ)"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Quantization maps continuous 16-bit weights into discrete {1} integers, with formats like {2} providing portable local inference."
+],
+    blanks: [
+      {
+            "a": [
+                  "4-bit"
+            ],
+            "why": "16-state integer compression"
+      },
+      {
+            "a": [
+                  "GGUF"
+            ],
+            "why": "llama.cpp universal container format"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the primary benefit of the GGUF file format in local AI?",
+      a: ["It is a self-contained single-file format that stores model weights, metadata, tokenizer vocabularies, and quantization configurations together","It converts models into video files","It encrypts files with passwords","It runs only on Android phones"],
+      c: 0,
+      why: "GGUF bundles all necessary metadata, tokenizer rules, and quantized tensors into one portable file."
+    },
+    {
+      q: "Why does a 2-bit quantized model (Q2) frequently produce broken, incoherent text?",
+      a: ["2 bits only provide 4 discrete states (0, 1, 2, 3), which is too coarse to capture the nuanced geometry of neural weights","2-bit math is forbidden in Python","2-bit models have no weights","The computer refuses to run 2-bit files"],
+      c: 0,
+      why: "4 states is too coarse to represent weights without catastrophic information loss."
+    },
+    {
+      q: "What does 'AWQ' stand for in modern quantization research?",
+      a: ["Activation-aware Weight Quantization: observing activation distributions to protect the most important 1% of weights from truncation","Apple Wireless Quality","Automated Web Query","Advanced Word Queue"],
+      c: 0,
+      why: "AWQ protects salient weights whose activations have the highest impact on output quality."
+    },
+    {
+      q: "Why is Q4_K_M considered the gold standard quantization level for local deployment?",
+      a: ["It achieves an optimal balance between slashing VRAM requirements by over 70% while retaining over 98% of original model performance","It is the only format supported by Ollama","It runs without a CPU","It was created by Microsoft"],
+      c: 0,
+      why: "Q4_K_M uses mixed 4-bit and 6-bit quantization blocks to maximize fidelity while minimizing size."
+    }
+  ]);
+</script>
+</body>
+</html>

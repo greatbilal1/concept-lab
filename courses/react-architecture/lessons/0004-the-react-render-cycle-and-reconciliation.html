@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 04 — The React render cycle and reconciliation</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="react-architecture" data-lesson="4" data-lesson-id="the-react-render-cycle-and-reconciliation">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 04</span> · State & The Render Cycle</span>
+
+  <h1 class="lesson-title">The React render cycle and reconciliation</h1>
+  <p class="lesson-lede">
+    What happens when you call setState? Explore the two phases of React: the Render Phase (pure calculation, virtual DOM diffing) and the Commit Phase (mutating the real DOM).
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Explain the Render and Commit phases, Virtual DOM diffing, and derived state</span>
+    <span><b>Mission link</b> Demystifies how React updates the screen and optimizes DOM operations</span>
+  </div>
+
+  <h2><span class="n">1</span>Render phase versus Commit phase</h2>
+  <p>Many developers think calling <code>setState</code> immediately updates the physical DOM on screen. In reality, React operates in two distinct phases: <b>1. The Render Phase</b> and <b>2. The Commit Phase</b>.</p><p>During the <b>Render Phase</b>, React calls your component functions to build a new Virtual DOM tree, comparing (<b>reconciling</b>) it with the previous snapshot. During the <b>Commit Phase</b>, React applies <i>only the minimal necessary differences</i> to the real browser DOM (e.g. changing one text node) and schedules painting.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Render phase computes the virtual DOM diff; Commit phase applies minimal mutations to the real DOM.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The two-phase pipeline</h2>
+  <p>Understand the boundary between pure virtual calculations and physical browser DOM mutations.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing derived state versus redundant state</h2>
+  <p>Trace why calculating values on the fly during render eliminates desynchronization bugs.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of the React render cycle.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can optimize React rendering performance and eliminate redundant state synchronization bugs by deriving values.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit a component and replace a redundant useEffect/useState sync with derived state.</li>
+    <li>Use the React DevTools Profiler to record and inspect component render durations.</li>
+    <li>Observe how React batches multiple setState calls into a single render pass.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    React Official Documentation: *Render and Commit* (react.dev/learn/render-and-commit).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "If a component re-renders, does React always update the real browser DOM elements on the screen?",
+    a: ["No, if the Virtual DOM diff shows the JSX output is identical, React skips touching the real DOM entirely","Yes, React rewrites the entire HTML document on every re-render","The real DOM is deleted and recreated from scratch","Only in production mode"],
+    c: 0,
+    why: "Reconciliation computes the diff; if nothing changed in JSX output, zero real DOM touches occur."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1. Trigger",
+            "lines": [
+                  "user clicks button -> setState()",
+                  "component queued for re-render"
+            ]
+      },
+      {
+            "title": "2. Render Phase (Pure)",
+            "lines": [
+                  "calls component functions",
+                  "diffs new Virtual DOM vs previous",
+                  "ZERO real DOM mutations!"
+            ]
+      },
+      {
+            "title": "3. Commit Phase (Mutate)",
+            "lines": [
+                  "applies minimal mutations to real DOM",
+                  "executes useLayoutEffect & useEffect"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Bad (Redundant state):",
+      "# const [items, setItems] = useState([10, 20]);",
+      "# const [total, setTotal] = useState(30); # must be manually synced whenever items change!",
+      "# Good (Derived during render phase):",
+      "const [items, setItems] = useState([10, 20]);",
+      "const total = items.reduce((a, b) => a + b, 0); # computed in 0.001ms during render!"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "anti_pattern": "two state variables can desynchronize"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "best_practice": "single source of truth: total derived during render"
+            }
+      },
+      {
+            "line": 5,
+            "vars": {
+                  "result": "impossible for total to be out of sync with items!"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The algorithm React uses to diff virtual trees is <0>.",
+      "The phase where React applies changes to the real DOM is the <1> phase.",
+      "Values calculated on-the-fly during render are <2> state."
+],
+    blanks: [
+      {
+            "a": [
+                  "reconciliation"
+            ],
+            "why": "Reconciliation diffs Virtual DOM trees."
+      },
+      {
+            "a": [
+                  "commit"
+            ],
+            "why": "Commit phase mutates real DOM elements."
+      },
+      {
+            "a": [
+                  "derived"
+            ],
+            "why": "Derived state is calculated without extra useState."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is 'Derived State' in React component design?",
+      a: ["A value calculated on-the-fly during the render phase from existing props or state, rather than stored in a separate useState","State imported from an external database","State that is derived from browser cookies","A state variable that never changes"],
+      c: 0,
+      why: "Deriving values during render guarantees they can never get out of sync with their source."
+    },
+    {
+      q: "What is 'State Batching' in modern React 18+?",
+      a: ["React automatically groups multiple setState calls within the same event into a single re-render pass for performance","A tool that deletes old state variables","A feature that runs states on multiple servers","State that is updated once per hour"],
+      c: 0,
+      why: "Batching prevents unnecessary intermediate renders when multiple state updates occur together."
+    },
+    {
+      q: "Why is the Virtual DOM faster than directly manipulating the browser DOM?",
+      a: ["Computing diffs in pure JavaScript memory is orders of magnitude faster than browser layout and paint calculations","The Virtual DOM is stored on a flash drive","The Virtual DOM bypasses JavaScript completely","The Virtual DOM is written in assembly language"],
+      c: 0,
+      why: "JavaScript memory operations are microsecond fast; real DOM modifications trigger expensive reflows."
+    },
+    {
+      q: "When should you use 'useMemo' for a calculation?",
+      a: ["Only when profiling proves an expensive calculation (like sorting 10,000 items) is noticeably slowing down re-renders","On every single variable and math equation in your application","Only on strings shorter than three letters","Never; useMemo is deprecated"],
+      c: 0,
+      why: "useMemo has memory and comparison overhead; only use it for genuinely expensive operations."
+    }
+  ]);
+</script>
+</body>
+</html>

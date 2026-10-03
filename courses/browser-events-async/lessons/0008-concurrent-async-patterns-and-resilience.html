@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 08 — Concurrent async patterns and resilience</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="browser-events-async" data-lesson="8" data-lesson-id="concurrent-async-patterns-and-resilience">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 08</span> · Async/Await & Concurrency</span>
+
+  <h1 class="lesson-title">Concurrent async patterns and resilience</h1>
+  <p class="lesson-lede">
+    Real networks fail, hang, and drop connections. Master concurrent execution patterns, request cancellation with AbortController, and exponential backoff retry loops.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Implement resilient async patterns including request timeouts and retry loops</span>
+    <span><b>Mission link</b> Prepares web applications for real-world network instability and latency spikes</span>
+  </div>
+
+  <h2><span class="n">1</span>Defensive asynchronous architecture</h2>
+  <p>In production, network calls fail. They encounter timeouts, 500 errors, and dropped packets. Writing <code>await fetch(url)</code> without timeouts or error boundaries is a recipe for hanging UI states.</p><p>Resilient applications implement two essential patterns: <b>Request Cancellation</b> using the browser's native <code>AbortController</code> API, and <b>Exponential Backoff Retries</b> to recover from temporary network hiccups.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Never leave network calls without timeouts; use AbortController to cancel hanging requests.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The AbortController pattern</h2>
+  <p>Learn how AbortController bridges timers and network fetch requests for robust timeouts.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing exponential backoff retry</h2>
+  <p>Trace how a retry loop doubles its waiting interval between successive failed network attempts.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of resilient async patterns.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can author production-grade asynchronous logic featuring request cancellation, timeouts, and automated retry mechanisms.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Implement a fetch wrapper that aborts requests if they exceed 3 seconds.</li>
+    <li>Write an async retry function that retries a failing operation up to 3 times.</li>
+    <li>Cancel an in-flight search autocomplete request when the user types a new character.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    WHATWG DOM Standard: *AbortController and AbortSignal* (dom.spec.whatwg.org/#aborting-ongoing-activities).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What happens if a user navigates away from a page while a slow fetch request is still downloading?",
+    a: ["The fetch continues downloading in the background unless explicitly cancelled with AbortController","The browser cancels the fetch automatically within 1 millisecond","The computer turns off Wi-Fi","The server throws a database syntax error"],
+    c: 0,
+    why: "Fetch requests continue running in the background unless aborted, wasting bandwidth and memory."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "AbortController",
+            "lines": [
+                  "const controller = new AbortController();",
+                  "pass controller.signal to fetch()"
+            ]
+      },
+      {
+            "title": "Timeout Trigger",
+            "lines": [
+                  "setTimeout(() => controller.abort(), 5000)",
+                  "fires abort if time exceeds 5s"
+            ]
+      },
+      {
+            "title": "Fetch Rejection",
+            "lines": [
+                  "fetch rejects with AbortError",
+                  "UI informs user of network timeout"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Attempt 1: fails (wait 100ms)",
+      "# Attempt 2: fails (wait 200ms = 100 * 2)",
+      "# Attempt 3: fails (wait 400ms = 200 * 2)",
+      "# Attempt 4: succeeds! Request completed without user noticing failure"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "attempt": "1 failed; backoff delay 100ms"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "attempt": "2 failed; backoff delay 200ms"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "attempt": "3 failed; backoff delay 400ms"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "success": "attempt 4 resolved successfully"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The native web API used to cancel fetch requests is <0>Controller.",
+      "Progressively doubling retry delays is exponential <1>.",
+      "When an aborted fetch rejects, its error name is <2>Error."
+],
+    blanks: [
+      {
+            "a": [
+                  "Abort"
+            ],
+            "why": "AbortController handles cancellation signals."
+      },
+      {
+            "a": [
+                  "backoff"
+            ],
+            "why": "Exponential backoff relieves server load during outages."
+      },
+      {
+            "a": [
+                  "Abort"
+            ],
+            "why": "Aborted fetches throw an DOMException named AbortError."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "How do you connect an AbortController to a fetch() network request?",
+      a: ["Pass { signal: controller.signal } in the fetch options object","Call fetch.abort(controller)","Set window.abort = controller","Pass the controller as the first parameter instead of the URL"],
+      c: 0,
+      why: "The signal property on the fetch options connects the request to the controller."
+    },
+    {
+      q: "Why is exponential backoff preferred over immediate retries when a server fails with status 503?",
+      a: ["Immediate retries hammer an already overloaded server; backoff gives the server breathing room to recover","Immediate retries are forbidden by TCP specifications","Backoff speeds up the computer processor clock speed","Immediate retries always succeed on the second attempt"],
+      c: 0,
+      why: "Flooding a struggling server with immediate retries causes a thundering herd failure."
+    },
+    {
+      q: "What does controller.abort() do to an active network fetch?",
+      a: ["Terminates the network transfer immediately and causes the fetch Promise to reject with an AbortError","Deletes the server database record","Closes the user web browser window","Replaces the response body with an empty string without throwing an error"],
+      c: 0,
+      why: "abort() halts the request socket immediately and rejects the promise with an AbortError."
+    },
+    {
+      q: "Why should you always clear the timeout timer in a finally block after an aborted fetch completes?",
+      a: ["To prevent the timer callback from firing later and wasting CPU resources or throwing unexpected errors","Because browsers allow only three timers to exist at a time","Because timers delete computer RAM if left running","To speed up the internet download connection"],
+      c: 0,
+      why: "clearTimeout(timer) in finally ensures the timer is cleaned up when requests succeed quickly."
+    }
+  ]);
+</script>
+</body>
+</html>

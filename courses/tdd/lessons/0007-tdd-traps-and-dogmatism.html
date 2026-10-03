@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 07 — Common TDD Traps and Dogmatism</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="tdd" data-lesson="7" data-lesson-id="tdd-traps-and-dogmatism">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 07</span> · Anti-Patterns</span>
+
+  <h1 class="lesson-title">Common TDD Traps and Dogmatism</h1>
+  <p class="lesson-lede">
+    Avoiding the common pitfalls of TDD dogmatism: testing trivial code, over-mocking, and paralysis.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to avoid TDD dogmatism and practice pragmatic test-first engineering.</span>
+    <span><b>Mission link</b> Mastering common tdd traps and dogmatism across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Common TDD Traps and Dogmatism</h2>
+  <p>Like many powerful engineering disciplines, TDD can be distorted into rigid dogmatism that slows teams down instead of speeding them up. Recognizing common TDD traps is essential for long-term sustainable practice.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Avoiding the common pitfalls of TDD dogmatism: testing trivial code, over-mocking, and paralysis.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Common TDD Anti-Patterns</h2>
+  <p>Key TDD anti-patterns to avoid:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>The Spike-and-Stabilize Loop</h2>
+  <ul><li><strong>Testing the Trivial:</strong> Writing tests for simple field accessors, standard library functions, or one-line ORM definitions. If code has zero conditional logic, a unit test has near-zero ROI.</li><li><strong>Mocking Every Seam:</strong> Replacing every single collaborator with a mock until your tests only verify that method A calls method B with arguments C. If you change a method name, 50 tests break even though behavior is intact!</li><li><strong>Refactoring Paralysis:</strong> Spending three hours polishing code during the Refactor step instead of taking small, focused steps.</li><li><strong>Never Spiking or Prototyping:</strong> Refusing to write exploratory code when exploring an unfamiliar API or architecture.</li></ul><pre><code># DOGMATIC ANTI-PATTERN: Testing trivial property accessors
+def test_user_set_name():
+    user = User()
+    user.name = "Bob"
+    assert user.name == "Bob"  # Zero value! You are testing Python itself!
+
+# HIGH ROI: Testing genuine business decisions and edge cases
+def test_cannot_transfer_more_than_daily_limit():
+    account = Account(daily_limit=1000)
+    with pytest.raises(DailyLimitExceeded):
+        account.transfer(1500)</code></pre><div class="callout"><p><strong>The Spike Solution:</strong> When you do not know how a problem should be structured, throw away TDD temporarily! Write a dirty, exploratory prototype (a 'Spike') to learn the problem space, throw the code away, and then TDD the real solution cleanly.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the TDD trap remediation sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to avoid TDD dogmatism and practice pragmatic test-first engineering.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where common tdd traps and dogmatism applies.</li>
+    <li>Author a unit test or verification script exercising common tdd traps and dogmatism.</li>
+    <li>Document team architectural conventions regarding common tdd traps and dogmatism.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Common TDD Traps and Dogmatism.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is a common trap that leads developers to abandon TDD?",
+    a: ["Writing tests for trivial getters, setters, and framework boilerplate instead of real business logic","Running tests with automated test runners","Writing tests that execute in under a second","Refactoring code when tests are green"],
+    c: 0,
+    why: "Testing trivial boilerplate creates high maintenance overhead with zero real defect-prevention value."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Testing Boilerplate",
+            "lines": [
+                  "Asserting getters & setters",
+                  "Zero ROI, high maintenance"
+            ]
+      },
+      {
+            "title": "Mock Obsession",
+            "lines": [
+                  "Mocking every single class",
+                  "Brittle tests coupled to internals"
+            ]
+      },
+      {
+            "title": "Dogmatic Refusal to Spike",
+            "lines": [
+                  "TDD-ing in complete ignorance",
+                  "Paralysis when problem is unknown"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Common TDD Traps and Dogmatism",
+      "def execute_flow():",
+      "    # Avoiding the common pitfalls of TDD dogmatism: tes...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Common TDD Traps and Dogmatism"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "1. Exploration Spike"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "2. Trash Prototype"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "step": "3. Clean TDD Cycle"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "When exploring unfamiliar architectures or APIs, developers should write a throwaway {1} before rebuilding cleanly with {2}."
+],
+    blanks: [
+      {
+            "a": [
+                  "spike"
+            ],
+            "why": "Exploratory prototype to gain knowledge"
+      },
+      {
+            "a": [
+                  "TDD"
+            ],
+            "why": "Disciplined test-first cycle"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is a 'Spike' in agile and TDD terminology?",
+      a: ["A temporary, throwaway prototype written strictly to explore technical feasibility and learn an API","A sudden unexpected drop in code coverage","A test that takes longer than 10 seconds","A git merge conflict on the main branch"],
+      c: 0,
+      why: "Spikes are time-boxed exploratory experiments used to understand problems before applying TDD."
+    },
+    {
+      q: "Why is testing third-party library internals (like testing that 'dict[key] = val' works) an anti-pattern?",
+      a: ["You are testing the standard library rather than your own business logic, adding maintenance overhead for zero gain","Third-party libraries cannot be tested in Python","It slows down the internet connection","It causes compiler memory leaks"],
+      c: 0,
+      why: "Trust that standard libraries and well-maintained frameworks work; test your own domain rules."
+    },
+    {
+      q: "What is the consequence of 'mock-heavy' testing on refactoring?",
+      a: ["Tests become brittle because any internal restructuring breaks mock expectations even when behavior is unchanged","Tests become completely immune to breaking","Refactoring runs 10x faster","Code coverage increases to 200%"],
+      c: 0,
+      why: "Mocks verify internal interactions; refactoring changes those interactions, breaking mock assertions."
+    },
+    {
+      q: "What should you do with exploratory spike code once you understand the solution?",
+      a: ["Discard or set it aside, and implement the real solution using disciplined TDD","Deploy the spike directly to production","Write tests after shipping the spike to users","Add comments to the spike and merge"],
+      c: 0,
+      why: "Throwing away the spike allows you to build the clean, tested production implementation without baggage."
+    }
+  ]);
+</script>
+</body>
+</html>

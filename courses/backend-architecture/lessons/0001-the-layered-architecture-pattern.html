@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 01 — The layered architecture pattern</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="backend-architecture" data-lesson="1" data-lesson-id="the-layered-architecture-pattern">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 01</span> · Layers & Architectural Boundaries</span>
+
+  <h1 class="lesson-title">The layered architecture pattern</h1>
+  <p class="lesson-lede">
+    Controllers should not write SQL, and database models should not format HTML. Master the classic 3-tier layered architecture: Presentation, Business, and Persistence.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Organize backend codebases into distinct Presentation, Service, and Persistence layers</span>
+    <span><b>Mission link</b> The foundational architectural pattern used by the vast majority of enterprise backends</span>
+  </div>
+
+  <h2><span class="n">1</span>The classic three-layer pattern</h2>
+  <p>The most widely adopted backend architecture divides software into three horizontal tiers: <b>1. Presentation Layer</b> (HTTP routing, JSON parsing, status codes), <b>2. Business Logic Layer</b> (pure domain rules, calculations, workflows), and <b>3. Persistence Layer</b> (database access, SQL queries, cache clients).</p><p>The golden rule of layered architecture: <b>Dependencies flow strictly downward</b>. The Presentation layer calls the Business layer; the Business layer calls the Persistence layer. The Business layer never knows about HTTP, and the Persistence layer never knows about web controllers.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Dependencies flow downward: Presentation calls Business Services; Business Services call Persistence.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The three horizontal tiers</h2>
+  <p>Understand the strict separation of responsibilities across the three layers.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing a checkout request through the layers</h2>
+  <p>Trace how a checkout request moves downward through the three layers to complete an order.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of layered architecture.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can structure backend servers into clean horizontal layers with strict separation of concerns.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit a route handler in your project and extract any embedded SQL queries into a repository.</li>
+    <li>Ensure your business logic functions take domain types rather than raw HTTP request objects.</li>
+    <li>Write a unit test for your business service without spinning up an HTTP web server.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Martin Fowler, *Patterns of Enterprise Application Architecture*, Chapter 2: 'Separation of Concerns and Layering'.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What architectural violation occurs if an HTTP controller writes an SQL query directly inside its route handler?",
+    a: ["It tightly couples the transport layer to the database, preventing reuse, complicating testing, and violating layer boundaries","The query will fail to execute in modern web browsers","The database will automatically delete the table","The computer CPU will catch on fire"],
+    c: 0,
+    why: "Mixing SQL into HTTP controllers prevents testing business logic without running a full web server."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Presentation Layer",
+            "lines": [
+                  "REST controllers, GraphQL resolvers",
+                  "parse HTTP request, return 200/400"
+            ]
+      },
+      {
+            "title": "Business Logic Layer",
+            "lines": [
+                  "OrderService, BillingCalculator",
+                  "pure business rules; zero HTTP knowledge!"
+            ]
+      },
+      {
+            "title": "Persistence Layer",
+            "lines": [
+                  "UserRepository, OrderRepository",
+                  "SQL queries, ORM sessions, database connections"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# 1. Controller receives POST /checkout with JSON body",
+      "# 2. Controller calls OrderService.place_order(user_id, cart_items)",
+      "# 3. OrderService verifies discount rules and tax calculations",
+      "# 4. OrderService calls OrderRepository.save(order)",
+      "# 5. Controller receives saved Order and returns HTTP 201 Created"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "presentation": "parses HTTP JSON and extracts parameters"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "business_logic": "orchestrates business rules independently of HTTP"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "persistence": "executes SQL insert and commits transaction"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "response": "HTTP response constructed with 201 status and JSON payload"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The layer handling HTTP routing and status codes is the <0> layer.",
+      "The layer containing business calculation logic is the <1> layer.",
+      "The layer responsible for SQL queries and data storage is the <2> layer."
+],
+    blanks: [
+      {
+            "a": [
+                  "presentation",
+                  "controller"
+            ],
+            "why": "Presentation handles transport protocols."
+      },
+      {
+            "a": [
+                  "business",
+                  "service"
+            ],
+            "why": "Business layer holds domain rules."
+      },
+      {
+            "a": [
+                  "persistence",
+                  "data"
+            ],
+            "why": "Persistence layer interfaces with storage."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why shouldn't business logic services accept framework HTTP request objects (like Request or HttpRequest)?",
+      a: ["It couples business logic to the web framework, preventing the same logic from being called via CLI, background workers, or unit tests","HTTP request objects are deleted by the operating system after five seconds","Business services cannot parse Python objects","It causes database tables to be dropped"],
+      c: 0,
+      why: "Passing domain primitives or DTOs allows business logic to be invoked by any transport (CLI, workers, tests)."
+    },
+    {
+      q: "What is a 'sinkhole anti-pattern' in layered architectures?",
+      a: ["When requests pass through multiple layers without performing any logic, acting as pure pass-through boilerplates","When a database runs out of disk storage space","When all network cables are unplugged","When an SQL query contains a syntax error"],
+      c: 0,
+      why: "Sinkholes occur when simple CRUD passes through layers that add zero value, adding unnecessary indirection."
+    },
+    {
+      q: "Which layer in a 3-tier architecture owns the database transaction boundary?",
+      a: ["The Business/Service layer, because a business transaction often spans multiple repository calls","The Presentation controller layer","The database client driver","The operating system kernel"],
+      c: 0,
+      why: "Business operations (like checkout) dictate atomic boundaries across multiple entity updates."
+    },
+    {
+      q: "What is the primary benefit of the Layered Architecture pattern?",
+      a: ["High maintainability: changes to database schemas or web frameworks are isolated to a single layer","It eliminates the need for software testing","It speeds up internet connection bandwidth","It converts Python backends into C++ binaries automatically"],
+      c: 0,
+      why: "Decoupled layers isolate changes: switching from Flask to FastAPI leaves persistence untouched."
+    }
+  ]);
+</script>
+</body>
+</html>

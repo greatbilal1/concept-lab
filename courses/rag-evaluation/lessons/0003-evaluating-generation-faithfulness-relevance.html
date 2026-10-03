@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 03 — Evaluating Generation: Faithfulness and Answer Relevance</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="rag-evaluation" data-lesson="3" data-lesson-id="evaluating-generation-faithfulness-relevance">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 03</span> · Generation Metrics</span>
+
+  <h1 class="lesson-title">Evaluating Generation: Faithfulness and Answer Relevance</h1>
+  <p class="lesson-lede">
+    Measuring generation quality: Faithfulness (checking hallucinations against context) and Answer Relevance (query alignment).
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to evaluate RAG generation using Faithfulness and Answer Relevance metrics.</span>
+    <span><b>Mission link</b> Mastering evaluating generation: faithfulness and answer relevance across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Evaluating Generation: Faithfulness and Answer Relevance</h2>
+  <p>Once your retriever delivers high-quality chunks, the generation stage begins. The LLM must read the context and compose a helpful answer. To ensure the model did not hallucinate or wander off-topic, we evaluate two core generation metrics:</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Measuring generation quality: Faithfulness (checking hallucinations against context) and Answer Relevance (query alignment).
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Faithfulness Calculation Flow</h2>
+  <ul><li><strong>1. Faithfulness (Groundedness Score):</strong> Measures whether the answer is strictly derived from the context. Formula: $\text{Faithfulness} = \frac{\text{Number of Claims Supported by Context}}{\text{Total Number of Claims in Answer}}$. A faithfulness score of $1.0$ guarantees zero hallucination!</li><li><strong>2. Answer Relevance:</strong> Measures whether the response actually answers the user's question. A model could recite random faithful facts from the document that have zero relevance to the user's prompt. We generate reverse synthetic questions from the answer and compute embedding cosine similarity with the original query!</li></ul>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Answer Relevance Mechanism</h2>
+  <pre><code># The Faithfulness Evaluation Algorithm in Ragas:
+# Step 1: LLM extracts atomic claims from generated answer:
+#   Answer: "The warranty covers 2 years. Accidental drops are not included."
+#   Claims: ["Warranty is 2 years", "Accidental drops are not included"]
+#
+# Step 2: Evaluator verifies each claim against retrieved context:
+#   Context: "Products have a 2-year warranty covering manufacturer defects."
+#   - Claim 1: SUPPORTED by context (True)
+#   - Claim 2: NOT MENTIONED in context (False - Hallucination!)
+#
+# Faithfulness Score = 1 / 2 = 0.50 (Failed threshold!)</code></pre><div class="callout"><p><strong>The Target Threshold:</strong> In enterprise production RAG systems, set a minimum <strong>Faithfulness threshold of 0.95</strong>. Responses falling below 0.95 should be flagged or blocked before reaching users.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the generation evaluation sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to evaluate RAG generation using Faithfulness and Answer Relevance metrics.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where evaluating generation: faithfulness and answer relevance applies.</li>
+    <li>Author a unit test or verification script exercising evaluating generation: faithfulness and answer relevance.</li>
+    <li>Document team architectural conventions regarding evaluating generation: faithfulness and answer relevance.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Evaluating Generation: Faithfulness and Answer Relevance.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "How does the 'Faithfulness' metric mathematically evaluate an LLM response in a RAG pipeline?",
+    a: ["It breaks the response into atomic claims and calculates the ratio of claims that can be logically inferred from the retrieved context","It checks if the model used polite language","It counts the number of words in the answer","It measures the speed of the GPU"],
+    c: 0,
+    why: "Faithfulness measures the proportion of generated claims directly supported by the retrieved context."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1. Extract Claims",
+            "lines": [
+                  "Break response into atomic propositions",
+                  "Isolates individual factual assertions"
+            ]
+      },
+      {
+            "title": "2. Verify Against Context",
+            "lines": [
+                  "Check each claim against source chunks",
+                  "Marks claims: Supported or Unsupported"
+            ]
+      },
+      {
+            "title": "3. Compute Ratio",
+            "lines": [
+                  "Supported Claims / Total Claims",
+                  "Score: 1.0 = Pure Grounding, 0.5 = 50% Hallucination"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Evaluating Generation: Faithfulness and Answer Relevance",
+      "def execute_flow():",
+      "    # Measuring generation quality: Faithfulness (checki...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Evaluating Generation: Faithfulness and Answer Relevance"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "User Query"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Generated Answer"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "step": "Relevance Score"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Faithfulness measures the proportion of generated claims supported by {1}, while answer relevance measures alignment with user {2}."
+],
+    blanks: [
+      {
+            "a": [
+                  "context"
+            ],
+            "why": "Retrieved source document chunks"
+      },
+      {
+            "a": [
+                  "intent"
+            ],
+            "why": "The user's original question and goal"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What happens if a RAG answer contains 4 claims, and 3 are supported by context while 1 is an ungrounded hallucination?",
+      a: ["The Faithfulness score is 3/4 = 0.75, which fails standard enterprise quality thresholds","The score is 1.0","The score is 0.0","The system crashes"],
+      c: 0,
+      why: "Faithfulness calculates the exact proportion of supported claims (3/4 = 0.75)."
+    },
+    {
+      q: "How does Ragas measure Answer Relevance without relying on human subjective scoring?",
+      a: ["It instructs an LLM to generate candidate questions from the answer, then computes cosine similarity between those questions and the original query","By counting exclamation points","By measuring response length","By checking word spellings"],
+      c: 0,
+      why: "Semantic similarity between reverse-generated questions and the original query quantifies relevance."
+    },
+    {
+      q: "What is the recommended target threshold for Faithfulness in customer-facing production RAG systems?",
+      a: ["At least 0.95 (95%+ of claims directly grounded in retrieved context)","0.10","0.50","Zero"],
+      c: 0,
+      why: "Enterprise customer trust requires near-perfect (95%+) factual grounding."
+    },
+    {
+      q: "If Faithfulness is 1.0 but Answer Relevance is low, what is the most likely root cause?",
+      a: ["The model is reciting facts from the context that fail to answer the user's specific question, or the prompt template is unhelpful","The database is deleted","The model has no parameters","The internet is disconnected"],
+      c: 0,
+      why: "The model is grounded in the text, but off-topic relative to the user's intent."
+    }
+  ]);
+</script>
+</body>
+</html>

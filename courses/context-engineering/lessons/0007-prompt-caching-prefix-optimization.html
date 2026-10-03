@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 07 — Prompt Caching and Prefix Optimization</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="context-engineering" data-lesson="7" data-lesson-id="prompt-caching-prefix-optimization">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 07</span> · Caching Optimization</span>
+
+  <h1 class="lesson-title">Prompt Caching and Prefix Optimization</h1>
+  <p class="lesson-lede">
+    Leveraging LLM prompt caching (Anthropic, OpenAI, DeepSeek) by structuring prompts with static prefixes.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to structure prompts to maximize prompt caching discounts and latency speedups.</span>
+    <span><b>Mission link</b> Mastering prompt caching and prefix optimization across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Prompt Caching and Prefix Optimization</h2>
+  <p>In 2024, frontier model providers (Anthropic, OpenAI, DeepSeek, Google) introduced a game-changing architectural feature: <strong>Prompt Caching</strong> (KV-Cache Reuse). When two requests share an identical prompt prefix, the provider does not re-compute attention over those tokens; it loads the pre-computed Key-Value (KV) cache from memory.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Leveraging LLM prompt caching (Anthropic, OpenAI, DeepSeek) by structuring prompts with static prefixes.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The KV-Cache Reuse Boundary</h2>
+  <p>Prompt caching offers staggering benefits:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Cache Invalidation Pitfall</h2>
+  <ul><li><strong>Cost:</strong> Cached input tokens are discounted by 50% to 90%!</li><li><strong>Latency:</strong> Time-to-First-Token drops from 8 seconds to under 800 milliseconds!</li></ul><p>However, prompt caching requires strict <strong>Prefix Discipline</strong>. Caching works from the top down. If you change a single character on line 1, the entire cache for the whole prompt is invalidated!</p><pre><code># PROMPT CACHING PREFIX STRUCTURE (Must be 100% Static!)
+[SYSTEM PROMPT]             -> 100% Static (Cached! 90% discount!)
+[REPO CONVENTIONS & MAP]    -> 100% Static (Cached!)
+[CORE TOOL DEFINITIONS]     -> 100% Static (Cached!)
+-------------------------------- CACHE BOUNDARY --------------------------------
+[DYNAMIC RETRIEVED FILES]   -> Semi-dynamic (Invalidates cache if changed)
+[CURRENT USER QUERY]        -> Dynamic (Processed fresh on each call)</code></pre><div class="callout"><p><strong>Rule of Caching:</strong> Never place dynamic elements (like timestamps, random IDs, or changing git hashes) at the top of your prompt! Keep the static prefix pristine to maximize cache hit rates.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the prompt caching sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to structure prompts to maximize prompt caching discounts and latency speedups.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where prompt caching and prefix optimization applies.</li>
+    <li>Author a unit test or verification script exercising prompt caching and prefix optimization.</li>
+    <li>Document team architectural conventions regarding prompt caching and prefix optimization.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Prompt Caching and Prefix Optimization.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "How does Prompt Caching reduce API costs and latency in modern LLM providers?",
+    a: ["The provider reuses pre-computed KV-cache states for identical prompt prefixes across requests, cutting cost up to 90%","The provider saves prompts to local floppy disks","The browser caches HTML pages in memory","The API skips running the neural network entirely"],
+    c: 0,
+    why: "KV-cache reuse avoids recomputing attention over large static prefixes, slashing cost and latency."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Static Prefix (Top)",
+            "lines": [
+                  "System prompt, conventions, tools",
+                  "100% Cache HIT -> 90% discount, 10x faster"
+            ]
+      },
+      {
+            "title": "Cache Checkpoint Boundary",
+            "lines": [
+                  "Provider checks prefix hash",
+                  "Exact match found in GPU RAM"
+            ]
+      },
+      {
+            "title": "Dynamic Suffix (Bottom)",
+            "lines": [
+                  "User query & dynamic diffs",
+                  "Only these new tokens are computed"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Prompt Caching and Prefix Optimization",
+      "def execute_flow():",
+      "    # Leveraging LLM prompt caching (Anthropic, OpenAI, ...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Prompt Caching and Prefix Optimization"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Timestamp on Line 1"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Static Top / Dynamic Bottom"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Prompt caching reuses pre-computed {1} states for identical prompt prefixes, requiring static elements to be placed at the {2}."
+],
+    blanks: [
+      {
+            "a": [
+                  "KV-cache"
+            ],
+            "why": "Key-Value attention cache in GPU memory"
+      },
+      {
+            "a": [
+                  "top"
+            ],
+            "why": "Beginning of the prompt"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What happens to prompt caching if you put a dynamic timestamp at the very beginning of the system prompt?",
+      a: ["It invalidates the entire cache for all subsequent tokens, causing a 0% cache hit rate and full pricing","The model runs in reverse","The prompt is rejected with an HTTP 400 error","The timestamp is automatically deleted"],
+      c: 0,
+      why: "Prompt caching matches prefixes from character zero; any change on line 1 busts the entire cache."
+    },
+    {
+      q: "What is the typical cost discount provided by major LLM APIs for cached prompt tokens?",
+      a: ["Between 50% and 90% discount compared to uncached input tokens","Exactly 1%","Cached tokens are 10x more expensive","There is no discount"],
+      c: 0,
+      why: "Providers offer massive discounts because cached tokens require almost zero GPU compute."
+    },
+    {
+      q: "Where should frequently changing elements (like the user query or active file diff) be placed?",
+      a: ["At the very end of the prompt, after all static, cached prefixes","At the very top of line 1","In a separate repository","In the file comments"],
+      c: 0,
+      why: "Placing dynamic text at the end preserves the large static prefix cache untouched."
+    },
+    {
+      q: "How does prompt caching improve the responsiveness of multi-turn coding agents?",
+      a: ["It cuts Time-to-First-Token from seconds to sub-second responses, making agent turns feel instantaneous","It eliminates the need for unit tests","It generates code without errors","It automatically merges pull requests"],
+      c: 0,
+      why: "Reusing cached attention matrices bypasses expensive pre-fill processing."
+    }
+  ]);
+</script>
+</body>
+</html>

@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 04 — Command Query Separation and side effects</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="clean-code" data-lesson="4" data-lesson-id="command-query-separation-and-side-effects">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 04</span> · Small Functions & Guards</span>
+
+  <h1 class="lesson-title">Command Query Separation and side effects</h1>
+  <p class="lesson-lede">
+    Asking a question shouldn't change the answer. Discover Bertrand Meyer's Command Query Separation (CQS) principle and eliminate hidden side effects.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Enforce Command Query Separation to eliminate hidden mutation side effects</span>
+    <span><b>Mission link</b> Prevents subtle bugs where reading data unexpectedly mutates system state</span>
+  </div>
+
+  <h2><span class="n">1</span>Asking a question must not change state</h2>
+  <p>Bertrand Meyer introduced the <b>Command Query Separation (CQS)</b> principle: every method should either be a <b>Command</b> (performs an action and mutates state, returning void) OR a <b>Query</b> (calculates and returns data, with zero side effects).</p><p>A function called <code>is_valid_user()</code> should never secretly update the user's password or send an email! When queries cause hidden side effects, developers cannot trust their code to inspect state without accidentally triggering mutations.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Commands change state but return void; Queries return data but cause zero side effects.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Command versus Query contract</h2>
+  <p>Understand the strict separation between state mutators and observational queries.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing CQS refactoring</h2>
+  <p>Trace how separating a getter from a mutator makes code predictable and testable.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of Command Query Separation.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can write predictable functions following CQS that do not cause hidden state mutations when queried.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit a function in your codebase that returns data while secretly modifying state.</li>
+    <li>Refactor it into two explicit functions: a command and a query.</li>
+    <li>Ensure all getter functions in your classes are pure and idempotent.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Bertrand Meyer, *Object-Oriented Software Construction* (Prentice Hall, 1988).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What violates Command Query Separation in 'boolean is_authenticated = login_and_charge_card()'?",
+    a: ["It mixes an informational query (is_authenticated) with a destructive financial mutation (charge_card) in one function","It takes zero arguments","It returns a boolean","The function name has underscores"],
+    c: 0,
+    why: "Calling a function that sounds like a check should not secretly charge a credit card."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Command (Action)",
+            "lines": [
+                  "user.activate()",
+                  "mutates state",
+                  "returns void / status"
+            ]
+      },
+      {
+            "title": "Query (Observation)",
+            "lines": [
+                  "user.is_active()",
+                  "pure inspection",
+                  "zero state changes!"
+            ]
+      },
+      {
+            "title": "The CQS Guarantee",
+            "lines": [
+                  "Calling a query 100 times",
+                  "leaves system state 100% identical!"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Bad (Violates CQS):",
+      "# def get_next_token(user): user.token_count += 1; return generate_token()",
+      "# Good (Separated):",
+      "def generate_token(): return crypto_token() # pure query",
+      "def record_token_usage(user): user.token_count += 1 # command"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "bad_cqs": "getter secretly mutates user.token_count"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "query": "generate_token is pure query; safe to call without mutating"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "command": "record_token_usage makes mutation explicit and visible"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The principle dividing functions into mutators and getters is Command <0> Separation.",
+      "A method that mutates state but returns void is a <1>.",
+      "A method that returns data with zero side effects is a <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "Query"
+            ],
+            "why": "CQS stands for Command Query Separation."
+      },
+      {
+            "a": [
+                  "command"
+            ],
+            "why": "Commands perform actions and mutate state."
+      },
+      {
+            "a": [
+                  "query"
+            ],
+            "why": "Queries inspect data without side effects."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the primary rule of the Command Query Separation (CQS) principle?",
+      a: ["A method should either be a command that modifies state, or a query that returns data, but never both","All SQL queries must be written in capital letters","Commands and queries must be stored in separate database files","Queries must run in separate operating system threads"],
+      c: 0,
+      why: "CQS ensures asking a question does not change the answer by isolating mutations from reads."
+    },
+    {
+      q: "Why are hidden side effects inside getter functions dangerous?",
+      a: ["Developers assume reading data is safe; hidden mutations cause mysterious state corruptions and test failures","They cause physical disk drives to overheat","Browsers block getter functions with side effects","They double the size of JavaScript files"],
+      c: 0,
+      why: "Callers expect getters to be observational; unexpected mutations break program predictability."
+    },
+    {
+      q: "What is an acceptable common exception to strict CQS in standard data structures?",
+      a: ["Stack pop() or Queue dequeue(), which removes an item (command) and returns it (query) in one atomic call","Writing to a relational database table","Rendering an HTML web page","Sending an HTTP request"],
+      c: 0,
+      why: "Stack.pop() is a classic pragmatic exception combining mutation with item retrieval."
+    },
+    {
+      q: "What is the modern architectural extension of CQS applied to distributed systems?",
+      a: ["CQRS (Command Query Responsibility Segregation)","REST APIs","Model-View-Controller","The Relational Model"],
+      c: 0,
+      why: "CQRS scales CQS to entire system architectures, separating read and write data models."
+    }
+  ]);
+</script>
+</body>
+</html>

@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 02 — The event loop and task queues</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="browser-events-async" data-lesson="2" data-lesson-id="the-event-loop-and-task-queues">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 02</span> · The Event Loop & Queues</span>
+
+  <h1 class="lesson-title">The event loop and task queues</h1>
+  <p class="lesson-lede">
+    How does setTimeout(fn, 0) run AFTER console.log? Discover the event loop, macrotasks, microtasks, and the strict priority rules governing browser concurrency.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Predict asynchronous execution timing between call stack, microtasks, and macrotasks</span>
+    <span><b>Mission link</b> The central concurrency model of modern browser JavaScript</span>
+  </div>
+
+  <h2><span class="n">1</span>The conductor of the browser</h2>
+  <p>The <b>Event Loop</b> is a continuous coordination loop that checks: <i>'Is the call stack empty?'</i> If yes, it checks the queues for waiting tasks.</p><p>Crucially, there are two different queues with different priorities: the <b>Macrotask Queue</b> (for <code>setTimeout</code>, <code>setInterval</code>, DOM events) and the <b>Microtask Queue</b> (for Promise callbacks and <code>queueMicrotask</code>). The engine drains the <i>entire</i> microtask queue before it touches a single macrotask.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Microtasks (Promises) always run before Macrotasks (setTimeout), as soon as the call stack clears.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The queue priority hierarchy</h2>
+  <p>Visualise the order in which the event loop processes tasks and render updates.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing microtask versus macrotask execution</h2>
+  <p>Trace how a microtask cuts in line ahead of a zero-delay setTimeout callback.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of event loop queues.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can accurately trace and predict the execution order of complex asynchronous code mixing promises and timers.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Run the classic 1, 4, 3, 2 prediction snippet in your browser console.</li>
+    <li>Schedule an explicit microtask using window.queueMicrotask().</li>
+    <li>Observe how an infinite microtask loop starves the UI from rendering.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Jake Archibald: *Tasks, microtasks, queues and schedules* (jakearchibald.com).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "console.log(1); setTimeout(() => console.log(2), 0); Promise.resolve().then(() => console.log(3)); console.log(4); What order prints?",
+    a: ["1, 4, 3, 2","1, 2, 3, 4","1, 4, 2, 3","2, 3, 1, 4"],
+    c: 0,
+    why: "Synchronous (1, 4) runs first; then microtask Promise (3); finally macrotask setTimeout (2)."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1. Call Stack",
+            "lines": [
+                  "synchronous code",
+                  "runs until empty"
+            ]
+      },
+      {
+            "title": "2. Microtask Queue",
+            "lines": [
+                  "Promises (.then, catch)",
+                  "drained completely to 0!"
+            ]
+      },
+      {
+            "title": "3. Macrotask Queue",
+            "lines": [
+                  "setTimeout, I/O",
+                  "runs ONE task, then checks microtasks again"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "setTimeout(() => console.log('timeout'), 0); # enqueues macrotask",
+      "Promise.resolve().then(() => console.log('promise')); # enqueues microtask",
+      "console.log('sync');"
+],
+    steps: [
+      {
+            "line": 2,
+            "vars": {
+                  "step_1": "'sync' logs immediately from call stack"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step_2": "'promise' logs from microtask queue (higher priority)"
+            }
+      },
+      {
+            "line": 0,
+            "vars": {
+                  "step_3": "'timeout' logs from macrotask queue"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Callbacks from Promises are placed in the <0> queue.",
+      "Callbacks from setTimeout are placed in the <1> queue.",
+      "The engine drains the entire microtask queue before running the next <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "microtask"
+            ],
+            "why": "Promises use the high-priority microtask queue."
+      },
+      {
+            "a": [
+                  "macrotask",
+                  "task"
+            ],
+            "why": "Timers and DOM events use the macrotask queue."
+      },
+      {
+            "a": [
+                  "macrotask",
+                  "task"
+            ],
+            "why": "Microtasks are drained between every single macrotask."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why does a Promise.then callback run before a setTimeout(fn, 0) callback?",
+      a: ["Promises are queued as microtasks, which are drained immediately before any macrotask runs","setTimeout adds a mandatory 1-second delay in all browsers","Promises execute in a different thread inside the CPU","setTimeout is deprecated in modern ECMAScript"],
+      c: 0,
+      why: "The event loop specification guarantees that microtasks drain before the next macrotask."
+    },
+    {
+      q: "What does setTimeout(fn, 0) actually do?",
+      a: ["Schedules fn as a macrotask to run on the next event loop turn after current sync and microtasks clear","Executes fn synchronously on line 0","Pauses the computer clock for zero seconds","Cancels the function execution"],
+      c: 0,
+      why: "A delay of 0ms simply yields execution, queueing the callback in the macrotask queue."
+    },
+    {
+      q: "What happens if a microtask recursively schedules another microtask forever?",
+      a: ["The microtask queue never empties, starving the event loop and completely locking the UI","The browser crashes with a stack overflow error","The browser promotes the tasks to macrotasks automatically","The computer screen dims"],
+      c: 0,
+      why: "Because microtasks drain completely before rendering, infinite microtasks freeze the page."
+    },
+    {
+      q: "When does the browser perform visual rendering and layout updates?",
+      a: ["Between event loop turns, after microtasks drain and before the next macrotask","Continuously inside the synchronous call stack","Only when the user moves the mouse cursor","Every 100 milliseconds regardless of JavaScript execution"],
+      c: 0,
+      why: "Rendering updates occur opportunistically between macrotask cycles after microtasks clear."
+    }
+  ]);
+</script>
+</body>
+</html>

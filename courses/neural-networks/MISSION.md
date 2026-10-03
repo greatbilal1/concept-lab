@@ -1,0 +1,3 @@
+# Mission — Neural Networks Visually
+
+Demystify the visual and mathematical physics of deep neural networks. Master the anatomy of artificial neurons, explore why non-linear activations like ReLU unlocked deep learning, trace forward matrix multiplications, navigate non-convex loss landscapes, derive the backpropagation chain rule, tune AdamW with cosine warmup, conquer vanishing gradients with residual skip connections, and visualize hierarchical representation learning.

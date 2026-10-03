@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 02 — Monoliths, modular monoliths, and microservices</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="software-architecture-patterns" data-lesson="2" data-lesson-id="monoliths-modular-monoliths-and-microservices">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 02</span> · Macro Architecture & Monoliths</span>
+
+  <h1 class="lesson-title">Monoliths, modular monoliths, and microservices</h1>
+  <p class="lesson-lede">
+    Microservices aren't free: you trade code complexity for operational complexity. Compare traditional Monoliths, Modular Monoliths, and Microservices across real engineering trade-offs.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Evaluate Monoliths, Modular Monoliths, and Microservices based on team size and operational scale</span>
+    <span><b>Mission link</b> The central macro-architectural debate in modern enterprise systems</span>
+  </div>
+
+  <h2><span class="n">1</span>The distributed trade-off</h2>
+  <p>A <b>Monolith</b> packages all features into a single deployment unit sharing a single database. It is easy to develop, easy to test, and deploys as one binary. But as teams grow to 100+ engineers, coordinating releases and scaling independent hot spots becomes challenging.</p><p><b>Microservices</b> split features into independently deployable network services. This buys <b>independent scaling and team autonomy</b>, but you pay a massive tax: <b>network latency, distributed data consistency, partial failure modes, and DevOps complexity</b>. A <b>Modular Monolith</b> offers a sweet spot: strict internal module boundaries inside a single deployable artifact!</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Microservices trade in-process code complexity for distributed operational complexity.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The three macro architectural shapes</h2>
+  <p>Compare the operational, deployment, and structural properties of the three architectures.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing in-process calls versus network RPC</h2>
+  <p>Trace the latency and failure differences between an in-memory method call and a microservice HTTP request.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your memory of monolith versus microservice trade-offs.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can evaluate architectural options objectively, championing modular monoliths where appropriate and choosing microservices only when organizational scale demands it.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your application to evaluate whether it is a tangled monolith or a modular monolith.</li>
+    <li>Draw module boundaries around a feature to prepare it for modular extraction.</li>
+    <li>List the operational prerequisites (monitoring, CI/CD, tracing) required before adopting microservices.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Sam Newman, *Building Microservices: Designing Fine-Grained Systems* (2nd Edition, O'Reilly, 2021).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is a 'Modular Monolith'?",
+    a: ["A single deployable application whose internal code is strictly partitioned into decoupled modules with zero direct database crosstalk","A monolith that has broken into ten pieces and crashed","A monolith running on ten different cloud providers","A database stored in memory"],
+    c: 0,
+    why: "Modular monoliths provide domain isolation and clean boundaries without distributed network operational overhead."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Monolith (Single Unit)",
+            "lines": [
+                  "1 deployment pipeline, 1 shared DB",
+                  "in-process calls in 0.001ms",
+                  "operational simplicity!"
+            ]
+      },
+      {
+            "title": "Modular Monolith (Sweet Spot)",
+            "lines": [
+                  "strict module boundaries",
+                  "single deployment artifact",
+                  "clean domain isolation without network lag!"
+            ]
+      },
+      {
+            "title": "Microservices (Distributed)",
+            "lines": [
+                  "20 independent services & DBs",
+                  "independent team deployment",
+                  "operational tax: network lag & distributed transactions"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Monolith: In-process method call",
+      "user = user_service.get(42) # executes in 0.00005 ms; cannot fail from network drop!",
+      "# Microservices: Over-the-network HTTP call",
+      "user = http.get('https://user-service/users/42') # executes in 15 ms (300,000x slower!)",
+      "# Vulnerable to: DNS timeouts, network drops, packet loss, TLS handshakes, 503 errors!"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "in_process": "memory pointer hop in sub-microsecond time with zero network failure risk"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "network_rpc": "crosses network stack; 15ms latency and multiple partial failure modes"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "An application packaged into a single deployment unit is a <0>.",
+      "A single deployable unit with strict internal module boundaries is a <1> monolith.",
+      "In microservices, each service must strictly own its own private <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "monolith"
+            ],
+            "why": "Monoliths deploy as a single artifact."
+      },
+      {
+            "a": [
+                  "modular"
+            ],
+            "why": "Modular monoliths enforce internal boundaries."
+      },
+      {
+            "a": [
+                  "database"
+            ],
+            "why": "Shared databases across microservices violate service autonomy."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the 'Golden Rule' of microservice database architecture?",
+      a: ["Each microservice must own its own private database; services must NEVER directly query another service's database tables","All microservices must share a single giant MySQL database table","Microservices are forbidden from using databases","Databases can only be accessed on weekends"],
+      c: 0,
+      why: "Shared databases recreate tight coupling at the storage layer, defeating independent deployment."
+    },
+    {
+      q: "Why do companies with small engineering teams (under 20 developers) often struggle with microservices?",
+      a: ["The operational overhead (container orchestration, service meshes, distributed tracing, network failures) consumes more engineering hours than feature development","Microservices can only be written by developers with PhDs","Cloud providers charge ten times more for small teams","Microservices do not run on Linux"],
+      c: 0,
+      why: "Small teams become bogged down in distributed plumbing instead of shipping product value."
+    },
+    {
+      q: "What is the primary advantage of a Modular Monolith over a traditional unorganized monolith?",
+      a: ["It enforces strict boundaries between domain modules in code, preventing spaghetti dependencies while preserving single-command deployment and 0ms in-process calls","It turns off the need for compiler optimization","It makes the application run without internet access","It eliminates the need for unit testing"],
+      c: 0,
+      why: "Modular monoliths give you clean architecture without the pain of distributed systems."
+    },
+    {
+      q: "What is the 'Strangler Fig' pattern in legacy software modernization?",
+      a: ["Gradually replacing specific features of a legacy monolith with new services around the edges until the old monolith is completely deprecated","Shutting down a company's servers without warning","Rewriting a 10-million line application from scratch over a weekend","Deleting all unit tests to move faster"],
+      c: 0,
+      why: "Strangler Fig migrates legacy systems incrementally feature-by-feature, minimizing risk."
+    }
+  ]);
+</script>
+</body>
+</html>

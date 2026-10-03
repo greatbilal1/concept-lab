@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 07 — Media queries and responsive units</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="css-layout" data-lesson="7" data-lesson-id="media-queries-and-responsive-units">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 07</span> · Responsive Design & Debugging</span>
+
+  <h1 class="lesson-title">Media queries and responsive units</h1>
+  <p class="lesson-lede">
+    Fixed pixel layouts belong in the 1990s. Master mobile-first media queries, relative units (rem, em), and mathematical functions like clamp() and min().
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Implement mobile-first responsive breakpoints and fluid clamp typography</span>
+    <span><b>Mission link</b> Ensures flawless rendering across all screen sizes from mobile to ultrawide</span>
+  </div>
+
+  <h2><span class="n">1</span>Mobile-first responsive architecture</h2>
+  <p>A <b>mobile-first</b> approach authors default styles for the smallest viewport first, using <code>@media (min-width: 768px)</code> to layer on complexity as screen real estate expands. This reduces CSS bloat on mobile devices and avoids overriding desktop styles.</p><p>Complement media queries with modern mathematical functions like <code>clamp(min, preferred, max)</code>. With <code>font-size: clamp(1rem, 2vw + 1rem, 2.5rem)</code>, text scales smoothly with screen size without a single breakpoint.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Author mobile-first with min-width queries; use clamp() for fluid, continuous scaling.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The relative unit taxonomy</h2>
+  <p>Understand why rem units protect user accessibility preferences over hardcoded pixels.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing mobile-first media query evaluation</h2>
+  <p>Trace how a browser evaluates min-width media queries as screen width expands.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your recall of responsive units and queries.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can build fluid responsive layouts and accessible typography that adapt gracefully across all device viewports.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Replace hardcoded px font sizes with accessible rem units.</li>
+    <li>Implement fluid heading typography using clamp().</li>
+    <li>Toggle responsive device mode in DevTools to test your site from 320px to 1440px.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    MDN Web Docs: *Responsive design* (developer.mozilla.org/en-US/docs/Learn/CSS/CSS_layout/Responsive_Design).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What does 'font-size: clamp(16px, 4vw, 32px)' do as the viewport width expands from 300px to 2000px?",
+    a: ["Scales smoothly with viewport width, never shrinking below 16px and never growing above 32px","Remains locked permanently at 16px regardless of screen size","Toggles randomly between 16px and 32px","Causes the font to disappear on mobile devices"],
+    c: 0,
+    why: "clamp() mathematically bounds the dynamic 4vw value between 16px min and 32px max."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "rem (Root EM)",
+            "lines": [
+                  "relative to root <html> font-size",
+                  "respects user browser accessibility settings"
+            ]
+      },
+      {
+            "title": "em",
+            "lines": [
+                  "relative to parent font-size",
+                  "compounds in nested elements"
+            ]
+      },
+      {
+            "title": "vw / vh (Viewport)",
+            "lines": [
+                  "1vw = 1% of viewport width",
+                  "1vh = 1% of viewport height"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "/* Default (Mobile): 1 column */",
+      ".grid { display: flex; flex-direction: column; }",
+      "/* Tablet breakpoint (>= 768px): 2 columns */",
+      "@media (min-width: 768px) { .grid { flex-direction: row; } }",
+      "/* Desktop breakpoint (>= 1024px): 3 columns */",
+      "@media (min-width: 1024px) { .grid { gap: 2rem; } }"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "screen_400px": "mobile styles: 1 vertical column"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "screen_800px": "min-width: 768px triggers: switched to row"
+            }
+      },
+      {
+            "line": 5,
+            "vars": {
+                  "screen_1200px": "min-width: 1024px triggers: gap expanded"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The CSS unit relative to the root html element font-size is <0>.",
+      "The CSS function clamping values between min, val, and max is <1>().",
+      "Authoring styles for phones first using min-width is <2>-first design."
+],
+    blanks: [
+      {
+            "a": [
+                  "rem"
+            ],
+            "why": "rem scales based on the root font-size setting."
+      },
+      {
+            "a": [
+                  "clamp"
+            ],
+            "why": "clamp(min, preferred, max) bounds fluid values."
+      },
+      {
+            "a": [
+                  "mobile"
+            ],
+            "why": "Mobile-first builds progressive enhancements upward."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why are 'rem' units preferred over 'px' for font sizing in accessible design?",
+      a: ["rem units respect user font-size accessibility preferences set in browser settings; px overrides them","rem units download faster over the internet than px units","px units cannot be displayed on Apple Retina screens","rem units automatically convert English into other languages"],
+      c: 0,
+      why: "Users with visual impairments configure larger default browser fonts; rem scales with this setting."
+    },
+    {
+      q: "What is the primary advantage of a mobile-first media query strategy?",
+      a: ["It writes simpler default styles for constrained screens and progressively enhances for larger displays","It allows websites to run without internet connections","It completely eliminates the need for CSS Grid","It increases mobile battery life by fifty percent"],
+      c: 0,
+      why: "Mobile-first keeps mobile styles lightweight and avoids writing desktop overrides."
+    },
+    {
+      q: "What does '100vw' represent in CSS?",
+      a: ["100 percent of the current viewport width","100 vector watts of power","100 virtual words of text","The maximum width of a computer monitor"],
+      c: 0,
+      why: "vw stands for viewport width; 1vw equals 1/100th of the visible browser window width."
+    },
+    {
+      q: "What does the 'min(90vw, 1200px)' pattern achieve on a container max-width?",
+      a: ["Caps the container at 1200px on large screens, while leaving a 5% margin on screens narrower than 1200px","Shrinks the container to 0 pixels on mobile phones","Forces the container to be 1200px wide on all mobile phones","Deletes content that exceeds 1200 characters"],
+      c: 0,
+      why: "min() chooses whichever value is smaller, providing automatic breathing room on small screens."
+    }
+  ]);
+</script>
+</body>
+</html>

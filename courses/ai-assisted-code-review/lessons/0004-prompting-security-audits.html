@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 04 — Prompting for Security Audits and Vulnerabilities</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="ai-assisted-code-review" data-lesson="4" data-lesson-id="prompting-security-audits">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 04</span> · Security Audits</span>
+
+  <h1 class="lesson-title">Prompting for Security Audits and Vulnerabilities</h1>
+  <p class="lesson-lede">
+    Directing AI agents to perform targeted security reviews: SQL injection, SSRF, XSS, and authorization leaks.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to direct AI agents to conduct rigorous security reviews.</span>
+    <span><b>Mission link</b> Mastering prompting for security audits and vulnerabilities across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Prompting for Security Audits and Vulnerabilities</h2>
+  <p>Asking an agent a generic question like <em>'Is this code secure?'</em> will produce a useless, generic answer: <em>'Yes, this code looks good, but always remember to use HTTPS.'</em></p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Directing AI agents to perform targeted security reviews: SQL injection, SSRF, XSS, and authorization leaks.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Targeted Security Audits</h2>
+  <p>To conduct a real security review, you must give the agent an <strong>explicit threat model</strong> and direct it to hunt for specific vulnerability classes:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>IDOR Vulnerability Scan</h2>
+  <ul><li><strong>1. Insecure Direct Object References (IDOR):</strong> Can user A access `/invoices/104` belonging to user B simply by changing the ID parameter?</li><li><strong>2. SQL & Command Injection:</strong> Are parameters concatenated directly into SQL queries or shell strings rather than parameterized?</li><li><strong>3. SSRF (Server-Side Request Forgery):</strong> Does the endpoint fetch URLs supplied by users without validating IP ranges (blocking `169.254.169.254` and `localhost`)?</li><li><strong>4. Broken Object-Level Authorization (BOLA):</strong> Are permission checks performed on every single entity access?</li></ul><pre><code># The High-Signal Security Audit Prompt:
+"Perform a focused security audit on src/endpoints/documents.py.
+Threat Model: Unauthenticated external attacker and malicious tenant user.
+Audit explicitly for:
+1. IDOR: Verify that document queries enforce `WHERE tenant_id = current_user.tenant_id`.
+2. SSRF: Audit the URL fetch utility in line 54 for private IP range blocking.
+3. Injection: Verify all database calls use parameterized ORM queries.
+Provide concrete proof of any vulnerability found with attack payload examples."</code></pre><div class="callout"><p><strong>Defense in Depth:</strong> Combine AI security audits with automated static analysis tools (Semgrep, Bandit, Snyk) for multi-layered protection.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the security audit sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to direct AI agents to conduct rigorous security reviews.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where prompting for security audits and vulnerabilities applies.</li>
+    <li>Author a unit test or verification script exercising prompting for security audits and vulnerabilities.</li>
+    <li>Document team architectural conventions regarding prompting for security audits and vulnerabilities.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Prompting for Security Audits and Vulnerabilities.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "How do you effectively prompt an AI agent to perform a security audit on a codebase?",
+    a: ["Provide specific threat models and prompt for dedicated vulnerability classes (e.g. OWASP Top 10, IDOR, SQL injection)","Ask the agent: 'Is this code safe?'","Prompt the agent with: 'Act as a hacker and break everything'","Security cannot be audited with AI"],
+    c: 0,
+    why: "Targeted threat models and explicit vulnerability classes yield rigorous, actionable security findings."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Generic Prompt (Useless)",
+            "lines": [
+                  "'Is this code secure?'",
+                  "Vague answer, misses critical flaws"
+            ]
+      },
+      {
+            "title": "Targeted Threat Model (Actionable)",
+            "lines": [
+                  "Audit for IDOR, SSRF, Injection",
+                  "Discovers missing tenant_id check",
+                  "Provides exploit payload proof"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Prompting for Security Audits and Vulnerabilities",
+      "def execute_flow():",
+      "    # Directing AI agents to perform targeted security r...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Prompting for Security Audits and Vulnerabilities"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Vulnerable Query"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Secured Query"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Effective security audits provide explicit {1} models and target specific vulnerability classes like IDOR, SSRF, and SQL {2}."
+],
+    blanks: [
+      {
+            "a": [
+                  "threat"
+            ],
+            "why": "Profile of attackers and assets"
+      },
+      {
+            "a": [
+                  "injection"
+            ],
+            "why": "Command or query injection"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is an Insecure Direct Object Reference (IDOR) vulnerability?",
+      a: ["Allowing a user to access a resource simply by providing its ID without verifying ownership or permission","An error when a Python object is None","A missing CSS stylesheet","A hardware memory leak"],
+      c: 0,
+      why: "IDOR occurs when an application exposes a database key without validating caller authorization."
+    },
+    {
+      q: "Why is Server-Side Request Forgery (SSRF) particularly dangerous in cloud environments?",
+      a: ["Attackers can force the server to query cloud metadata services (e.g. 169.254.169.254) to steal IAM credentials","It deletes the cloud hosting account","It turns off the cloud data center power","It renames git branches"],
+      c: 0,
+      why: "SSRF allows attackers to query internal network services and cloud metadata endpoints."
+    },
+    {
+      q: "How does providing a concrete threat model improve an agent's security review?",
+      a: ["It focuses the model on realistic attacker capabilities and specific architectural boundaries","It makes the model run in parallel","It bypasses all rate limits","It encrypts the prompt"],
+      c: 0,
+      why: "Threat models provide the boundary conditions needed to evaluate attack surfaces systematically."
+    },
+    {
+      q: "Why should automated security linters (like Semgrep or Bandit) run alongside AI code reviews?",
+      a: ["Deterministic AST linters never hallucinate and catch known security patterns with 100% reliability","Linters are required by the US government","Linters run on quantum computers","Linters eliminate the need for firewalls"],
+      c: 0,
+      why: "Static security analyzers provide deterministic, rule-based coverage that complements LLM reasoning."
+    }
+  ]);
+</script>
+</body>
+</html>

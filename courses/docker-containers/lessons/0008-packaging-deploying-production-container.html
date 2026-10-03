@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 08 — Packaging and Deploying a Production Containerized Service</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="docker-containers" data-lesson="8" data-lesson-id="packaging-deploying-production-container">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 08</span> · Container Deployment</span>
+
+  <h1 class="lesson-title">Packaging and Deploying a Production Containerized Service</h1>
+  <p class="lesson-lede">
+    Synthesizing containerization: building production images, passing automated Trivy gates, and deploying to cloud registries and runners.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You have completed the Docker & Containers course.</span>
+    <span><b>Mission link</b> Mastering packaging and deploying a production containerized service across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Packaging and Deploying a Production Containerized Service</h2>
+  <p>We have covered the complete engineering discipline of Docker & Containers: kernel namespaces and cgroups, Union File System layer caching, production multi-stage Dockerfiles, non-root users, container networking and DNS, persistent storage volumes, multi-container Docker Compose, and distroless hardening.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Synthesizing containerization: building production images, passing automated Trivy gates, and deploying to cloud registries and runners.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Production Container Release Pipeline</h2>
+  <p>Now, we synthesize these into an <strong>End-to-End Production Container Pipeline</strong>:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>The Power of Immutable Git SHA Tags</h2>
+  <ul><li><strong>1. Build Multi-Stage Hardened Image:</strong> Compile dependencies in a builder stage; assemble final runtime on an unprivileged `USER 1000` base with `.dockerignore` pruning.</li><li><strong>2. Automated Security Verification (Trivy):</strong> Scan image in CI/CD. Fail build if any High/Critical CVE is discovered.</li><li><strong>3. Multi-Service Validation (Docker Compose):</strong> Execute integration test suite across web, database, and Redis services using `compose.yaml` with healthcheck gates.</li><li><strong>4. Tagging & Registry Push:</strong> Tag with immutable git SHA (e.g. `company/api:a849f2b`) and push to AWS ECR or GitHub Container Registry (GHCR). <em>Never rely on mutable `latest` tags in production!</em></li></ul><pre><code># The Complete Production Deployment Script (deploy.sh):
+# 1. Build hardened production image with git SHA tag:
+COMMIT_SHA=$(git rev-parse --short HEAD)
+IMAGE_URI="ghcr.io/company/prod-service:${COMMIT_SHA}"
+
+docker build -t "$IMAGE_URI" .
+
+# 2. Automated Vulnerability Gate
+trivy image --exit-code 1 --severity CRITICAL "$IMAGE_URI"
+
+# 3. Push immutable versioned image to Container Registry
+docker push "$IMAGE_URI"
+
+# 4. Deploy to Kubernetes / ECS cluster with zero downtime!
+echo "Successfully published $IMAGE_URI to production registry!"</code></pre><div class="callout"><p><strong>The Immutable Tag Law:</strong> Never deploy `:latest` to production. Always deploy immutable tags pinned to the git commit SHA. If an issue occurs, you can roll back instantly to the exact prior commit.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the container deployment sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You have completed the Docker & Containers course.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where packaging and deploying a production containerized service applies.</li>
+    <li>Author a unit test or verification script exercising packaging and deploying a production containerized service.</li>
+    <li>Document team architectural conventions regarding packaging and deploying a production containerized service.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Packaging and Deploying a Production Containerized Service.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What complete sequence of operations defines a production-grade container release pipeline?",
+    a: ["Multi-stage build, non-root user enforcement, automated vulnerability scanning with Trivy, image signing, and deployment to a container registry","Writing code in Notepad and uploading to FTP","Sending Dockerfiles via email","Running containers without building images"],
+    c: 0,
+    why: "Production release pipelines build lean multi-stage images, enforce non-root security, scan for CVEs, and publish to registries."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1. Multi-Stage Build",
+            "lines": [
+                  "Prunes build tools, runs as non-root",
+                  "Leaves zero dev dependencies behind"
+            ]
+      },
+      {
+            "title": "2. Trivy Security Gate",
+            "lines": [
+                  "Scans for CVEs in CI pipeline",
+                  "Exits code 1 on Critical vulnerabilities"
+            ]
+      },
+      {
+            "title": "3. Push to GHCR / ECR",
+            "lines": [
+                  "Tagged with immutable git commit SHA",
+                  "Published to production cloud registry"
+            ]
+      },
+      {
+            "title": "4. Rolling Cloud Deploy",
+            "lines": [
+                  "ECS / Kubernetes pulls verified image",
+                  "Zero-downtime rolling update!"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Packaging and Deploying a Production Containerized Service",
+      "def execute_flow():",
+      "    # Synthesizing containerization: building production...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Packaging and Deploying a Production Containerized Service"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Deploying :latest (Brittle)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Deploying :a849f2 (Deterministic)"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Production container pipelines build multi-stage images, verify security with automated {1} scans, and deploy using immutable {2} commit SHA tags."
+],
+    blanks: [
+      {
+            "a": [
+                  "vulnerability"
+            ],
+            "why": "CVE security testing"
+      },
+      {
+            "a": [
+                  "git"
+            ],
+            "why": "Version control commit hash"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why is deploying Docker images tagged as ':latest' considered an enterprise anti-pattern?",
+      a: ["':latest' is a mutable tag that can change unexpectedly, making deployments non-reproducible and rollback to exact prior versions impossible","':latest' is illegal in Kubernetes","':latest' makes images 10x larger","Docker deletes ':latest' images"],
+      c: 0,
+      why: "Mutable ':latest' tags break reproducibility and prevent instant, reliable rollbacks."
+    },
+    {
+      q: "What is an 'Image Registry' (like AWS ECR, Docker Hub, or GitHub Container Registry)?",
+      a: ["A secure, centralized cloud storage service where versioned Docker image artifacts are stored, cataloged, and pulled by production clusters","A list of computer names","A website for buying domains","A database query optimizer"],
+      c: 0,
+      why: "Container registries act as the central distribution hub for versioned container images."
+    },
+    {
+      q: "How does a healthcheck instruction in a Dockerfile or Compose file enable zero-downtime rolling deployments in Kubernetes?",
+      a: ["The orchestrator waits for the new container's healthcheck to pass before terminating the old container, ensuring uninterrupted service for users","It turns off the old container immediately","It deletes the database","It makes servers run for free"],
+      c: 0,
+      why: "Healthchecks ensure that incoming traffic is only routed to newly spawned containers once they are fully initialized."
+    },
+    {
+      q: "What is the ultimate mark of an expert DevOps and container engineer?",
+      a: ["Authoring minimal, secure, non-root multi-stage containers that build fast via layer caching and deploy reliably via immutable pipelines","Writing 1,000-line Dockerfiles","Running all containers as root to avoid errors","Deploying code without testing"],
+      c: 0,
+      why: "Minimal size, non-root execution, fast caching, and immutable tagging define container craftsmanship."
+    }
+  ]);
+</script>
+</body>
+</html>

@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 01 — A module is just a file</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="python-modules-packages" data-lesson="1" data-lesson-id="module-is-a-file">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 01</span> · Imports</span>
+
+  <h1 class="lesson-title">A module is just a file</h1>
+  <p class="lesson-lede">
+    You have been writing one file at a time. The moment a program grows past a
+    screenful, that stops working — and the fix is not a new language feature. It
+    is a file. This lesson shows you that "module" is a fancy word for something
+    you already know how to make.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Split one file into two</span>
+    <span><b>Mission link</b> The unit every Python project is built from</span>
+  </div>
+
+  <h2><span class="n">1</span>The problem with one big file</h2>
+
+  <p>
+    Imagine a script that reads a CSV, cleans the rows, computes a summary, writes
+    a report, and emails it. That is five jobs in one file. It works — until you
+    want to reuse the cleaning step somewhere else, or test the summary without
+    sending an email, or find the bug that only happens on Tuesdays.
+  </p>
+
+  <p>
+    The fix is the oldest one in programming: <b>put related code in its own file</b>.
+    Python gives that idea a name. A file of Python code that other files can load
+    is called a <b>module</b>.
+  </p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    A module is not a special kind of file. It is <b>any</b> <code>.py</code> file
+    that something else imports. The word describes a <i>role</i>, not a format.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>What "importing" actually does</h2>
+
+  <p>
+    When you write <code>import helpers</code>, Python does three things, in order:
+  </p>
+
+  <div id="intro1"></div>
+
+  <p>
+    The second step is the one people miss. Importing a module <b>runs its top-level
+    code</b> — every statement not inside a function or class. That is why a module
+    with a stray <code>print()</code> at the top prints the moment you import it.
+  </p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">3</span>Names travel with the module</h2>
+
+  <p>
+    Everything defined at the top level of a module — functions, classes, constants —
+    becomes an <b>attribute</b> of the module object. If <code>helpers.py</code>
+    defines <code>clean_row</code>, then after <code>import helpers</code> you reach
+    it as <code>helpers.clean_row</code>.
+  </p>
+
+  <p>
+    That dot is not decoration. It is the whole point: the module name is a
+    <b>namespace</b>, a prefix that keeps your names from colliding with everyone
+    else's. Two modules can both define <code>clean</code> and nothing breaks,
+    because one is <code>helpers.clean</code> and the other is <code>csv_tools.clean</code>.
+  </p>
+
+  <div id="diagram1"></div>
+
+  <div class="note good">
+    <span class="note-label">Why this matters later</span>
+    Every package, every library, every framework you will ever install is built
+    from this one move: a file, imported by name, exposing its top-level names as
+    attributes. Once you see it here, you will see it everywhere.
+  </div>
+
+  <h2><span class="n">4</span>Split a file, right now</h2>
+
+  <p>
+    Take a script with two functions and a constant. Move the reusable parts into
+    <code>helpers.py</code> and import them back:
+  </p>
+
+  <pre><code># helpers.py
+TAX_RATE = 0.2
+
+def with_tax(price):
+    return price * (1 + TAX_RATE)
+
+# main.py
+import helpers
+
+print(helpers.with_tax(50))   # 60.0
+print(helpers.TAX_RATE)       # 0.2</code></pre>
+
+  <p>
+    Nothing was rewritten. The code moved, and a name was bound. That is the entire
+    operation, and it scales to a hundred files without changing shape.
+  </p>
+
+  <div id="fill1"></div>
+
+  <h2><span class="n">5</span>Check yourself</h2>
+
+  <p>
+    Answer from memory — do not scroll back up. Each option has the same number of
+    words, so nothing gives the answer away.
+  </p>
+
+  <div id="quiz"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>
+      You can now take a single-file script and split it into a module plus a
+      caller, and you know exactly what happens when Python executes the import.
+      That is the foundation the next nine lessons stand on.
+    </p>
+  </div>
+
+  <h2><span class="n">6</span>Do this next</h2>
+
+  <ol>
+    <li>
+      Take any script you have written with more than one function. Move the
+      reusable functions into a second file and import them back.
+    </li>
+    <li>
+      Add a <code>print("loading helpers")</code> at the top of the module and
+      import it twice. Notice it prints once — the module cache is doing its job.
+    </li>
+    <li>
+      Deliberately break it: import a module that does not exist and read the
+      <code>ModuleNotFoundError</code> message carefully. You will meet it again.
+    </li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Read the Python tutorial's
+    <a href="https://docs.python.org/3/tutorial/modules.html">Modules chapter</a>,
+    sections 6.1 and 6.2. It is short, official, and says exactly what this lesson
+    says with fewer jokes.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher (me) anything — "what happens if two
+    modules have the same name?", "can a module import itself?", "why does the
+    module cache exist?". There are no bad questions here.
+  </div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  /* the three steps of an import */
+  TeachWidgets.introCards("#intro1", {
+    cards: [
+      { ico: "🔍", title: "Find the file", body: "Python searches its import path for a matching .py file." },
+      { ico: "▶️", title: "Run it once", body: "The module's top-level code executes, top to bottom, one time." },
+      { ico: "🏷️", title: "Bind the name", body: "A name in your file now points at the module object." }
+    ]
+  });
+
+  /* predict-then-reveal */
+  TeachWidgets.predict("#predict1", {
+    q: "You import the same module from two different files. How many times does its top-level code run?",
+    a: ["Once per importing file", "Once in total, ever", "Every time it is imported"],
+    c: 1,
+    why: "Python caches modules in sys.modules. The first import runs the file; every later import returns the cached object without re-running anything."
+  });
+
+  /* step-through trace of an import */
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "import helpers",
+      "  -> search sys.path for helpers.py",
+      "  -> execute helpers.py top to bottom",
+      "  -> store module in sys.modules",
+      "  -> bind name 'helpers' here"
+    ],
+    steps: [
+      { line: 0, vars: { statement: "import helpers" } },
+      { line: 1, vars: { found: "helpers.py" } },
+      { line: 2, vars: { ran: "TAX_RATE = 0.2, def with_tax" } },
+      { line: 3, vars: { cached: "sys.modules['helpers']" } },
+      { line: 4, vars: { bound: "helpers -> module object" } }
+    ]
+  });
+
+  /* module as a namespace */
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      { title: "helpers", lines: ["module object", "namespace"] },
+      { title: "helpers.TAX_RATE", lines: ["0.2", "constant"] },
+      { title: "helpers.with_tax", lines: ["function", "callable"] }
+    ]
+  });
+
+  /* recall from memory */
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — complete the import",
+    lines: [
+      "To load a module called <code>helpers</code>: <0> helpers",
+      "To call its <code>with_tax</code> function: helpers.<1>(50)",
+      "The module's top-level code runs <2> time(s) no matter how many imports."
+    ],
+    blanks: [
+      { a: ["import"], why: "The plain import statement binds the module object under its own name." },
+      { a: ["with_tax"], why: "Top-level functions become attributes, reached with a dot." },
+      { a: ["one", "1"], why: "The module cache means the file executes exactly once per process." }
+    ]
+  });
+
+  /* the quiz — every option is exactly three words */
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is a module?",
+      a: ["A special Python file", "A file that is imported", "A folder of many files", "A built in function"],
+      c: 1,
+      why: "Any .py file that another file imports is playing the role of a module."
+    },
+    {
+      q: "What happens on import?",
+      a: ["Only the functions load", "The file runs top level", "Nothing runs until called", "The file is copied over"],
+      c: 1,
+      why: "Importing executes the module's top-level statements once, then caches the result."
+    },
+    {
+      q: "Why does the module name matter?",
+      a: ["It makes imports much faster", "It acts as a namespace", "It must match the class", "It controls the file order"],
+      c: 1,
+      why: "The module name prefixes its contents, so two modules can define the same name safely."
+    },
+    {
+      q: "How do you reach a function?",
+      a: ["Call it by bare name", "Use the module dot name", "Import it into globals", "Reference the file path"],
+      c: 1,
+      why: "After import helpers, you call helpers.with_tax — the dot reaches into the module namespace."
+    }
+  ]);
+</script>
+</body>
+</html>

@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 02 — Manipulating files and directories</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="command-line-shell" data-lesson="2" data-lesson-id="manipulating-files-and-directories">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 02</span> · Filesystem & Navigation</span>
+
+  <h1 class="lesson-title">Manipulating files and directories</h1>
+  <p class="lesson-lede">
+    Creating, copying, moving, and removing files is the core of terminal productivity. Learn safe habits and powerful shell wildcard matching.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Manage files and directories safely using cp, mv, rm, and wildcards</span>
+    <span><b>Mission link</b> Prevents accidental data loss during file management</span>
+  </div>
+
+  <h2><span class="n">1</span>The atomic file verbs</h2>
+  <p>UNIX provides single-purpose file utilities: <code>touch</code> to create empty files or update timestamps, <code>mkdir -p</code> to create nested directory trees, <code>cp -r</code> to recursively copy folders, and <code>mv</code> to move or rename files.</p><p>Notice that <code>mv</code> handles both renaming and moving: in the UNIX filesystem, renaming a file is simply moving it to a new name in the same directory.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    In UNIX, renaming a file and moving a file are the exact same operation.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Shell glob wildcards</h2>
+  <p>The shell expands wildcards before passing arguments to commands: <code>*</code> matches any characters, <code>?</code> matches single characters, and <code>*.{jpg,png}</code> matches braces.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing directory tree creation</h2>
+  <p>Trace how mkdir -p creates multiple nested folder levels in a single operation.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your recall of essential file manipulation tools.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can manipulate complex nested file structures rapidly using atomic commands and wildcards.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Create a three-tier directory structure using a single mkdir -p command.</li>
+    <li>Copy multiple files using an asterisk glob pattern.</li>
+    <li>Rename a file using the mv command.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    William Shotts, *The Linux Command Line* (Chapter 4: 'Manipulating Files and Directories').
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What happens if you run 'mv report.txt docs/new_report.txt'?",
+    a: ["It creates a duplicate copy in docs and keeps the original","It moves the file into docs and renames it to new_report.txt in one step","It throws an error because mv cannot change filenames","It prints the text contents of the report to the terminal"],
+    c: 1,
+    why: "mv transfers the file to the destination path with the specified new filename."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "User Types",
+            "lines": [
+                  "rm *.log",
+                  "shell intercepts wildcard"
+            ]
+      },
+      {
+            "title": "Shell Expands",
+            "lines": [
+                  "matches: app.log, error.log",
+                  "passes explicit list"
+            ]
+      },
+      {
+            "title": "Command Runs",
+            "lines": [
+                  "rm app.log error.log",
+                  "files deleted safely"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "mkdir -p src/components/buttons",
+      "touch src/components/buttons/Primary.tsx",
+      "cp Primary.tsx Secondary.tsx",
+      "ls src/components/buttons"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "created": "3 nested directory levels"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "file_1": "Primary.tsx"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "file_2": "Secondary.tsx copied"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "contents": "Primary.tsx, Secondary.tsx"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The flag to create parent directories without error is mkdir <0>.",
+      "The flag to copy an entire directory recursively is cp <1>.",
+      "The wildcard symbol that matches zero or more characters is <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "-p"
+            ],
+            "why": "-p creates missing parent directories automatically."
+      },
+      {
+            "a": [
+                  "-r",
+                  "-R"
+            ],
+            "why": "-r enables recursive copying of directory trees."
+      },
+      {
+            "a": [
+                  "*",
+                  "asterisk"
+            ],
+            "why": "* expands to match any string of characters."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What does the -p flag do when creating directories with mkdir?",
+      a: ["Creates necessary parent directories and suppresses errors if they exist","Encrypts the created directory with user password authentication","Prints the memory address of the created directory in RAM","Sets read-only permissions on all child files"],
+      c: 0,
+      why: "mkdir -p builds the entire path hierarchy without failing if intermediate folders exist."
+    },
+    {
+      q: "Why must you exercise extreme caution with 'rm -rf'?",
+      a: ["It permanently deletes files and directories recursively without confirmation or recycle bin","It reboots the computer operating system immediately","It changes all file extensions into executable binary files","It revokes git commit privileges for current user accounts"],
+      c: 0,
+      why: "UNIX rm does not move files to a trash bin; removal is permanent and immediate."
+    },
+    {
+      q: "Who performs wildcard glob expansion when you run 'ls *.txt'?",
+      a: ["The shell expands the pattern before executing the ls binary","The ls binary program parses the wildcard itself","The hard drive hardware controller","The network DNS server"],
+      c: 0,
+      why: "The shell expands glob patterns into matching filenames before passing them as argv."
+    },
+    {
+      q: "How do you duplicate a directory and all its contents to a backup path?",
+      a: ["cp -r original/ backup/","mv original/ backup/","touch -d original/ backup/","cat original/ > backup/"],
+      c: 0,
+      why: "cp -r recursively copies directories, subdirectories, and files."
+    }
+  ]);
+</script>
+</body>
+</html>

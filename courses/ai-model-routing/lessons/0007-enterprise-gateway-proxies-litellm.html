@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 07 — Enterprise Gateway Proxies: LiteLLM, Portkey</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="ai-model-routing" data-lesson="7" data-lesson-id="enterprise-gateway-proxies-litellm">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 07</span> · Proxy Gateways</span>
+
+  <h1 class="lesson-title">Enterprise Gateway Proxies: LiteLLM, Portkey</h1>
+  <p class="lesson-lede">
+    Standardizing infrastructure: LiteLLM Proxy, Portkey, unified OpenAI-compatible interfaces, load balancing, and spend controls.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You know how to deploy and configure LiteLLM Proxy for enterprise load balancing and fallbacks.</span>
+    <span><b>Mission link</b> Mastering enterprise gateway proxies: litellm, portkey across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Enterprise Gateway Proxies: LiteLLM, Portkey</h2>
+  <p>Writing custom Python wrappers to handle SDK syntax differences between OpenAI, Anthropic, Bedrock, Vertex AI, and local vLLM creates spaghetti code. The industry solution is an <strong>Enterprise AI Gateway Proxy</strong>, with <strong>LiteLLM Proxy</strong> and <strong>Portkey</strong> leading the market.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Standardizing infrastructure: LiteLLM Proxy, Portkey, unified OpenAI-compatible interfaces, load balancing, and spend controls.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>LiteLLM Proxy Architecture</h2>
+  <p>What LiteLLM Proxy provides out of the box:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Virtual Keys & Spend Limits</h2>
+  <ul><li><strong>1. 100+ Models, 1 Unified API:</strong> Your application sends standard `client.chat.completions.create()` requests to LiteLLM. LiteLLM translates the request to Anthropic, Bedrock, Cohere, or Vertex AI transparently!</li><li><strong>2. Declarative Fallbacks & Retries:</strong> Configure fallbacks in a simple YAML file: <code>fallbacks: [{"gpt-4o": ["claude-3-5-sonnet", "gemini-1.5-pro"]}]</code>. LiteLLM handles all retry logic automatically!</li><li><strong>3. Load Balancing Across Keys:</strong> Distribute traffic across 5 different OpenAI API keys or Azure endpoints to bypass TPM (tokens-per-minute) rate limits!</li><li><strong>4. Virtual API Keys & Spend Limits:</strong> Issue internal virtual API keys to engineering teams with hard monthly budget caps ($500/month). When a team hits their cap, LiteLLM blocks their calls automatically!</li></ul><pre><code># LiteLLM Proxy Configuration (config.yaml):
+model_list:
+  - model_name: gpt-4o
+    litellm_params:
+      model: openai/gpt-4o
+      api_key: os.environ/OPENAI_API_KEY
+  - model_name: gpt-4o
+    litellm_params:
+      model: anthropic/claude-3-5-sonnet-20241022
+      api_key: os.environ/ANTHROPIC_API_KEY
+
+router_settings:
+  routing_strategy: "latency-based-routing" # Auto-routes to lowest latency!
+  fallbacks: [{"gpt-4o": ["claude-3-5-sonnet"]}]</code></pre><div class="callout"><p><strong>The Gateway Rule:</strong> Never hardcode cloud provider SDKs in application code. Route all application traffic through an enterprise proxy gateway.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the proxy gateway sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know how to deploy and configure LiteLLM Proxy for enterprise load balancing and fallbacks.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where enterprise gateway proxies: litellm, portkey applies.</li>
+    <li>Author a unit test or verification script exercising enterprise gateway proxies: litellm, portkey.</li>
+    <li>Document team architectural conventions regarding enterprise gateway proxies: litellm, portkey.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Enterprise Gateway Proxies: LiteLLM, Portkey.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is 'LiteLLM Proxy' and why has it become an industry standard for AI infrastructure?",
+    a: ["An open-source reverse proxy that provides a unified OpenAI-compatible API to 100+ LLMs with built-in load balancing, fallbacks, and cost tracking","A lightweight programming language","A brand of computer chips","A video player"],
+    c: 0,
+    why: "LiteLLM Proxy provides a standardized, unified proxy interface with native fallbacks, routing, and spend controls."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Application Code",
+            "lines": [
+                  "Calls http://litellm-proxy:4000/v1",
+                  "Standard OpenAI SDK syntax",
+                  "Zero provider-specific code"
+            ]
+      },
+      {
+            "title": "LiteLLM Proxy Core",
+            "lines": [
+                  "Load balances across keys & regions",
+                  "Executes fallbacks & circuit breakers",
+                  "Enforces team budgets & OTel traces"
+            ]
+      },
+      {
+            "title": "Downstream Providers",
+            "lines": [
+                  "OpenAI, Anthropic, Bedrock, vLLM",
+                  "Completely decoupled from app code"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Enterprise Gateway Proxies: LiteLLM, Portkey",
+      "def execute_flow():",
+      "    # Standardizing infrastructure: LiteLLM Proxy, Portk...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Enterprise Gateway Proxies: LiteLLM, Portkey"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Team Marketing Key"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "step": "Team Engineering Key"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Enterprise proxies like LiteLLM unify multi-provider access behind a standard {1} API interface while providing automated fallbacks, load balancing, and {2} tracking."
+],
+    blanks: [
+      {
+            "a": [
+                  "OpenAI"
+            ],
+            "why": "Standard /v1/chat/completions format"
+      },
+      {
+            "a": [
+                  "spend"
+            ],
+            "why": "Financial cost management and budgets"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "How does LiteLLM Proxy simplify application code for software engineering teams?",
+      a: ["Developers write standard OpenAI client code, and LiteLLM translates the calls to any model provider (Anthropic, Bedrock, Google) without custom SDKs","It writes the application code","It translates Python to C","It removes the need for tests"],
+      c: 0,
+      why: "A standardized API format decouples application code from diverse upstream provider interfaces."
+    },
+    {
+      q: "How does key load-balancing in LiteLLM prevent HTTP 429 rate-limit errors?",
+      a: ["It distributes requests across multiple API keys, enterprise organizations, or cloud regions in a round-robin or least-busy pattern","It makes rate limits illegal","It turns off the internet","It deletes half the requests"],
+      c: 0,
+      why: "Spreading traffic across multiple keys multiplies effective Tokens-Per-Minute quotas."
+    },
+    {
+      q: "What happens when an internal team exceeds its virtual key budget limit in LiteLLM Proxy?",
+      a: ["LiteLLM automatically rejects subsequent requests with HTTP 429 budget exceeded, protecting company cloud bills","The team is fired","The server shuts down","The database is deleted"],
+      c: 0,
+      why: "Virtual keys enforce hard budget ceilings at the gateway proxy layer."
+    },
+    {
+      q: "Can LiteLLM Proxy export telemetry traces to OpenTelemetry backends?",
+      a: ["Yes; it has built-in integration to export spans and token metrics to Langfuse, Datadog, OpenTelemetry, and Prometheus","No; proxies cannot do logging","Only in Linux","Only on Sundays"],
+      c: 0,
+      why: "LiteLLM natively emits structured OpenTelemetry traces and cost metrics for every routed call."
+    }
+  ]);
+</script>
+</body>
+</html>

@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 08 — Architecting a Highly Available, Fault-Tolerant Cloud Infrastructure</title>
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="cloud-architecture" data-lesson="8" data-lesson-id="architecting-highly-available-cloud">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 08</span> · Cloud Architecture</span>
+
+  <h1 class="lesson-title">Architecting a Highly Available, Fault-Tolerant Cloud Infrastructure</h1>
+  <p class="lesson-lede">
+    Synthesizing cloud architecture: unifying multi-AZ VPCs, autoscaling container clusters, RDS Multi-AZ, CDNs, and IAM governance.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> You have completed the Cloud Architecture course.</span>
+    <span><b>Mission link</b> Mastering architecting a highly available, fault-tolerant cloud infrastructure across modern software engineering</span>
+  </div>
+
+  <h2><span class="n">1</span>Core principles of Architecting a Highly Available, Fault-Tolerant Cloud Infrastructure</h2>
+  <p>We have covered the complete engineering discipline of Cloud Architecture: the mental model of cloud and shared responsibility, three-tier VPC design, compute paradigms (EC2, Lambda, EKS), storage hierarchies (EBS, S3, EFS), enterprise IAM federation, global traffic management, and disaster recovery.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Synthesizing cloud architecture: unifying multi-AZ VPCs, autoscaling container clusters, RDS Multi-AZ, CDNs, and IAM governance.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Complete Multi-AZ Cloud Architecture</h2>
+  <p>Now, we synthesize these into a <strong>Comprehensive Highly Available, Fault-Tolerant Cloud Blueprint</strong>:</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Disaster Survival Test</h2>
+  <ul><li><strong>1. Global Ingress Layer:</strong> Route 53 Anycast DNS routes to CloudFront CDN PoPs (terminates TLS, serves static cache in 15ms).</li><li><strong>2. Three-Tier Multi-AZ VPC:</strong> Spans two Availability Zones (`us-east-1a` and `us-east-1b`). Redundant Public, Private App, and Isolated Data subnets!</li><li><strong>3. Elastic Compute Cluster:</strong> Application Load Balancer routes traffic to autoscaling container pods in private subnets across both AZs.</li><li><strong>4. Resilient Database Tier:</strong> Amazon RDS PostgreSQL configured with <strong>Multi-AZ Synchronous Replication</strong>: if the primary DB instance in AZ-A fails, AWS promotes the standby replica in AZ-B in <strong>under 60 seconds</strong>!</li><li><strong>5. Enterprise Governance:</strong> Keyless OIDC deployments from GitHub Actions, centralized SSO, and S3 lifecycle tiering.</li></ul><pre><code># The Complete Fault-Tolerant Cloud Infrastructure Topology:
+[Global Users] ──(Route 53 DNS + CloudFront CDN Edge)──>
+       │
+[Application Load Balancer (ALB) across Multi-AZ]
+       ├── AZ-A Public Subnet (ALB-Node-A) ──> AZ-A Private Subnet (API Pod 1)
+       └── AZ-B Public Subnet (ALB-Node-B) ──> AZ-B Private Subnet (API Pod 2)
+                                                      │
+       ┌──────────────────────────────────────────────┘
+       ▼
+[Isolated Multi-AZ Database Tier]
+       ├── AZ-A: Primary PostgreSQL RDS (Active)
+       │          │ (Synchronous Block-Level Replication!)
+       └── AZ-B: Standby PostgreSQL RDS (Warm Standby - Auto-Failover < 60s!)</code></pre><div class="callout"><p><strong>The Final Cloud Engineering Standard:</strong> You have built a truly resilient cloud system. Physical data centers can lose power, fiber cables can be severed, and traffic can surge 100x—your architecture absorbs it all with five-nines uptime.</p></div>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Complete the cloud architecture sentence</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You have completed the Cloud Architecture course.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your project code and identify where architecting a highly available, fault-tolerant cloud infrastructure applies.</li>
+    <li>Author a unit test or verification script exercising architecting a highly available, fault-tolerant cloud infrastructure.</li>
+    <li>Document team architectural conventions regarding architecting a highly available, fault-tolerant cloud infrastructure.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Industry standards and best practices for Architecting a Highly Available, Fault-Tolerant Cloud Infrastructure.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What architectural combination guarantees that a cloud application survives the total destruction of a physical data center without downtime?",
+    a: ["Multi-AZ deployment: Application Load Balancers distributing traffic across compute pods and automated Multi-AZ failover databases in separate physical zones","Buying a more expensive server","Installing antivirus on the server","Running without a database"],
+    c: 0,
+    why: "Multi-AZ redundancy across load balancers, container pods, and databases ensures automated survival of datacenter failures."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1. Edge Ingress Tier",
+            "lines": [
+                  "Route 53 Anycast DNS + CloudFront CDN",
+                  "Caches assets, terminates TLS at edge"
+            ]
+      },
+      {
+            "title": "2. Multi-AZ Compute Tier",
+            "lines": [
+                  "ALB distributes across AZ-A and AZ-B",
+                  "Container pods autoscale on private subnets"
+            ]
+      },
+      {
+            "title": "3. Multi-AZ Data Tier",
+            "lines": [
+                  "Primary DB (AZ-A) -> Standby DB (AZ-B)",
+                  "Synchronous replication, 60s auto-failover!"
+            ]
+      },
+      {
+            "title": "4. Enterprise Governance",
+            "lines": [
+                  "Keyless OIDC CI/CD, Centralized SSO, S3 Glacier"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Tracing Architecting a Highly Available, Fault-Tolerant Cloud Infrastructure",
+      "def execute_flow():",
+      "    # Synthesizing cloud architecture: unifying multi-AZ...",
+      "    return True"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "phase": "Initialize",
+                  "concept": "Architecting a Highly Available, Fault-Tolerant Cloud Infrastructure"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "phase": "Execution",
+                  "state": "Active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "phase": "Result",
+                  "status": "Success"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "step": "Physical Fire Destroys AZ-A"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "A fault-tolerant cloud architecture achieves high availability through multi-AZ compute redundancy, automated database failover, and global {1} caching that eliminates single points of {2}."
+],
+    blanks: [
+      {
+            "a": [
+                  "edge"
+            ],
+            "why": "CDN Points of Presence"
+      },
+      {
+            "a": [
+                  "failure"
+            ],
+            "why": "Vulnerable single components"
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What happens automatically if the primary database instance in an Amazon RDS Multi-AZ deployment experiences a hardware failure?",
+      a: ["RDS automatically promotes the synchronous standby replica in the secondary Availability Zone to primary in under 60 seconds with zero data loss","The database is deleted permanently","The database converts to an Excel sheet","An administrator must manually reinstall Linux"],
+      c: 0,
+      why: "RDS Multi-AZ maintains a synchronous standby replica that is promoted automatically upon primary failure."
+    },
+    {
+      q: "Why is distributing container pods across at least two Availability Zones required for high availability?",
+      a: ["If an entire physical Availability Zone suffers a power or cooling failure, the surviving pods in the other AZ continue serving production traffic","It makes containers smaller","It reduces network bandwidth costs to zero","It is required by Docker syntax"],
+      c: 0,
+      why: "Cross-AZ compute distribution ensures container workloads survive physical datacenter outages."
+    },
+    {
+      q: "How does using an Application Load Balancer across multiple AZs prevent user requests from hitting dead servers?",
+      a: ["The ALB continuously runs healthchecks and dynamically removes failing instances from the target group in seconds","The load balancer restarts the servers","The load balancer deletes the code","The user's browser checks server health"],
+      c: 0,
+      why: "Continuous health checking ensures traffic is routed strictly to healthy compute targets."
+    },
+    {
+      q: "What is the ultimate mark of an enterprise Cloud Systems Architect?",
+      a: ["Designing resilient, decoupled, highly available, and cost-optimized cloud architectures that survive hardware failures automatically without human panic","Clicking buttons in the AWS web console","Using the most expensive virtual machine available","Running all databases on public IP addresses"],
+      c: 0,
+      why: "Automated resilience, cost governance, and fault tolerance define elite cloud architecture."
+    }
+  ]);
+</script>
+</body>
+</html>
