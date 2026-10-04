@@ -548,7 +548,7 @@
         bottom: 72px;
         right: 0;
         width: 320px;
-        height: 420px;
+        height: 440px;
         background: var(--bg, #ffffff);
         border: 1px solid var(--border, #e5e7eb);
         border-radius: 12px;
@@ -571,15 +571,19 @@
         justify-content: space-between;
         align-items: center;
       }
-      #chat-buddy-close {
+      #chat-buddy-controls {
+        display: flex;
+        gap: 12px;
+      }
+      .chat-btn {
         background: none;
         border: none;
         color: white;
         cursor: pointer;
-        font-size: 18px;
+        font-size: 16px;
         opacity: 0.8;
       }
-      #chat-buddy-close:hover { opacity: 1; }
+      .chat-btn:hover { opacity: 1; }
       #chat-buddy-messages {
         flex: 1;
         padding: 16px;
@@ -587,6 +591,23 @@
         display: flex;
         flex-direction: column;
         gap: 12px;
+      }
+      #chat-buddy-settings {
+        display: none;
+        flex: 1;
+        padding: 16px;
+        overflow-y: auto;
+        background: var(--bg-alt, #f9fafb);
+      }
+      @media (prefers-color-scheme: dark) {
+        #chat-buddy-settings { background: var(--bg-alt, #111827); }
+      }
+      .settings-group { margin-bottom: 12px; }
+      .settings-group label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px; color: var(--text-muted, #6b7280); }
+      .settings-group input { width: 100%; padding: 8px; font-size: 13px; border: 1px solid var(--border, #d1d5db); border-radius: 6px; background: var(--bg, #fff); color: inherit; box-sizing: border-box; }
+      @media (prefers-color-scheme: dark) {
+        .settings-group input { border-color: #4b5563; background: #1f2937; }
+        .settings-group label { color: #9ca3af; }
       }
       .msg {
         max-width: 85%;
@@ -660,6 +681,18 @@
       @media (prefers-color-scheme: dark) {
         .course-link { color: #60a5fa; }
       }
+      #chat-buddy-save-settings {
+        background: var(--c-brand, #2563eb);
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 600;
+        width: 100%;
+        margin-top: 8px;
+      }
+      #chat-buddy-save-settings:hover { opacity: 0.9; }
     `;
     document.head.appendChild(style);
 
@@ -669,9 +702,31 @@
       <div id="chat-buddy-window">
         <div id="chat-buddy-header">
           <span>🤖 Labby</span>
-          <button id="chat-buddy-close">✖</button>
+          <div id="chat-buddy-controls">
+            <button id="chat-buddy-settings-btn" class="chat-btn" title="Settings">⚙️</button>
+            <button id="chat-buddy-close" class="chat-btn" title="Close">✖</button>
+          </div>
         </div>
         <div id="chat-buddy-messages"></div>
+        <div id="chat-buddy-settings">
+          <h3 style="margin-top:0;font-size:15px;margin-bottom:12px;">API Settings</h3>
+          <p style="font-size:12px;color:var(--text-muted);margin-bottom:16px;">
+            Configure your AI provider. Keys are saved securely in your browser's local storage and never sent to our servers.
+          </p>
+          <div class="settings-group">
+            <label>Provider URL</label>
+            <input type="text" id="cb-api-url" placeholder="https://api.openai.com/v1/chat/completions">
+          </div>
+          <div class="settings-group">
+            <label>Model</label>
+            <input type="text" id="cb-api-model" placeholder="gpt-4o-mini">
+          </div>
+          <div class="settings-group">
+            <label>API Key (Optional for Local Models)</label>
+            <input type="password" id="cb-api-key" placeholder="sk-...">
+          </div>
+          <button id="chat-buddy-save-settings">Save & Close</button>
+        </div>
         <form id="chat-buddy-input-area">
           <input type="text" id="chat-buddy-input" placeholder="Ask Labby..." autocomplete="off">
           <button type="submit" id="chat-buddy-send">➤</button>
@@ -684,11 +739,24 @@
     var windowEl = document.getElementById("chat-buddy-window");
     var toggleEl = document.getElementById("chat-buddy-toggle");
     var closeEl = document.getElementById("chat-buddy-close");
+    var settingsBtn = document.getElementById("chat-buddy-settings-btn");
     var formEl = document.getElementById("chat-buddy-input-area");
     var inputEl = document.getElementById("chat-buddy-input");
     var messagesEl = document.getElementById("chat-buddy-messages");
+    var settingsEl = document.getElementById("chat-buddy-settings");
+    
+    var cbApiUrl = document.getElementById("cb-api-url");
+    var cbApiModel = document.getElementById("cb-api-model");
+    var cbApiKey = document.getElementById("cb-api-key");
+    var saveSettingsBtn = document.getElementById("chat-buddy-save-settings");
 
     var isOpen = false;
+    var showingSettings = false;
+
+    // Load saved settings
+    cbApiUrl.value = localStorage.getItem("labby_api_url") || "https://api.openai.com/v1/chat/completions";
+    cbApiModel.value = localStorage.getItem("labby_api_model") || "gpt-4o-mini";
+    cbApiKey.value = localStorage.getItem("labby_api_key") || "";
 
     function addMessage(text, sender, html) {
       var msg = document.createElement("div");
@@ -706,7 +774,7 @@
       isOpen = !isOpen;
       windowEl.style.display = isOpen ? "flex" : "none";
       if (isOpen) {
-        inputEl.focus();
+        if (!showingSettings) inputEl.focus();
         if (messagesEl.children.length === 0) {
           var cid = getCourseId();
           var welcome = "Hi! I'm Labby! 🐾 How can I help you learn today?";
@@ -723,30 +791,43 @@
       windowEl.style.display = "none";
     });
 
-    function getRecommendations(query) {
-      if (!global.COURSES) return null;
-      var q = query.toLowerCase();
-      var matches = global.COURSES.filter(function(c) {
-        return c.status === "live" && (
-          c.id.includes(q) || c.title.toLowerCase().includes(q) || (c.tags && c.tags.some(t => t.includes(q)))
-        );
-      });
-      return matches;
-    }
+    settingsBtn.addEventListener("click", function() {
+      showingSettings = !showingSettings;
+      if (showingSettings) {
+        messagesEl.style.display = "none";
+        formEl.style.display = "none";
+        settingsEl.style.display = "block";
+      } else {
+        settingsEl.style.display = "none";
+        messagesEl.style.display = "flex";
+        formEl.style.display = "flex";
+      }
+    });
+
+    saveSettingsBtn.addEventListener("click", function() {
+      localStorage.setItem("labby_api_url", cbApiUrl.value.trim());
+      localStorage.setItem("labby_api_model", cbApiModel.value.trim());
+      localStorage.setItem("labby_api_key", cbApiKey.value.trim());
+      
+      settingsEl.style.display = "none";
+      messagesEl.style.display = "flex";
+      formEl.style.display = "flex";
+      showingSettings = false;
+      
+      addMessage(null, "bot", "Settings saved successfully! 🚀");
+    });
 
     var chatHistory = [];
-    var isWaitingForKey = false;
-    var pendingMessage = "";
 
     function getSystemPrompt() {
       var courseList = global.COURSES ? global.COURSES.map(function(c) {
         return "- " + c.id + ": " + c.title;
-      }).join("\n") : "";
+      }).join("\\n") : "";
       return "You are Labby 🐾, a fun, highly engaging, and smart learning assistant for Concept Lab. " +
         "You love programming puns, using emojis, and keeping learners motivated. " +
         "You have memory of this conversation. " +
-        "When relevant, recommend courses to the user. Here are the available courses:\n" +
-        courseList + "\n\n" +
+        "When relevant, recommend courses to the user. Here are the available courses:\\n" +
+        courseList + "\\n\\n" +
         "The user is currently viewing the course ID: '" + getCourseId() + "'. " +
         "Format responses using Markdown (e.g. **bold**, `code`, and [Course Title](" + rootPath + "courses/ID/course.html)). Keep responses concise and helpful.";
     }
@@ -756,33 +837,15 @@
       var text = inputEl.value.trim();
       if (!text) return;
       inputEl.value = "";
+      
+      addMessage(text, "user");
 
-      var apiKey = localStorage.getItem("labby_api_key");
+      var apiUrl = localStorage.getItem("labby_api_url") || "https://api.openai.com/v1/chat/completions";
+      var apiModel = localStorage.getItem("labby_api_model") || "gpt-4o-mini";
+      var apiKey = localStorage.getItem("labby_api_key") || "";
 
-      if (isWaitingForKey) {
-        if (text.startsWith("sk-")) {
-          apiKey = text;
-          localStorage.setItem("labby_api_key", apiKey);
-          isWaitingForKey = false;
-          addMessage(null, "bot", "Awesome! Key saved securely in your browser. Now, let me think about your previous question...");
-          text = pendingMessage;
-        } else {
-          addMessage(text, "user");
-          addMessage(null, "bot", "That doesn't look like an OpenAI API key (it should start with 'sk-'). Please try again, or type 'cancel' to stay in dumb mode.");
-          if (text.toLowerCase() === 'cancel') {
-             isWaitingForKey = false;
-             addMessage("API key request cancelled.", "bot");
-          }
-          return;
-        }
-      } else {
-        addMessage(text, "user");
-      }
-
-      if (!apiKey) {
-        isWaitingForKey = true;
-        pendingMessage = text;
-        addMessage(null, "bot", "To make me super smart, I need an OpenAI API key. It stays perfectly safe in your browser's local storage and is sent directly to OpenAI. Please paste your key below:");
+      if (!apiKey && apiUrl.includes("openai.com")) {
+        addMessage(null, "bot", "To make me smart, please click the ⚙️ Settings icon above and enter your OpenAI API key, or configure a local LLM URL.");
         return;
       }
 
@@ -795,14 +858,14 @@
       addMessage(null, "bot", "<span id='" + loadingId + "'>🐾 Thinking...</span>");
 
       try {
-        var response = await fetch("https://api.openai.com/v1/chat/completions", {
+        var response = await fetch(apiUrl, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             "Authorization": "Bearer " + apiKey
           },
           body: JSON.stringify({
-            model: "gpt-4o-mini",
+            model: apiModel,
             messages: chatHistory,
             temperature: 0.7
           })
@@ -813,14 +876,11 @@
         
         if (data.error) {
           if (loadEl) loadEl.parentNode.innerHTML = "Oops! API Error: " + data.error.message;
-          if (data.error.code === "invalid_api_key") {
-             localStorage.removeItem("labby_api_key");
-          }
           chatHistory.pop(); 
           return;
         }
 
-        var botReply = data.choices[0].message.content;
+        var botReply = data.choices && data.choices[0] && data.choices[0].message ? data.choices[0].message.content : "Received empty response from API.";
         chatHistory.push({ role: "assistant", content: botReply });
         
         if (loadEl) {
@@ -833,7 +893,7 @@
         }
       } catch (err) {
         var loadEl2 = document.getElementById(loadingId);
-        if (loadEl2) loadEl2.parentNode.innerHTML = "Oops! Network error. Are you offline?";
+        if (loadEl2) loadEl2.parentNode.innerHTML = "Oops! Network error connecting to the API. Are you offline or is the provider URL wrong?";
         chatHistory.pop();
       }
     });
