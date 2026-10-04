@@ -1626,5 +1626,69 @@ window.COURSES = [
     prereq: ["distributed-systems", "backend-architecture"], related: ["production-ai-architecture", "software-architecture-patterns"],
     paths: ["backend-engineer", "cs-foundations", "devops"],
     concepts: ["backend", "database", "complexity", "separation-of-concerns", "transaction"]
+  },
+  {
+    num: 101, id: "typescript-fundamentals", title: "TypeScript Fundamentals", emoji: "📘",
+    tag: "WEB", category: "web", level: "intermediate", tier: 3,
+    desc: "Bring static typing to JavaScript for robust, scalable front-end and back-end applications.",
+    chips: ["Static Types", "Interfaces", "Generics"], colors: { c1: "#2563eb", c2: "#0ea5e9" }, stageArt: "code",
+    status: "planned", tags: ["web", "typescript", "frontend", "types"],
+    prereq: ["javascript-fundamentals"], related: ["react-architecture", "nodejs-backend"], paths: ["frontend-engineer", "full-stack-developer"]
+  },
+  {
+    num: 102, id: "nodejs-backend", title: "Node.js & Backend JavaScript", emoji: "🟢",
+    tag: "WEB", category: "web", level: "intermediate", tier: 4,
+    desc: "Build scalable backend services using event-driven, non-blocking I/O in JavaScript.",
+    chips: ["Event Loop", "Express", "Streams"], colors: { c1: "#22c55e", c2: "#0ea5e9" }, stageArt: "code-pulse",
+    status: "planned", tags: ["web", "backend", "nodejs", "javascript"],
+    prereq: ["javascript-fundamentals", "http"], related: ["rest-apis-json", "frontend-backend"], paths: ["backend-engineer", "full-stack-developer"]
+  },
+  {
+    num: 103, id: "kubernetes-orchestration", title: "Kubernetes & Orchestration", emoji: "☸️",
+    tag: "DEVOPS", category: "devops", level: "advanced", tier: 6,
+    desc: "Deploy, scale, and manage containerized applications securely across clusters.",
+    chips: ["Pods", "Services", "Scaling"], colors: { c1: "#3b82f6", c2: "#8b5cf6" }, stageArt: "layers",
+    status: "planned", tags: ["devops", "cloud", "kubernetes", "containers"],
+    prereq: ["docker-containers"], related: ["cloud-architecture", "distributed-systems"], paths: ["devops"]
+  },
+  {
+    num: 104, id: "infrastructure-as-code", title: "Infrastructure as Code", emoji: "🏗️",
+    tag: "DEVOPS", category: "devops", level: "intermediate", tier: 5,
+    desc: "Define, provision, and version cloud infrastructure predictably and reliably.",
+    chips: ["Terraform", "State", "Modules"], colors: { c1: "#8b5cf6", c2: "#c026d3" }, stageArt: "term-layers",
+    status: "planned", tags: ["devops", "cloud", "infrastructure", "automation"],
+    prereq: ["cloud-architecture", "command-line-shell"], related: ["ci-cd", "kubernetes-orchestration"], paths: ["devops"]
+  },
+  {
+    num: 105, id: "data-pipelines-etl", title: "Data Pipelines & ETL", emoji: "🚰",
+    tag: "DATA", category: "data", level: "intermediate", tier: 5,
+    desc: "Extract, transform, and move large datasets efficiently and reliably between systems.",
+    chips: ["ETL", "Batch", "Streaming"], colors: { c1: "#14b8a6", c2: "#3b82f6" }, stageArt: "flow",
+    status: "planned", tags: ["data", "etl", "pipelines", "engineering"],
+    prereq: ["python-files-json-data", "sql-relational-databases"], related: ["database-indexes-performance", "machine-learning"], paths: ["data-engineer", "data-analyst"]
+  },
+  {
+    num: 106, id: "web-accessibility", title: "Web Accessibility (a11y)", emoji: "♿",
+    tag: "WEB", category: "web", level: "intermediate", tier: 3,
+    desc: "Design and build web interfaces that are usable by everyone, regardless of ability.",
+    chips: ["ARIA", "Semantics", "Keyboard"], colors: { c1: "#06b6d4", c2: "#3b82f6" }, stageArt: "layers",
+    status: "planned", tags: ["web", "frontend", "accessibility", "ui"],
+    prereq: ["html-dom", "css-layout"], related: ["ui-ux-for-engineers", "react-architecture"], paths: ["frontend-engineer", "full-stack-developer"]
+  },
+  {
+    num: 107, id: "webassembly", title: "WebAssembly", emoji: "🕸️",
+    tag: "WEB", category: "web", level: "advanced", tier: 8,
+    desc: "Run compiled, high-performance code in the browser at near-native speed.",
+    chips: ["Wasm", "Performance", "Compilation"], colors: { c1: "#6366f1", c2: "#ec4899" }, stageArt: "layers-orbit",
+    status: "planned", tags: ["web", "wasm", "performance", "frontend"],
+    prereq: ["how-computers-work", "javascript-fundamentals"], related: ["html-dom", "how-the-internet-works"], paths: ["frontend-engineer"]
+  },
+  {
+    num: 108, id: "ui-ux-for-engineers", title: "UI & UX for Engineers", emoji: "🎨",
+    tag: "DESIGN", category: "design", level: "beginner", tier: 2,
+    desc: "Design thinking, color theory, typography, and spacing for developers building interfaces.",
+    chips: ["Layouts", "Colors", "Usability"], colors: { c1: "#ec4899", c2: "#f43f5e" }, stageArt: "layers",
+    status: "planned", tags: ["design", "ui", "ux", "frontend"],
+    prereq: ["css-layout"], related: ["web-accessibility", "react-architecture"], paths: ["frontend-engineer", "full-stack-developer"]
   }
 ];

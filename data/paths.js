@@ -24,6 +24,7 @@ window.PATHS = [
     desc: "Design data, expose APIs and run services that stay up.",
     steps: ["python-fundamentals", "http", "rest-apis-json", "sql-relational-databases",
             "database-design", "sql-joins", "orms", "backend-architecture", "fastapi",
+            "authentication-sessions", "secrets-identity",
             "testing-fundamentals", "docker-containers", "ci-cd", "cybersecurity-fundamentals",
             "distributed-systems", "system-design"]
   },
@@ -33,8 +34,9 @@ window.PATHS = [
     emoji: "🎨",
     desc: "Understand the web platform, then build interfaces with it.",
     steps: ["how-the-internet-works", "http", "html-dom", "css-layout",
-            "javascript-fundamentals", "browser-events-async", "rest-apis-json",
-            "frontend-backend", "react-architecture"]
+            "javascript-fundamentals", "typescript-fundamentals", "browser-events-async",
+            "rest-apis-json", "frontend-backend", "react-architecture",
+            "web-accessibility", "ui-ux-for-engineers", "web-security"]
   },
   {
     id: "cs-foundations",
@@ -52,7 +54,8 @@ window.PATHS = [
     title: "DevOps & Platform",
     emoji: "⚙️",
     desc: "Automate the path from commit to production.",
-    steps: ["command-line-shell", "git-version-control", "docker-containers", "ci-cd",
+    steps: ["command-line-shell", "git-version-control", "docker-containers",
+            "kubernetes-orchestration", "infrastructure-as-code", "ci-cd",
             "cloud-architecture", "secrets-identity", "llm-observability",
             "cybersecurity-fundamentals", "distributed-systems"]
   },
@@ -108,5 +111,40 @@ window.PATHS = [
     steps: ["how-the-internet-works", "http", "authentication-sessions",
             "cybersecurity-fundamentals", "web-security", "secrets-identity",
             "prompt-injection", "ai-agent-security", "cloud-architecture"]
+  },
+  {
+    id: "full-stack-developer",
+    title: "Full-Stack Web Developer",
+    emoji: "🥞",
+    desc: "Bridge the gap between frontend interfaces and backend infrastructure.",
+    steps: ["how-the-internet-works", "html-dom", "css-layout", "javascript-fundamentals",
+            "typescript-fundamentals", "react-architecture", "frontend-backend", "nodejs-backend",
+            "rest-apis-json", "sql-relational-databases", "authentication-sessions", "docker-containers"]
+  },
+  {
+    id: "software-architect",
+    title: "Software Architect",
+    emoji: "📐",
+    desc: "Design resilient, scalable systems and define engineering standards.",
+    steps: ["software-project-structure", "clean-code", "separation-of-concerns", "design-patterns",
+            "composition-vs-inheritance", "dependency-injection", "software-architecture-patterns",
+            "distributed-systems", "system-design"]
+  },
+  {
+    id: "quality-assurance-sdet",
+    title: "Quality Assurance & SDET",
+    emoji: "✅",
+    desc: "Ensure code reliability through testing, automation, and continuous delivery.",
+    steps: ["debugging-code", "reading-code", "testing-fundamentals", "unit-integration-testing",
+            "tdd", "ci-cd", "ai-assisted-code-review", "ai-assisted-debugging"]
+  },
+  {
+    id: "data-engineer",
+    title: "Data Engineer",
+    emoji: "🗄️",
+    desc: "Build the pipelines and infrastructure that power analytics and machine learning.",
+    steps: ["python-files-json-data", "sql-relational-databases", "postgresql",
+            "database-indexes-performance", "transactions-data-integrity", "data-pipelines-etl",
+            "docker-containers", "distributed-systems"]
   }
 ];
