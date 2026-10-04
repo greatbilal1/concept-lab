@@ -574,3 +574,10 @@
     STAGE_ART: STAGE_ART
   };
 })(window);
+
+// Load Chat Buddy for root pages
+(function() {
+  var s = document.createElement("script");
+  s.src = "assets/js/chat-buddy.js";
+  document.head.appendChild(s);
+})();
