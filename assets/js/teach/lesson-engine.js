@@ -734,62 +734,108 @@
       return matches;
     }
 
-    formEl.addEventListener("submit", function(e) {
+    var chatHistory = [];
+    var isWaitingForKey = false;
+    var pendingMessage = "";
+
+    function getSystemPrompt() {
+      var courseList = global.COURSES ? global.COURSES.map(function(c) {
+        return "- " + c.id + ": " + c.title;
+      }).join("\n") : "";
+      return "You are Labby 🐾, a fun, highly engaging, and smart learning assistant for Concept Lab. " +
+        "You love programming puns, using emojis, and keeping learners motivated. " +
+        "You have memory of this conversation. " +
+        "When relevant, recommend courses to the user. Here are the available courses:\n" +
+        courseList + "\n\n" +
+        "The user is currently viewing the course ID: '" + getCourseId() + "'. " +
+        "Format responses using Markdown (e.g. **bold**, `code`, and [Course Title](" + rootPath + "courses/ID/course.html)). Keep responses concise and helpful.";
+    }
+
+    formEl.addEventListener("submit", async function(e) {
       e.preventDefault();
       var text = inputEl.value.trim();
       if (!text) return;
-
-      addMessage(text, "user");
       inputEl.value = "";
 
-      setTimeout(function() {
-        var lower = text.toLowerCase();
+      var apiKey = localStorage.getItem("labby_api_key");
+
+      if (isWaitingForKey) {
+        if (text.startsWith("sk-")) {
+          apiKey = text;
+          localStorage.setItem("labby_api_key", apiKey);
+          isWaitingForKey = false;
+          addMessage(null, "bot", "Awesome! Key saved securely in your browser. Now, let me think about your previous question...");
+          text = pendingMessage;
+        } else {
+          addMessage(text, "user");
+          addMessage(null, "bot", "That doesn't look like an OpenAI API key (it should start with 'sk-'). Please try again, or type 'cancel' to stay in dumb mode.");
+          if (text.toLowerCase() === 'cancel') {
+             isWaitingForKey = false;
+             addMessage("API key request cancelled.", "bot");
+          }
+          return;
+        }
+      } else {
+        addMessage(text, "user");
+      }
+
+      if (!apiKey) {
+        isWaitingForKey = true;
+        pendingMessage = text;
+        addMessage(null, "bot", "To make me super smart, I need an OpenAI API key. It stays perfectly safe in your browser's local storage and is sent directly to OpenAI. Please paste your key below:");
+        return;
+      }
+
+      if (chatHistory.length === 0) {
+        chatHistory.push({ role: "system", content: getSystemPrompt() });
+      }
+      chatHistory.push({ role: "user", content: text });
+
+      var loadingId = "msg-" + Date.now();
+      addMessage(null, "bot", "<span id='" + loadingId + "'>🐾 Thinking...</span>");
+
+      try {
+        var response = await fetch("https://api.openai.com/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + apiKey
+          },
+          body: JSON.stringify({
+            model: "gpt-4o-mini",
+            messages: chatHistory,
+            temperature: 0.7
+          })
+        });
+
+        var data = await response.json();
+        var loadEl = document.getElementById(loadingId);
         
-        if (lower.match(/joke|fun/)) {
-          addMessage(jokes[Math.floor(Math.random() * jokes.length)], "bot");
-          return;
-        }
-
-        if (lower.match(/help|stuck|hard|error/)) {
-          addMessage("Don't sweat it! Error messages are just the computer asking for clarification. Take a deep breath, break the problem down into smaller parts, or grab a coffee! ☕", "bot");
-          return;
-        }
-
-        if (lower.match(/next|finish|recommend|what else/)) {
-          var cid = getCourseId();
-          if (cid && global.COURSES) {
-            var curr = global.COURSES.find(c => c.id === cid);
-            if (curr && curr.related && curr.related.length > 0) {
-              var rel = global.COURSES.find(c => c.id === curr.related[0]);
-              if (rel) {
-                var link = '<a class="course-link" href="' + rootPath + 'courses/' + rel.id + '/course.html">' + rel.title + '</a>';
-                addMessage(null, "bot", "Since you're looking at this course, I highly recommend checking out:<br>" + link);
-                return;
-              }
-            }
+        if (data.error) {
+          if (loadEl) loadEl.parentNode.innerHTML = "Oops! API Error: " + data.error.message;
+          if (data.error.code === "invalid_api_key") {
+             localStorage.removeItem("labby_api_key");
           }
-          addMessage("Check out our Learning Paths on the main hub! They'll guide you step-by-step. 🚀", "bot");
+          chatHistory.pop(); 
           return;
         }
 
-        // Try to recommend based on keywords
-        var words = lower.split(' ').filter(w => w.length > 3);
-        for (var i = 0; i < words.length; i++) {
-          var recs = getRecommendations(words[i]);
-          if (recs && recs.length > 0) {
-            var rec = recs[0];
-            if (rec.id !== getCourseId()) {
-              var link = '<a class="course-link" href="' + rootPath + 'courses/' + rec.id + '/course.html">' + rec.title + '</a>';
-              addMessage(null, "bot", "Speaking of that, I think you'd love this course:<br>" + link);
-              return;
-            }
-          }
+        var botReply = data.choices[0].message.content;
+        chatHistory.push({ role: "assistant", content: botReply });
+        
+        if (loadEl) {
+          var formattedReply = botReply
+            .replace(/\n/g, "<br>")
+            .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+            .replace(/`(.*?)`/g, "<code>$1</code>")
+            .replace(/\[(.*?)\]\((.*?)\)/g, '<a class="course-link" href="$2">$1</a>');
+          loadEl.parentNode.innerHTML = formattedReply;
         }
-
-        // Default response
-        addMessage("I'm Labby, your friendly learning assistant! Try asking me for a joke, or ask me for course recommendations like 'I want to learn Python'.", "bot");
-
-      }, 400);
+      } catch (err) {
+        var loadEl2 = document.getElementById(loadingId);
+        if (loadEl2) loadEl2.parentNode.innerHTML = "Oops! Network error. Are you offline?";
+        chatHistory.pop();
+      }
     });
   }
 
