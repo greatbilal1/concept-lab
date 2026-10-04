@@ -483,3 +483,322 @@
     boot();
   }
 })(window);
+(function(global) {
+  "use strict";
+  if (global.TeachChatBuddy) return;
+
+  // We need to figure out the root path to load data/courses.js if missing
+  var rootPath = "../../";
+  var engineScript = document.querySelector('script[src*="lesson-engine.js"]');
+  if (engineScript) {
+    rootPath = engineScript.src.split('assets/js/teach/lesson-engine.js')[0];
+  }
+
+  // Load courses if needed
+  if (!global.COURSES) {
+    var s = document.createElement("script");
+    s.src = rootPath + "data/courses.js";
+    document.head.appendChild(s);
+  }
+
+  var jokes = [
+    "Why do programmers prefer dark mode? Because light attracts bugs!",
+    "How many programmers does it take to change a light bulb? None, that's a hardware problem.",
+    "A SQL query goes into a bar, walks up to two tables and asks... 'Can I join you?'",
+    "Why do Java developers wear glasses? Because they don't C#.",
+    "There are 10 types of people in the world: those who understand binary, and those who don't."
+  ];
+
+  function getCourseId() {
+    var b = document.body;
+    return (b && b.dataset && b.dataset.course) || "";
+  }
+
+  function renderUI() {
+    var style = document.createElement("style");
+    style.innerHTML = `
+      #chat-buddy-container {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        z-index: 9999;
+        font-family: var(--font-sans, system-ui, sans-serif);
+      }
+      #chat-buddy-toggle {
+        width: 56px;
+        height: 56px;
+        border-radius: 28px;
+        background: var(--c-brand, #2563eb);
+        color: white;
+        border: none;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+        transition: transform 0.2s;
+      }
+      #chat-buddy-toggle:hover {
+        transform: scale(1.05);
+      }
+      #chat-buddy-window {
+        display: none;
+        position: absolute;
+        bottom: 72px;
+        right: 0;
+        width: 320px;
+        height: 420px;
+        background: var(--bg, #ffffff);
+        border: 1px solid var(--border, #e5e7eb);
+        border-radius: 12px;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+        flex-direction: column;
+        overflow: hidden;
+      }
+      @media (prefers-color-scheme: dark) {
+        #chat-buddy-window {
+          background: var(--bg, #1f2937);
+          border-color: var(--border, #374151);
+        }
+      }
+      #chat-buddy-header {
+        background: var(--c-brand, #2563eb);
+        color: white;
+        padding: 12px 16px;
+        font-weight: 600;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      #chat-buddy-close {
+        background: none;
+        border: none;
+        color: white;
+        cursor: pointer;
+        font-size: 18px;
+        opacity: 0.8;
+      }
+      #chat-buddy-close:hover { opacity: 1; }
+      #chat-buddy-messages {
+        flex: 1;
+        padding: 16px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .msg {
+        max-width: 85%;
+        padding: 10px 14px;
+        border-radius: 16px;
+        font-size: 14px;
+        line-height: 1.4;
+      }
+      .msg.bot {
+        background: var(--bg-alt, #f3f4f6);
+        color: var(--text, #111827);
+        align-self: flex-start;
+        border-bottom-left-radius: 4px;
+      }
+      @media (prefers-color-scheme: dark) {
+        .msg.bot {
+          background: var(--bg-alt, #374151);
+          color: var(--text, #f9fafb);
+        }
+      }
+      .msg.user {
+        background: var(--c-brand, #2563eb);
+        color: white;
+        align-self: flex-end;
+        border-bottom-right-radius: 4px;
+      }
+      #chat-buddy-input-area {
+        padding: 12px;
+        border-top: 1px solid var(--border, #e5e7eb);
+        display: flex;
+        gap: 8px;
+        background: var(--bg, #ffffff);
+      }
+      @media (prefers-color-scheme: dark) {
+        #chat-buddy-input-area {
+          background: var(--bg, #1f2937);
+          border-color: var(--border, #374151);
+        }
+      }
+      #chat-buddy-input {
+        flex: 1;
+        padding: 8px 12px;
+        border: 1px solid var(--border, #d1d5db);
+        border-radius: 20px;
+        outline: none;
+        background: transparent;
+        color: inherit;
+      }
+      @media (prefers-color-scheme: dark) {
+        #chat-buddy-input { border-color: #4b5563; }
+      }
+      #chat-buddy-send {
+        background: var(--c-brand, #2563eb);
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 36px;
+        height: 36px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .course-link {
+        display: inline-block;
+        margin-top: 6px;
+        color: var(--c-brand, #2563eb);
+        text-decoration: underline;
+        font-weight: 600;
+      }
+      @media (prefers-color-scheme: dark) {
+        .course-link { color: #60a5fa; }
+      }
+    `;
+    document.head.appendChild(style);
+
+    var container = document.createElement("div");
+    container.id = "chat-buddy-container";
+    container.innerHTML = `
+      <div id="chat-buddy-window">
+        <div id="chat-buddy-header">
+          <span>🤖 Labby</span>
+          <button id="chat-buddy-close">✖</button>
+        </div>
+        <div id="chat-buddy-messages"></div>
+        <form id="chat-buddy-input-area">
+          <input type="text" id="chat-buddy-input" placeholder="Ask Labby..." autocomplete="off">
+          <button type="submit" id="chat-buddy-send">➤</button>
+        </form>
+      </div>
+      <button id="chat-buddy-toggle">🤖</button>
+    `;
+    document.body.appendChild(container);
+
+    var windowEl = document.getElementById("chat-buddy-window");
+    var toggleEl = document.getElementById("chat-buddy-toggle");
+    var closeEl = document.getElementById("chat-buddy-close");
+    var formEl = document.getElementById("chat-buddy-input-area");
+    var inputEl = document.getElementById("chat-buddy-input");
+    var messagesEl = document.getElementById("chat-buddy-messages");
+
+    var isOpen = false;
+
+    function addMessage(text, sender, html) {
+      var msg = document.createElement("div");
+      msg.className = "msg " + sender;
+      if (html) {
+        msg.innerHTML = html;
+      } else {
+        msg.textContent = text;
+      }
+      messagesEl.appendChild(msg);
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+    }
+
+    toggleEl.addEventListener("click", function() {
+      isOpen = !isOpen;
+      windowEl.style.display = isOpen ? "flex" : "none";
+      if (isOpen) {
+        inputEl.focus();
+        if (messagesEl.children.length === 0) {
+          var cid = getCourseId();
+          var welcome = "Hi! I'm Labby! 🐾 How can I help you learn today?";
+          if (cid) {
+            welcome = "Hi! I'm Labby! 🐾 I see you're checking out our **" + cid + "** course! Having fun?";
+          }
+          addMessage(welcome, "bot");
+        }
+      }
+    });
+
+    closeEl.addEventListener("click", function() {
+      isOpen = false;
+      windowEl.style.display = "none";
+    });
+
+    function getRecommendations(query) {
+      if (!global.COURSES) return null;
+      var q = query.toLowerCase();
+      var matches = global.COURSES.filter(function(c) {
+        return c.status === "live" && (
+          c.id.includes(q) || c.title.toLowerCase().includes(q) || (c.tags && c.tags.some(t => t.includes(q)))
+        );
+      });
+      return matches;
+    }
+
+    formEl.addEventListener("submit", function(e) {
+      e.preventDefault();
+      var text = inputEl.value.trim();
+      if (!text) return;
+
+      addMessage(text, "user");
+      inputEl.value = "";
+
+      setTimeout(function() {
+        var lower = text.toLowerCase();
+        
+        if (lower.match(/joke|fun/)) {
+          addMessage(jokes[Math.floor(Math.random() * jokes.length)], "bot");
+          return;
+        }
+
+        if (lower.match(/help|stuck|hard|error/)) {
+          addMessage("Don't sweat it! Error messages are just the computer asking for clarification. Take a deep breath, break the problem down into smaller parts, or grab a coffee! ☕", "bot");
+          return;
+        }
+
+        if (lower.match(/next|finish|recommend|what else/)) {
+          var cid = getCourseId();
+          if (cid && global.COURSES) {
+            var curr = global.COURSES.find(c => c.id === cid);
+            if (curr && curr.related && curr.related.length > 0) {
+              var rel = global.COURSES.find(c => c.id === curr.related[0]);
+              if (rel) {
+                var link = '<a class="course-link" href="' + rootPath + 'courses/' + rel.id + '/course.html">' + rel.title + '</a>';
+                addMessage(null, "bot", "Since you're looking at this course, I highly recommend checking out:<br>" + link);
+                return;
+              }
+            }
+          }
+          addMessage("Check out our Learning Paths on the main hub! They'll guide you step-by-step. 🚀", "bot");
+          return;
+        }
+
+        // Try to recommend based on keywords
+        var words = lower.split(' ').filter(w => w.length > 3);
+        for (var i = 0; i < words.length; i++) {
+          var recs = getRecommendations(words[i]);
+          if (recs && recs.length > 0) {
+            var rec = recs[0];
+            if (rec.id !== getCourseId()) {
+              var link = '<a class="course-link" href="' + rootPath + 'courses/' + rec.id + '/course.html">' + rec.title + '</a>';
+              addMessage(null, "bot", "Speaking of that, I think you'd love this course:<br>" + link);
+              return;
+            }
+          }
+        }
+
+        // Default response
+        addMessage("I'm Labby, your friendly learning assistant! Try asking me for a joke, or ask me for course recommendations like 'I want to learn Python'.", "bot");
+
+      }, 400);
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", renderUI);
+  } else {
+    renderUI();
+  }
+
+  global.TeachChatBuddy = true;
+
+})(window);
