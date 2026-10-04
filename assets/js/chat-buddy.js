@@ -208,6 +208,28 @@
         margin-top: 8px;
       }
       #chat-buddy-save-settings:hover { opacity: 0.9; }
+      @keyframes cb-typing-bounce {
+        0%, 80%, 100% { transform: translateY(0); opacity: 0.5; }
+        40% { transform: translateY(-4px); opacity: 1; }
+      }
+      .cb-typing {
+        display: inline-flex;
+        gap: 4px;
+        align-items: center;
+        height: 20px;
+        padding: 0 4px;
+      }
+      .cb-typing span {
+        width: 6px;
+        height: 6px;
+        background-color: currentColor;
+        border-radius: 50%;
+        animation: cb-typing-bounce 1.4s infinite ease-in-out both;
+      }
+      .cb-typing span:nth-child(1) { animation-delay: -0.32s; }
+      .cb-typing span:nth-child(2) { animation-delay: -0.16s; }
+      @keyframes cb-cursor-blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+      .cb-cursor { font-weight: bold; animation: cb-cursor-blink 1s infinite; display: inline-block; margin-left: 2px; }
     `;
     document.head.appendChild(style);
 
@@ -370,7 +392,7 @@
       chatHistory.push({ role: "user", content: text });
 
       var loadingId = "msg-" + Date.now();
-      addMessage(null, "bot", "<span id='" + loadingId + "'>🐾 Thinking...</span>");
+      addMessage(null, "bot", "<div id='" + loadingId + "' class='cb-typing'><span></span><span></span><span></span></div>");
 
       try {
         var response = await fetch(apiUrl, {
@@ -382,30 +404,64 @@
           body: JSON.stringify({
             model: apiModel,
             messages: chatHistory,
-            temperature: 0.7
+            temperature: 0.7,
+            stream: true
           })
         });
 
-        var data = await response.json();
         var loadEl = document.getElementById(loadingId);
-        
-        if (data.error) {
-          if (loadEl) loadEl.parentNode.innerHTML = "Oops! API Error: " + data.error.message;
-          chatHistory.pop(); 
+        var msgContainer = loadEl ? loadEl.parentNode : null;
+
+        if (!response.ok) {
+          var errData = await response.json();
+          if (msgContainer) msgContainer.innerHTML = "Oops! API Error: " + (errData.error ? errData.error.message : response.statusText);
+          chatHistory.pop();
           return;
         }
 
-        var botReply = data.choices && data.choices[0] && data.choices[0].message ? data.choices[0].message.content : "Received empty response from API.";
-        chatHistory.push({ role: "assistant", content: botReply });
+        if (msgContainer) msgContainer.innerHTML = "";
         
-        if (loadEl) {
+        var reader = response.body.getReader();
+        var decoder = new TextDecoder("utf-8");
+        var botReply = "";
+
+        while (true) {
+          var { done, value } = await reader.read();
+          if (done) break;
+          var chunk = decoder.decode(value, { stream: true });
+          var lines = chunk.split('\n');
+          for (var i = 0; i < lines.length; i++) {
+            var line = lines[i].trim();
+            if (line.startsWith("data: ") && line !== "data: [DONE]") {
+              try {
+                var parsed = JSON.parse(line.substring(6));
+                if (parsed.choices && parsed.choices[0].delta && parsed.choices[0].delta.content) {
+                  botReply += parsed.choices[0].delta.content;
+                  if (msgContainer) {
+                    var formattedReply = botReply
+                      .replace(/\n/g, "<br>")
+                      .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+                      .replace(/`(.*?)`/g, "<code>$1</code>")
+                      .replace(/\[(.*?)\]\((.*?)\)/g, '<a class="course-link" href="$2">$1</a>');
+                    msgContainer.innerHTML = formattedReply + '<span class="cb-cursor">|</span>';
+                    messagesEl.scrollTop = messagesEl.scrollHeight;
+                  }
+                }
+              } catch (e) {}
+            }
+          }
+        }
+        
+        // Finalize (remove cursor and save to history)
+        if (msgContainer) {
           var formattedReply = botReply
             .replace(/\n/g, "<br>")
             .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
             .replace(/`(.*?)`/g, "<code>$1</code>")
             .replace(/\[(.*?)\]\((.*?)\)/g, '<a class="course-link" href="$2">$1</a>');
-          loadEl.parentNode.innerHTML = formattedReply;
+          msgContainer.innerHTML = formattedReply;
         }
+        chatHistory.push({ role: "assistant", content: botReply });
       } catch (err) {
         var loadEl2 = document.getElementById(loadingId);
         if (loadEl2) loadEl2.parentNode.innerHTML = "Oops! Network error connecting to the API. Are you offline or is the provider URL wrong?";
