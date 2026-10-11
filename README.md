@@ -4,9 +4,20 @@
 
 Concept Lab is a free, no-login learning space for people who want to understand how technology works. Explore a broad curriculum through short explanations, interactive lessons, visual models, and hands-on knowledge checks—all in your browser.
 
-**[Open Concept Lab](https://greatbilal1.github.io/concept-lab/)** · **[Browse all courses](https://greatbilal1.github.io/concept-lab/courses.html)**
+**[Open Concept Lab](https://greatbilal1.github.io/concept-lab/)** · **[Browse all 100+ courses](https://greatbilal1.github.io/concept-lab/courses.html)** · **[Learning paths](https://greatbilal1.github.io/concept-lab/#paths)** · **[AI blog](https://greatbilal1.github.io/concept-lab/news.html)** · **[Glossary](https://greatbilal1.github.io/concept-lab/glossary.html)**
 
 ![Concept Lab homepage](screenshots/homepage.png)
+
+## Why Concept Lab
+
+| | |
+| --- | --- |
+| **100+ courses** | From computer science foundations to production AI, security, and distributed systems |
+| **900+ interactive lessons** | Short, focused, and built to be finished in one sitting |
+| **14 learning paths** | Guided tracks that tell you what to learn next |
+| **1,600+ glossary terms** | Every concept cross-linked back to the course that teaches it |
+| **100 AI articles** | A running blog on applied AI engineering |
+| **0 logins** | No account, no email, no tracking, no backend |
 
 ## Learn by exploring
 
@@ -20,6 +31,40 @@ Concept Lab is a free, no-login learning space for people who want to understand
   <img src="screenshots/python-course.png" width="49%" alt="Python course map with lessons grouped by topic">
   <img src="screenshots/python-lesson.png" width="49%" alt="Interactive Python lesson with an understanding check">
 </p>
+
+## Learning paths
+
+Not sure where to start? Each path is an ordered track through the catalog, from first principles to job-ready depth.
+
+| Path | What it covers |
+| --- | --- |
+| 🐍 **Python Developer** | Language fundamentals, modules, type hints, errors, files and JSON |
+| 🧱 **CS Foundations** | How computers work, data structures, algorithms, Big-O, complexity |
+| 🌐 **Frontend Engineer** | HTML and the DOM, CSS layout, JavaScript, browser events and async |
+| 🛠️ **Backend Engineer** | HTTP, REST APIs, databases, ORMs, authentication, sessions |
+| 🚀 **DevOps** | Command line, Git, Docker, CI/CD, Kubernetes, infrastructure as code |
+| 📊 **Data Analyst** | Python for data, SQL, PostgreSQL, data pipelines and ETL |
+| 🤖 **AI Engineer** | LLMs, embeddings, RAG, function calling, evaluation, observability |
+| 🧠 **AI App Builder** | First LLM app, prompt engineering, context, memory, guardrails |
+| 🔐 **Security Engineer** | Cybersecurity fundamentals, secrets, identity, prompt injection |
+| 🧩 **Full-Stack Developer** | Frontend and backend together, end to end |
+| 🏛️ **Software Architect** | Design patterns, separation of concerns, distributed systems |
+| ✅ **Quality & SDET** | Testing, debugging, code review, refactoring, technical debt |
+| 🗄️ **Data Engineer** | Pipelines, warehouses, streaming, orchestration at scale |
+| ⚡ **Vibe Coding** | Working effectively with AI coding agents on real projects |
+
+## The AI blog
+
+[`news.html`](https://greatbilal1.github.io/concept-lab/news.html) is a running blog of 100 articles on applied AI engineering — the practical side of building with models. Topics include:
+
+- **AI Guardrails** and adversarial defense
+- **Multi-agent swarms** and agent architecture
+- **Agent protocols** and tool use
+- **Vector databases** and retrieval at scale
+- **Context caching** and prompt compilers
+- **On-device inference** and latency optimization
+
+Each article is a self-contained page with a reading time, category, and author card.
 
 ## Run it locally
 
@@ -44,10 +89,13 @@ Then visit [http://localhost:8000](http://localhost:8000).
 | Path | Purpose |
 | --- | --- |
 | `index.html` | Home page, featured courses, and learning paths |
-| `courses.html`, `glossary.html`, `news.html` | Course catalog and reference pages |
+| `courses.html` | Full course catalog with level and tier filters |
+| `glossary.html` | 1,600+ cross-linked terms |
+| `news.html`, `article.html` | AI blog index and article reader |
 | `courses/` | Course hubs, lessons, and reference material |
-| `data/` | Course catalog, learning paths, glossary, and other site data |
-| `assets/css/`, `assets/js/` | Shared styles and browser-side behavior |
+| `data/` | Course catalog, learning paths, glossary, and news data |
+| `assets/css/` | Design tokens, site styles, explainer animations, motion layer |
+| `assets/js/` | Renderer, search, motion engine, and the optional Labby assistant |
 | `screenshots/` | README screenshots |
 
 ## Add or improve a course

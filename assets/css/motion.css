@@ -1,0 +1,426 @@
+/* ============================================================
+   Concept Lab — motion layer
+   ------------------------------------------------------------
+   A single, opt-in motion system that sits on top of tokens.css
+   and site.css. Nothing here changes layout or colour; it only
+   adds movement, depth and polish.
+
+   Design rules
+     1. Motion is a garnish, never a gate. Every animated element
+        is fully readable with JS disabled and with
+        `prefers-reduced-motion: reduce`.
+     2. One easing vocabulary. Use the --mo-* tokens below rather
+        than inventing new curves per component.
+     3. Animate only `transform` and `opacity` on scroll-driven
+        elements so the compositor does the work.
+     4. Stagger by index, not by hand-tuned delays.
+
+   Load order: tokens.css -> site.css -> anim.css -> motion.css
+   ============================================================ */
+
+:root {
+  /* ---------- easing ---------- */
+  --mo-ease: cubic-bezier(.22, .61, .36, 1);          /* standard out */
+  --mo-ease-out: cubic-bezier(.16, 1, .3, 1);         /* expressive out */
+  --mo-ease-in-out: cubic-bezier(.65, .05, .36, 1);   /* symmetric */
+  --mo-spring: cubic-bezier(.34, 1.56, .64, 1);       /* slight overshoot */
+
+  /* ---------- duration ---------- */
+  --mo-fast: .18s;
+  --mo-base: .32s;
+  --mo-slow: .6s;
+  --mo-reveal: .72s;
+
+  /* ---------- distance ---------- */
+  --mo-rise: 26px;
+  --mo-rise-sm: 14px;
+
+  /* ---------- stagger step (set per container) ---------- */
+  --mo-step: 60ms;
+}
+
+/* ============================================================
+   1. Scroll reveal — richer than the base .reveal
+   ------------------------------------------------------------
+   The base system in site.css fades + rises. This adds a
+   directional variant, a scale variant and index-based stagger,
+   all driven by the same `.in` class the renderer already adds.
+   ============================================================ */
+
+.reveal {
+  transition:
+    opacity var(--mo-reveal) var(--mo-ease-out),
+    transform var(--mo-reveal) var(--mo-ease-out),
+    filter var(--mo-reveal) var(--mo-ease-out);
+  transition-delay: calc(var(--mo-i, 0) * var(--mo-step));
+  will-change: opacity, transform;
+}
+
+/* directional variants */
+.reveal[data-mo="left"]  { transform: translate3d(calc(-1 * var(--mo-rise)), 0, 0); }
+.reveal[data-mo="right"] { transform: translate3d(var(--mo-rise), 0, 0); }
+.reveal[data-mo="zoom"]  { transform: scale(.94); }
+.reveal[data-mo="blur"]  { filter: blur(10px); transform: translate3d(0, var(--mo-rise-sm), 0); }
+
+.reveal[data-mo].in { transform: none; filter: none; }
+
+/* once revealed, stop hinting the compositor */
+.reveal.in { will-change: auto; }
+
+/* ============================================================
+   2. Hero entrance
+   ------------------------------------------------------------
+   The hero plays once on load, top to bottom, without waiting
+   for a scroll event. Elements opt in with `data-mo-hero`.
+   ============================================================ */
+
+@keyframes moHeroIn {
+  from { opacity: 1; transform: translate3d(0, 22px, 0) scale(.985); filter: blur(6px); }
+  to   { opacity: 1; transform: none; filter: none; }
+}
+
+[data-mo-hero] {
+  opacity: 1;
+  animation: moHeroIn .85s var(--mo-ease-out) forwards;
+  animation-delay: calc(var(--mo-i, 0) * 90ms + 60ms);
+}
+
+/* ============================================================
+   3. Gradient text shimmer
+   ------------------------------------------------------------
+   A slow sheen that travels across the hero gradient headline.
+   Purely decorative; the text colour is unchanged underneath.
+   ============================================================ */
+
+h1 .grad {
+  background-size: 220% 100%;
+  animation: moSheen 9s var(--mo-ease-in-out) infinite;
+}
+
+@keyframes moSheen {
+  0%, 100% { background-position: 0% 50%; }
+  50%      { background-position: 100% 50%; }
+}
+
+/* ============================================================
+   4. Badge + chip micro-motion
+   ============================================================ */
+
+.badge {
+  position: relative;
+  overflow: hidden;
+  transition: border-color var(--mo-base) var(--mo-ease), color var(--mo-base) var(--mo-ease);
+}
+
+/* a light sweeps across the badge every few seconds */
+.badge::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 35%, #67e8f933 50%, transparent 65%);
+  transform: translateX(-120%);
+  animation: moBadgeSweep 6.5s var(--mo-ease-in-out) infinite;
+  pointer-events: none;
+}
+
+@keyframes moBadgeSweep {
+  0%, 62% { transform: translateX(-120%); }
+  82%     { transform: translateX(120%); }
+  100%    { transform: translateX(120%); }
+}
+
+.badge:hover { border-color: var(--accent); }
+
+/* ============================================================
+   5. Stat cards
+   ------------------------------------------------------------
+   Lift on hover, and a soft accent glow that follows the card.
+   The count-up itself is handled in JS (render.js).
+   ============================================================ */
+
+.stat {
+  position: relative;
+  overflow: hidden;
+  transition:
+    transform var(--mo-base) var(--mo-ease-out),
+    border-color var(--mo-base) var(--mo-ease),
+    box-shadow var(--mo-base) var(--mo-ease);
+}
+
+.stat::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  background: radial-gradient(120px 80px at var(--mo-mx, 50%) var(--mo-my, 0%), #67e8f92e, transparent 70%);
+  opacity: 0;
+  transition: opacity var(--mo-base) var(--mo-ease);
+  pointer-events: none;
+}
+
+.stat:hover {
+  transform: translateY(-4px);
+  border-color: #3d5488;
+  box-shadow: 0 16px 34px #0006;
+}
+
+.stat:hover::before { opacity: 1; }
+
+.stat b {
+  transition: transform var(--mo-base) var(--mo-spring);
+  display: block;
+}
+
+.stat:hover b { transform: scale(1.06); }
+
+/* ============================================================
+   6. Buttons — press feedback + arrow travel
+   ============================================================ */
+
+.btn {
+  position: relative;
+  overflow: hidden;
+  transition:
+    transform var(--mo-fast) var(--mo-ease-out),
+    box-shadow var(--mo-base) var(--mo-ease),
+    filter var(--mo-fast) var(--mo-ease);
+}
+
+.btn:active { transform: translateY(0) scale(.975); }
+
+/* ripple sheen on hover */
+.btn::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 40%, #ffffff1f 50%, transparent 60%);
+  transform: translateX(-130%);
+  transition: transform .55s var(--mo-ease-out);
+  pointer-events: none;
+}
+
+.btn:hover::after { transform: translateX(130%); }
+
+.btn .arrow { transition: transform var(--mo-base) var(--mo-spring); }
+.btn:hover .arrow { transform: translateX(5px); }
+
+/* ============================================================
+   7. Cards — course, path, news, glossary
+   ------------------------------------------------------------
+   A shared lift + border-glow treatment so every card family
+   feels like one product.
+   ============================================================ */
+
+.course,
+.path,
+.news-card,
+.gloss,
+.step,
+details {
+  transition:
+    transform var(--mo-base) var(--mo-ease-out),
+    border-color var(--mo-base) var(--mo-ease),
+    box-shadow var(--mo-base) var(--mo-ease),
+    background var(--mo-base) var(--mo-ease);
+}
+
+.course:hover,
+.path:hover,
+.news-card:hover,
+.gloss:hover,
+.step:hover {
+  transform: translateY(-6px);
+  border-color: #3d5488;
+  box-shadow: 0 22px 48px #0007;
+}
+
+/* the course card already lifts in site.css — keep the deeper shadow */
+.course:hover { box-shadow: 0 26px 56px #0008; }
+
+/* thumbnails breathe slightly on hover */
+.course .thumb .glyph,
+.news-thumb-img {
+  transition: transform .5s var(--mo-ease-out), filter .5s var(--mo-ease-out);
+}
+
+.course:hover .thumb .glyph { transform: scale(1.14) rotate(-4deg); }
+.news-card:hover .news-thumb-img { transform: scale(1.06); }
+
+/* ============================================================
+   8. Section heads — the rule draws itself in
+   ============================================================ */
+
+.section-head .line {
+  transform-origin: left center;
+  transform: scaleX(0);
+  transition: transform .8s var(--mo-ease-out);
+}
+
+.section-head.in .line,
+.section-head.reveal.in .line { transform: scaleX(1); }
+
+/* ============================================================
+   9. Top bar — condenses once you scroll
+   ============================================================ */
+
+.topbar {
+  transition:
+    background var(--mo-base) var(--mo-ease),
+    box-shadow var(--mo-base) var(--mo-ease),
+    border-color var(--mo-base) var(--mo-ease);
+}
+
+body.mo-scrolled .topbar {
+  background: #0a1020f2;
+  box-shadow: 0 10px 30px #0006;
+  border-bottom-color: #3d5488;
+}
+
+/* ============================================================
+   10. Scroll progress bar
+   ============================================================ */
+
+#moProgress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 2px;
+  width: 100%;
+  transform: scaleX(0);
+  transform-origin: left center;
+  background: linear-gradient(90deg, var(--accent), var(--accent2), #f0abfc);
+  z-index: 60;
+  pointer-events: none;
+  will-change: transform;
+}
+
+/* ============================================================
+   11. Back-to-top button
+   ============================================================ */
+
+#toTop {
+  transition:
+    opacity var(--mo-base) var(--mo-ease),
+    transform var(--mo-base) var(--mo-spring),
+    border-color var(--mo-base) var(--mo-ease),
+    box-shadow var(--mo-base) var(--mo-ease);
+}
+
+#toTop.show { transform: translateY(0) scale(1); }
+#toTop:not(.show) { transform: translateY(10px) scale(.9); }
+#toTop:hover { transform: translateY(-4px) scale(1.05); box-shadow: 0 12px 26px #0007; }
+
+/* ============================================================
+   12. Search results — pop in
+   ============================================================ */
+
+@keyframes moPopIn {
+  from { opacity: 0; transform: translateY(-8px) scale(.98); }
+  to   { opacity: 1; transform: none; }
+}
+
+.search-results.open { animation: moPopIn .22s var(--mo-ease-out); }
+
+.sr-item { transition: background var(--mo-fast) var(--mo-ease), transform var(--mo-fast) var(--mo-ease); }
+.sr-item:hover { transform: translateX(3px); }
+
+/* ============================================================
+   13. FAQ accordion — content eases open
+   ============================================================ */
+
+details p {
+  animation: moFadeDown .35s var(--mo-ease-out);
+}
+
+@keyframes moFadeDown {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: none; }
+}
+
+summary::after { transition: transform var(--mo-base) var(--mo-spring), color var(--mo-base) var(--mo-ease); }
+details[open] summary::after { transform: rotate(135deg); }
+
+/* ============================================================
+   14. Filter chips
+   ============================================================ */
+
+.filterbar .chip,
+.gloss-tags .chip {
+  transition:
+    background var(--mo-fast) var(--mo-ease),
+    border-color var(--mo-fast) var(--mo-ease),
+    color var(--mo-fast) var(--mo-ease),
+    transform var(--mo-fast) var(--mo-spring);
+}
+
+.filterbar .chip:hover,
+.gloss-tags .chip:hover { transform: translateY(-2px); border-color: #3d5488; color: var(--text); }
+
+.filterbar .chip.active,
+.gloss-tags .chip.active { transform: translateY(-1px); }
+
+/* ============================================================
+   15. Grid items entering after a filter change
+   ============================================================ */
+
+@keyframes moGridIn {
+  from { opacity: 0; transform: translateY(14px) scale(.98); }
+  to   { opacity: 1; transform: none; }
+}
+
+.mo-enter { animation: moGridIn .38s var(--mo-ease-out) both; }
+
+/* ============================================================
+   16. Ambient background — orbs drift a little more
+   ============================================================ */
+
+.orb { will-change: transform; }
+
+.grid-overlay {
+  animation: moGridDrift 40s linear infinite;
+}
+
+@keyframes moGridDrift {
+  from { background-position: 0 0, 0 0; }
+  to   { background-position: 44px 44px, 44px 44px; }
+}
+
+/* ============================================================
+   17. Focus visibility — motion must never hide focus
+   ============================================================ */
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+/* ============================================================
+   18. Reduced motion — hard stop
+   ------------------------------------------------------------
+   Everything above collapses to a static, fully visible page.
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  [data-mo-hero],
+  .reveal,
+  .reveal[data-mo] {
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+  }
+
+  .section-head .line { transform: scaleX(1) !important; }
+  #moProgress { display: none; }
+  .badge::after,
+  .btn::after { display: none; }
+}

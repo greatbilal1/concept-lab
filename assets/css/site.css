@@ -31,9 +31,10 @@ main { max-width: var(--maxw); margin: auto; padding: 0 20px 90px; }
 .courses { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 22px; }
 .course {
   position: relative; display: flex; flex-direction: column; text-decoration: none; color: inherit;
+  isolation: isolate;
   background: rgba(18, 26, 47, .9); border: 1px solid var(--border); border-radius: 18px; overflow: hidden;
   transition: transform .25s cubic-bezier(.2, .8, .3, 1), box-shadow .25s, border-color .25s;
-  opacity: 0; transform: translateY(26px);
+  opacity: 1; transform: none;
 }
 .course.in { opacity: 1; transform: translateY(0); }
 .course:hover { transform: translateY(-6px); box-shadow: 0 22px 50px #0007; border-color: #3d5488; }
@@ -256,9 +257,12 @@ main { max-width: var(--maxw); margin: auto; padding: 0 20px 90px; }
 /* ---------- secondary "guided lessons" link on a course card ---------- */
 /* The card is a <div>; the primary destination is a stretched overlay link
    so secondary links (like "Guided lessons") can sit above it. */
-.course .course-hit { position: absolute; inset: 0; z-index: 1; border-radius: inherit; }
+.course .course-hit {
+  position: absolute; inset: 0; z-index: 10; display: block;
+  border-radius: inherit; cursor: pointer;
+}
 .course .course-hit:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
-.course .course-lessons { position: relative; z-index: 2; }
+.course .course-lessons { position: relative; z-index: 11; }
 .course .course-lessons {
   display: inline-flex; align-items: center; gap: 7px;
   align-self: flex-start;
