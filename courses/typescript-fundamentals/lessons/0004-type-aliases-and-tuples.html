@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 04 — Type Aliases & Tuples</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="typescript-fundamentals" data-lesson="4" data-lesson-id="type-aliases-and-tuples">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 04</span> · Interfaces & Type Aliases</span>
+
+  <h1 class="lesson-title">Type Aliases & Tuples</h1>
+  <p class="lesson-lede">
+    Type aliases give a name to any type—including unions, primitives, and tuples. Learn how they complement interfaces.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Create type aliases for custom types and define fixed-length, typed tuples</span>
+    <span><b>Mission link</b> Represent complex primitive combinations and structured return values cleanly</span>
+  </div>
+
+  <h2><span class="n">1</span>Type aliases: naming any shape</h2>
+  <p>While <code>interface</code> is specifically designed for object structures, a <b>type alias</b> (declared with <code>type Name = ...</code>) can name <i>any</i> valid type: primitives, unions, intersections, functions, or tuples.</p><p>For example: <code>type ID = string | number;</code> cannot be expressed with an interface. Type aliases are indispensable when modeling domain types and functional signatures.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Use interface for open, extensible object models; use type alias for unions, primitives, tuples, and function signatures.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Tuples: fixed-length, ordered arrays</h2>
+  <p>A <b>tuple</b> is a specialized array with a fixed number of elements where each position has a specific type. A classic example is a coordinate pair <code>[number, number]</code> or React's <code>useState</code> return value <code>[state, setState]</code>.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing tuple type boundaries</h2>
+  <p>Trace how TypeScript verifies position and length on tuple assignments.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your knowledge of type aliases and tuple data structures.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You know when to use type aliases over interfaces and how to model fixed pairs and records with tuples.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Define a tuple for geo-coordinates [latitude: number, longitude: number].</li>
+    <li>Create a type alias for a callback function receiving a string and returning void.</li>
+    <li>Compare declaration merging behavior between interfaces and type aliases.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Official TypeScript Handbook, *Everyday Types: Type Aliases & Tuples*.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Can an interface represent a union of string | number?",
+    a: ["No, interfaces can only describe object shapes and function signatures; unions require type aliases","Yes, using interface ID extends string, number","Yes, using interface ID { value: string | number }","Yes, interfaces and types are 100% identical in every syntax capability"],
+    c: 0,
+    why: "An interface defines an object structure; union types of primitives require the 'type' keyword."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Standard Array",
+            "lines": [
+                  "let list: number[] = [1, 2, 3];",
+                  "Arbitrary length",
+                  "All elements share type"
+            ]
+      },
+      {
+            "title": "Tuple",
+            "lines": [
+                  "let coord: [number, number] = [10, 20];",
+                  "Fixed length: exactly 2 items",
+                  "Positional typing"
+            ]
+      },
+      {
+            "title": "Labeled Tuple",
+            "lines": [
+                  "type UserPair = [id: number, name: string];",
+                  "Self-documenting positional slots",
+                  "Clear editor autocompletion"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "type ResponseEntry = [statusCode: number, message: string];",
+      "let res: ResponseEntry = [200, 'OK']; // valid",
+      "// let bad1: ResponseEntry = ['OK', 200]; // Error: Type 'string' is not assignable to type 'number'",
+      "// let bad2: ResponseEntry = [200, 'OK', true]; // Error: Source has 3 elements, target allows only 2"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "tuple_definition": "Slot 0: number, Slot 1: string"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "res": "[200, 'OK'] matches length 2 and types"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "type_mismatch": "Index 0 must be number, got string"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "length_mismatch": "Length 3 exceeds target length 2"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The keyword used to define a type alias is <0>.",
+      "An array with fixed length and explicit types at each index is a <1>.",
+      "To define a type representing either a string or number, you write string <2> number."
+],
+    blanks: [
+      {
+            "a": [
+                  "type"
+            ],
+            "why": "type creates a custom type alias."
+      },
+      {
+            "a": [
+                  "tuple"
+            ],
+            "why": "Tuples guarantee fixed size and positional typing."
+      },
+      {
+            "a": [
+                  "|"
+            ],
+            "why": "The pipe symbol (|) creates a union type."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Which scenario strictly requires a 'type' alias rather than an 'interface'?",
+      a: ["Creating a union type (e.g. type Status = 'open' | 'closed')","Defining the shape of a simple object with two strings","Describing a class constructor","Inheriting properties from another object shape"],
+      c: 0,
+      why: "Only type aliases can directly declare union, intersection, and primitive aliases."
+    },
+    {
+      q: "What is the key characteristic of a TypeScript tuple?",
+      a: ["It is an array where the number of elements and their types at specific positions are fixed","It is an immutable object frozen with Object.freeze","It can only contain numbers","It is a database table row stored in memory"],
+      c: 0,
+      why: "Tuples express arrays with fixed lengths and specific types per index position."
+    },
+    {
+      q: "What is declaration merging in TypeScript?",
+      a: ["Multiple interface declarations with the same name automatically merge their properties into a single interface","Combining two JavaScript files using a bundler like Webpack","Automatically importing all files in a directory","Converting all functions into arrow functions"],
+      c: 0,
+      why: "Interfaces with identical names merge their property definitions; type aliases will throw a duplicate identifier error."
+    },
+    {
+      q: "Which syntax correctly defines a tuple type with a string and a boolean?",
+      a: ["A colon followed by string and boolean enclosed in square brackets","A colon followed by string and boolean enclosed in parentheses","Angle brackets: Tuple of string and boolean","Curly braces containing string and boolean"],
+      c: 0,
+      why: "Square brackets enclose the positional element types of a tuple."
+    }
+  ]);
+</script>
+</body>
+</html>

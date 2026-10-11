@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Node.js & Backend JavaScript — Cheat Sheet</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
 <link rel="stylesheet" href="../../../assets/css/tokens.css">
 <link rel="stylesheet" href="../../../assets/css/components.css">
 <style>
@@ -32,16 +33,73 @@
   </p>
 
   <div class="ref-toc">
-    <a href="#section-one">Section one</a>
+    <a href="#sec-1">Event Loop & Timers</a>
+    <a href="#sec-2">Buffers & File System</a>
+    <a href="#sec-3">Streams & Backpressure</a>
+    <a href="#sec-4">Express & Middleware</a>
   </div>
 
-  <h2 id="section-one"><span class="n">1</span>Section one</h2>
-
+  <h2 id="sec-1"><span class="n">1</span>Event Loop & Timers</h2>
   <div class="snippet">
-    <div class="lbl">Label</div>
-    <pre><code>code or summary here</code></pre>
+    <div class="lbl">Phases of asynchronous execution</div>
+    <pre><code>// Microtasks (run immediately after current operation):
+process.nextTick(() =&gt; console.log("nextTick"));
+Promise.resolve().then(() =&gt; console.log("promise microtask"));
+
+// Macrotasks (run in event loop phases):
+setTimeout(() =&gt; console.log("timer phase"), 0);
+setImmediate(() =&gt; console.log("check phase"));</code></pre>
   </div>
-  <p class="see">See <a href="../lessons/0001-slug.html">Lesson 01 — Title</a>.</p>
+  <p class="see">See <a href="../lessons/0001-event-loop-and-libuv.html">Lesson 01 — The Event Loop & Libuv Architecture</a>.</p>
+
+  <h2 id="sec-2"><span class="n">2</span>Buffers & File System</h2>
+  <div class="snippet">
+    <div class="lbl">Asynchronous binary I/O</div>
+    <pre><code>import fs from "node:fs/promises";
+
+// Allocating and converting binary buffers
+const buf = Buffer.from("Hello Node.js", "utf-8");
+console.log(buf.length, buf.toString("hex"));
+
+// Safe non-blocking file read
+const content = await fs.readFile("./config.json", "utf-8");</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0003-file-system-and-buffers.html">Lesson 03 — File System, Buffers & Binary Data</a>.</p>
+
+  <h2 id="sec-3"><span class="n">3</span>Streams & Backpressure</h2>
+  <div class="snippet">
+    <div class="lbl">Memory-efficient data pipelines</div>
+    <pre><code>import fs from "node:fs";
+import { pipeline } from "node:stream/promises";
+import zlib from "node:zlib";
+
+// Pipe readable file stream through gzip into destination
+await pipeline(
+  fs.createReadStream("large-input.log"),
+  zlib.createGzip(),
+  fs.createWriteStream("large-input.log.gz")
+);</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0004-streams-and-pipes.html">Lesson 04 — Streams & Piping Large Datasets</a>.</p>
+
+  <h2 id="sec-4"><span class="n">4</span>Express & Middleware</h2>
+  <div class="snippet">
+    <div class="lbl">Composable request pipeline</div>
+    <pre><code>import express from "express";
+
+const app = express();
+app.use(express.json()); // parse JSON body
+
+// Custom logging middleware
+app.use((req, res, next) =&gt; {
+  console.log(req.method, req.url);
+  next(); // pass to next handler
+});
+
+app.get("/api/health", (req, res) =&gt; res.json({ ok: true }));
+app.listen(3000);</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0006-express-and-middleware-pattern.html">Lesson 06 — Express & Middleware</a>.</p>
 
   <div class="lesson-foot">
     <div class="links">
@@ -51,12 +109,5 @@
   </div>
 
 </div>
-
-<script src="../../../assets/js/icons.js"></script>
-<script src="../lessons.js"></script>
-<script src="../../../assets/js/teach/lesson-engine.js"></script>
-<script>
-  TeachLesson.init({ course: "nodejs-backend", lessons: window.TeachLessons || [] });
-</script>
 </body>
 </html>

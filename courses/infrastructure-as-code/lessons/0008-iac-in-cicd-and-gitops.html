@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 08 — IaC in CI/CD & GitOps Pipelines</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="infrastructure-as-code" data-lesson="8" data-lesson-id="iac-in-cicd-and-gitops">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 08</span> · Drift Detection, CI/CD & Security</span>
+
+  <h1 class="lesson-title">IaC in CI/CD & GitOps Pipelines</h1>
+  <p class="lesson-lede">
+    Never run 'terraform apply' from a developer laptop in production. Automate delivery through GitOps pipelines.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Design an automated GitOps CI/CD pipeline for Terraform with automated planning, reviews, and applies</span>
+    <span><b>Mission link</b> Eliminate human operational errors and deploy infrastructure reliably across environments</span>
+  </div>
+
+  <h2><span class="n">1</span>The danger of laptop applies</h2>
+  <p>Running <code>terraform apply</code> directly from an engineer's laptop introduces massive operational risks: local differences in Terraform versions, uncommitted local edits, personal cloud credential leaks, and zero peer visibility.</p><p>In a mature <b>GitOps pipeline</b>, the only entity permitted to execute <code>terraform apply</code> is the automated CI/CD pipeline (e.g. GitHub Actions, GitLab CI, Atlantis, or Spacelift). Humans open Pull Requests; machines test, plan, and apply.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    All production infrastructure changes must flow through version control and be executed by automated CI/CD pipelines.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The standard GitOps workflow for IaC</h2>
+  <p>A production GitOps pipeline follows strict stages:</p><ol><li><b>Branch & Edit:</b> Engineer creates a branch and edits <code>.tf</code> files.</li><li><b>Validation:</b> CI runs <code>terraform fmt -check</code>, <code>terraform validate</code>, and <code>checkov</code>.</li><li><b>Plan generation:</b> CI runs <code>terraform plan</code> and posts the diff as a comment on the Pull Request.</li><li><b>Peer Review:</b> Tech lead approves the PR after inspecting the exact plan.</li><li><b>Merge & Apply:</b> Merging to <code>main</code> triggers the CI runner to execute <code>terraform apply</code>.</li></ol>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing automated plan output commenting</h2>
+  <p>Trace how modern tools like Atlantis or GitHub Actions post live plan diffs onto Pull Requests.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your mastery of GitOps pipelines and automated IaC delivery.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can design and maintain production-grade GitOps pipelines for automated, peer-reviewed infrastructure delivery.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Write a GitHub Actions workflow that executes terraform fmt, validate, and plan on pull requests.</li>
+    <li>Implement branch protection rules requiring at least one peer approval before merging to main.</li>
+    <li>Explore specialized IaC automation tools like Atlantis or Spacelift for PR-driven applies.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    HashiCorp Guide: *Automating Terraform with GitHub Actions*.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "In an automated CI/CD pipeline, when should 'terraform plan' vs 'terraform apply' be executed?",
+    a: ["Plan runs automatically on Pull Request creation to generate a review comment; Apply runs automatically only after merge to main","Apply runs on Pull Request creation; Plan runs after merge","Both plan and apply run continuously every 5 seconds","Neither: humans must always run apply from their laptops"],
+    c: 0,
+    why: "Planning on PRs allows human review of the diff; applying on merge executes the approved change into production."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1. Pull Request",
+            "lines": [
+                  "git push branch",
+                  "fmt, validate, checkov",
+                  "terraform plan posted to PR"
+            ]
+      },
+      {
+            "title": "2. Peer Review",
+            "lines": [
+                  "Engineers inspect plan diff",
+                  "Senior sign-off approved",
+                  "Merged to main branch"
+            ]
+      },
+      {
+            "title": "3. CI Apply Runner",
+            "lines": [
+                  "Runs in isolated container",
+                  "terraform apply executes",
+                  "Updates prod cloud safely"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "1. PR #42 opened: 'Add read replica for Postgres'",
+      "2. GitHub Action executes: terraform plan -no-color > plan.txt",
+      "3. Action posts markdown comment to PR #42:",
+      "   'Plan: 1 to add, 0 to change, 0 to destroy. Click to inspect...'",
+      "4. Reviewer approves; PR merged; CI runner applies changes"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "trigger": "Pull Request opened"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "ci_execution": "Non-destructive plan generated in runner"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "pr_feedback": "Transparent diff posted for team inspection"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "pipeline_complete": "Controlled, auditable deployment executed"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The operational model where Git is the single source of truth is called Git<0>.",
+      "The command that checks whether all HCL files follow standard formatting is terraform <1> -check.",
+      "In CI/CD, terraform plan runs on pull requests, while terraform apply runs on <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "Ops"
+            ],
+            "why": "GitOps drives operations via Git."
+      },
+      {
+            "a": [
+                  "fmt"
+            ],
+            "why": "terraform fmt enforces canonical indentation."
+      },
+      {
+            "a": [
+                  "merge"
+            ],
+            "why": "Apply triggers upon merging to the release branch."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why should developers be forbidden from running 'terraform apply' from their local laptops in production?",
+      a: ["It bypasses peer review, risks using out-of-date local state, leaks credentials, and lacks audit trails","Laptops do not have enough battery power to run Terraform","Terraform only compiles on Linux server CPUs","Applying from laptops cancels cloud service level agreements (SLAs)"],
+      c: 0,
+      why: "Centralized CI/CD ensures code review, consistent versions, audit logs, and locked-down credentials."
+    },
+    {
+      q: "What is the role of 'terraform fmt -check' in a CI validation pipeline?",
+      a: ["It checks whether all code conforms to canonical Terraform formatting standards without modifying the files","It checks if the database is running","It formats the hard drive of the runner","It validates whether cloud billing credentials are valid"],
+      c: 0,
+      why: "terraform fmt -check returns a non-zero exit code if any file has non-canonical formatting, enforcing clean style."
+    },
+    {
+      q: "How does GitOps improve auditability for compliance standards like SOC2 or ISO 27001?",
+      a: ["Every infrastructure modification is linked to a specific Git commit, Pull Request, author, and reviewer","It encrypts all employee emails automatically","It eliminates the need for any internal company passwords","It runs automated background checks on all developers"],
+      c: 0,
+      why: "Git history and PR reviews provide an immutable audit trail of who changed what, when, and why."
+    },
+    {
+      q: "What tool allows teams to run 'terraform plan' and 'terraform apply' directly from Pull Request comments?",
+      a: ["Atlantis","Vim","NPM","Webpack"],
+      c: 0,
+      why: "Atlantis is an open-source self-hosted pull-request automation server for Terraform."
+    }
+  ]);
+</script>
+</body>
+</html>

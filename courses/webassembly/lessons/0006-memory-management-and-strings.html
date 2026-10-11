@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 06 — Complex Types & Memory Management</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="webassembly" data-lesson="6" data-lesson-id="memory-management-and-strings">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 06</span> · Compiling Systems Languages (Rust/C)</span>
+
+  <h1 class="lesson-title">Complex Types & Memory Management</h1>
+  <p class="lesson-lede">
+    How do you pass a string or JSON object to Wasm when it only understands numbers? Master pointers, allocations, and deallocation.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Pass strings and byte buffers across the JS-Wasm boundary using memory pointers and prevent memory leaks</span>
+    <span><b>Mission link</b> Master low-level data marshaling and manual memory lifecycle management</span>
+  </div>
+
+  <h2><span class="n">1</span>The string challenge: Everything is a number</h2>
+  <p>WebAssembly functions can only accept and return <code>i32</code>, <code>i64</code>, <code>f32</code>, and <code>f64</code>. It has no native concept of a string, array, or object. So how does <code>greet("Alice")</code> work?</p><p>A string in Wasm is represented as <b>two numbers</b>:</p><ol><li>A <b>pointer (offset):</b> The 32-bit memory address where the string's bytes begin in linear memory.</li><li>A <b>length:</b> The number of UTF-8 bytes in the string.</li></ol>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Strings and buffers are passed to Wasm as a memory pointer (offset address) and a length.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The allocation lifecycle: malloc and free</h2>
+  <p>To pass data from JavaScript into Wasm without bindgen abstractions:</p><ol><li>Wasm exports an allocation helper: <code>alloc(size)</code> (which calls Rust/C <code>malloc</code>).</li><li>JavaScript calls <code>const ptr = instance.exports.alloc(byteLength)</code>.</li><li>JavaScript writes the UTF-8 bytes into <code>new Uint8Array(memory.buffer, ptr, byteLength)</code>.</li><li>Wasm processes the data at <code>ptr</code>.</li><li>JavaScript calls <code>instance.exports.dealloc(ptr, byteLength)</code> to prevent memory leaks.</li></ol>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing string encoding and decoding across boundaries</h2>
+  <p>Trace how TextEncoder and TextDecoder bridge strings across the linear memory boundary.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your understanding of manual memory allocation and string marshaling.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You understand how complex data types are passed across the boundary and can manage manual allocations safely.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Write an allocation and deallocation helper in WAT or C that exposes malloc and free.</li>
+    <li>Implement a round-trip string uppercase function using TextEncoder and TextDecoder.</li>
+    <li>Inspect memory leak behavior by repeatedly allocating memory without calling dealloc.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    MDN Web Docs: *Passing strings to WebAssembly*.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "If JavaScript allocates a buffer inside Wasm linear memory and passes it to Wasm, who is responsible for freeing that memory?",
+    a: ["The developer must explicitly manage allocation and deallocation: JavaScript's garbage collector cannot free Wasm linear memory","JavaScript's garbage collector automatically cleans up Wasm memory","The operating system reclaims it after 5 seconds","Wasm memory is read-only and cannot be freed"],
+    c: 0,
+    why: "Wasm linear memory is manually managed; objects allocated inside it must be freed explicitly to prevent memory leaks."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1. JS Allocation",
+            "lines": [
+                  "const ptr = exports.alloc(len)",
+                  "Gets free address in Wasm heap"
+            ]
+      },
+      {
+            "title": "2. Write Bytes",
+            "lines": [
+                  "TextEncoder().encodeInto()",
+                  "Writes bytes into memory.buffer at ptr"
+            ]
+      },
+      {
+            "title": "3. Deallocation",
+            "lines": [
+                  "exports.dealloc(ptr, len)",
+                  "Frees memory in Wasm allocator"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "const text = 'Hello WebAssembly';",
+      "const bytes = new TextEncoder().encode(text); // 17 bytes",
+      "const ptr = instance.exports.allocate(bytes.length); // e.g. address 1024",
+      "new Uint8Array(memory.buffer, ptr, bytes.length).set(bytes);",
+      "const outPtr = instance.exports.uppercase(ptr, bytes.length);",
+      "const result = new TextDecoder().decode(new Uint8Array(memory.buffer, outPtr, bytes.length));"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "encoded": "17 UTF-8 bytes in JS"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "pointer": "Memory allocated at offset 1024"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "wasm_transform": "Wasm processes bytes at offset 1024"
+            }
+      },
+      {
+            "line": 5,
+            "vars": {
+                  "decoded": "Result decoded back to JS string: 'HELLO WEBASSEMBLY'"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "A string in Wasm is represented by a memory <0> and a length.",
+      "The browser API used to encode JS strings into UTF-8 bytes is Text<1>.",
+      "Failing to deallocate memory allocated in Wasm causes a memory <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "pointer"
+            ],
+            "why": "Pointers point to memory offsets."
+      },
+      {
+            "a": [
+                  "Encoder"
+            ],
+            "why": "TextEncoder produces UTF-8 byte arrays."
+      },
+      {
+            "a": [
+                  "leak"
+            ],
+            "why": "Unfreed linear memory leaks permanently."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why can't you pass a JavaScript string directly to a WebAssembly function like 'instance.exports.greet(\"Ada\")'?",
+      a: ["Core WebAssembly only understands numeric primitive types; strings must be marshaled as a memory pointer and byte length","Strings are not supported on the web platform","Wasm only accepts emojis","Because JavaScript strings are always encrypted"],
+      c: 0,
+      why: "Wasm has no string type; strings are stored as raw bytes in linear memory referenced by numeric pointers."
+    },
+    {
+      q: "What standard browser API encodes a JavaScript string into a Uint8Array of UTF-8 bytes?",
+      a: ["TextEncoder","JSON.stringify","String.toBytes()","Buffer.from()"],
+      c: 0,
+      why: "new TextEncoder().encode() is the native browser API for converting strings into UTF-8 byte arrays."
+    },
+    {
+      q: "What happens if JavaScript continuously allocates buffers in Wasm memory without deallocating them?",
+      a: ["Wasm linear memory expands continuously until browser memory is exhausted, causing a memory leak and crash","The browser garbage collector frees them automatically after each function call","The Wasm module rewrites the memory automatically","Nothing, memory automatically resets to zero"],
+      c: 0,
+      why: "Wasm linear memory is not managed by the V8 garbage collector; manual deallocation is mandatory."
+    },
+    {
+      q: "What is a 'pointer' in the context of WebAssembly linear memory?",
+      a: ["An integer (i32) representing the byte offset index in the linear memory ArrayBuffer where data begins","The physical coordinates of the user's mouse cursor","A reference to an HTML DOM button","A URL link to an external website"],
+      c: 0,
+      why: "Pointers in 32-bit WebAssembly are 32-bit integers specifying the start index of data in linear memory."
+    }
+  ]);
+</script>
+</body>
+</html>

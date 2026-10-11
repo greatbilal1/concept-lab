@@ -1222,6 +1222,776 @@
     ];
   }
 
+  /* ---------- hcw (How Computers Work) ---------- */
+  function HcwBits(t) {
+    const p = pulse(t, 1.5);
+    const onShadow = "0 0 " + (10 + p.opacity * 15) + "px " + T.good;
+    const bitStyle = (val) => ({
+      top: 130, width: 80, height: 110, borderRadius: 12,
+      border: "3px solid " + (val ? T.good : T.border),
+      background: val ? T.good + "22" : T.bg,
+      display: "grid", placeItems: "center",
+      fontSize: 56, fontWeight: 700, color: val ? T.text : T.muted,
+      boxShadow: val ? onShadow : "none",
+    });
+
+    return [
+      el("b8", Object.assign(bitStyle(1), { left: 290 }), { text: "1" }),
+      el("b4", Object.assign(bitStyle(0), { left: 390 }), { text: "0" }),
+      el("b2", Object.assign(bitStyle(1), { left: 490 }), { text: "1" }),
+      el("b1", Object.assign(bitStyle(1), { left: 590 }), { text: "1" }),
+
+      el("v8", { left: 290, top: 260, width: 80, textAlign: "center", color: T.accent, fontSize: 18, fontWeight: 700 }, { text: "8" }),
+      el("v4", { left: 390, top: 260, width: 80, textAlign: "center", color: T.muted, fontSize: 18, fontWeight: 700 }, { text: "4" }),
+      el("v2", { left: 490, top: 260, width: 80, textAlign: "center", color: T.accent, fontSize: 18, fontWeight: 700 }, { text: "2" }),
+      el("v1", { left: 590, top: 260, width: 80, textAlign: "center", color: T.accent, fontSize: 18, fontWeight: 700 }, { text: "1" }),
+
+      el("sum", { left: 200, top: 330, width: 560, textAlign: "center", fontSize: 32, color: T.text, fontWeight: 500 }, { html: '<span style="color:' + T.accent + '">8</span> + 0 + <span style="color:' + T.accent + '">2</span> + <span style="color:' + T.accent + '">1</span> = <b>11</b>' }),
+      
+      caption(t, "Binary numbers are built by turning <b>powers of two</b> on or off")
+    ];
+  }
+
+  function HcwGates(t) {
+    const cycle = loop(t, 2);
+    const p = cycle > 0.5 ? 1 : 0; 
+    const glow = p ? T.good : T.muted;
+    const glowBg = p ? T.good + "33" : "transparent";
+
+    return [
+      el("inA", { left: 260, top: 160, fontSize: 32, fontWeight: 700, color: T.good }, { text: "1" }),
+      el("wireA", { left: 300, top: 178, width: 120, height: 4, background: T.good }),
+      
+      el("inB", { left: 260, top: 240, fontSize: 32, fontWeight: 700, color: glow }, { text: p ? "1" : "0" }),
+      el("wireB", { left: 300, top: 258, width: 120, height: 4, background: glow }),
+
+      el("gate", { left: 420, top: 130, width: 140, height: 180, border: "4px solid " + T.accent, borderRadius: "8px 70px 70px 8px", display: "grid", placeItems: "center", fontSize: 32, fontWeight: 700, color: T.accent, background: T.panel }, { text: "AND" }),
+
+      el("wireOut", { left: 560, top: 218, width: 120, height: 4, background: glow }),
+      el("out", { left: 690, top: 200, fontSize: 32, fontWeight: 700, color: glow, background: glowBg, padding: "8px 24px", borderRadius: 8, border: "2px solid " + glow }, { text: p ? "1" : "0" }),
+
+      caption(t, "Logic gates combine simple electrical signals to make <b>decisions</b>")
+    ];
+  }
+
+  function HcwCpu(t) {
+    const b = bob(t, 6, 2);
+    const flow = travel(t, 2);
+    const flow2 = travel(t, 2, 60);
+    
+    return [
+      node("ram", {
+        icon: "database", title: "Memory", tag: "RAM", color: T.accent2,
+        rows: ["0x01: LOAD A", "0x02: ADD B", "0x03: STORE"],
+        style: { left: 150, top: 140, width: 220 }
+      }),
+      
+      el("wire1", { left: 370, top: 190, width: 220, height: 4, background: T.border }),
+      el("wire2", { left: 370, top: 230, width: 220, height: 4, background: T.border }),
+
+      dot("pkt1", { size: 14, color: T.accent, style: { left: 370 + flow.t * 220, top: 185, opacity: flow.opacity } }),
+      el("flabel1", { left: 450, top: 160, fontSize: 14, fontWeight: 700, color: T.accent, opacity: flow.opacity }, { text: "fetch" }),
+
+      dot("pkt2", { size: 14, color: T.bad, style: { left: 590 - flow2.t * 220, top: 225, opacity: flow2.opacity } }),
+      el("flabel2", { left: 450, top: 245, fontSize: 14, fontWeight: 700, color: T.bad, opacity: flow2.opacity }, { text: "write" }),
+
+      node("cpu", {
+        icon: "cpu", title: "Processor", tag: "CPU", color: T.accent,
+        rows: ["Control Unit", "ALU", "Registers"],
+        style: { left: 590, top: 140, width: 220, transform: "translateY(" + b + "px)" }
+      }),
+
+      caption(t, "The CPU constantly fetches instructions from memory and <b>executes</b> them")
+    ];
+  }
+
+  function HcwCompile(t) {
+    const flow = travel(t, 1.5);
+    const sp = spin(t, 1.5);
+
+    return [
+      node("src", {
+        icon: "code", title: "Source Code", tag: "Python", color: T.good,
+        rows: ["x = 5", "y = x + 2"],
+        style: { left: 120, top: 160, width: 200 }
+      }),
+
+      el("wire", { left: 320, top: 210, width: 320, height: 4, background: T.border }),
+      dot("pkt", { size: 16, color: T.accent, style: { left: 320 + flow.t * 320, top: 204, opacity: flow.opacity } }),
+
+      el("compiler", { left: 440, top: 170, fontSize: 50, color: T.accent, transform: "rotate(" + sp + "deg)" }, { html: icon("settings", 80, T.accent) }),
+      el("clabel", { left: 435, top: 260, fontSize: 16, fontWeight: 700, color: T.accent }, { text: "Compiler" }),
+
+      node("bin", {
+        icon: "binary", title: "Machine Code", tag: "Binary", color: T.bad,
+        rows: ["10110010", "01001011"],
+        style: { left: 640, top: 160, width: 200 }
+      }),
+
+      caption(t, "High-level code must be <b>translated</b> into binary instructions for the CPU")
+    ];
+  }
+
+  /* ---------- pct (Programming & Computational Thinking) ---------- */
+  function PctLoop(t) {
+    const p = t * 4;
+    const act = (n) => (p >= n && p < n + 1) ? T.accent : T.muted;
+    const scale = (n) => (p >= n && p < n + 1) ? 1.05 : 1;
+
+    return [
+      node("n1", { icon: "brain", title: "Understand", color: act(0), style: { left: 130, top: 200, width: 140, transform: "scale(" + scale(0) + ")" } }),
+      el("w1", { left: 270, top: 232, width: 40, height: 2, background: T.border }),
+      
+      node("n2", { icon: "grid-dots", title: "Decompose", color: act(1), style: { left: 310, top: 200, width: 140, transform: "scale(" + scale(1) + ")" } }),
+      el("w2", { left: 450, top: 232, width: 40, height: 2, background: T.border }),
+
+      node("n3", { icon: "bulb", title: "Algorithm", color: act(2), style: { left: 490, top: 200, width: 140, transform: "scale(" + scale(2) + ")" } }),
+      el("w3", { left: 630, top: 232, width: 40, height: 2, background: T.border }),
+
+      node("n4", { icon: "code", title: "Automate", color: act(3), style: { left: 670, top: 200, width: 140, transform: "scale(" + scale(3) + ")" } }),
+
+      caption(t, "Thinking like a programmer is a <b>repeatable process</b>")
+    ];
+  }
+
+  function PctDecompose(t) {
+    const split = easeInOut(span(t, 0.2, 0.8));
+    
+    return [
+      node("big", { title: "Complex App", color: T.muted, style: { left: 400 - split * 200, top: 200 - split * 50, width: 160, transform: "scale(" + (1 + (1-split)*0.4) + ")", opacity: 1 - split * 0.5 } }),
+      
+      node("small1", { title: "Database", color: T.accent, style: { left: 400 + split * 100, top: 120, width: 160, opacity: split } }),
+      node("small2", { title: "Server", color: T.accent, style: { left: 400 + split * 100, top: 200, width: 160, opacity: split } }),
+      node("small3", { title: "Interface", color: T.accent, style: { left: 400 + split * 100, top: 280, width: 160, opacity: split } }),
+
+      caption(t, "Decomposition breaks a complex problem into <b>manageable pieces</b>")
+    ];
+  }
+
+  function PctPattern(t) {
+    const match = easeInOut(span(t, 0.25, 0.75));
+    const h = match > 0.5 ? T.good : T.border;
+
+    return [
+      node("item1", { title: "User", rows: ["auth()", "avatar"], color: h, style: { left: 160, top: 130, width: 180 } }),
+      node("item2", { title: "Admin", rows: ["auth()", "token"], color: h, style: { left: 390, top: 130, width: 180 } }),
+      node("item3", { title: "API", rows: ["auth()", "key"], color: h, style: { left: 620, top: 130, width: 180 } }),
+      
+      el("extract", { left: 390, top: 320, width: 180, opacity: match, border: "2px dashed " + T.good, borderRadius: 12, padding: "16px 0", textAlign: "center", color: T.good, fontWeight: 700, fontSize: 18 }, { text: "Shared: auth()" }),
+      
+      el("w1", { left: 250, top: 230, width: 180, height: 2, background: T.good, transformOrigin: "0 0", transform: "rotate(25deg)", opacity: match }),
+      el("w2", { left: 480, top: 230, width: 2, height: 90, background: T.good, opacity: match }),
+      el("w3", { left: 530, top: 230, width: 180, height: 2, background: T.good, transformOrigin: "100% 0", transform: "rotate(-25deg)", opacity: match }),
+      
+      caption(t, "Pattern recognition finds the <b>similarities</b> hiding inside different things")
+    ];
+  }
+
+  function PctAbstract(t) {
+    const focus = easeInOut(span(t, 0.2, 0.8));
+    
+    return [
+      node("sys", {
+        icon: "car", title: "Car", tag: "Complex", color: T.muted,
+        rows: ["combustion_engine", "brake_pads", "drive()", "stop()"],
+        style: { left: 380, top: 150, width: 200, opacity: 1 - focus }
+      }),
+
+      node("abs", {
+        icon: "car", title: "Car", tag: "Abstracted", color: T.good,
+        rows: ["drive()", "stop()"],
+        style: { left: 380, top: 150, width: 200, opacity: focus, transform: "scale(" + (1 + focus * 0.1) + ")" }
+      }),
+
+      caption(t, "Abstraction hides the messy details and exposes only the <b>essential interface</b>")
+    ];
+  }
+  /* ---------- variables-types-memory ---------- */
+  function VtmName(t) {
+    const slide = easeInOut(span(t, 0.2, 0.8));
+    
+    return [
+      el("v1", { left: 240, top: 180, fontSize: 56, fontWeight: 700, color: T.accent }, { text: "42" }),
+      
+      el("lbl", { left: 200 + slide * 260, top: 120, background: T.good, color: "#000", padding: "8px 24px", borderRadius: 8, fontSize: 24, fontWeight: 700 }, { text: "score" }),
+      el("arr", { left: 240 + slide * 260, top: 170, width: 4, height: 40, background: T.good, opacity: slide }),
+
+      el("v2", { left: 500, top: 180, fontSize: 56, fontWeight: 700, color: T.muted }, { text: "42" }),
+      
+      caption(t, "A variable is not a box. It is a <b>label</b> attached to a value.")
+    ];
+  }
+
+  function VtmBind(t) {
+    const link = easeInOut(span(t, 0.1, 0.4));
+    const unlink = easeInOut(span(t, 0.5, 0.7));
+    const relink = easeInOut(span(t, 0.7, 0.9));
+
+    return [
+      el("lbl", { left: 400, top: 120, background: T.good, color: "#000", padding: "8px 24px", borderRadius: 8, fontSize: 24, fontWeight: 700 }, { text: "age" }),
+      
+      el("v1", { left: 280, top: 220, fontSize: 56, fontWeight: 700, color: T.accent }, { text: "19" }),
+      el("arr1", { left: 420, top: 165, width: 4, height: 90, background: T.good, transformOrigin: "top left", transform: "rotate(45deg)", opacity: link * (1 - unlink) }),
+
+      el("v2", { left: 520, top: 220, fontSize: 56, fontWeight: 700, color: T.accent2 }, { text: "20" }),
+      el("arr2", { left: 450, top: 165, width: 4, height: 90, background: T.good, transformOrigin: "top left", transform: "rotate(-45deg)", opacity: relink }),
+
+      codePanel("cp", t, [{ t: "age = 19", h: link > 0 && unlink == 0 }, { t: "age = 20", h: relink > 0 }], { style: { left: 70, top: 120, width: 140 } }),
+
+      caption(t, "Assignment rips the label off the old value and <b>binds</b> it to a new one.")
+    ];
+  }
+
+  function VtmType(t) {
+    const show = easeInOut(span(t, 0.2, 0.8));
+    return [
+      node("n1", { title: "5", tag: "int", color: T.accent, rows: ["+  -  *  /", ">  <  =="], style: { left: 240, top: 150, width: 160 } }),
+      node("n2", { title: "'hello'", tag: "str", color: T.accent2, rows: ["+ (join)", "lower()"], style: { left: 480, top: 150, width: 160, opacity: show } }),
+
+      caption(t, "A type is a <b>rulebook</b>. It tells the computer what a value can and cannot do.")
+    ];
+  }
+
+  function VtmRef(t) {
+    const link = easeInOut(span(t, 0.2, 0.8));
+    return [
+      el("lbl1", { left: 240, top: 150, background: T.good, color: "#000", padding: "8px 24px", borderRadius: 8, fontSize: 24, fontWeight: 700 }, { text: "user" }),
+      el("lbl2", { left: 240, top: 250, background: T.good, color: "#000", padding: "8px 24px", borderRadius: 8, fontSize: 24, fontWeight: 700, opacity: link }, { text: "active" }),
+      
+      node("obj", { title: "{ name: 'Bilal' }", tag: "dict", color: T.accent, rows: [], style: { left: 520, top: 180, width: 220 } }),
+      
+      el("arr1", { left: 340, top: 165, width: 180, height: 4, background: T.good }),
+      el("arr2", { left: 340, top: 265, width: 180, height: 4, background: T.good, transformOrigin: "0 0", transform: "rotate(-25deg)", opacity: link }),
+
+      codePanel("cp", t, [{ t: "user = { ... }" }, { t: "active = user", h: link > 0 }], { style: { left: 30, top: 180, width: 180 } }),
+
+      caption(t, "Variables do not contain objects. They hold <b>references</b> pointing to them.")
+    ];
+  }
+
+  /* ---------- control-flow-logic ---------- */
+  function CflTruth(t) {
+    const cycle = loop(t, 2);
+    const p = cycle > 0.5 ? 1 : 0;
+    
+    return [
+      el("c1", { left: 280, top: 180, fontSize: 40, fontWeight: 700, color: p ? T.good : T.muted, background: p ? T.good+"33" : T.bg, padding: "10px 30px", borderRadius: 12, border: "2px solid " + (p ? T.good : T.border) }, { text: "True" }),
+      el("c2", { left: 480, top: 180, fontSize: 40, fontWeight: 700, color: p ? T.muted : T.bad, background: p ? T.bg : T.bad+"33", padding: "10px 30px", borderRadius: 12, border: "2px solid " + (p ? T.border : T.bad) }, { text: "False" }),
+
+      caption(t, "Booleans are the simplest type: exactly <b>two states</b>, and nothing in between.")
+    ];
+  }
+
+  function CflCompare(t) {
+    const flow = t * 3;
+    const a1 = flow > 0.5;
+    const a2 = flow > 1.5;
+    const a3 = flow > 2.5;
+
+    return [
+      el("eq1", { left: 200, top: 120, fontSize: 32, color: T.text }, { html: '5 <span style="color:'+T.accent+'">==</span> 5 <span style="color:'+(a1?T.good:T.bg)+'">→ True</span>' }),
+      el("eq2", { left: 200, top: 190, fontSize: 32, color: T.text }, { html: '9 <span style="color:'+T.accent+'">&lt;</span> 4 <span style="color:'+(a2?T.bad:T.bg)+'">→ False</span>' }),
+      el("eq3", { left: 200, top: 260, fontSize: 32, color: T.text }, { html: '"a" <span style="color:'+T.accent+'">!=</span> "b" <span style="color:'+(a3?T.good:T.bg)+'">→ True</span>' }),
+
+      caption(t, "Comparisons are questions you ask the computer. It always answers <b>True</b> or <b>False</b>.")
+    ];
+  }
+
+  function CflBranch(t) {
+    const dec = easeInOut(span(t, 0.2, 0.4));
+    const path = easeInOut(span(t, 0.4, 0.8));
+
+    return [
+      el("code", { left: 160, top: 160, fontSize: 24, color: T.text, background: T.panel, padding: 16, borderRadius: 8, border: "1px solid " + T.border }, { html: '<div style="color:'+T.accent+'">if <span style="color:'+T.text+'">score > 50:</span></div><div style="padding-left:20px">win()</div><div style="color:'+T.accent+';margin-top:8px">else:</div><div style="padding-left:20px">lose()</div>' }),
+      
+      el("w1", { left: 400, top: 220, width: 80, height: 4, background: T.border }),
+      el("q", { left: 480, top: 190, width: 80, height: 60, background: T.panel2, border: "2px solid " + T.accent, borderRadius: 8, display: "grid", placeItems: "center", color: T.accent, fontWeight: 700 }, { text: "score>50" }),
+
+      el("wT", { left: 560, top: 218, width: 60, height: 4, background: T.good, transformOrigin: "0 0", transform: "rotate(-40deg)", opacity: dec }),
+      el("nodeT", { left: 620, top: 160, padding: "8px 16px", background: T.good, color: "#000", fontWeight: 700, borderRadius: 8, opacity: path }),
+
+      el("wF", { left: 560, top: 222, width: 60, height: 4, background: T.bad, transformOrigin: "0 0", transform: "rotate(40deg)", opacity: dec }),
+      el("nodeF", { left: 620, top: 240, padding: "8px 16px", background: T.bad, color: "#000", fontWeight: 700, borderRadius: 8, opacity: 0.2 }),
+
+      caption(t, "An <b>if statement</b> creates a fork in the road. Execution takes exactly one path.")
+    ];
+  }
+
+  function CflWhile(t) {
+    const cycle = t * 3;
+    const p = cycle % 1;
+    const p_ease = easeInOut(p);
+    
+    return [
+      el("code", { left: 160, top: 160, fontSize: 24, color: T.text, background: T.panel, padding: 16, borderRadius: 8, border: "1px solid " + T.border }, { html: '<div style="color:'+T.accent+'">while <span style="color:'+T.text+'">hp > 0:</span></div><div style="padding-left:20px">fight()</div>' }),
+      
+      el("loop", { left: 420, top: 140, width: 140, height: 140, border: "4px solid " + T.accent, borderRadius: "50%", opacity: 0.3 }),
+      dot("d1", { size: 24, color: T.accent, style: { left: 480 + 70*Math.cos(p_ease*Math.PI*2 - Math.PI/2), top: 200 + 70*Math.sin(p_ease*Math.PI*2 - Math.PI/2) } }),
+
+      el("lbl", { left: 600, top: 200, fontSize: 24, fontWeight: 700, color: T.text }, { text: "Iteration " + Math.floor(cycle + 1) }),
+
+      caption(t, "A loop wraps a block of code in a circle. It repeats <b>as long as</b> the condition is True.")
+    ];
+  }
+  /* ---------- algorithms-problem-solving ---------- */
+  function AlgWhat(t) {
+    const flow = travel(t, 1.5);
+    const proc = easeInOut(span(t, 0.4, 0.6));
+
+    return [
+      node("in", { title: "Unsorted Data", color: T.muted, style: { left: 160, top: 180, width: 160 } }),
+      el("w1", { left: 320, top: 220, width: 140, height: 4, background: T.border }),
+      dot("d1", { size: 16, color: T.accent, style: { left: 320 + flow.t * 140, top: 214, opacity: flow.t < 0.5 ? flow.opacity : 0 } }),
+
+      node("algo", { icon: "settings", title: "Algorithm", color: T.accent, rows: ["step 1", "step 2", "step 3"], style: { left: 460, top: 150, width: 160, transform: "scale(" + (1 + proc * 0.05) + ")" } }),
+
+      el("w2", { left: 620, top: 220, width: 140, height: 4, background: T.border }),
+      dot("d2", { size: 16, color: T.good, style: { left: 620 + (flow.t - 0.5) * 2 * 140, top: 214, opacity: flow.t > 0.5 ? flow.opacity : 0 } }),
+
+      node("out", { title: "Sorted Result", color: T.good, style: { left: 760, top: 180, width: 160, opacity: proc } }),
+
+      caption(t, "An algorithm is a precise, step-by-step recipe that transforms <b>inputs</b> into <b>outputs</b>.")
+    ];
+  }
+
+  function AlgLinear(t) {
+    const p = t * 6; // 6 items to scan
+    const act = (n) => (p >= n && p < n + 1) ? T.accent : T.border;
+    const isTarget = (n) => n === 4;
+    const matchColor = (n) => isTarget(n) && p >= n ? T.good : act(n);
+
+    const cellStyle = (n) => ({
+      left: 150 + n * 110, top: 180, width: 90, height: 90, borderRadius: 12,
+      border: "3px solid " + matchColor(n), background: matchColor(n) + "22",
+      display: "grid", placeItems: "center", fontSize: 32, fontWeight: 700, color: T.text
+    });
+
+    return [
+      el("c0", cellStyle(0), { text: "12" }),
+      el("c1", cellStyle(1), { text: "45" }),
+      el("c2", cellStyle(2), { text: "7" }),
+      el("c3", cellStyle(3), { text: "23" }),
+      el("c4", cellStyle(4), { text: "89" }), // Target
+      el("c5", cellStyle(5), { text: "34" }),
+
+      el("target", { left: 150 + 4 * 110, top: 110, color: T.good, fontSize: 18, fontWeight: 700, opacity: p >= 4 ? 1 : 0 }, { text: "Found it!" }),
+      
+      caption(t, "<b>Linear search</b> checks every item one by one. It is slow but works on any list.")
+    ];
+  }
+
+  function AlgBinary(t) {
+    const s1 = span(t, 0.0, 0.33);
+    const s2 = span(t, 0.33, 0.66);
+    const s3 = span(t, 0.66, 1.0);
+
+    const cell = (n, val, hl, dim) => el("c"+n, {
+      left: 100 + n * 95, top: 180, width: 80, height: 80, borderRadius: 8,
+      border: "2px solid " + (hl ? T.good : T.border),
+      background: hl ? T.good + "22" : T.bg,
+      display: "grid", placeItems: "center", fontSize: 24, fontWeight: 700,
+      color: dim ? T.muted : T.text, opacity: dim ? 0.3 : 1
+    }, { text: val });
+
+    return [
+      cell(0, "2", false, s1 > 0),
+      cell(1, "7", false, s1 > 0),
+      cell(2, "12", false, s1 > 0),
+      cell(3, "23", false, s1 > 0),
+      cell(4, "34", s1 > 0 && s1 < 1, s1 > 0), // Mid 1
+      cell(5, "45", false, s2 > 0),
+      cell(6, "56", false, s2 > 0),
+      cell(7, "78", s2 > 0 && s2 < 1, s2 > 0), // Mid 2
+      cell(8, "89", s3 > 0, false), // Target
+      
+      caption(t, "<b>Binary search</b> halves the search space each step. The list must be sorted.")
+    ];
+  }
+
+  function AlgSortBasic(t) {
+    const swap = easeInOut(span(t, 0.2, 0.8));
+    
+    return [
+      el("v1", { left: 300, top: 200, fontSize: 48, fontWeight: 700, color: T.bad, transform: "translateY(" + (swap * -60) + "px) translateX(" + (swap * 150) + "px)" }, { text: "8" }),
+      el("v2", { left: 450, top: 200, fontSize: 48, fontWeight: 700, color: T.good, transform: "translateY(" + (swap * 60) + "px) translateX(" + (swap * -150) + "px)" }, { text: "3" }),
+      
+      el("w1", { left: 310, top: 280, width: 160, height: 2, background: T.border }),
+      el("w2", { left: 310, top: 280, width: 2, height: 10, background: T.border }),
+      el("w3", { left: 470, top: 280, width: 2, height: 10, background: T.border }),
+      
+      caption(t, "Basic sorting algorithms like Selection Sort repeatedly <b>find the smallest item</b> and swap it into place.")
+    ];
+  }
+
+  /* ---------- data-structures ---------- */
+  function DsArrays(t) {
+    const idx = Math.floor(t * 5);
+    const hl = (n) => idx === n ? T.accent : T.border;
+
+    return [
+      el("mem", { left: 200, top: 160, width: 560, height: 120, border: "2px solid " + T.border, borderRadius: 12, display: "flex" }),
+      
+      el("c0", { flex: 1, borderRight: "2px solid " + T.border, display: "grid", placeItems: "center", fontSize: 32, fontWeight: 700, color: T.text, background: hl(0)+"22" }, { text: "10" }),
+      el("c1", { flex: 1, borderRight: "2px solid " + T.border, display: "grid", placeItems: "center", fontSize: 32, fontWeight: 700, color: T.text, background: hl(1)+"22" }, { text: "20" }),
+      el("c2", { flex: 1, borderRight: "2px solid " + T.border, display: "grid", placeItems: "center", fontSize: 32, fontWeight: 700, color: T.text, background: hl(2)+"22" }, { text: "30" }),
+      el("c3", { flex: 1, borderRight: "2px solid " + T.border, display: "grid", placeItems: "center", fontSize: 32, fontWeight: 700, color: T.text, background: hl(3)+"22" }, { text: "40" }),
+      el("c4", { flex: 1, display: "grid", placeItems: "center", fontSize: 32, fontWeight: 700, color: T.text, background: hl(4)+"22" }, { text: "50" }),
+
+      el("i0", { left: 240, top: 300, color: T.muted, fontSize: 18, fontWeight: 700 }, { text: "0" }),
+      el("i1", { left: 350, top: 300, color: T.muted, fontSize: 18, fontWeight: 700 }, { text: "1" }),
+      el("i2", { left: 460, top: 300, color: T.muted, fontSize: 18, fontWeight: 700 }, { text: "2" }),
+      el("i3", { left: 570, top: 300, color: T.muted, fontSize: 18, fontWeight: 700 }, { text: "3" }),
+      el("i4", { left: 680, top: 300, color: T.muted, fontSize: 18, fontWeight: 700 }, { text: "4" }),
+
+      caption(t, "An array stores items in a <b>contiguous block</b> of memory, allowing instant access by index.")
+    ];
+  }
+
+  function DsLinkedLists(t) {
+    const flow = travel(t, 2);
+    
+    return [
+      node("n1", { title: "Data: 5", tag: "Node", color: T.accent, rows: ["next →"], style: { left: 150, top: 160, width: 140 } }),
+      el("w1", { left: 290, top: 245, width: 90, height: 3, background: T.accent }),
+      dot("d1", { size: 12, color: T.text, style: { left: 290 + flow.t * 90, top: 240, opacity: flow.opacity } }),
+
+      node("n2", { title: "Data: 8", tag: "Node", color: T.accent, rows: ["next →"], style: { left: 380, top: 220, width: 140 } }),
+      el("w2", { left: 520, top: 305, width: 90, height: 3, background: T.accent, transformOrigin: "0 0", transform: "rotate(-20deg)" }),
+
+      node("n3", { title: "Data: 3", tag: "Node", color: T.accent, rows: ["next: null"], style: { left: 610, top: 140, width: 140 } }),
+
+      caption(t, "A linked list stores items in scattered memory locations, connected by <b>pointers</b>.")
+    ];
+  }
+
+  function DsStacks(t) {
+    const push = easeInOut(span(t, 0.1, 0.4));
+    const pop = easeInOut(span(t, 0.6, 0.9));
+    
+    return [
+      el("container", { left: 400, top: 150, width: 160, height: 200, borderLeft: "4px solid " + T.border, borderRight: "4px solid " + T.border, borderBottom: "4px solid " + T.border, borderRadius: "0 0 12px 12px" }),
+      
+      el("item1", { left: 410, top: 290, width: 140, height: 50, background: T.panel2, border: "2px solid " + T.accent, borderRadius: 8, display: "grid", placeItems: "center", fontSize: 24, fontWeight: 700, color: T.text }, { text: "1" }),
+      el("item2", { left: 410, top: 230, width: 140, height: 50, background: T.panel2, border: "2px solid " + T.accent, borderRadius: 8, display: "grid", placeItems: "center", fontSize: 24, fontWeight: 700, color: T.text }, { text: "2" }),
+      el("item3", { left: 410, top: 170 - (1-push)*100 - pop*100, width: 140, height: 50, background: T.panel2, border: "2px solid " + T.accent, borderRadius: 8, display: "grid", placeItems: "center", fontSize: 24, fontWeight: 700, color: T.text, opacity: (push > 0 && pop < 1) ? 1 : 0 }, { text: "3" }),
+
+      el("lblIn", { left: 280, top: 100, color: T.good, fontWeight: 700, fontSize: 18, opacity: (push > 0 && push < 1) ? 1 : 0 }, { text: "Push →" }),
+      el("lblOut", { left: 600, top: 100, color: T.bad, fontWeight: 700, fontSize: 18, opacity: (pop > 0 && pop < 1) ? 1 : 0 }, { text: "→ Pop" }),
+
+      caption(t, "A stack operates on <b>LIFO</b> (Last In, First Out) — like a stack of plates.")
+    ];
+  }
+
+  function DsQueues(t) {
+    const push = easeInOut(span(t, 0.1, 0.4));
+    const pop = easeInOut(span(t, 0.6, 0.9));
+    
+    return [
+      el("container", { left: 200, top: 200, width: 560, height: 80, borderTop: "4px solid " + T.border, borderBottom: "4px solid " + T.border }),
+      
+      el("item1", { left: 600 + pop*150, top: 210, width: 100, height: 60, background: T.panel2, border: "2px solid " + T.accent2, borderRadius: 8, display: "grid", placeItems: "center", fontSize: 24, fontWeight: 700, color: T.text, opacity: pop < 1 ? 1 : 0 }, { text: "1" }),
+      el("item2", { left: 450 + pop*150, top: 210, width: 100, height: 60, background: T.panel2, border: "2px solid " + T.accent2, borderRadius: 8, display: "grid", placeItems: "center", fontSize: 24, fontWeight: 700, color: T.text }, { text: "2" }),
+      el("item3", { left: 300 + pop*150, top: 210, width: 100, height: 60, background: T.panel2, border: "2px solid " + T.accent2, borderRadius: 8, display: "grid", placeItems: "center", fontSize: 24, fontWeight: 700, color: T.text }, { text: "3" }),
+      
+      el("item4", { left: 150 - (1-push)*150 + pop*150, top: 210, width: 100, height: 60, background: T.panel2, border: "2px solid " + T.accent2, borderRadius: 8, display: "grid", placeItems: "center", fontSize: 24, fontWeight: 700, color: T.text, opacity: push > 0 ? 1 : 0 }, { text: "4" }),
+
+      el("lblIn", { left: 100, top: 150, color: T.good, fontWeight: 700, fontSize: 18, opacity: (push > 0 && push < 1) ? 1 : 0 }, { text: "Enqueue ↓" }),
+      el("lblOut", { left: 750, top: 150, color: T.bad, fontWeight: 700, fontSize: 18, opacity: (pop > 0 && pop < 1) ? 1 : 0 }, { text: "Dequeue ↑" }),
+
+      caption(t, "A queue operates on <b>FIFO</b> (First In, First Out) — like a line at a store.")
+    ];
+  }
+
+  /* ---------- python-fundamentals ---------- */
+  function PyFirst(t) {
+    const flow = travel(t, 1.5);
+    const run = easeInOut(span(t, 0.4, 0.6));
+
+    return [
+      node("src", { icon: "code", title: "hello.py", color: T.accent, rows: ["print('hello')"], style: { left: 160, top: 180, width: 180 } }),
+      
+      el("w1", { left: 340, top: 220, width: 140, height: 4, background: T.border }),
+      dot("d1", { size: 16, color: T.text, style: { left: 340 + flow.t * 140, top: 214, opacity: flow.t < 0.5 ? flow.opacity : 0 } }),
+
+      node("py", { icon: "brand-python", title: "Python Interpreter", color: T.good, rows: [], style: { left: 480, top: 180, width: 220, transform: "scale(" + (1 + run * 0.05) + ")" } }),
+
+      el("w2", { left: 700, top: 220, width: 100, height: 4, background: T.border }),
+      dot("d2", { size: 16, color: T.accent2, style: { left: 700 + (flow.t - 0.5) * 2 * 100, top: 214, opacity: flow.t > 0.5 ? flow.opacity : 0 } }),
+
+      el("out", { left: 800, top: 180, width: 120, background: T.panel, border: "2px solid " + T.border, borderRadius: 8, padding: 16, color: T.text, fontFamily: "monospace", fontSize: 20, opacity: run }, { text: "> hello" }),
+
+      caption(t, "Python is an <b>interpreted</b> language. A program reads your code and runs it line by line.")
+    ];
+  }
+
+  function PyNames(t) {
+    const slide = easeInOut(span(t, 0.2, 0.8));
+    
+    return [
+      codePanel("cp", t, [{ t: "score = 100" }], { style: { left: 100, top: 180, width: 160 } }),
+
+      el("v1", { left: 600, top: 180, fontSize: 56, fontWeight: 700, color: T.accent }, { text: "100" }),
+      
+      el("lbl", { left: 320 + slide * 140, top: 120, background: T.good, color: "#000", padding: "8px 24px", borderRadius: 8, fontSize: 24, fontWeight: 700 }, { text: "score" }),
+      el("arr", { left: 360 + slide * 140, top: 170, width: 4, height: 40, background: T.good, opacity: slide }),
+
+      caption(t, "In Python, a variable is not a box. It is a <b>name tag</b> bound to a value.")
+    ];
+  }
+
+  function PyTypes(t) {
+    const h1 = span(t, 0.1, 0.3) > 0 ? T.accent : T.muted;
+    const h2 = span(t, 0.3, 0.5) > 0 ? T.good : T.muted;
+    const h3 = span(t, 0.5, 0.7) > 0 ? T.warn : T.muted;
+    const h4 = span(t, 0.7, 0.9) > 0 ? T.accent2 : T.muted;
+
+    return [
+      node("n1", { title: "42", tag: "int", color: h1, style: { left: 150, top: 180, width: 140 } }),
+      node("n2", { title: "3.14", tag: "float", color: h2, style: { left: 310, top: 180, width: 140 } }),
+      node("n3", { title: "'hello'", tag: "str", color: h3, style: { left: 470, top: 180, width: 140 } }),
+      node("n4", { title: "True", tag: "bool", color: h4, style: { left: 630, top: 180, width: 140 } }),
+
+      caption(t, "Every value in Python has a <b>type</b>. The type determines what you can do with it.")
+    ];
+  }
+
+  function PyStrings(t) {
+    const build = easeInOut(span(t, 0.2, 0.8));
+    
+    return [
+      el("lbl", { left: 200, top: 140, fontSize: 24, color: T.muted }, { html: 'name = <span style="color:'+T.good+'">"Alice"</span>' }),
+      
+      el("fstr", { left: 200, top: 200, fontSize: 32, color: T.text }, { html: '<span style="color:'+T.accent+'">f</span>"Hello, <span style="color:'+T.good+'">{name}</span>!"' }),
+      
+      el("arrow", { left: 450, top: 220, fontSize: 24, color: T.muted, opacity: build }, { text: "→" }),
+      
+      el("out", { left: 520, top: 200, fontSize: 32, color: T.accent2, fontWeight: 700, opacity: build }, { text: '"Hello, Alice!"' }),
+
+      caption(t, "<b>f-strings</b> let you seamlessly inject Python variables directly into text.")
+    ];
+  }
+
+  /* ---------- git-version-control ---------- */
+  function GitWhy(t) {
+    const fade = easeInOut(span(t, 0.2, 0.5));
+    const show = easeInOut(span(t, 0.5, 0.8));
+
+    return [
+      node("f1", { title: "report_final.doc", color: T.bad, style: { left: 150, top: 100, width: 200, opacity: 1 - fade } }),
+      node("f2", { title: "report_final_v2.doc", color: T.bad, style: { left: 180, top: 160, width: 200, opacity: 1 - fade } }),
+      node("f3", { title: "report_final_v2_REAL.doc", color: T.bad, style: { left: 210, top: 220, width: 240, opacity: 1 - fade } }),
+      node("f4", { title: "report_final_v2_REAL_final.doc", color: T.bad, style: { left: 240, top: 280, width: 260, opacity: 1 - fade } }),
+
+      el("git", { left: 100, top: 200, width: 760, height: 4, background: T.border, opacity: show }),
+      dot("c1", { size: 24, color: T.good, style: { left: 150, top: 190, opacity: show } }),
+      dot("c2", { size: 24, color: T.good, style: { left: 350, top: 190, opacity: show } }),
+      dot("c3", { size: 24, color: T.good, style: { left: 550, top: 190, opacity: show } }),
+      dot("c4", { size: 24, color: T.accent, style: { left: 750, top: 190, opacity: show } }),
+      
+      el("lbl2", { left: 730, top: 150, fontSize: 18, color: T.accent, fontWeight: 700, opacity: show }, { text: "main" }),
+      
+      caption(t, "Version control replaces the chaos of file copies with a clean, linear <b>history</b>.")
+    ];
+  }
+
+  function GitCommit(t) {
+    const snap = easeInOut(span(t, 0.3, 0.6));
+    
+    return [
+      node("dir", { icon: "folder", title: "Project folder", color: T.muted, rows: ["index.html", "style.css", "app.js"], style: { left: 200, top: 150, width: 200 } }),
+      
+      el("flash", { left: 180, top: 130, width: 240, height: 180, background: "#fff", opacity: (snap > 0 && snap < 0.2) ? 0.8 : 0 }),
+
+      el("arr", { left: 420, top: 200, width: 100, height: 4, background: T.accent, opacity: snap }),
+      
+      node("cmt", { icon: "camera", title: "Commit a4b9c", tag: "Snapshot", color: T.good, rows: ["Author: Bilal", "Message: Add styles"], style: { left: 540, top: 150, width: 240, opacity: snap, transform: "scale(" + (0.8 + snap*0.2) + ")" } }),
+
+      caption(t, "A commit is not a diff. It is a <b>complete snapshot</b> of your project at a point in time.")
+    ];
+  }
+
+  function GitTrees(t) {
+    const p1 = easeInOut(span(t, 0.1, 0.4));
+    const p2 = easeInOut(span(t, 0.6, 0.9));
+
+    return [
+      node("wd", { title: "Working Directory", color: T.muted, rows: ["(your files on disk)"], style: { left: 100, top: 180, width: 200 } }),
+      
+      el("a1", { left: 320, top: 220, width: 100, height: 4, background: T.accent, opacity: p1 }),
+      el("l1", { left: 330, top: 190, color: T.accent, fontSize: 16, fontWeight: 700, opacity: p1 }, { text: "git add" }),
+
+      node("st", { title: "Staging Area", color: T.warn, rows: ["(what goes in next)"], style: { left: 440, top: 180, width: 200, opacity: p1 } }),
+
+      el("a2", { left: 660, top: 220, width: 100, height: 4, background: T.good, opacity: p2 }),
+      el("l2", { left: 665, top: 190, color: T.good, fontSize: 16, fontWeight: 700, opacity: p2 }, { text: "git commit" }),
+
+      node("repo", { title: "Repository", color: T.good, rows: ["(permanent history)"], style: { left: 780, top: 180, width: 200, opacity: p2 } }),
+
+      caption(t, "Git manages three areas. You <b>add</b> changes to staging, then <b>commit</b> them to history.")
+    ];
+  }
+
+  function GitLog(t) {
+    const cycle = t * 3;
+    
+    return [
+      el("w1", { left: 200, top: 220, width: 150, height: 4, background: T.border }),
+      el("w2", { left: 400, top: 220, width: 150, height: 4, background: T.border }),
+      el("w3", { left: 600, top: 220, width: 150, height: 4, background: T.border }),
+
+      node("c1", { title: "Commit 1", tag: "a1b2", color: T.muted, style: { left: 100, top: 180, width: 140 } }),
+      node("c2", { title: "Commit 2", tag: "c3d4", color: T.muted, style: { left: 300, top: 180, width: 140 } }),
+      node("c3", { title: "Commit 3", tag: "e5f6", color: T.muted, style: { left: 500, top: 180, width: 140 } }),
+      node("c4", { title: "Commit 4", tag: "g7h8", color: T.good, style: { left: 700, top: 180, width: 140 } }),
+
+      el("head", { left: 730, top: 120, background: T.accent, color: "#fff", padding: "6px 16px", borderRadius: 8, fontSize: 18, fontWeight: 700, transform: "translateY(" + bob(t, 5, 2) + "px)" }, { text: "HEAD" }),
+      el("arr", { left: 760, top: 150, width: 4, height: 30, background: T.accent, transform: "translateY(" + bob(t, 5, 2) + "px)" }),
+
+      caption(t, "History is a chain of commits. <b>HEAD</b> is simply a pointer to where you are right now.")
+    ];
+  }
+
+  /* ---------- javascript-fundamentals ---------- */
+  function JsVars(t) {
+    const swap = easeInOut(span(t, 0.4, 0.6));
+    
+    return [
+      codePanel("cp", t, [{ t: "let age = 10", h: swap == 0 }, { t: "age = 11", h: swap > 0 }, { t: "const name = 'Lee'" }], { style: { left: 80, top: 180, width: 220 } }),
+      
+      el("lbl1", { left: 400, top: 140, background: T.good, color: "#000", padding: "8px 24px", borderRadius: 8, fontSize: 24, fontWeight: 700 }, { text: "age (let)" }),
+      el("v1a", { left: 420, top: 220, fontSize: 56, fontWeight: 700, color: T.accent, opacity: 1 - swap, transform: "translateY(" + swap*50 + "px)" }, { text: "10" }),
+      el("v1b", { left: 420, top: 220, fontSize: 56, fontWeight: 700, color: T.good, opacity: swap, transform: "translateY(" + (1-swap)*-50 + "px)" }, { text: "11" }),
+      
+      el("lbl2", { left: 600, top: 140, background: T.bad, color: "#fff", padding: "8px 24px", borderRadius: 8, fontSize: 24, fontWeight: 700 }, { text: "name (const)" }),
+      el("v2", { left: 630, top: 220, fontSize: 40, fontWeight: 700, color: T.accent }, { text: "'Lee'" }),
+      el("lock", { left: 740, top: 230, fontSize: 24, color: T.bad }, { html: "🔒" }),
+
+      caption(t, "Variables declared with <b>let</b> can be reassigned. Variables declared with <b>const</b> cannot.")
+    ];
+  }
+
+  function JsEquality(t) {
+    const cycle = loop(t, 2);
+    const p = cycle > 0.5;
+
+    return [
+      el("eq1", { left: 200, top: 130, fontSize: 32, color: T.text }, { html: '5 <span style="color:'+T.bad+'">==</span> "5" <span style="color:'+(p?T.bad:T.bg)+'">→ True</span> <span style="font-size:18px;color:'+T.muted+'">(type coerced)</span>' }),
+      el("eq2", { left: 200, top: 230, fontSize: 32, color: T.text }, { html: '5 <span style="color:'+T.good+'">===</span> "5" <span style="color:'+(!p?T.good:T.bg)+'">→ False</span> <span style="font-size:18px;color:'+T.muted+'">(types differ)</span>' }),
+
+      caption(t, "Always use <b>===</b> (strict equality). The double equals tries to convert types behind your back.")
+    ];
+  }
+
+  function JsFunctions(t) {
+    const flow = travel(t, 1.5);
+
+    return [
+      el("in", { left: 160, top: 210, fontSize: 32, fontWeight: 700, color: T.accent }, { text: "3, 4" }),
+      el("w1", { left: 240, top: 228, width: 140, height: 4, background: T.border }),
+      dot("d1", { size: 16, color: T.accent, style: { left: 240 + flow.t * 140, top: 222, opacity: flow.t < 0.5 ? flow.opacity : 0 } }),
+
+      node("fn", { icon: "math-function", title: "add(x, y)", color: T.good, rows: ["return x + y"], style: { left: 380, top: 180, width: 200 } }),
+
+      el("w2", { left: 580, top: 228, width: 140, height: 4, background: T.border }),
+      dot("d2", { size: 16, color: T.good, style: { left: 580 + (flow.t - 0.5) * 2 * 140, top: 222, opacity: flow.t > 0.5 ? flow.opacity : 0 } }),
+
+      el("out", { left: 740, top: 210, fontSize: 32, fontWeight: 700, color: T.good }, { text: "7" }),
+
+      caption(t, "A function takes <b>parameters</b> as input, performs work, and <b>returns</b> a result.")
+    ];
+  }
+
+  function JsScope(t) {
+    const focus = easeInOut(span(t, 0.2, 0.8));
+
+    return [
+      el("outer", { left: 160, top: 120, width: 640, height: 300, border: "2px solid " + T.muted, borderRadius: 16, background: T.bg }),
+      el("olbl", { left: 180, top: 140, color: T.muted, fontSize: 20, fontWeight: 700 }, { text: "Global Scope (window)" }),
+      el("ovar", { left: 180, top: 180, color: T.accent, fontSize: 24 }, { text: "let user = 'Bilal'" }),
+
+      el("inner", { left: 400, top: 180, width: 360, height: 200, border: "2px solid " + T.good, borderRadius: 16, background: T.panel, boxShadow: "0 10px 30px #000a", transform: "scale(" + (1 + focus*0.05) + ")" }),
+      el("ilbl", { left: 420, top: 200, color: T.good, fontSize: 20, fontWeight: 700 }, { text: "Function Scope" }),
+      el("ivar", { left: 420, top: 240, color: T.accent, fontSize: 24 }, { text: "let temp = 42" }),
+      
+      el("read", { left: 420, top: 300, color: T.text, fontSize: 20 }, { html: 'print(user) <span style="color:'+T.good+'">✓</span>' }),
+      el("read2", { left: 180, top: 300, color: T.text, fontSize: 20 }, { html: 'print(temp) <span style="color:'+T.bad+'">✗ Error</span>' }),
+
+      caption(t, "Inner scopes can see outer variables, but outer scopes <b>cannot</b> see inner ones.")
+    ];
+  }
+
+  /* ---------- html-dom ---------- */
+  function DomElements(t) {
+    const build = easeInOut(span(t, 0.2, 0.8));
+    
+    return [
+      el("tag1", { left: 240, top: 180, fontSize: 32, color: T.accent, fontFamily: "monospace" }, { text: "<button" }),
+      el("attr", { left: 380, top: 180, fontSize: 32, color: T.good, fontFamily: "monospace" }, { text: 'id="btn"' }),
+      el("tag2", { left: 540, top: 180, fontSize: 32, color: T.accent, fontFamily: "monospace" }, { text: ">" }),
+      el("text", { left: 570, top: 180, fontSize: 32, color: T.text, fontFamily: "monospace" }, { text: "Click" }),
+      el("tag3", { left: 670, top: 180, fontSize: 32, color: T.accent, fontFamily: "monospace" }, { text: "</button>" }),
+
+      el("l1", { left: 260, top: 250, color: T.muted, fontSize: 16, opacity: build }, { text: "Tag" }),
+      el("l2", { left: 410, top: 250, color: T.good, fontSize: 16, opacity: build }, { text: "Attribute" }),
+      el("l3", { left: 580, top: 250, color: T.text, fontSize: 16, opacity: build }, { text: "Content" }),
+
+      el("w1", { left: 280, top: 220, width: 2, height: 20, background: T.muted, opacity: build }),
+      el("w2", { left: 440, top: 220, width: 2, height: 20, background: T.good, opacity: build }),
+      el("w3", { left: 610, top: 220, width: 2, height: 20, background: T.text, opacity: build }),
+
+      caption(t, "An HTML element is made of <b>tags</b> for structure, <b>attributes</b> for data, and <b>content</b>.")
+    ];
+  }
+
+  function DomSemantic(t) {
+    const split = easeInOut(span(t, 0.2, 0.8));
+
+    return [
+      el("b1", { left: 200, top: 120, width: 200, height: 240, border: "2px solid " + T.bad, borderRadius: 8, opacity: 1 - split }),
+      el("l1", { left: 280, top: 160, color: T.bad, fontSize: 24, opacity: 1 - split }, { text: "div" }),
+      el("l2", { left: 280, top: 220, color: T.bad, fontSize: 24, opacity: 1 - split }, { text: "div" }),
+      el("l3", { left: 280, top: 280, color: T.bad, fontSize: 24, opacity: 1 - split }, { text: "div" }),
+
+      el("b2", { left: 560, top: 120, width: 200, height: 240, border: "2px solid " + T.good, borderRadius: 8, opacity: split }),
+      el("h1", { left: 560, top: 120, width: 200, height: 50, background: T.good+"33", borderBottom: "2px solid " + T.good, display: "grid", placeItems: "center", color: T.good, fontSize: 20, opacity: split }, { text: "header" }),
+      el("m1", { left: 560, top: 170, width: 200, height: 140, display: "grid", placeItems: "center", color: T.text, fontSize: 20, opacity: split }, { text: "main" }),
+      el("f1", { left: 560, top: 310, width: 200, height: 50, background: T.accent+"33", borderTop: "2px solid " + T.accent, display: "grid", placeItems: "center", color: T.accent, fontSize: 20, opacity: split }, { text: "footer" }),
+
+      caption(t, "Semantic tags (like <b>main</b> and <b>header</b>) tell the browser and screen readers what the content <i>means</i>.")
+    ];
+  }
+
+  function DomTree(t) {
+    return [
+      node("doc", { title: "Document", color: T.accent, style: { left: 400, top: 100, width: 160 } }),
+      
+      el("w1", { left: 480, top: 160, width: 2, height: 40, background: T.border }),
+      node("html", { title: "<html>", color: T.accent2, style: { left: 400, top: 200, width: 160 } }),
+
+      el("w2", { left: 480, top: 260, width: 2, height: 20, background: T.border }),
+      el("w3", { left: 320, top: 280, width: 320, height: 2, background: T.border }),
+      el("w4", { left: 320, top: 280, width: 2, height: 20, background: T.border }),
+      el("w5", { left: 640, top: 280, width: 2, height: 20, background: T.border }),
+
+      node("head", { title: "<head>", color: T.muted, style: { left: 240, top: 300, width: 160 } }),
+      node("body", { title: "<body>", color: T.good, style: { left: 560, top: 300, width: 160 } }),
+
+      caption(t, "The browser parses HTML into the <b>Document Object Model (DOM)</b>, a tree of nodes you can query.")
+    ];
+  }
+
+  function DomNodes(t) {
+    const focus = easeInOut(span(t, 0.2, 0.8));
+
+    return [
+      node("body", { title: "<body>", color: T.good, rows: ["parentElement"], style: { left: 400, top: 120, width: 160 } }),
+      el("w1", { left: 480, top: 215, width: 2, height: 65, background: T.good }),
+      node("p", { title: "<p>", tag: "element", color: T.accent, rows: ["children[0]"], style: { left: 400, top: 280, width: 160, transform: "scale(" + (1 + focus*0.05) + ")", boxShadow: focus > 0 ? "0 0 20px " + T.accent+"55" : "none" } }),
+      
+      caption(t, "Every element is a <b>node</b> with properties that point to its parent, children, and siblings.")
+    ];
+  }
+
   /* ---------- registry ---------- */
   global.ExplainerScenes = {
     hub: {
@@ -1231,6 +2001,66 @@
       Composition: composition,
       Experimentation: experimentation,
       DesignTradeoffs: designTradeoffs,
+    },
+    "how-computers-work": {
+      HcwBits,
+      HcwGates,
+      HcwCpu,
+      HcwCompile,
+    },
+    "programming-computational-thinking": {
+      PctLoop,
+      PctDecompose,
+      PctPattern,
+      PctAbstract,
+    },
+    "variables-types-memory": {
+      VtmName,
+      VtmBind,
+      VtmType,
+      VtmRef,
+    },
+    "control-flow-logic": {
+      CflTruth,
+      CflCompare,
+      CflBranch,
+      CflWhile,
+    },
+    "algorithms-problem-solving": {
+      AlgWhat,
+      AlgLinear,
+      AlgBinary,
+      AlgSortBasic,
+    },
+    "data-structures": {
+      DsArrays,
+      DsLinkedLists,
+      DsStacks,
+      DsQueues,
+    },
+    "python-fundamentals": {
+      PyFirst,
+      PyNames,
+      PyTypes,
+      PyStrings,
+    },
+    "git-version-control": {
+      GitWhy,
+      GitCommit,
+      GitTrees,
+      GitLog,
+    },
+    "javascript-fundamentals": {
+      JsVars,
+      JsEquality,
+      JsFunctions,
+      JsScope,
+    },
+    "html-dom": {
+      DomElements,
+      DomSemantic,
+      DomTree,
+      DomNodes,
     },
     oop: {
       OopMentalModel: oopMentalModel,

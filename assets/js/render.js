@@ -426,29 +426,136 @@
 
   /* ---------- glossary page ---------- */
 
-  function glossaryCard(g) {
-    var c = byId(g.course);
-    /* Link to the course's own glossary page when it has one — that page
-       renders the full term list from the course manifest, so the site
-       glossary and the course glossary can never drift apart. Fall back
-       to the course page + section anchor for courses without one. */
-    var link = "#";
-    if (c) {
-      link = c.glossary
-        ? c.glossary
-        : hrefOf(c) + "#" + g.section;
-    }
-    var source = c ? c.title : g.course;
-    var tags = (g.tags || []).map(function (t) {
+  function termSlug(term) {
+    return "term-" + String(term || "").toLowerCase().trim()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-|-$)/g, "");
+  }
+
+  function groupGlossary(list) {
+    var map = new Map();
+    (list || []).forEach(function (g) {
+      if (!g || !g.term) return;
+      var norm = g.term.trim().toLowerCase();
+      if (!map.has(norm)) {
+        map.set(norm, {
+          term: g.term.trim(),
+          norm: norm,
+          definitions: [],
+          tags: new Set(),
+          courses: new Set()
+        });
+      }
+      var grp = map.get(norm);
+      (g.tags || []).forEach(function (t) { grp.tags.add(t); });
+      if (g.course) grp.courses.add(g.course);
+
+      var cleanDef = (g.def || "").trim();
+      var c = byId(g.course);
+      var link = "#";
+      if (c) {
+        link = c.glossary ? c.glossary : (hrefOf(c) + "#" + (g.section || ""));
+      }
+      var courseTitle = c ? c.title : g.course;
+      var courseSource = {
+        course: g.course,
+        section: g.section,
+        title: courseTitle,
+        link: link
+      };
+
+      var existingDef = null;
+      for (var i = 0; i < grp.definitions.length; i++) {
+        if (grp.definitions[i].def.toLowerCase() === cleanDef.toLowerCase()) {
+          existingDef = grp.definitions[i];
+          break;
+        }
+      }
+
+      if (existingDef) {
+        existingDef.sources.push(courseSource);
+      } else {
+        grp.definitions.push({
+          def: cleanDef,
+          sources: [courseSource]
+        });
+      }
+    });
+
+    return Array.from(map.values()).sort(function (a, b) {
+      return a.norm.localeCompare(b.norm);
+    });
+  }
+
+  function glossaryCard(grp) {
+    var slug = termSlug(grp.term);
+    var tags = Array.from(grp.tags || []).sort().map(function (t) {
       return '<span class="chip" data-tag="' + esc(t) + '">' + esc(t) + "</span>";
     }).join("");
-    return '<div class="gloss reveal" data-tags="' + esc((g.tags || []).join(" ")) + '"' +
-      ' data-course="' + esc(g.course) + '">' +
-      '<div class="gloss-head"><h3>' + esc(g.term) + "</h3>" +
-        '<a class="src" href="' + esc(link) + '">' + esc(source) + " →</a></div>" +
-      "<p>" + esc(g.def) + "</p>" +
-      '<div class="chips">' + tags + "</div>" +
-    "</div>";
+
+    var allCourses = Array.from(grp.courses || []).join(" ");
+    var allTags = Array.from(grp.tags || []).join(" ");
+
+    var defs = grp.definitions || [];
+    var totalSources = 0;
+    defs.forEach(function (d) { totalSources += (d.sources || []).length; });
+
+    // Single definition with a single course source
+    if (defs.length === 1 && totalSources === 1) {
+      var d0 = defs[0];
+      var s0 = d0.sources[0];
+      return '<div class="gloss reveal" id="' + slug + '" data-slug="' + slug + '" data-term="' + esc(grp.norm) + '" data-tags="' + esc(allTags) + '"' +
+        ' data-course="' + esc(allCourses) + '">' +
+        '<div class="gloss-head"><h3>' + esc(grp.term) + '</h3>' +
+          '<a class="src" href="' + esc(s0.link) + '">' + esc(s0.title) + ' →</a></div>' +
+        '<p>' + esc(d0.def) + '</p>' +
+        '<div class="chips">' + tags + '</div>' +
+      '</div>';
+    }
+
+    // Single definition shared by multiple courses
+    if (defs.length === 1 && totalSources > 1) {
+      var d0 = defs[0];
+      var sourcesHtml = d0.sources.map(function (s) {
+        return '<a class="src" href="' + esc(s.link) + '">' + esc(s.title) + ' →</a>';
+      }).join(' ');
+
+      return '<div class="gloss reveal" id="' + slug + '" data-slug="' + slug + '" data-term="' + esc(grp.norm) + '" data-tags="' + esc(allTags) + '"' +
+        ' data-course="' + esc(allCourses) + '">' +
+        '<div class="gloss-head">' +
+          '<h3>' + esc(grp.term) + ' <span class="gloss-badge">' + totalSources + ' courses</span></h3>' +
+        '</div>' +
+        '<p>' + esc(d0.def) + '</p>' +
+        '<div class="gloss-sources"><span class="gloss-sources-lbl">Taught in:</span> ' + sourcesHtml + '</div>' +
+        '<div class="chips">' + tags + '</div>' +
+      '</div>';
+    }
+
+    // Multiple distinct definitions (polysemous / multi-context terms)
+    var entriesHtml = defs.map(function (d) {
+      var sourcesHtml = d.sources.map(function (s) {
+        return '<a class="src" href="' + esc(s.link) + '">Lesson →</a>';
+      }).join(' ');
+
+      var sourceTitles = d.sources.map(function (s) { return s.title; }).join(" · ");
+
+      return '<div class="gloss-entry">' +
+        '<div class="gloss-entry-head">' +
+          '<span class="gloss-entry-tag">' + esc(sourceTitles) + '</span>' +
+          '<div class="gloss-entry-links">' + sourcesHtml + '</div>' +
+        '</div>' +
+        '<p class="gloss-entry-def">' + esc(d.def) + '</p>' +
+      '</div>';
+    }).join("");
+
+    return '<div class="gloss gloss-multi reveal' + (defs.length >= 4 ? ' gloss-span-2' : '') + '" id="' + slug + '" data-slug="' + slug + '" data-term="' + esc(grp.norm) + '" data-tags="' + esc(allTags) + '"' +
+      ' data-course="' + esc(allCourses) + '">' +
+      '<div class="gloss-head">' +
+        '<h3>' + esc(grp.term) + ' <span class="gloss-badge">' + defs.length + ' contexts</span></h3>' +
+      '</div>' +
+      '<div class="gloss-entries">' + entriesHtml + '</div>' +
+      '<div class="chips">' + tags + '</div>' +
+    '</div>';
   }
 
   function renderGlossary() {
@@ -459,10 +566,12 @@
     var tagBar = $("#glossaryTags");
     var count = $("#glossaryCount");
 
-    /* build the tag filter bar from the data */
+    var groups = groupGlossary(GLOSSARY);
+
+    /* build the tag filter bar from the grouped terms */
     var tagSet = {};
-    GLOSSARY.forEach(function (g) {
-      (g.tags || []).forEach(function (t) { tagSet[t] = (tagSet[t] || 0) + 1; });
+    groups.forEach(function (grp) {
+      grp.tags.forEach(function (t) { tagSet[t] = (tagSet[t] || 0) + 1; });
     });
     var tags = Object.keys(tagSet).filter(function (t) {
       return tagSet[t] >= 8;
@@ -493,7 +602,71 @@
       if (count) count.textContent = shown;
     }
 
-    host.innerHTML = GLOSSARY.map(glossaryCard).join("");
+    function scrollToTarget() {
+      var params = new URLSearchParams(window.location.search);
+      var q = (params.get("term") || params.get("q") || "").trim();
+      var hash = (window.location.hash || "").replace(/^#/, "").trim();
+
+      if (!q && !hash) return;
+
+      var targetSlug = hash || (q ? termSlug(q) : "");
+      var normQ = q.toLowerCase();
+      var normDashes = normQ.replace(/-/g, " ");
+
+      var cards = host.querySelectorAll(".gloss");
+      var targetCard = null;
+
+      // 1. Try exact slug / id match
+      if (targetSlug) {
+        for (var i = 0; i < cards.length; i++) {
+          if (cards[i].id === targetSlug || cards[i].getAttribute("data-slug") === targetSlug) {
+            targetCard = cards[i];
+            break;
+          }
+        }
+      }
+
+      // 2. Try exact term name match
+      if (!targetCard && normQ) {
+        for (var j = 0; j < cards.length; j++) {
+          var t = (cards[j].getAttribute("data-term") || "").toLowerCase();
+          if (t === normQ || t === normDashes) {
+            targetCard = cards[j];
+            break;
+          }
+        }
+      }
+
+      // 3. Fallback to startsWith or substring match
+      if (!targetCard && normQ) {
+        for (var k = 0; k < cards.length; k++) {
+          var tk = (cards[k].getAttribute("data-term") || "").toLowerCase();
+          if (tk.indexOf(normQ) === 0 || tk.indexOf(normDashes) === 0) {
+            targetCard = cards[k];
+            break;
+          }
+        }
+      }
+
+      if (targetCard) {
+        var h3 = targetCard.querySelector("h3");
+        var exactTitle = h3 ? (h3.firstChild ? h3.firstChild.textContent.trim() : h3.textContent.trim()) : q;
+        if (search) {
+          search.value = exactTitle;
+        }
+        apply();
+        targetCard.classList.remove("hidden");
+        targetCard.classList.add("highlight");
+        setTimeout(function () {
+          targetCard.scrollIntoView({ behavior: "smooth", block: "center" });
+        }, 150);
+      } else if (q && search) {
+        search.value = q;
+        apply();
+      }
+    }
+
+    host.innerHTML = groups.map(glossaryCard).join("");
 
     if (search) search.addEventListener("input", apply);
     if (tagBar) {
@@ -508,6 +681,8 @@
       });
     }
     apply();
+    scrollToTarget();
+    window.addEventListener("hashchange", scrollToTarget);
   }
 
   /* ---------- boot ---------- */

@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 06 — ARIA Live Regions & Dynamic Content</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="web-accessibility" data-lesson="6" data-lesson-id="aria-live-regions-and-dynamic-content">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 06</span> · ARIA Roles, States & Live Regions</span>
+
+  <h1 class="lesson-title">ARIA Live Regions & Dynamic Content</h1>
+  <p class="lesson-lede">
+    When content updates via AJAX or WebSockets, sighted users see it. Learn how aria-live announces updates to screen readers without moving focus.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Announce asynchronous updates politely or assertively using aria-live regions and role='alert'</span>
+    <span><b>Mission link</b> Keep assistive technology users informed of dynamic Single Page App (SPA) updates</span>
+  </div>
+
+  <h2><span class="n">1</span>The problem of silent dynamic updates</h2>
+  <p>In modern web applications, content changes constantly without full page reloads: a toast notification appears saying <i>"Payment Successful"</i>, a timer counts down, or search results filter live.</p><p>Sighted users notice these changes through peripheral vision. Screen reader users only hear what is currently focused. Without intervention, dynamic updates happen completely silently. <b>ARIA Live Regions</b> solve this by announcing DOM updates automatically without shifting user focus.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    ARIA live regions announce asynchronous content changes to screen readers without moving user focus.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Configuring live regions: polite, assertive, and atomic</h2>
+  <p>Configuring a live region requires careful tuning:</p><ul><li><code>aria-live="polite":</code> Use for 95% of updates (e.g. cart item counts, search result totals). Waits for conversational pauses.</li><li><code>aria-live="assertive"</code> (or <code>role="alert"</code>): Reserved for critical, time-sensitive emergencies (e.g. <i>"Server disconnected"</i>, session timeout warnings). Interrupts speech immediately.</li><li><code>aria-atomic="true":</code> Instructs the screen reader to read the <i>entire container</i> rather than just the mutated text node (critical for timestamps or sentences).</li></ul><p><b>Crucial Rule:</b> The live region container must be present in the DOM <i>before</i> the content is injected. Injecting both the container and content simultaneously often fails to trigger announcements.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing live region announcement on shopping cart update</h2>
+  <p>Trace how a live region announces shopping cart changes without interrupting the shopping flow.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your understanding of ARIA live regions and dynamic announcement rules.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can announce asynchronous data updates, toasts, and status changes smoothly without disorienting assistive technology users.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Build an accessible toast notification system using a pre-rendered aria-live='polite' container.</li>
+    <li>Add role='status' to a dynamic search results counter (e.g. '14 results found').</li>
+    <li>Verify that your live region is present in the DOM before dynamic content is inserted.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    MDN Web Docs: *ARIA live regions* (developer.mozilla.org).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is the difference between 'aria-live=\"polite\"' and 'aria-live=\"assertive\"'?",
+    a: ["polite waits until the screen reader finishes speaking its current sentence; assertive interrupts the user immediately","polite only works on mobile phones; assertive works on desktops","assertive plays an audio beep; polite does not","There is no difference; they are exact synonyms"],
+    c: 0,
+    why: "polite queues notifications gracefully, whereas assertive immediately interrupts whatever the user is listening to."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Static DOM Container",
+            "lines": [
+                  "<div aria-live='polite'",
+                  "  aria-atomic='true'",
+                  "  id='status-msg'></div>"
+            ]
+      },
+      {
+            "title": "Async Event (Fetch)",
+            "lines": [
+                  "Product added to cart",
+                  "JS sets status-msg.textContent",
+                  "= 'Item added to basket'"
+            ]
+      },
+      {
+            "title": "Screen Reader Speech",
+            "lines": [
+                  "Waits for idle moment",
+                  "Announces: 'Item added to basket'",
+                  "Focus remains on 'Add' button!"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "1. Pre-existing DOM container: <div id='cart-alert' aria-live='polite'></div>",
+      "2. User clicks <button>Add to Cart</button>",
+      "3. Network fetch succeeds; cart count increments to 3",
+      "4. Script executes: document.getElementById('cart-alert').textContent = 'Item added. 3 items in cart.'",
+      "5. Screen reader finishes speaking button name, then vocalizes: 'Item added. 3 items in cart.'"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "dom_ready": "Live region listener registered in AOM"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "api": "Cart update response received"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "mutation": "Text node injected into live region"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "polite_queue": "Spoken naturally during speech pause"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The default non-interrupting setting for a live region is aria-live='<0>'.",
+      "The interrupting live region role used for critical system errors is role='<1>'.",
+      "To instruct the screen reader to read the entire container rather than just the changed words, set aria-<2>='true'."
+],
+    blanks: [
+      {
+            "a": [
+                  "polite"
+            ],
+            "why": "polite waits for pauses."
+      },
+      {
+            "a": [
+                  "alert"
+            ],
+            "why": "role='alert' creates an assertive live region."
+      },
+      {
+            "a": [
+                  "atomic"
+            ],
+            "why": "aria-atomic reads the complete container."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why must an ARIA live region container be present in the initial DOM before content is injected?",
+      a: ["Assistive technologies attach event listeners to existing live regions; injecting both container and text simultaneously is frequently ignored","Because browsers delete new elements created via JavaScript","Because live regions cannot contain CSS classes","Because it is required by the HTTP/2 protocol"],
+      c: 0,
+      why: "The screen reader must register the live region in the Accessibility Tree before monitoring it for text mutations."
+    },
+    {
+      q: "When is 'aria-live=\"assertive\"' (or role='alert') appropriate to use?",
+      a: ["Only for urgent, time-critical information that requires immediate user awareness (e.g. lost internet connection, session timeout)","For all product search results","For website copyright notices","Whenever a button is clicked"],
+      c: 0,
+      why: "Assertive interrupts current speech immediately; overusing it causes extreme frustration for screen reader users."
+    },
+    {
+      q: "What does 'aria-atomic=\"true\"' achieve in a live region?",
+      a: ["It forces the screen reader to announce the entire contents of the live region container, not just the mutated text fragment","It splits the text into atomic syllables","It encrypts the live text","It prevents the text from being changed more than once"],
+      c: 0,
+      why: "aria-atomic='true' ensures the complete message is vocalized so the user understands full context."
+    },
+    {
+      q: "Does an aria-live announcement shift the user's active keyboard focus to the live region?",
+      a: ["No: it vocalizes the message in speech while leaving active keyboard focus exactly where it was","Yes: it forcibly yanks keyboard focus to the live region","Yes: but only if the user is using Google Chrome","No: it moves keyboard focus to the top of the body"],
+      c: 0,
+      why: "Live regions speak messages in the audio channel without disrupting active keyboard focus."
+    }
+  ]);
+</script>
+</body>
+</html>

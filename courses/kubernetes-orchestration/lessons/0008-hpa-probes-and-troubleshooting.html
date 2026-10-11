@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 08 — Health Probes, Autoscaling (HPA) & Debugging</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="kubernetes-orchestration" data-lesson="8" data-lesson-id="hpa-probes-and-troubleshooting">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 08</span> · Storage, Config & Production Operations</span>
+
+  <h1 class="lesson-title">Health Probes, Autoscaling (HPA) & Debugging</h1>
+  <p class="lesson-lede">
+    Ensure production resilience: configure automated health checks, scale pod replicas based on traffic, and troubleshoot failures.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Configure Liveness/Readiness probes, set up the Horizontal Pod Autoscaler, and debug production outages</span>
+    <span><b>Mission link</b> Automate recovery from service deadlocks and scale capacity seamlessly during traffic spikes</span>
+  </div>
+
+  <h2><span class="n">1</span>The three health probes</h2>
+  <p>Kubernetes cannot know if your application is actually working just because its process is running. A node application might be stuck in an infinite loop or locked waiting for a database socket.</p><p>The kubelet uses three distinct probes to manage container health:</p><ul><li><b>Startup Probe:</b> Determines if a slow-starting application has initialized. While running, it disables liveness and readiness checks to prevent premature restarts.</li><li><b>Liveness Probe:</b> Detects deadlocks and fatal states. If it fails, the kubelet kills the container and restarts it according to its <code>restartPolicy</code>.</li><li><b>Readiness Probe:</b> Determines if the container is ready to accept user traffic. If it fails, the pod is removed from Service endpoints; it is <i>not</i> killed.</li></ul>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Liveness probe failures trigger container restarts; readiness probe failures temporarily remove the pod from service traffic.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Horizontal Pod Autoscaler (HPA)</h2>
+  <p>The <b>Horizontal Pod Autoscaler (HPA)</b> automatically adjusts the number of replica pods in a Deployment based on observed metrics (like average CPU utilization, memory pressure, or custom Prometheus metrics).</p><p>For example, if average CPU exceeds <code>70%</code>, the HPA controller calculates <code>desiredReplicas = ceil[currentReplicas * (currentMetric / targetMetric)]</code> and scales up the Deployment.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing production troubleshooting workflow</h2>
+  <p>Trace the systematic diagnostic procedure for an unhealthy pod in production.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your mastery of health probes, autoscaling, and cluster troubleshooting.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can configure bulletproof health probes, set up automated autoscaling, and troubleshoot production cluster incidents systematically.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Configure an HTTP liveness and readiness probe on an Express or FastAPI deployment.</li>
+    <li>Deploy the Kubernetes Metrics Server and test autoscaling using kubectl autoscale deployment.</li>
+    <li>Practice diagnosing an un-schedulable pod with insufficient memory requests.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Kubernetes Documentation: *Configure Liveness, Readiness and Startup Probes*.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "If an overloaded container starts failing its Readiness Probe, what does Kubernetes do?",
+    a: ["It immediately stops routing Service traffic to that pod until the probe succeeds, giving the container time to recover","It kills and restarts the container immediately","It deletes the deployment","It reboots the worker node"],
+    c: 0,
+    why: "Readiness probes isolate unhealthy pods from traffic without restarting them, preventing cascading failures."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Metrics Server",
+            "lines": [
+                  "Collects CPU / RAM metrics",
+                  "from kubelet summary API"
+            ]
+      },
+      {
+            "title": "HPA Controller",
+            "lines": [
+                  "Monitors target: 70% CPU",
+                  "Calculates required replicas",
+                  "Scales: 3 -> 8 replicas"
+            ]
+      },
+      {
+            "title": "Deployment Replicas",
+            "lines": [
+                  "Instantly handles traffic surge",
+                  "Scales back down during lulls"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "1. Step 1: kubectl get pods -n prod -> Check STATUS (CrashLoopBackOff, OOMKilled, Pending)",
+      "2. Step 2: kubectl describe pod <name> -n prod -> Check EVENTS at bottom (probe failures, scheduling errors)",
+      "3. Step 3: kubectl logs <name> -n prod --previous -> Inspect crash stack trace before container terminated",
+      "4. Step 4: kubectl exec -it <name> -n prod -- /bin/sh -> Run connectivity and filesystem diagnostics"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "identify_status": "Pod in CrashLoopBackOff"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "check_events": "Liveness probe failed: HTTP 500"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "inspect_logs": "Logs show database connection timeout on /healthz"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "root_cause": "Firewall blocking outbound DB connection identified"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The probe that causes a container to be killed and restarted when failing is the <0> probe.",
+      "The probe that controls whether a pod receives Service traffic is the <1> probe.",
+      "The controller that automatically scales pod replica counts based on CPU is the <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "liveness"
+            ],
+            "why": "Liveness probe triggers restarts."
+      },
+      {
+            "a": [
+                  "readiness"
+            ],
+            "why": "Readiness probe controls traffic flow."
+      },
+      {
+            "a": [
+                  "HPA"
+            ],
+            "why": "Horizontal Pod Autoscaler adjusts replica counts."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the critical behavioral difference between a failed Liveness probe and a failed Readiness probe?",
+      a: ["A failed Liveness probe restarts the container; a failed Readiness probe removes the pod from Service traffic without killing it","A failed Liveness probe reboots the server; a failed Readiness probe sends an email","A failed Liveness probe deletes the database; a failed Readiness probe does nothing","There is no difference; both kill the container immediately"],
+      c: 0,
+      why: "Liveness handles unrecoverable deadlocks (restart); Readiness handles temporary overload (stop traffic)."
+    },
+    {
+      q: "Why is a Startup probe especially useful for legacy applications with slow boot times (e.g. 90 seconds)?",
+      a: ["It holds off liveness probe execution until the application is fully initialized, preventing premature crash-restarts during boot","It speeds up CPU execution by 10x during boot","It compiles Java code to native binaries on the fly","It prevents the container from being scheduled on older hardware"],
+      c: 0,
+      why: "Startup probes protect slow-booting applications from being killed by aggressive liveness probes before they are ready."
+    },
+    {
+      q: "What must be installed in a Kubernetes cluster for the Horizontal Pod Autoscaler (HPA) to scale based on CPU usage?",
+      a: ["The Kubernetes Metrics Server (or an equivalent metrics provider)","A third-party payment gateway","Docker Desktop Enterprise edition","A dedicated GPU cluster"],
+      c: 0,
+      why: "The HPA queries the Metrics Server API (metrics.k8s.io) to obtain real-time CPU and memory usage statistics."
+    },
+    {
+      q: "Which kubectl command displays the chronological event history and error messages for a specific pod?",
+      a: ["kubectl describe pod <pod-name>","kubectl print pod <pod-name>","kubectl events-only <pod-name>","kubectl dump-all <pod-name>"],
+      c: 0,
+      why: "kubectl describe displays detailed metadata, container statuses, and the recent events log for that resource."
+    }
+  ]);
+</script>
+</body>
+</html>

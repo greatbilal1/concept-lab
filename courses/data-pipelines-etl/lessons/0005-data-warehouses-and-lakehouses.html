@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 05 — Data Warehouses, Data Lakes & Lakehouses</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="data-pipelines-etl" data-lesson="5" data-lesson-id="data-warehouses-and-lakehouses">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 05</span> · Data Warehouses & Orchestration</span>
+
+  <h1 class="lesson-title">Data Warehouses, Data Lakes & Lakehouses</h1>
+  <p class="lesson-lede">
+    Understand the storage revolution: why columnar formats like Parquet outperform row-based databases for analytics by 100x.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Contrast row vs columnar storage and explain the architecture of Data Lakes, Warehouses, and Lakehouses</span>
+    <span><b>Mission link</b> Select and optimize analytical storage engines to reduce query runtimes and cloud storage bills</span>
+  </div>
+
+  <h2><span class="n">1</span>Row-oriented vs Column-oriented storage</h2>
+  <p>Transactional databases (PostgreSQL, MySQL) store data <b>by row</b>: row 1 followed by row 2. This is optimal for OLTP: looking up a single user by primary key reads one contiguous block of disk.</p><p>Analytics queries do not look up single rows; they aggregate millions of rows across a few columns: <code>SELECT region, SUM(revenue) FROM orders GROUP BY region</code>. Reading row-oriented data forces the disk to scan every unused column (customer address, notes, email).</p><p><b>Columnar storage (e.g. Apache Parquet)</b> stores all values of column A together, followed by column B. The query engine only reads the <code>region</code> and <code>revenue</code> bytes from disk, achieving 10–100x faster scans and superior compression.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Row storage is built for single-record lookups; columnar storage is built for aggregating millions of rows across few columns.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The evolution: Warehouse vs Lake vs Lakehouse</h2>
+  <p>Modern data architecture evolved through three generations:</p><ul><li><b>Data Warehouse (Snowflake, BigQuery):</b> Highly structured, proprietary columnar storage, blazingly fast SQL, managed security, higher cost.</li><li><b>Data Lake (AWS S3 + Parquet):</b> Low-cost object storage holding raw, semi-structured files. Historically lacked ACID transactions.</li><li><b>Data Lakehouse (Delta Lake, Apache Iceberg):</b> Brings ACID transactions, schema enforcement, and time travel directly to open Parquet files on object storage.</li></ul>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing columnar projection pushdown</h2>
+  <p>Trace how a columnar query engine skips reading unneeded columns from storage.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your understanding of analytical storage formats and lakehouse architectures.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You understand how columnar formats optimize analytical workloads and know when to leverage Warehouses, Lakes, and Lakehouses.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Inspect a Parquet file metadata using pyarrow or parquet-tools.</li>
+    <li>Compare the byte size and query speed of a 1GB CSV file vs its Parquet equivalent.</li>
+    <li>Explore how table formats like Apache Iceberg manage snapshot metadata and time travel.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Martin Kleppmann, *Designing Data-Intensive Applications*, Chapter 3: *Column-Oriented Storage*.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Why do columnar formats like Apache Parquet compress so much better than row-based formats like CSV?",
+    a: ["Adjacent values in a column share the same data type and often have similar or repeated values, maximizing compression algorithms (Snappy/Gzip)","Parquet deletes all vowels from text strings","Parquet encrypts the data with AES-256","Parquet stores data only on the GPU"],
+    c: 0,
+    why: "Homogeneous columnar data enables run-length encoding and dictionary encoding that achieves incredible compression ratios."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Row Storage (Postgres)",
+            "lines": [
+                  "Row 1: [1, 'Alice', 29]",
+                  "Row 2: [2, 'Bob', 34]",
+                  "Reads entire row from disk"
+            ]
+      },
+      {
+            "title": "Column Storage (Parquet)",
+            "lines": [
+                  "IDs: [1, 2, ...]",
+                  "Names: ['Alice', 'Bob', ...]",
+                  "Ages: [29, 34, ...]",
+                  "Scans only requested columns!"
+            ]
+      },
+      {
+            "title": "Table Formats (Iceberg/Delta)",
+            "lines": [
+                  "ACID transactions over S3",
+                  "Time travel & snapshots",
+                  "Schema evolution on open files"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "Query: SELECT AVG(age) FROM users; (Table has 50 columns, 100M rows)",
+      "Row-based scan: Reads all 50 columns -> 50GB scanned from disk",
+      "Columnar scan (Parquet): Reads only 'age' column metadata & byte chunks",
+      "Projection pushdown skips 49 columns: Only 400MB scanned from disk",
+      "Execution finishes in 0.4 seconds instead of 45 seconds"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "query_intent": "Single column aggregated across 100M rows"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "row_penalty": "Disproportionate disk I/O reading unused fields"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "columnar_advantage": "Directly seeks to 'age' column byte offsets"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "efficiency": "99% reduction in bytes scanned"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The open-source columnar storage format commonly used in data lakes is Apache <0>.",
+      "Reading only the columns required by a query is called projection <1>.",
+      "Modern table formats like Apache Iceberg add <2> transactions to open data lakes."
+],
+    blanks: [
+      {
+            "a": [
+                  "Parquet"
+            ],
+            "why": "Parquet is the standard open columnar format."
+      },
+      {
+            "a": [
+                  "pushdown"
+            ],
+            "why": "Projection pushdown skips unreferenced columns."
+      },
+      {
+            "a": [
+                  "ACID"
+            ],
+            "why": "ACID guarantees consistency on data lake storage."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why is columnar storage vastly superior to row storage for analytical aggregation queries (e.g. SUM, AVG)?",
+      a: ["The query engine only reads the specific columns referenced in the query from disk, ignoring all other fields","Columnar files can only store numbers, not text","Columnar files automatically execute queries on the client's graphics card","Row storage requires human approval for each query"],
+      c: 0,
+      why: "Projection pushdown allows the engine to bypass reading irrelevant columns, reducing disk I/O by up to 99%."
+    },
+    {
+      q: "What is Apache Parquet?",
+      a: ["An open-source, columnar storage file format optimized for fast analytical queries and efficient data compression","A web framework for building Python dashboards","A relational database management system created by Oracle","A message queue protocol"],
+      c: 0,
+      why: "Parquet is the open industry-standard columnar format for data engineering and big data processing."
+    },
+    {
+      q: "What capability does a modern Data Lakehouse format (like Apache Iceberg or Delta Lake) bring to object storage?",
+      a: ["ACID transactions, time travel, and schema enforcement over open Parquet files in object stores like S3","The ability to run Node.js code inside S3 buckets","Automatic translation of SQL into HTML webpages","Free unlimited internet bandwidth"],
+      c: 0,
+      why: "Lakehouse formats bring warehouse-grade ACID guarantees and snapshot metadata directly to open cloud storage."
+    },
+    {
+      q: "What is 'time travel' in a modern data lakehouse or cloud warehouse?",
+      a: ["The ability to query a table exactly as it existed at a specific timestamp or commit snapshot in the past","A hardware feature that speeds up CPU clocks","Predicting future sales using machine learning algorithms","Synchronizing computer clocks with atomic time servers"],
+      c: 0,
+      why: "Snapshot-based storage retains immutable historical versions, enabling queries against historical timestamps."
+    }
+  ]);
+</script>
+</body>
+</html>

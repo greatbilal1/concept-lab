@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 05 — Union & Intersection Types</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="typescript-fundamentals" data-lesson="5" data-lesson-id="union-and-intersection-types">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 05</span> · Unions, Narrowing & Literals</span>
+
+  <h1 class="lesson-title">Union & Intersection Types</h1>
+  <p class="lesson-lede">
+    Compose flexible and expressive types using union (|) and intersection (&) operators, combining distinct data structures.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Combine types with unions and intersections to express complex domain states</span>
+    <span><b>Mission link</b> Prevent invalid states and enable flexible API contract composition</span>
+  </div>
+
+  <h2><span class="n">1</span>Unions: One of several types</h2>
+  <p>A <b>union type</b> (<code>A | B</code>) models a value that can be <i>either</i> type A <i>or</i> type B. It is TypeScript's way of expressing "OR".</p><p>When accessing properties on a raw union value before narrowing, TypeScript only allows properties that are shared by <i>all</i> members of the union.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    A union A | B represents values that are either A or B; only shared properties can be accessed without narrowing.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Intersections: Combining all properties</h2>
+  <p>An <b>intersection type</b> (<code>A & B</code>) combines multiple types into one. A value of type <code>A & B</code> must satisfy <i>all</i> properties of A <b>and</b> all properties of B. It is TypeScript's way of expressing "AND".</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing literal unions in action</h2>
+  <p>Trace how string literal unions catch typos in configuration strings.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your recall of unions, intersections, and literal types.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can combine types using union and intersection operators and prevent typos with literal types.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Create a string literal union for HTTP methods: 'GET' | 'POST' | 'PUT' | 'DELETE'.</li>
+    <li>Compose an entity type with timestamps using an intersection (&).</li>
+    <li>Explain why accessing a non-shared property on a union results in a compiler error.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Official TypeScript Handbook, *Unions and Intersection Types*.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "If type A = { id: string; name: string }; and type B = { id: string; count: number }; what property can you access on variable x: A | B without narrowing?",
+    a: ["Only 'id', because it is the only property common to both A and B","All three: id, name, and count","None, you cannot access any properties on unions","name, because string properties take precedence"],
+    c: 0,
+    why: "TypeScript only permits property access on a union if the property exists on every possible member."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Union (A | B)",
+            "lines": [
+                  "Either A OR B",
+                  "Only COMMON properties accessible",
+                  "Models alternatives / states"
+            ]
+      },
+      {
+            "title": "Intersection (A & B)",
+            "lines": [
+                  "Both A AND B",
+                  "ALL properties from both required",
+                  "Models mixins & composition"
+            ]
+      },
+      {
+            "title": "Literal Unions",
+            "lines": [
+                  "type Role = 'admin' | 'user' | 'guest';",
+                  "Restricts values to exact strings",
+                  "Replaces error-prone magic strings"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "type Theme = 'light' | 'dark' | 'system';",
+      "let currentTheme: Theme = 'light'; // valid",
+      "currentTheme = 'dark'; // valid",
+      "// currentTheme = 'dim'; // Error: Type '\"dim\"' is not assignable to type 'Theme'."
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "allowed_literals": "'light' | 'dark' | 'system'"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "currentTheme": "'light' (ok)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "currentTheme": "'dark' (ok)"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "compiler_error": "TS2322: 'dim' is not assignable to Theme"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The operator used to create a union type is the <0> character.",
+      "The operator used to create an intersection type is the <1> character.",
+      "A type composed of exact specific string values is a string <2> union."
+],
+    blanks: [
+      {
+            "a": [
+                  "|"
+            ],
+            "why": "Pipe (|) represents union (OR)."
+      },
+      {
+            "a": [
+                  "&"
+            ],
+            "why": "Ampersand (&) represents intersection (AND)."
+      },
+      {
+            "a": [
+                  "literal"
+            ],
+            "why": "String literal types restrict values to exact strings."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What does the type 'string | number' represent?",
+      a: ["A value that can be either a string or a number","A value that must simultaneously be both a string and a number","A string converted into a number at runtime","An array containing strings and numbers"],
+      c: 0,
+      why: "The union operator (|) represents alternative types: either string or number."
+    },
+    {
+      q: "What properties does an object of type 'Person & Employee' possess?",
+      a: ["All properties of Person and all properties of Employee combined","Only the properties shared between Person and Employee","Only properties declared as functions","Zero properties until initialized with a class"],
+      c: 0,
+      why: "An intersection type (&) merges all constituent property requirements."
+    },
+    {
+      q: "Why are string literal unions like 'type State = \"pending\" | \"done\";' superior to plain strings?",
+      a: ["They prevent typos at compile time and provide instant IDE autocomplete for all valid options","They take up less RAM in the browser V8 engine","They encrypt the string data in network transfers","They eliminate the need for unit testing completely"],
+      c: 0,
+      why: "String literal unions restrict values to exact allowed options, catching misspelled strings immediately."
+    },
+    {
+      q: "If you have a variable of type 'Dog | Fish', when can you call '.bark()' on it?",
+      a: ["Only after narrowing the type to confirm the value is actually a Dog","At any time, TypeScript will ignore the call if it is a Fish","Never, because Fish does not have a bark method","Only inside an asynchronous function"],
+      c: 0,
+      why: "You cannot call a method unique to one union branch until you narrow the type."
+    }
+  ]);
+</script>
+</body>
+</html>

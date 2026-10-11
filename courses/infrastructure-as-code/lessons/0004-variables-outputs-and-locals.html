@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 04 — Variables, Outputs & Locals</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="infrastructure-as-code" data-lesson="4" data-lesson-id="variables-outputs-and-locals">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 04</span> · Modules, Variables & Composition</span>
+
+  <h1 class="lesson-title">Variables, Outputs & Locals</h1>
+  <p class="lesson-lede">
+    Hardcoded values make code brittle. Use input variables for parameterization, local values for DRY logic, and outputs for exports.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Parameterize Terraform code with typed input variables, compute locals, and export resource attributes via outputs</span>
+    <span><b>Mission link</b> Write flexible, parameterized configurations that deploy across dev, staging, and production effortlessly</span>
+  </div>
+
+  <h2><span class="n">1</span>Input variables: Parameterizing code</h2>
+  <p>Hardcoding values like <code>region = "us-east-1"</code> or <code>instance_type = "t3.micro"</code> makes configurations rigid and impossible to reuse across environments. <b>Input variables</b> act as function parameters for your infrastructure.</p><p>A variable declaration specifies its <code>type</code> (string, number, bool, list, map), a <code>description</code>, an optional <code>default</code>, and optional <code>validation</code> blocks with custom error messages.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Input variables parameterize infrastructure; always declare explicit types and descriptions.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Locals and Output values</h2>
+  <p>Two other primitives round out configuration flexibility:</p><ul><li><b>Locals (<code>local.name</code>):</b> Named expressions used to eliminate repetition (DRY) and compute complex values (e.g. combining environment and project name into standard tag conventions).</li><li><b>Outputs (<code>output.name</code>):</b> Exposes values to the terminal user, other modules, or external tools via <code>terraform output</code> (e.g. database endpoint or load balancer DNS).</li></ul>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing variable precedence order</h2>
+  <p>Trace which value wins when variables are defined in multiple locations.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your understanding of variables, locals, and outputs.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can parameterize infrastructure with typed variables, use locals to avoid repetition, and export outputs cleanly.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Create a terraform.tfvars file to customize variable values for a staging environment.</li>
+    <li>Add a custom validation block to an input variable ensuring an S3 bucket name is lowercase.</li>
+    <li>Retrieve output values programmatically using terraform output -json.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    HashiCorp Terraform Documentation: *Input Variables*, *Local Values*, and *Outputs*.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "If a variable has no 'default' value specified and is not passed via CLI or tfvars file, what does Terraform do during 'terraform apply'?",
+    a: ["It interactively prompts the user in the terminal to enter a value before proceeding","It assigns the value to null automatically","It crashes immediately with a SyntaxError","It picks a random string"],
+    c: 0,
+    why: "Variables without defaults become required inputs; Terraform prompts the operator interactively if omitted."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Input Variables",
+            "lines": [
+                  "var.environment ('prod')",
+                  "var.db_instance_class",
+                  "Configured via .tfvars or CLI"
+            ]
+      },
+      {
+            "title": "Locals Block",
+            "lines": [
+                  "local.name_prefix = '${var.project}-${var.env}'",
+                  "Common tagging logic",
+                  "Internal calculations"
+            ]
+      },
+      {
+            "title": "Output Values",
+            "lines": [
+                  "output 'lb_dns' { value = aws_lb.main.dns_name }",
+                  "Exposed to CI/CD & users"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "1. Default in variable block: 'dev'",
+      "2. Environment variable: TF_VAR_environment='staging'",
+      "3. terraform.tfvars file: environment='prod'",
+      "4. Command line flag: -var='environment=hotfix' -> HIGHEST PRECEDENCE",
+      "Result: Variable evaluated as 'hotfix'"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "lowest_priority": "default in declaration"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "mid_priority_1": "TF_VAR_* environment variable"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "mid_priority_2": "terraform.tfvars file"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "highest_priority": "Direct CLI -var flag overrides all previous settings"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Input variables are referenced in HCL using the prefix <0>.",
+      "Internal intermediate calculated expressions are defined in a <1> block.",
+      "Values exported from a Terraform configuration are declared with the <2> block."
+],
+    blanks: [
+      {
+            "a": [
+                  "var"
+            ],
+            "why": "var.name accesses input variables."
+      },
+      {
+            "a": [
+                  "locals"
+            ],
+            "why": "locals define reusable expressions."
+      },
+      {
+            "a": [
+                  "output"
+            ],
+            "why": "output blocks export data."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the primary difference between an input variable and a local value in Terraform?",
+      a: ["Variables can be customized by callers/operators; locals are internal constants and computed expressions defined within the code","Variables can only be strings; locals can be any type","Variables are stored on disk; locals are stored in RAM","Variables run on the cloud; locals run on your laptop"],
+      c: 0,
+      why: "Variables serve as parameters for external inputs, while locals define internal DRY expressions."
+    },
+    {
+      q: "Which source has the HIGHEST precedence when setting Terraform variable values?",
+      a: ["Command line -var or -var-file flags","The default argument in the variable block","The terraform.tfvars file","Environment variables prefixed with TF_VAR_"],
+      c: 0,
+      why: "Direct command-line arguments override all file and environment-based defaults."
+    },
+    {
+      q: "What does setting 'sensitive = true' on an output block achieve?",
+      a: ["It prevents Terraform from displaying the value in plaintext terminal logs during plan and apply","It automatically encrypts the database with AES-256","It deletes the variable from the state file","It requires biometric authentication to view"],
+      c: 0,
+      why: "sensitive = true redacts the output in stdout logs (note: it still exists in the state file)."
+    },
+    {
+      q: "How do you define an input variable that accepts a list of string IP addresses?",
+      a: ["type = list(string)","type = array<string>","type = string[]","type = ListOfString"],
+      c: 0,
+      why: "HCL uses list(type) syntax for collections of homogeneous elements."
+    }
+  ]);
+</script>
+</body>
+</html>

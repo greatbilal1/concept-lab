@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 06 — Ingress Controllers & Network Security Policies</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="kubernetes-orchestration" data-lesson="6" data-lesson-id="ingress-and-network-policies">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 06</span> · Networking, Services & Ingress</span>
+
+  <h1 class="lesson-title">Ingress Controllers & Network Security Policies</h1>
+  <p class="lesson-lede">
+    Creating a cloud LoadBalancer for every microservice is costly and wasteful. Ingress consolidates traffic behind a single smart reverse proxy.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Configure Ingress rules for path-based routing and secure inter-pod communication with NetworkPolicies</span>
+    <span><b>Mission link</b> Save cloud infrastructure costs and implement zero-trust network boundaries across microservices</span>
+  </div>
+
+  <h2><span class="n">1</span>Ingress: One entry point for the cluster</h2>
+  <p>If your company operates 20 microservices, creating 20 <code>type: LoadBalancer</code> services incurs 20 separate cloud load balancer bills (hundreds of dollars a month). More importantly, basic cloud load balancers cannot inspect HTTP host headers or URL paths.</p><p>An <b>Ingress</b> object manages external HTTP and HTTPS access to cluster services. An <b>Ingress Controller</b> (such as NGINX Ingress, Traefik, or Envoy) runs as a reverse proxy, inspecting hostnames (e.g. <code>api.example.com</code> vs <code>app.example.com</code>) and paths (<code>/users</code> vs <code>/orders</code>) to route traffic using a single cloud IP address.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Ingress consolidates external HTTP/HTTPS routing, TLS termination, and path-based routing behind a single entry point.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Zero-trust with NetworkPolicies</h2>
+  <p>By default, Kubernetes uses a <b>flat, open network</b>: any Pod in any namespace can communicate with any other Pod in the cluster. If an attacker compromises a public web pod, they can query internal database pods unrestricted.</p><p>A <b>NetworkPolicy</b> functions as a distributed firewall. You specify <code>ingress</code> (incoming) and <code>egress</code> (outgoing) rules using label selectors, locking down communication to only authorized services.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing NetworkPolicy traffic rejection</h2>
+  <p>Trace how a CNI network plugin enforces NetworkPolicy isolation rules.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your understanding of Ingress routing and NetworkPolicy security.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can consolidate web routing with Ingress and secure cluster traffic using zero-trust NetworkPolicies.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Deploy an NGINX Ingress Controller and configure path routing for /v1 and /v2.</li>
+    <li>Write a default-deny NetworkPolicy that blocks all incoming traffic in a namespace.</li>
+    <li>Configure automatic TLS certificate generation with cert-manager and Let's Encrypt annotations.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Kubernetes Documentation: *Ingress* and *Network Policies*.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What happens if you create an Ingress YAML resource in a cluster where NO Ingress Controller is installed?",
+    a: ["Nothing happens: the Ingress resource is saved in etcd, but no traffic is routed because no controller is running to configure a proxy","Kubernetes automatically downloads and installs NGINX","The cluster rejects the YAML with an UnknownResource error","The operating system routes traffic using localhost"],
+    c: 0,
+    why: "Ingress is only a specification; an Ingress Controller must be running to implement the routing rules."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Public Internet",
+            "lines": [
+                  "https://example.com/api",
+                  "Single external cloud LoadBalancer"
+            ]
+      },
+      {
+            "title": "Ingress Controller",
+            "lines": [
+                  "TLS termination",
+                  "Path / Host routing: /api -> api-svc",
+                  "/web -> web-svc"
+            ]
+      },
+      {
+            "title": "NetworkPolicy Firewall",
+            "lines": [
+                  "Allows Web -> API only",
+                  "Blocks Web -> Database directly",
+                  "Zero-trust network enforcement"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "1. Compromised pod 'frontend-abc' attempts TCP connection to 'database-xyz:5432'",
+      "2. Node network packet filter evaluates NetworkPolicy on 'database-xyz'",
+      "3. Policy ingress allows only pods matching: { role: 'backend' }",
+      "4. Packet from { role: 'frontend' } does not match allowed selector",
+      "5. Packet is immediately dropped at the kernel level; connection times out"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "attack_vector": "Unauthorized lateral movement attempt"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "firewall_rule": "Ingress whitelist: role=backend"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "enforcement": "Packet dropped silently; database safe"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The reverse proxy software that satisfies Ingress rules is an Ingress <0>.",
+      "By default, Kubernetes network communication between pods is completely <1>.",
+      "The Kubernetes resource that acts as a declarative firewall between pods is a Network<2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "Controller"
+            ],
+            "why": "An Ingress Controller implements the proxy."
+      },
+      {
+            "a": [
+                  "open",
+                  "unrestricted"
+            ],
+            "why": "Default pod networking is flat and unrestricted."
+      },
+      {
+            "a": [
+                  "Policy"
+            ],
+            "why": "NetworkPolicy restricts inter-pod traffic."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the difference between an Ingress resource and an Ingress Controller?",
+      a: ["An Ingress is a declarative specification of routing rules; an Ingress Controller is the running reverse proxy daemon that fulfills them","An Ingress is for Windows nodes; an Ingress Controller is for Linux nodes","An Ingress handles database queries; an Ingress Controller handles HTTP","There is no difference; they are interchangeable terms"],
+      c: 0,
+      why: "The Ingress resource holds the YAML configuration; the Ingress Controller (e.g. NGINX) executes the actual routing."
+    },
+    {
+      q: "What is the default inter-pod communication policy in a fresh Kubernetes namespace without NetworkPolicies?",
+      a: ["All pods can communicate with any other pod across all namespaces without restriction","All pods are isolated and can only communicate with localhost","Only pods with the same image name can communicate","Inter-pod communication requires an active VPN"],
+      c: 0,
+      why: "Kubernetes enforces a flat, non-isolated network model by default until NetworkPolicies are defined."
+    },
+    {
+      q: "Why is an Ingress more cost-effective than using individual LoadBalancer services for 20 microservices?",
+      a: ["It shares a single public cloud LoadBalancer and IP address, routing via HTTP host and path rules","Ingress runs on free peer-to-peer torrent networks","Ingress avoids encrypting network traffic","Cloud providers do not bill for Ingress traffic"],
+      c: 0,
+      why: "Ingress consolidates many routes behind a single cloud load balancer, drastically reducing cloud infrastructure fees."
+    },
+    {
+      q: "What must be present in a Kubernetes cluster for NetworkPolicies to actually enforce packet filtering?",
+      a: ["A Container Network Interface (CNI) plugin that supports NetworkPolicies (e.g. Calico, Cilium)","A hardware Cisco firewall attached to each node","A public domain name registered with GoDaddy","A separate database node"],
+      c: 0,
+      why: "NetworkPolicies require a network plugin like Calico, Cilium, or Weave that enforces firewall rules at the Linux kernel level."
+    }
+  ]);
+</script>
+</body>
+</html>

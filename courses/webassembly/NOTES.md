@@ -1,15 +1,5 @@
 # Notes — WebAssembly
 
-Authoring decisions and open questions. Append as you go; never rewrite history.
-
 ## Decisions
-
-- (date) Decision and the reason for it.
-
-## Open questions
-
-- Question that still needs an answer.
-
-## Known gaps
-
-- Something the course does not yet cover.
+- Group into four themes: Virtual Machine Architecture, Linear Memory & Interop, Language Compilation (Rust/C), and High Performance & WASI.
+- Ground explanations in stack-based bytecode execution, linear memory buffers, and boundary marshaling overhead.

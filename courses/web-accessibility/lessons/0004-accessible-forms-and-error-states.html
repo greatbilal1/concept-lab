@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 04 — Accessible Forms, Labels & Error Announcements</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="web-accessibility" data-lesson="4" data-lesson-id="accessible-forms-and-error-states">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 04</span> · Semantic HTML, Landmarks & The AOM</span>
+
+  <h1 class="lesson-title">Accessible Forms, Labels & Error Announcements</h1>
+  <p class="lesson-lede">
+    Forms are the primary point of failure on the web. Learn how to programmatically associate labels, hints, and error alerts.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Build accessible forms with programmatic label wiring, aria-describedby hints, and aria-invalid errors</span>
+    <span><b>Mission link</b> Ensure users with disabilities can independently complete purchases, logins, and registrations</span>
+  </div>
+
+  <h2><span class="n">1</span>The fatal flaw: Missing form labels</h2>
+  <p>A visually sighted user sees a text box next to the word <i>"Phone Number"</i>. But a screen reader does not infer relationships by visual proximity: unless programmatically linked, it focuses the input and announces: <code>"edit text, blank"</code>.</p><p>You must programmatically connect inputs and labels:</p><ul><li><b>Explicit association:</b> <code>&lt;label for="user-phone"&gt;Phone&lt;/label&gt;&lt;input id="user-phone" ... /&gt;</code>.</li><li><b>Implicit wrapping:</b> <code>&lt;label&gt;Phone &lt;input ... /&gt;&lt;/label&gt;</code>.</li></ul><p>Never rely on <code>placeholder="..."</code> as a label: placeholders disappear when typing begins, lack sufficient contrast, and are ignored by many assistive devices.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Every form control must have a programmatically associated label via the for/id relationship.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Wiring hints and errors with aria-describedby</h2>
+  <p>An input often needs auxiliary text: password requirements or validation error messages. The <code>aria-describedby</code> attribute takes one or more element IDs and speaks their text <i>after</i> the label is read.</p><p>When validation fails, add <code>aria-invalid="true"</code> to the input and point <code>aria-describedby</code> to the error message container (which should also have <code>role="alert"</code>).</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing screen reader announcement on invalid input</h2>
+  <p>Trace how a screen reader announces an invalid form control configured with accessibility attributes.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your understanding of accessible form design and error communication.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can build fully accessible forms with programmatic label wiring, contextual instructions, and immediate error announcements.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Refactor an existing login form so that all inputs have programmatic <label for='...'> associations.</li>
+    <li>Add aria-describedby to an input with password complexity requirements and test with a screen reader.</li>
+    <li>Implement a live form validation error that announces immediately using role='alert'.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    W3C WAI: *Form Instructions and Validating Input* (w3.org/WAI/tutorials/forms).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Why is 'placeholder=\"Enter your password\"' an unacceptable substitute for a real <label> element?",
+    a: ["It disappears once the user begins typing, fails color contrast standards, and is not reliably spoken as an accessible name","Browsers disable password submission when placeholders are used","Placeholders only render on mobile phones","It prevents form autofill from working"],
+    c: 0,
+    why: "Placeholders vanish on input, burden working memory, and fail WCAG requirements for permanent accessible labels."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "<label for='email'>",
+            "lines": [
+                  "Name: 'Email Address'",
+                  "Announced first upon focus"
+            ]
+      },
+      {
+            "title": "<input id='email'>",
+            "lines": [
+                  "aria-invalid='true'",
+                  "aria-describedby='err-msg'"
+            ]
+      },
+      {
+            "title": "<span id='err-msg'>",
+            "lines": [
+                  "role='alert'",
+                  "'Invalid email format'",
+                  "Announced as description!"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "<label for='pwd'>Password</label>",
+      "<input id='pwd' type='password' aria-invalid='true' aria-describedby='pwd-err'>",
+      "<span id='pwd-err' role='alert'>Must contain at least 8 characters</span>",
+      "User tabs to input field.",
+      "Screen reader speaks: 'Password, invalid data, edit text, secure, Must contain at least 8 characters'"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "label": "'Password' read first"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "state": "aria-invalid='true' announces 'invalid data'"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "type": "'secure' announces password masking"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "description": "aria-describedby reads exact error message text"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "To link a label to an input, the label's <0> attribute must match the input's id.",
+      "To associate secondary instructions or error text with an input, use aria-<1>.",
+      "When a form field fails validation, set the attribute aria-<2>='true'."
+],
+    blanks: [
+      {
+            "a": [
+                  "for"
+            ],
+            "why": "for links to input id."
+      },
+      {
+            "a": [
+                  "describedby"
+            ],
+            "why": "aria-describedby provides additional descriptions."
+      },
+      {
+            "a": [
+                  "invalid"
+            ],
+            "why": "aria-invalid flags validation failure."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "How do you programmatically link a '<label>' element to an '<input>' element?",
+      a: ["Set the label's 'for' attribute to match the exact 'id' attribute of the input","Give them the same CSS class name","Place them inside the same <div> container","Set the input's 'name' attribute to match the label's text"],
+      c: 0,
+      why: "The label for='id' attribute explicitly binds the label to the input across the Accessibility Tree."
+    },
+    {
+      q: "What does the attribute 'aria-describedby=\"hint-text\"' do?",
+      a: ["It instructs screen readers to vocalize the content of element #hint-text after reading the input's label","It translates the hint into Spanish","It turns the input into a multi-line textarea","It automatically validates the input with a regex"],
+      c: 0,
+      why: "aria-describedby provides supplementary guidance or error messages that assistive tech speaks on focus."
+    },
+    {
+      q: "What attribute should be applied to an input element when user validation fails?",
+      a: ["aria-invalid=\"true\"","class=\"error-box\"","invalid=\"yes\"","disabled=\"true\""],
+      c: 0,
+      why: "aria-invalid='true' programmatically informs assistive tech that the field contains an error."
+    },
+    {
+      q: "When grouping related radio buttons or checkboxes (e.g. shipping options), what HTML elements should wrap them?",
+      a: ["<fieldset> containing a <legend> as the group title","A plain <div> with an <h3> title","<form-group> with a <span> title","An unordered list <ul> without headers"],
+      c: 0,
+      why: "<fieldset> and <legend> group related radio/checkbox controls, speaking the legend on every option selection."
+    }
+  ]);
+</script>
+</body>
+</html>

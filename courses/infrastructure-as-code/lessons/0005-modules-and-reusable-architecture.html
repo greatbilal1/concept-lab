@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 05 — Modules & Reusable Architecture Patterns</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="infrastructure-as-code" data-lesson="5" data-lesson-id="modules-and-reusable-architecture">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 05</span> · Modules, Variables & Composition</span>
+
+  <h1 class="lesson-title">Modules & Reusable Architecture Patterns</h1>
+  <p class="lesson-lede">
+    Do not copy-paste 300 lines of VPC code across 10 repositories. Package infrastructure into clean, reusable modules.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Author reusable Terraform modules with inputs, outputs, and semantic versioning</span>
+    <span><b>Mission link</b> Standardize cloud infrastructure architecture across enterprise development teams</span>
+  </div>
+
+  <h2><span class="n">1</span>What is a Terraform Module?</h2>
+  <p>Any directory containing <code>.tf</code> files is technically a module (the <b>root module</b>). When you organize code into subdirectories and call them using a <code>module "name" { source = "..." }</code> block, you create a <b>reusable child module</b>.</p><p>Modules function like functions in programming languages: they accept input variables as arguments, provision resources internally, and return output values to the caller.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Modules package related resources into standardized, reusable infrastructure building blocks.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Module sources: Local vs Remote vs Registry</h2>
+  <p>The <code>source</code> argument specifies where Terraform fetches the module code:</p><ul><li><b>Local paths:</b> <code>source = "./modules/database"</code> (great for mono-repos).</li><li><b>Public Registry:</b> <code>source = "terraform-aws-modules/vpc/aws"</code> with <code>version = "5.0.0"</code>.</li><li><b>Private Git:</b> <code>source = "git::https://github.com/corp/tf-modules.git?ref=v1.2.0"</code>.</li></ul><p>Always pin remote module sources to a specific <b>tag or version</b> to prevent unexpected breaking changes during deployment.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing module instantiation and graph resolution</h2>
+  <p>Trace how Terraform prefixes module resource names inside the unified state graph.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your mastery of Terraform module design and composition.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can design and publish clean, encapsulated, versioned infrastructure modules for team-wide reuse.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Create a reusable /modules/s3-static-site module that provisions a bucket with website hosting.</li>
+    <li>Refactor an existing monolithic configuration into separate network and compute modules.</li>
+    <li>Reference a public Terraform Registry module with explicit version pinning.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    HashiCorp Terraform Documentation: *Modules Overview* and *Module Development*.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Can a root module directly access an internal resource attribute of a child module (e.g. module.vpc.aws_subnet.main.id)?",
+    a: ["No: child module internals are private; the child module must explicitly export the attribute via an output block","Yes, all child resources are globally accessible everywhere in Terraform","Yes, using the global:: prefix","Only if both modules share the same file name"],
+    c: 0,
+    why: "Modules enforce encapsulation: child module resources are private unless explicitly exported as outputs."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Root Module (main.tf)",
+            "lines": [
+                  "module 'network' {",
+                  "  source = './modules/vpc'",
+                  "  cidr = '10.0.0.0/16'",
+                  "}"
+            ]
+      },
+      {
+            "title": "Child Module (/modules/vpc)",
+            "lines": [
+                  "variables.tf (inputs)",
+                  "main.tf (aws_vpc, subnets)",
+                  "outputs.tf (vpc_id, subnet_ids)"
+            ]
+      },
+      {
+            "title": "Root Output",
+            "lines": [
+                  "output 'network_id' {",
+                  "  value = module.network.vpc_id",
+                  "}"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "module 'prod_db' { source = './modules/rds'; db_name = 'prod' }",
+      "module 'staging_db' { source = './modules/rds'; db_name = 'staging' }",
+      "State address 1: module.prod_db.aws_db_instance.main",
+      "State address 2: module.staging_db.aws_db_instance.main"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "module_1": "Instantiated with name prod_db"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "module_2": "Instantiated with name staging_db"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "state_isolation": "Resources scoped under module namespace"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "safety": "Zero naming collisions despite identical internal resource names"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The required argument in a module block pointing to its location is <0>.",
+      "To expose a value from a child module to the parent module, use an <1> block.",
+      "Locking a module to a specific release tag is called version <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "source"
+            ],
+            "why": "source specifies module path or URL."
+      },
+      {
+            "a": [
+                  "output"
+            ],
+            "why": "outputs act as module return values."
+      },
+      {
+            "a": [
+                  "pinning"
+            ],
+            "why": "Version pinning prevents breaking changes."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why is version pinning (e.g. version = \"5.1.0\") critical when using remote Terraform modules?",
+      a: ["It prevents upstream authors from introducing breaking API changes or unintended resource destructions unexpectedly","It makes the module download 5 times faster","It is required by the Git specification","It encrypts the module source code"],
+      c: 0,
+      why: "Pinning guarantees that your build remains deterministic and immune to unexpected upstream changes."
+    },
+    {
+      q: "How does a parent module access a value computed inside a child module?",
+      a: ["The child module must declare an output block, accessed as module.<name>.<output_name>","The parent module reads the child's local variables directly","The child module writes the value to an operating system environment variable","The parent module executes a regex search over the child's .tf files"],
+      c: 0,
+      why: "Child modules encapsulate resources; outputs are the only public API contract exposed to callers."
+    },
+    {
+      q: "What command must be run whenever you add a new module block to your configuration?",
+      a: ["terraform init","terraform validate","terraform refresh","terraform restart"],
+      c: 0,
+      why: "terraform init must be run to detect and download newly added child modules."
+    },
+    {
+      q: "What is a standard layout for a standalone Terraform module?",
+      a: ["main.tf (resources), variables.tf (inputs), outputs.tf (exports), and README.md","index.html, styles.css, and app.js","A single giant script.sh file","A Dockerfile and package.json"],
+      c: 0,
+      why: "Standard convention divides module logic into main.tf, variables.tf, and outputs.tf."
+    }
+  ]);
+</script>
+</body>
+</html>

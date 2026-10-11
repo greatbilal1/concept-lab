@@ -1,16 +1,8 @@
 # 0001 — UI & UX for Engineers course created
 
-- **Date:** 2026-10-03
-- **Milestone:** course scaffolded from the frozen COURSE_CONTRACT.md.
+- **Date:** 2026-10-04
+- **Milestone:** All 8 lessons, glossary, cheatsheet, and hub created.
 
-## What happened
-
-Created the course skeleton with `tools/new-course.js`. The manifest and
-glossary are empty; lessons will be added with `tools/new-lesson.js`.
-
-## What is next
-
-- Write MISSION.md in full.
-- Add the first lesson.
-- Register the course in `data/courses.js` (see the object printed by the
-  scaffolder) and set `status: "live"` once the first lesson exists.
+## What was built
+- Complete 8-lesson curriculum with interactive widgets and verified quizzes.
+- Reference glossary and cheat sheet.

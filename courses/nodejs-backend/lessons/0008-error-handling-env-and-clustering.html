@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 08 — Process Lifecycle, Environment & Clustering</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="nodejs-backend" data-lesson="8" data-lesson-id="error-handling-env-and-clustering">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 08</span> · Database Integration & Production Practices</span>
+
+  <h1 class="lesson-title">Process Lifecycle, Environment & Clustering</h1>
+  <p class="lesson-lede">
+    Take Node.js to production: handle unexpected process crashes, manage environment variables, and scale across multi-core CPUs.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Implement graceful shutdown handlers and scale Node.js across multi-core systems using clustering</span>
+    <span><b>Mission link</b> Ensure zero-downtime deployments and resilient production server availability</span>
+  </div>
+
+  <h2><span class="n">1</span>Process lifecycle and graceful shutdown</h2>
+  <p>In production environments (like Docker, Kubernetes, or systemd), servers frequently restart during deployments. When an orchestrator stops a container, it sends a <code>SIGTERM</code> signal.</p><p>A production Node.js service must capture <code>process.on('SIGTERM')</code>, stop accepting new connections (<code>server.close()</code>), allow in-flight requests to complete, close database pools, and exit cleanly with code 0.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Graceful shutdown prevents interrupted user requests when containers or services restart during deployment.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Scaling with the cluster module</h2>
+  <p>Because Node.js runs on a single thread, a server running on an 8-core CPU only uses 12.5% of the machine's processing capacity by default. The <b>cluster</b> module allows you to fork multiple worker processes that share the same server port, automatically balancing incoming connections across all CPU cores.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing graceful shutdown execution</h2>
+  <p>Trace how a production service coordinates clean termination upon receiving a SIGTERM signal.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your knowledge of production Node.js deployment, clustering, and process events.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can write resilient production services that scale across CPU cores and shut down gracefully without dropping requests.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Implement a graceful shutdown handler that cleanly closes both Express and database pool connections.</li>
+    <li>Set up a cluster script using os.cpus().length to fork workers across all available cores.</li>
+    <li>Configure modern environment variable loading using Node 20+ native --env-file flag.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Node.js Official Documentation: *Cluster* and *Process*.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What should you do if an 'uncaughtException' occurs in a Node.js process?",
+    a: ["Log the error details, close active connections gracefully, and exit the process (allowing an orchestrator like PM2/K8s to restart it cleanly)","Catch it with an empty try/catch and ignore it so the server stays up","Send an email to the user who triggered it","Restart the entire operating system"],
+    c: 0,
+    why: "An uncaught exception indicates your application state is corrupted; continuing to run risks erratic behavior and data corruption."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Primary Process",
+            "lines": [
+                  "cluster.isPrimary",
+                  "Spawns 1 worker per CPU core",
+                  "Monitors worker health & restarts"
+            ]
+      },
+      {
+            "title": "Shared Server Port (e.g. 3000)",
+            "lines": [
+                  "Operating system / cluster load balancing",
+                  "Distributes incoming TCP handshakes"
+            ]
+      },
+      {
+            "title": "Worker Processes (x8)",
+            "lines": [
+                  "Independent V8 & event loops",
+                  "Zero shared memory",
+                  "Full CPU core utilization"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "process.on('SIGTERM', async () => {",
+      "  console.log('SIGTERM received: closing HTTP server...');",
+      "  server.close(async () => {",
+      "    console.log('HTTP connections closed. Draining database pool...');",
+      "    await pool.end();",
+      "    process.exit(0);",
+      "  });",
+      "});"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "signal": "SIGTERM signal intercepted from container orchestrator"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "server": "server.close() rejects new requests, finishes active requests"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "database": "pool.end() terminates persistent database connections"
+            }
+      },
+      {
+            "line": 5,
+            "vars": {
+                  "exit": "process.exit(0) terminates with success status code"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The standard Linux termination signal sent by Docker before stopping is SIG<0>.",
+      "The built-in module used to fork worker processes across CPU cores is <1>.",
+      "Process termination without error should exit with code <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "TERM"
+            ],
+            "why": "SIGTERM requests graceful process shutdown."
+      },
+      {
+            "a": [
+                  "cluster"
+            ],
+            "why": "The cluster module scales across multi-core systems."
+      },
+      {
+            "a": [
+                  "0"
+            ],
+            "why": "Exit code 0 indicates clean, successful completion."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the purpose of the Node.js cluster module?",
+      a: ["To fork multiple child processes that share the same server port, utilizing all available CPU cores","To connect multiple independent physical servers into a Kubernetes cluster","To cluster database tables into partitions","To bundle frontend CSS and JavaScript files"],
+      c: 0,
+      why: "The cluster module spawns worker processes to scale single-threaded Node.js across multi-core systems."
+    },
+    {
+      q: "What is the official recommendation when an 'uncaughtException' occurs in production?",
+      a: ["Perform a graceful shutdown and exit the process, allowing a process manager to restart a clean instance","Catch it and ignore it so the server stays online","Send an HTTP 200 response to all connected clients","Clear the require cache"],
+      c: 0,
+      why: "Uncaught exceptions leave the application in an indeterminate corrupted state; restarting ensures reliability."
+    },
+    {
+      q: "How does Node.js 20+ natively support loading .env files without third-party packages like dotenv?",
+      a: ["Using the command-line flag: node --env-file=.env app.js","It automatically loads any file named .env found in the home directory","By calling JSON.parse(process.env)","By setting the environment variable USE_DOTENV=true"],
+      c: 0,
+      why: "Node 20+ introduced the native --env-file flag to read environment files without external dependencies."
+    },
+    {
+      q: "What does 'server.close()' do when called on an active HTTP server?",
+      a: ["It stops accepting new client connections while allowing in-flight requests to complete before closing","It forcibly tears down all active TCP sockets immediately","It shuts down the entire operating system","It clears all database tables"],
+      c: 0,
+      why: "server.close() initiates a graceful shutdown: new connections are refused while existing requests finish."
+    }
+  ]);
+</script>
+</body>
+</html>

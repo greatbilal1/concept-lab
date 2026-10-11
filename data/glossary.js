@@ -3359,7 +3359,7 @@ window.GLOSSARY = [
     ]
   },
   {
-    "term": "Generalisation",
+    "term": "Pattern generalisation",
     "def": "Replacing several specific cases with one rule that covers all of them.",
     "course": "programming-computational-thinking",
     "section": "patterns",

@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 04 — StatefulSets, DaemonSets & Batch Jobs</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="kubernetes-orchestration" data-lesson="4" data-lesson-id="statefulsets-and-daemonsets">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 04</span> · Workloads & Controllers</span>
+
+  <h1 class="lesson-title">StatefulSets, DaemonSets & Batch Jobs</h1>
+  <p class="lesson-lede">
+    Not every application is a stateless web server. Learn how to run databases (StatefulSets), node agents (DaemonSets), and one-off tasks (Jobs).
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Choose the correct workload controller (StatefulSet, DaemonSet, Job, CronJob) for specialized workloads</span>
+    <span><b>Mission link</b> Run databases and cluster-wide infrastructure agents predictably and safely</span>
+  </div>
+
+  <h2><span class="n">1</span>Stateful workloads with StatefulSets</h2>
+  <p>Stateless pods are interchangeable cattle: if <code>web-7f89d-abc</code> dies, it is replaced by <code>web-7f89d-xyz</code> with a new random IP and ephemeral storage.</p><p>Databases (PostgreSQL, Kafka, Cassandra) require <b>stable identities</b>. A <b>StatefulSet</b> guarantees:</p><ul><li><b>Stable network IDs:</b> Pods have predictable sequential names: <code>db-0</code>, <code>db-1</code>, <code>db-2</code>.</li><li><b>Dedicated storage:</b> Each pod receives its own dedicated PersistentVolume that reattaches to that exact pod index even after a crash or reschedule.</li><li><b>Ordered deployment and scaling:</b> Pods start and terminate strictly in sequential order (0, then 1, then 2).</li></ul>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    StatefulSets provide stable sequential hostnames and dedicated persistent volume bindings for databases.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>DaemonSets, Jobs, and CronJobs</h2>
+  <p>Different operational patterns require specialized controllers:</p><ul><li><b>DaemonSet:</b> Ensures that <i>every node</i> runs an exact replica of a Pod. Perfect for monitoring agents (Datadog, Prometheus node-exporter) and log collectors (Fluentbit).</li><li><b>Job:</b> Runs a pod until completion (exit code 0). Ideal for database migrations or batch data processing.</li><li><b>CronJob:</b> Schedules Jobs to run periodically at fixed intervals using standard cron syntax (e.g. <code>0 2 * * *</code> for nightly backups).</li></ul>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing a database migration Job</h2>
+  <p>Trace how a Kubernetes Job runs a container to completion and terminates cleanly.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your understanding of specialized Kubernetes workload controllers.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can select and configure the right workload controller for databases, log forwarders, and batch tasks.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Deploy a 3-node Redis or PostgreSQL cluster using a StatefulSet and Headless Service.</li>
+    <li>Inspect the DaemonSets running in your cluster using kubectl get daemonsets -A.</li>
+    <li>Create a CronJob that logs the current timestamp every 5 minutes.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Kubernetes Documentation: *StatefulSets* and *DaemonSets*.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "If pod 'db-1' in a StatefulSet crashes and is recreated on another node, what happens to its PersistentVolume?",
+    a: ["The exact same storage volume is detached from the old node and safely reattached to db-1 on the new node","The volume is formatted and wiped clean for security","A new blank volume is created with zero data","The volume data is merged into db-0"],
+    c: 0,
+    why: "StatefulSets pair each ordinal index (db-1) with a dedicated volume claim that persists across pod lifecycles."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "StatefulSet",
+            "lines": [
+                  "db-0, db-1, db-2",
+                  "Unique persistent volumes",
+                  "Databases, Kafka, Zookeeper"
+            ]
+      },
+      {
+            "title": "DaemonSet",
+            "lines": [
+                  "Runs on Node-1, Node-2, Node-3",
+                  "1 pod per worker node",
+                  "Log collectors, network agents"
+            ]
+      },
+      {
+            "title": "Job / CronJob",
+            "lines": [
+                  "Runs to completion (exit 0)",
+                  "Scheduled via cron syntax",
+                  "Batch processing, migrations"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "1. Job manifest applied: schema-migration-v4",
+      "2. Job controller launches pod: schema-migration-v4-abc",
+      "3. Pod executes SQL migration script: ALTER TABLE users ADD COLUMN...",
+      "4. Migration script finishes successfully with exit code 0",
+      "5. Pod phase becomes 'Completed'; Job controller marks Job 'Complete'"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "controller": "Job controller schedules pod"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "execution": "SQL migration commands execute"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "exit_code": "Exit code 0 detected"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "job_status": "Completed (Container is not restarted)"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The controller designed for stateful databases with ordered ordinal hostnames is <0>.",
+      "The controller that ensures every single node runs a copy of a pod is a <1>.",
+      "A workload that runs to completion and exits rather than restarting is a <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "StatefulSet"
+            ],
+            "why": "StatefulSets provide stable identities."
+      },
+      {
+            "a": [
+                  "DaemonSet"
+            ],
+            "why": "DaemonSets run on every node."
+      },
+      {
+            "a": [
+                  "Job"
+            ],
+            "why": "Jobs run to completion."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why are databases commonly deployed using StatefulSets rather than Deployments?",
+      a: ["StatefulSets provide persistent, predictable network identities (db-0, db-1) and dedicated persistent storage per replica","StatefulSets disable memory limits to allow faster SQL execution","StatefulSets can only run on physical bare-metal hardware","Deployments are forbidden from mounting any persistent storage"],
+      c: 0,
+      why: "StatefulSets maintain stable identity and ensure storage volumes reattach to the exact same ordinal instance."
+    },
+    {
+      q: "What workload controller is best suited for running a log-collection agent like Fluentbit on every cluster node?",
+      a: ["DaemonSet","Deployment","StatefulSet","CronJob"],
+      c: 0,
+      why: "DaemonSets guarantee that all existing and newly joined nodes run an instance of the pod."
+    },
+    {
+      q: "How does a Kubernetes Job differ from a Deployment?",
+      a: ["A Job runs pods until a successful exit code 0 is reached; a Deployment keeps pods running indefinitely","A Job can only run shell scripts","A Job cannot have resource limits","A Job runs exclusively on the control plane"],
+      c: 0,
+      why: "Deployments restart terminated pods; Jobs terminate cleanly once tasks complete successfully."
+    },
+    {
+      q: "What happens when a new worker node is added to a cluster that has an active DaemonSet?",
+      a: ["The DaemonSet controller automatically schedules a pod onto the new node without manual intervention","The cluster administrator must restart the entire cluster","The DaemonSet scales down on existing nodes to compensate","The new node remains empty until an image update occurs"],
+      c: 0,
+      why: "The DaemonSet controller automatically detects new nodes and provisions the required pod immediately."
+    }
+  ]);
+</script>
+</body>
+</html>

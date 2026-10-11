@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 02 — Modules: CommonJS and ECMAScript Modules</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="nodejs-backend" data-lesson="2" data-lesson-id="modules-commonjs-and-esm">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 02</span> · The Node.js Runtime & Architecture</span>
+
+  <h1 class="lesson-title">Modules: CommonJS and ECMAScript Modules</h1>
+  <p class="lesson-lede">
+    Node.js supports both historical CommonJS (require) and standard ECMAScript Modules (import). Learn how they interoperate.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Configure package.json for ESM and navigate import/export interoperability smoothly</span>
+    <span><b>Mission link</b> Modernize dependencies and prevent module loading syntax errors in server applications</span>
+  </div>
+
+  <h2><span class="n">1</span>Two module systems under one roof</h2>
+  <p>For years, Node.js exclusively used <b>CommonJS</b> (<code>require()</code> and <code>module.exports</code>). In CommonJS, modules load synchronously at runtime. Variable exports are copied by value or reference at the moment of evaluation.</p><p>Modern JavaScript uses <b>ECMAScript Modules (ESM)</b> (<code>import</code> and <code>export</code>). ESM is static: imports are parsed and linked before code executes, enabling tree-shaking, static analysis, and top-level await.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    CommonJS loads synchronously at runtime; ESM resolves statically ahead of execution.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Configuring ESM in package.json</h2>
+  <p>To enable standard ESM across an entire project, set <code>"type": "module"</code> in your <code>package.json</code>. All <code>.js</code> files will then be treated as ES modules.</p><p>You can also use explicit file extensions: <code>.mjs</code> for ES Modules, and <code>.cjs</code> for CommonJS modules.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing the module resolution lifecycle</h2>
+  <p>Trace how Node.js loads native packages with the explicit node: protocol prefix.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your knowledge of Node.js module systems and package resolution.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can configure and structure modern Node.js projects with ESM and avoid common interoperability pitfalls.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Create a package.json with 'type': 'module' and run a script using top-level await.</li>
+    <li>Import a CommonJS package inside an ESM file and observe default import behavior.</li>
+    <li>Inspect import.meta.url to calculate __dirname equivalents in ESM.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Node.js Official Documentation: *Modules: ECMAScript modules*.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What happens if you use top-level 'await' in a CommonJS (.cjs) module without wrapping it in an async function?",
+    a: ["SyntaxError: await is only valid in async functions and the top level of ES modules","Node.js executes it without issue","The module is automatically upgraded to ESM","The Node.js runtime crashes with a Segmentation Fault"],
+    c: 0,
+    why: "Top-level await is an ESM feature; CommonJS strictly requires await inside an async function."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "CommonJS (.cjs)",
+            "lines": [
+                  "const fs = require('fs');",
+                  "module.exports = { ... };",
+                  "Synchronous runtime load"
+            ]
+      },
+      {
+            "title": "package.json config",
+            "lines": [
+                  "{ 'type': 'module' }",
+                  "Declares ESM default for .js"
+            ]
+      },
+      {
+            "title": "ESM (.mjs / .js)",
+            "lines": [
+                  "import fs from 'node:fs';",
+                  "export const config = { ... };",
+                  "Static linking & top-level await"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "// package.json contains: { 'type': 'module' }",
+      "import fs from 'node:fs/promises';",
+      "const file = await fs.readFile('./package.json', 'utf-8');",
+      "console.log('Package loaded successfully');"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "mode": "ES Module resolution active"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "import": "Resolved built-in node:fs/promises"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "top_level_await": "Non-blocking async read executed"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "stdout": "Package loaded successfully"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "In package.json, set type to <0> to enable standard ES imports.",
+      "The file extension for explicit CommonJS modules in an ESM project is .<1>.",
+      "Node.js recommends prefixing core built-in modules with <2>:."
+],
+    blanks: [
+      {
+            "a": [
+                  "module"
+            ],
+            "why": "type: module enables ESM."
+      },
+      {
+            "a": [
+                  "cjs"
+            ],
+            "why": ".cjs denotes CommonJS."
+      },
+      {
+            "a": [
+                  "node"
+            ],
+            "why": "node: prefix guarantees resolving the built-in module."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "How do you enable ECMAScript modules (import/export) for all .js files in a project?",
+      a: ["Add 'type': 'module' to package.json","Run node with the --experimental-esm flag on every invocation","Install the esm package from npm","Set the environment variable NODE_ENV=esm"],
+      c: 0,
+      why: "Setting 'type': 'module' in package.json configures Node.js to interpret .js files as ESM."
+    },
+    {
+      q: "Why is the 'node:' prefix recommended when importing built-in modules (e.g. import fs from 'node:fs')?",
+      a: ["It unambiguously targets the native built-in module and avoids conflicts with third-party npm packages","It encrypts the import statement during network transport","It is required by the JavaScript language specification for all browsers","It forces the module to run on the GPU"],
+      c: 0,
+      why: "The node: protocol ensures that Node.js always loads the native core module rather than an installed npm module."
+    },
+    {
+      q: "What replaces the CommonJS __dirname and __filename variables in an ES Module?",
+      a: ["import.meta.url combined with fileURLToPath from node:url","process.cwd()","global.__dirname","window.location.pathname"],
+      c: 0,
+      why: "In ESM, import.meta.url provides the file URL, converted to a filesystem path via fileURLToPath."
+    },
+    {
+      q: "Can an ES Module use top-level 'await' directly at the root of the file?",
+      a: ["Yes, top-level await is natively supported in ES Modules","No, await is strictly forbidden outside functions in all JavaScript variants","Yes, but only if the file is named index.js","No, it requires an external compiler like Babel"],
+      c: 0,
+      why: "ES Modules natively support top-level await, allowing direct asynchronous setup before exporting."
+    }
+  ]);
+</script>
+</body>
+</html>

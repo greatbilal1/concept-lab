@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 05 — ARIA: Roles, States & The First Rule</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="web-accessibility" data-lesson="5" data-lesson-id="aria-roles-states-and-properties">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 05</span> · ARIA Roles, States & Live Regions</span>
+
+  <h1 class="lesson-title">ARIA: Roles, States & The First Rule</h1>
+  <p class="lesson-lede">
+    ARIA is powerful, but dangerous when misused. Learn the First Rule of ARIA and how to apply roles, states, and properties correctly.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Apply WAI-ARIA roles, states, and properties appropriately while prioritizing native semantic HTML</span>
+    <span><b>Mission link</b> Prevent catastrophic ARIA misconfigurations that break assistive technology functionality</span>
+  </div>
+
+  <h2><span class="n">1</span>The First Rule of ARIA</h2>
+  <p>The official W3C specification begins with a startling statement: <b>"If you can use a native HTML element or attribute with the semantics and behavior you require, then do so! Do NOT use ARIA!"</b></p><p>Why? Because ARIA only changes the <i>accessibility representation</i> in the AOM; it adds <b>zero behavior</b>. Writing <code>&lt;div role="button"&gt;</code> does <i>not</i> make the div focusable with Tab, and does <i>not</i> trigger click on Enter or Space. You must write 40 lines of JavaScript to recreate what <code>&lt;button&gt;</code> provides out of the box.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    No ARIA is better than bad ARIA. Always prefer native HTML elements.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Roles, States, and Properties</h2>
+  <p>When native HTML cannot express a complex widget (like an accordion, tabs, or modal dialog), ARIA fills the gap with three categories:</p><ul><li><b>Roles:</b> Define what an element is (e.g. <code>role="dialog"</code>, <code>role="tab"</code>, <code>role="progressbar"</code>). Roles do not change after creation.</li><li><b>States:</b> Dynamic attributes that change frequently (e.g. <code>aria-expanded="false"</code>, <code>aria-selected="true"</code>, <code>aria-busy="true"</code>).</li><li><b>Properties:</b> Characteristics less likely to change (e.g. <code>aria-haspopup="dialog"</code>, <code>aria-controls="panel-1"</code>).</li></ul>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing aria-expanded on a disclosure button</h2>
+  <p>Trace how updating aria-expanded informs screen reader users of visibility changes.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your mastery of ARIA roles, states, and the First Rule of ARIA.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You understand when and how to apply ARIA correctly, avoiding cargo-cult ARIA that degrades accessibility.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Build an accessible collapsible FAQ accordion using <button aria-expanded='false'>.</li>
+    <li>Audit an existing codebase for redundant ARIA (such as <button role='button'> or <nav role='navigation'>).</li>
+    <li>Implement an accessible tablist component following the W3C WAI-ARIA Authoring Practices Guide.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    W3C: *WAI-ARIA Authoring Practices Guide (APG)* (w3.org/WAI/ARIA/apg).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What does adding role='button' to a <div> do?",
+    a: ["It tells the Accessibility Tree to report the element as a button, but does NOT make it keyboard focusable or handle keyboard clicks","It automatically makes the div behave identically to a native <button>","It applies native browser button styling automatically","It disables mouse clicks on the div"],
+    c: 0,
+    why: "ARIA changes semantics in the accessibility tree, but imparts zero keyboard behavior, focusability, or browser events."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Accordion Trigger",
+            "lines": [
+                  "<button id='acc-btn'>",
+                  "aria-expanded='false'",
+                  "aria-controls='panel-1'"
+            ]
+      },
+      {
+            "title": "Dynamic State Toggle",
+            "lines": [
+                  "User clicks -> JS updates:",
+                  "aria-expanded='true'",
+                  "AOM announces 'expanded'"
+            ]
+      },
+      {
+            "title": "Accordion Content",
+            "lines": [
+                  "<div id='panel-1'>",
+                  "aria-labelledby='acc-btn'",
+                  "Content now visible"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "1. Closed state: <button aria-expanded='false' aria-controls='faq-1'>What is your refund policy?</button>",
+      "2. Screen reader announces: 'What is your refund policy?, button, collapsed'",
+      "3. User presses Space to expand",
+      "4. Script runs: button.setAttribute('aria-expanded', 'true'); faqPanel.hidden = false;",
+      "5. Screen reader announces: 'expanded'"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "initial_state": "aria-expanded='false'"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "speech": "Screen reader vocalizes collapsed state"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "toggle_action": "State updated dynamically in DOM"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "immediate_feedback": "User receives auditory confirmation of expansion"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The First Rule of ARIA states that developers should prefer <0> HTML whenever possible.",
+      "The state attribute indicating whether a collapsible menu is open is aria-<1>.",
+      "The attribute linking a trigger button to the content element it controls is aria-<2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "native",
+                  "semantic"
+            ],
+            "why": "Native HTML provides built-in behaviors."
+      },
+      {
+            "a": [
+                  "expanded"
+            ],
+            "why": "aria-expanded communicates open/closed state."
+      },
+      {
+            "a": [
+                  "controls"
+            ],
+            "why": "aria-controls links trigger to content ID."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the First Rule of ARIA?",
+      a: ["If you can use a native semantic HTML element with the required behavior, do so instead of using ARIA","Always add role attributes to every HTML tag","Every div must have an aria-label","ARIA is only for mobile applications"],
+      c: 0,
+      why: "Native elements have built-in keyboard behavior, focus management, and accessibility tree integration."
+    },
+    {
+      q: "Does adding 'role=\"checkbox\"' to a <span> automatically handle Spacebar toggling at runtime?",
+      a: ["No: ARIA only updates semantics in the Accessibility Tree; all keyboard events and state toggling must be coded manually in JavaScript","Yes: browsers natively wire keyboard events to all ARIA roles","Yes: but only in Google Chrome","No: ARIA is forbidden on span elements"],
+      c: 0,
+      why: "ARIA never changes element behavior or keyboard handling; it only changes what assistive technology hears."
+    },
+    {
+      q: "Which ARIA state attribute communicates whether an accordion or dropdown menu is currently open or closed?",
+      a: ["aria-expanded","aria-open","aria-visible","aria-active"],
+      c: 0,
+      why: "aria-expanded='true' or 'false' communicates the visibility status of collapsible controls."
+    },
+    {
+      q: "Why is '<a href=\"#\" role=\"button\">' considered an accessibility anti-pattern?",
+      a: ["Links are activated by the Enter key, while buttons are activated by both Space and Enter; simulating buttons with links creates subtle keyboard bugs","Links cannot display text inside","The browser forbids anchor tags from running JavaScript","It breaks mobile screen pinch-to-zoom"],
+      c: 0,
+      why: "Buttons and links have fundamentally different keyboard expectations and semantics; use <button> for actions."
+    }
+  ]);
+</script>
+</body>
+</html>

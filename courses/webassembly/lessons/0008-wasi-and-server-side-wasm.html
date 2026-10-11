@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 08 — Beyond the Browser: WASI & Server-Side Wasm</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="webassembly" data-lesson="8" data-lesson-id="wasi-and-server-side-wasm">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 08</span> · Wasm Beyond the Browser & WASI</span>
+
+  <h1 class="lesson-title">Beyond the Browser: WASI & Server-Side Wasm</h1>
+  <p class="lesson-lede">
+    'If WASM + WASI had existed in 2008, we wouldn't have needed to create Docker' — Solomon Hykes (co-founder of Docker). Discover serverless Wasm.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Explain the WebAssembly System Interface (WASI) and run standalone Wasm binaries with Wasmtime and Node.js</span>
+    <span><b>Mission link</b> Deploy ultra-lightweight, sandboxed microservices and edge compute functions using WASI</span>
+  </div>
+
+  <h2><span class="n">1</span>WebAssembly outside the browser</h2>
+  <p>WebAssembly was designed for browsers, but its core properties—near-native speed, compact size, instant startup (&lt;1ms), and capability-based security sandboxing—make it an extraordinary runtime for <b>cloud servers and edge compute</b>.</p><p>Docker containers require bundling an entire mini-Linux operating system (megabytes or gigabytes in size). A server-side Wasm module is typically a few hundred kilobytes, starts in microseconds, and consumes almost zero idle RAM.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Server-side WebAssembly provides sub-millisecond cold starts and sandboxed execution with zero OS container bloat.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>WASI: WebAssembly System Interface</h2>
+  <p>The <b>WebAssembly System Interface (WASI)</b> defines a modular, standard collection of POSIX-like system APIs: reading files, querying clocks, and generating random numbers.</p><p>Crucially, WASI uses <b>capability-based security</b>: a WASI module has zero access to files by default. The host runtime (like <b>Wasmtime</b>, <b>Wasmer</b>, or Node.js) must explicitly grant access to specific directories (e.g. <code>wasmtime run --dir=/tmp app.wasm</code>).</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing standalone WASI execution with Wasmtime</h2>
+  <p>Trace how a standalone Wasm binary executes securely via Wasmtime with pre-opened directory capabilities.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your understanding of WASI and server-side WebAssembly runtimes.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You understand how WASI enables server-side WebAssembly and why lightweight Wasm runtimes are revolutionizing edge compute.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Install wasmtime (curl https://wasmtime.dev/install.sh | bash) and run a hello-world Wasm binary.</li>
+    <li>Compile a Rust application targeting wasm32-wasi and execute it with Node.js wasi module.</li>
+    <li>Compare startup latency between a Docker Alpine container (200ms) vs a Wasmtime binary (1ms).</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Bytecode Alliance: *Standardizing WASI: The WebAssembly System Interface* (bytecodealliance.org).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What was missing that prevented standard WebAssembly from running standalone on a server outside the browser?",
+    a: ["A standardized system interface for file I/O, networking, and system clocks (WASI)","Browsers refused to allow Wasm files to be exported","Server CPUs cannot execute binary bytecode","Server motherboards lack WebAssembly chips"],
+    c: 0,
+    why: "In browsers, JS supplies host APIs; running standalone on servers requires a standard system call interface (WASI)."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Standalone Wasm Binary",
+            "lines": [
+                  "Compiled Rust / C / Go app",
+                  "No bundled Linux OS!",
+                  "Size: 200KB"
+            ]
+      },
+      {
+            "title": "WASI System Interface",
+            "lines": [
+                  "Capability-based security",
+                  "Sandboxed file / network access",
+                  "Standardized POSIX calls"
+            ]
+      },
+      {
+            "title": "Host Runtime",
+            "lines": [
+                  "Wasmtime / Wasmer / Node.js",
+                  "Sub-millisecond startup",
+                  "Runs on Edge / Cloud / Serverless"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "1. Developer compiles Rust CLI app: cargo build --target wasm32-wasi",
+      "2. Operator runs: wasmtime run --dir=./data app.wasm",
+      "3. App attempts to read './data/config.json' -> GRANTED by capability",
+      "4. App attempts to read '/etc/passwd' -> BLOCKED: Capability denied by WASI sandbox!",
+      "5. Process executes and exits cleanly with exit code 0"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "target": "wasm32-wasi compilation target"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "permissions": "Explicit capability granted for ./data only"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "security_check": "Attempted file traversal rejected at sandbox layer"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "safe_exit": "Untrusted code executes safely"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The standardized system interface for WebAssembly outside browsers is <0>.",
+      "A popular standalone WebAssembly runtime by the Bytecode Alliance is Wasm<1>.",
+      "WASI security where access to files must be explicitly pre-granted is <2>-based security."
+],
+    blanks: [
+      {
+            "a": [
+                  "WASI"
+            ],
+            "why": "WebAssembly System Interface."
+      },
+      {
+            "a": [
+                  "time"
+            ],
+            "why": "Wasmtime is a leading standalone runtime."
+      },
+      {
+            "a": [
+                  "capability"
+            ],
+            "why": "Capability-based security avoids ambient authority."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is WASI (WebAssembly System Interface)?",
+      a: ["A standardized set of modular system APIs allowing WebAssembly to access files, clocks, and system resources securely outside browsers","A web design layout framework","A protocol for connecting Bluetooth keyboards to computers","A CSS animation preprocessor"],
+      c: 0,
+      why: "WASI provides portable, sandboxed operating system abstractions for standalone WebAssembly runtimes."
+    },
+    {
+      q: "Why are edge compute platforms (like Cloudflare Workers and Fastly Compute) adopting WebAssembly over Docker containers?",
+      a: ["Wasm modules start in under 1 millisecond with minimal memory overhead, eliminating container cold starts","Docker is banned in international cloud datacenters","Wasm does not require electricity to run","Docker cannot execute Python code"],
+      c: 0,
+      why: "Wasm provides instant sub-millisecond cold starts and high density, running thousands of tenants on a single server."
+    },
+    {
+      q: "What does 'capability-based security' mean in the context of WASI?",
+      a: ["The program has zero access to files or network by default; specific directory and socket capabilities must be explicitly granted by the host","The program can only run if the user has a capability license key","The CPU must have hardware capability flags enabled in the BIOS","The program is allowed to do anything without restriction"],
+      c: 0,
+      why: "Capability-based security eliminates ambient authority: access to resources is denied unless explicitly pre-opened by the runtime."
+    },
+    {
+      q: "Which standalone WebAssembly runtime is maintained by the Bytecode Alliance (Mozilla, Fastly, Intel, Microsoft)?",
+      a: ["Wasmtime","Node.js","V8 Engine","VirtualBox"],
+      c: 0,
+      why: "Wasmtime is the flagship open-source standalone WASI runtime developed by the Bytecode Alliance."
+    }
+  ]);
+</script>
+</body>
+</html>

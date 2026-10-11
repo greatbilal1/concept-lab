@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 07 — Database Drivers & Connection Pooling</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="nodejs-backend" data-lesson="7" data-lesson-id="database-drivers-and-connection-pooling">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 07</span> · Database Integration & Production Practices</span>
+
+  <h1 class="lesson-title">Database Drivers & Connection Pooling</h1>
+  <p class="lesson-lede">
+    Establishing database connections is expensive. Connection pools reuse open TCP sockets to handle thousands of queries efficiently.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Configure connection pools for PostgreSQL or MySQL and prevent socket starvation under high load</span>
+    <span><b>Mission link</b> Prevent database connection exhaustion and latency degradation during peak user traffic</span>
+  </div>
+
+  <h2><span class="n">1</span>Why connection pooling is mandatory</h2>
+  <p>Opening a database connection requires a three-way TCP handshake, TLS negotiation, authentication, and backend server process allocation. This can take 50–100ms per connection.</p><p>If your web server receives 1,000 requests per second and establishes a fresh connection per request, both your app and the database will rapidly crash with <code>too many clients</code> errors. A <b>connection pool</b> maintains a fixed set of open sockets (e.g. 10–50) that queries borrow and return in milliseconds.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    A connection pool reuses a fixed set of database connections, eliminating connection setup overhead.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Managing pool clients with pg / mysql2</h2>
+  <p>Using libraries like <code>pg</code> (node-postgres), you typically call <code>pool.query('SELECT ...')</code> which handles borrowing, executing, and releasing automatically. When running transactions (BEGIN / COMMIT), you must manually checkout a client with <code>pool.connect()</code> and release it in a <code>finally</code> block.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing connection checkout and release</h2>
+  <p>Trace how a transaction client is safely checked out and released back to the pool.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your understanding of connection pooling and database driver mechanics.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can configure robust connection pools and safely manage database transactions without leaking connections.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Configure a node-postgres Pool with max connections, idleTimeoutMillis, and connectionTimeoutMillis.</li>
+    <li>Demonstrate connection starvation by acquiring a client without calling client.release().</li>
+    <li>Set up an index health-check endpoint that performs a lightweight SELECT 1 query.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    node-postgres Documentation: *Pooling* (node-postgres.com/features/pooling).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "If your database connection pool size is 20, and 50 simultaneous queries arrive at the server, what happens?",
+    a: ["20 queries execute immediately; the remaining 30 queue in memory and execute as connections become free","30 queries are immediately rejected with an error","The pool automatically expands to 500 connections","The database server crashes"],
+    c: 0,
+    why: "Connection pools queue excess queries and service them in FIFO order as active queries release their connections."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Incoming HTTP Requests",
+            "lines": [
+                  "1,000 req/sec",
+                  "Borrow client -> Run query -> Return"
+            ]
+      },
+      {
+            "title": "Connection Pool (e.g. 20)",
+            "lines": [
+                  "Pre-authenticated TCP sockets",
+                  "Queues queries if all busy",
+                  "Prevents database overload"
+            ]
+      },
+      {
+            "title": "Database Server (Postgres)",
+            "lines": [
+                  "Fixed worker processes",
+                  "Stable CPU and RAM usage",
+                  "Zero connection handshake spikes"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "const client = await pool.connect();",
+      "try {",
+      "  await client.query('BEGIN');",
+      "  await client.query('UPDATE accounts SET balance = balance - 100 WHERE id = 1');",
+      "  await client.query('COMMIT');",
+      "} finally {",
+      "  client.release(); // CRITICAL: return to pool",
+      "}"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "pool_status": "1 connection borrowed (19 free)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "transaction": "BEGIN executed"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "transaction": "COMMIT executed"
+            }
+      },
+      {
+            "line": 6,
+            "vars": {
+                  "pool_status": "client.release() called; 20 connections available"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Reusing database sockets across requests is called connection <0>.",
+      "To ensure a borrowed database client is returned even on error, release it in a <1> block.",
+      "When all pool connections are busy, incoming queries wait in the connection <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "pooling"
+            ],
+            "why": "Connection pooling maintains persistent sockets."
+      },
+      {
+            "a": [
+                  "finally"
+            ],
+            "why": "finally blocks guarantee release execution."
+      },
+      {
+            "a": [
+                  "queue"
+            ],
+            "why": "Excess queries wait in a FIFO queue."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What happens if a developer forgets to call 'client.release()' after checking out a database client from a pool?",
+      a: ["The connection remains marked as busy forever, eventually exhausting the pool and causing all subsequent queries to hang","The client is automatically garbage collected and returned to the pool after 1 millisecond","The database drops the entire database schema","Node.js restarts automatically"],
+      c: 0,
+      why: "Unreleased connections lead to pool starvation: once all slots are leaked, all future queries stall waiting forever."
+    },
+    {
+      q: "Why is a connection pool of 20 often capable of serving thousands of concurrent web users?",
+      a: ["Most web requests only interact with the database for a few milliseconds, so 20 connections service queries in rapid succession","The pool creates 20 threads per user","PostgreSQL executes queries in parallel on the client machine","The pool compresses the SQL queries"],
+      c: 0,
+      why: "Individual queries take 1–5ms, so 20 connections can service thousands of operations each second."
+    },
+    {
+      q: "Which parameter controls how long a query waits in the queue before throwing a timeout error if no connection is available?",
+      a: ["connectionTimeoutMillis","idleTimeoutMillis","maxWaitTimeSeconds","sslTimeout"],
+      c: 0,
+      why: "connectionTimeoutMillis dictates how long to wait for a connection before rejecting the request."
+    },
+    {
+      q: "Why are database transactions (BEGIN ... COMMIT) incompatible with simple pool.query() calls?",
+      a: ["pool.query() borrows a random connection for each call, but a transaction must run on the exact same dedicated connection","Transactions only work in C++","pool.query() can only run SELECT statements","Transactions require WebSocket connections"],
+      c: 0,
+      why: "Transactions are session-specific and require checking out a dedicated client with pool.connect()."
+    }
+  ]);
+</script>
+</body>
+</html>

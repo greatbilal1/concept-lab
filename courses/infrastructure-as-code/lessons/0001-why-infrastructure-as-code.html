@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 01 — Why IaC: Declarative vs Imperative</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="infrastructure-as-code" data-lesson="1" data-lesson-id="why-infrastructure-as-code">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 01</span> · IaC Philosophy & Declarative Infrastructure</span>
+
+  <h1 class="lesson-title">Why IaC: Declarative vs Imperative</h1>
+  <p class="lesson-lede">
+    Manual cloud configuration creates untracked drift and outages. Learn how declarative code brings software engineering rigor to infrastructure.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Contrast declarative vs imperative models and explain the consequences of configuration drift</span>
+    <span><b>Mission link</b> Prevent undocumented snowflake infrastructure and catastrophic cloud misconfigurations</span>
+  </div>
+
+  <h2><span class="n">1</span>The failure of manual infrastructure</h2>
+  <p>When an engineer provisions a cloud database by clicking through an AWS or Azure web dashboard, zero record of that action is stored in version control. Who made the change? Why was that subnet chosen? What was the previous setting?</p><p>This produces <b>snowflake servers</b>: unique systems that nobody understands and nobody dares touch. <b>Infrastructure as Code (IaC)</b> models all infrastructure as declarative source code stored in Git, reviewed via Pull Requests, and applied predictably.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    IaC replaces manual console clicks with version-controlled, auditable, reproducible source code.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Idempotence and configuration drift</h2>
+  <p>A hallmark of quality IaC tools is <b>idempotence</b>: running <code>terraform apply</code> ten times in a row without code changes produces zero modifications after the first run.</p><p>When an administrator makes emergency manual edits directly in the web console, <b>configuration drift</b> occurs: the live cloud reality diverges from Git code. IaC tools detect this drift during the planning phase.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing declarative delta computation</h2>
+  <p>Trace how a declarative engine computes only the necessary changes between live state and desired state.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your understanding of IaC concepts and declarative paradigms.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can explain the necessity of IaC, contrast declarative vs imperative approaches, and identify configuration drift.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit your cloud environment for unmanaged resources created through the web console.</li>
+    <li>Compare an imperative AWS CLI script with an equivalent declarative Terraform block.</li>
+    <li>Explain why clickops (manual console clicks) is banned in high-reliability engineering teams.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Yevgeniy Brikman, *Terraform: Up & Running*, Chapter 1: *Why Terraform*.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is the key difference between imperative (Bash/Python scripts) and declarative (Terraform/OpenTofu) infrastructure management?",
+    a: ["Imperative describes HOW to make changes step-by-step; declarative describes WHAT the desired end-state should look like","Imperative is faster than declarative in all cloud providers","Declarative only works with Linux servers","Imperative tools store state in etcd automatically"],
+    c: 0,
+    why: "Declarative code specifies the goal (e.g., '3 servers with tag prod'), and the engine resolves what API calls to make."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Git Repository",
+            "lines": [
+                  "vpc.tf, db.tf, ec2.tf",
+                  "Single source of truth",
+                  "Peer reviewed via Pull Request"
+            ]
+      },
+      {
+            "title": "IaC Engine (Terraform)",
+            "lines": [
+                  "Calculates Delta: Desired vs Live",
+                  "Executes minimal API calls",
+                  "Idempotent execution"
+            ]
+      },
+      {
+            "title": "Cloud Provider (AWS/GCP)",
+            "lines": [
+                  "VPC, Subnets, Gateways",
+                  "Live state matches code exactly",
+                  "Zero manual clicks"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "# Declared Code: server_count = 5",
+      "# Current Live Cloud State: 3 servers exist",
+      "1. Engine queries cloud API: Discovers servers 1, 2, 3",
+      "2. Engine compares: Desired (5) - Current (3) = Delta (+2 servers)",
+      "3. Plan output: +2 to add, ~0 to change, -0 to destroy",
+      "4. Apply executed: Only 2 new servers are launched"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "desired_state": "5 servers"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "observed_state": "3 servers"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "calculated_diff": "+2 resources needed"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "result": "Desired state achieved without recreating existing 3 servers"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "A paradigm that defines WHAT the end state should be is <0>.",
+      "An operation that produces the same result regardless of how many times it runs is <1>.",
+      "The divergence between code and live cloud state is called configuration <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "declarative"
+            ],
+            "why": "Declarative defines desired outcome."
+      },
+      {
+            "a": [
+                  "idempotent"
+            ],
+            "why": "Idempotence guarantees safe re-runs."
+      },
+      {
+            "a": [
+                  "drift"
+            ],
+            "why": "Configuration drift represents state divergence."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the primary risk of managing cloud infrastructure through web consoles ('ClickOps')?",
+      a: ["Changes are untracked, unversioned, impossible to reproduce identically, and prone to human error","Web consoles cost 20% more in cloud billing fees","Web consoles only work during business hours","Web consoles do not support multi-factor authentication"],
+      c: 0,
+      why: "Manual console changes bypass code review, documentation, and automated testing, causing drift and outages."
+    },
+    {
+      q: "What does it mean for an infrastructure tool to be 'idempotent'?",
+      a: ["Applying the configuration multiple times leaves the system in the exact same state without duplicate resources","The tool executes commands in reverse chronological order","The tool only provisions resources on local computers","The configuration can only be applied once in a lifetime"],
+      c: 0,
+      why: "Idempotence ensures that reapplying unchanged code causes zero unintended side effects or duplicate resources."
+    },
+    {
+      q: "What is configuration drift?",
+      a: ["When the live state of cloud infrastructure diverges from the state declared in version-controlled code","When a laptop moves between different physical Wi-Fi networks","When cloud servers migrate to newer CPU architectures","When Git branch names are renamed"],
+      c: 0,
+      why: "Drift happens when manual out-of-band changes or outages alter real-world resources without updating code."
+    },
+    {
+      q: "Why is a declarative model preferred over an imperative shell script for complex infrastructure?",
+      a: ["Declarative tools calculate the delta and handle dependencies, retries, and deletions automatically","Shell scripts are illegal in production data centers","Declarative tools do not require network access","Declarative code runs entirely on the client browser"],
+      c: 0,
+      why: "Declarative systems relieve the engineer of writing complex state checks, error recovery, and ordering logic."
+    }
+  ]);
+</script>
+</body>
+</html>

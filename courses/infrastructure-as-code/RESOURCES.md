@@ -1,13 +1,10 @@
 # Resources — Infrastructure as Code
 
 ## Knowledge (primary sources)
+- Official Terraform Documentation (developer.hashicorp.com/terraform).
+- *Terraform: Up & Running* by Yevgeniy Brikman (O'Reilly).
+- OpenTofu Manifesto and Architecture (opentofu.org).
+- Checkov & Open Policy Agent (OPA) Documentation.
 
-- Title — author — why it is trustworthy. (Used by lesson "Primary source" notes.)
-
-## Wisdom (practitioner insight)
-
-- Source — the judgement it offers that a textbook does not.
-
-## Gaps
-
-- What no source covers well, and how you will fill it.
+## Wisdom
+- The web console is read-only. If an infrastructure change is not recorded in Git and applied via IaC, it does not exist.

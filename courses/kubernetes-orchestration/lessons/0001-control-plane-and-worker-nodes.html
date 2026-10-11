@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 01 — Control Plane, etcd & Worker Architecture</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="kubernetes-orchestration" data-lesson="1" data-lesson-id="control-plane-and-worker-nodes">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 01</span> · Cluster Architecture & Core Primitives</span>
+
+  <h1 class="lesson-title">Control Plane, etcd & Worker Architecture</h1>
+  <p class="lesson-lede">
+    Kubernetes splits responsibilities cleanly between the brains of the cluster (Control Plane) and the muscle (Worker Nodes).
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Explain the responsibilities of every control plane and worker component and their interaction via the API server</span>
+    <span><b>Mission link</b> Diagnose cluster outages and master the control-plane reconciliation loop</span>
+  </div>
+
+  <h2><span class="n">1</span>Brain vs Muscle: The two tiers</h2>
+  <p>A Kubernetes cluster consists of two distinct tiers:</p><ul><li><b>Control Plane (The Brains):</b> Manages the cluster. It contains the <code>kube-apiserver</code> (the only component communicating directly with <code>etcd</code>), the <code>kube-scheduler</code> (decides which node hosts each pod), and the <code>kube-controller-manager</code> (runs reconciliation loops).</li><li><b>Worker Nodes (The Muscle):</b> The physical or virtual machines that actually run user containers. Each worker runs a <code>kubelet</code> (the local node manager), <code>kube-proxy</code> (handles network packet routing), and a container runtime (such as <code>containerd</code>).</li></ul>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    No component talks directly to etcd except the kube-apiserver; all other components interact via the REST API.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The continuous reconciliation loop</h2>
+  <p>Kubernetes operates on a simple principle: <b>Observed State vs. Desired State</b>. Controllers continuously query the API server: <i>"The user asked for 3 replicas, but only 2 are running. Therefore, I will create 1 new pod."</i></p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing a pod creation request</h2>
+  <p>Trace the step-by-step path of creating a new pod from kubectl to container start.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your understanding of Kubernetes cluster components.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can articulate the role of every Kubernetes component and understand the core declarative control loop.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Run kubectl get componentstatuses or inspect system pods in kube-system namespace.</li>
+    <li>Simulate scheduler decisions by cordoning a worker node with kubectl cordon.</li>
+    <li>Check kubelet systemd logs on a Linux node using journalctl -u kubelet.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Kubernetes Documentation: *Kubernetes Components* (kubernetes.io).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What happens to currently running user application containers if the entire control plane temporarily loses network connectivity?",
+    a: ["Existing containers continue running on worker nodes, but no new deployments, scalings, or rescheduling can occur","All containers across all nodes terminate instantly","Worker nodes automatically elect one node as the new control plane","The container images are wiped from disk"],
+    c: 0,
+    why: "Worker nodes run containerized workloads independently; control plane outages stop management operations, not active execution."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Control Plane",
+            "lines": [
+                  "kube-apiserver (REST gateway)",
+                  "etcd (state store)",
+                  "kube-scheduler (placement)",
+                  "controller-manager"
+            ]
+      },
+      {
+            "title": "Communication",
+            "lines": [
+                  "TLS bidirectional gRPC / HTTPS",
+                  "Worker nodes poll apiserver"
+            ]
+      },
+      {
+            "title": "Worker Node",
+            "lines": [
+                  "kubelet (monitors pods)",
+                  "kube-proxy (iptables routing)",
+                  "containerd (OIC runtime)"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "1. User executes: kubectl apply -f pod.yaml",
+      "2. kube-apiserver authenticates request and writes pod spec to etcd",
+      "3. kube-scheduler detects unscheduled pod and selects Node-02 based on resources",
+      "4. kube-scheduler updates pod spec: nodeName = 'Node-02'",
+      "5. kubelet on Node-02 detects assigned pod and instructs containerd to pull image and run"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "action": "kubectl sends POST /api/v1/pods to apiserver"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "etcd_state": "Pod recorded with status 'Pending' and nodeName empty"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "scheduler_decision": "Node-02 chosen (has sufficient CPU/RAM)"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "container_started": "containerd launches container; pod becomes 'Running'"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The only component that communicates directly with etcd is kube-<0>.",
+      "The node agent that receives pod manifests and drives the container runtime is the <1>.",
+      "The distributed key-value store holding all cluster state is <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "apiserver"
+            ],
+            "why": "kube-apiserver guards access to etcd."
+      },
+      {
+            "a": [
+                  "kubelet"
+            ],
+            "why": "kubelet runs on every worker node."
+      },
+      {
+            "a": [
+                  "etcd"
+            ],
+            "why": "etcd is the Raft-based state store."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Which control plane component decides which specific worker node a new Pod should run on?",
+      a: ["kube-scheduler","kubelet","kube-proxy","containerd"],
+      c: 0,
+      why: "kube-scheduler evaluates node affinity, resource limits, and taints to assign pods to nodes."
+    },
+    {
+      q: "What is etcd in a Kubernetes cluster?",
+      a: ["A strongly consistent, distributed key-value store that stores the entire state of the cluster","A high-speed caching proxy for frontend HTML files","The container image registry where Docker images are stored","A load balancer distributing external web traffic"],
+      c: 0,
+      why: "etcd stores all Kubernetes resources, specifications, and statuses reliably across cluster leaders."
+    },
+    {
+      q: "How does the kubelet learn what containers it needs to run on its local node?",
+      a: ["It continuously watches the kube-apiserver for Pods assigned to its node name","The scheduler connects via SSH to the node and runs docker run commands","Users email YAML files directly to the worker machine","The kube-proxy forwards pod specifications through TCP port 80"],
+      c: 0,
+      why: "The kubelet watches the apiserver API stream for Pods where spec.nodeName matches its identity."
+    },
+    {
+      q: "What is the core philosophy of Kubernetes controllers (like ReplicaSet controller)?",
+      a: ["Continuously observe the actual current state, compare it with the desired state, and execute corrections","Execute a single linear bash script when the cluster boots","Wait for a human administrator to manually approve every container restart","Run antivirus scans on all container binaries"],
+      c: 0,
+      why: "The reconciliation loop constantly works to make observed reality match desired YAML declarations."
+    }
+  ]);
+</script>
+</body>
+</html>

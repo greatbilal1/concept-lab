@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 01 — The Event Loop & Libuv Architecture</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="nodejs-backend" data-lesson="1" data-lesson-id="event-loop-and-libuv">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 01</span> · The Node.js Runtime & Architecture</span>
+
+  <h1 class="lesson-title">The Event Loop & Libuv Architecture</h1>
+  <p class="lesson-lede">
+    Node.js runs JavaScript on a single thread while delegating I/O to operating system kernels and libuv thread pools.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Explain the event loop phases and trace how asynchronous operations execute across queues</span>
+    <span><b>Mission link</b> Prevent synchronous bottlenecks that freeze server throughput for all connected clients</span>
+  </div>
+
+  <h2><span class="n">1</span>Single thread, non-blocking execution</h2>
+  <p>In traditional server platforms, every incoming request spawns an OS thread or worker process. If a thread waits 50ms for a database query, that entire thread sits idle while consuming 1–2MB of stack RAM.</p><p>Node.js runs on a <b>single main JavaScript thread</b>. When an I/O operation (reading a disk file, querying a database, or contacting an external API) is initiated, Node.js hands the request to the OS kernel or <b>libuv</b>'s background worker pool and immediately continues executing other JavaScript code.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    JavaScript runs on one thread; all blocking I/O is offloaded asynchronously to the operating system and libuv.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The six event loop phases</h2>
+  <p>Libuv drives the event loop through distinct phases in a continuous circle:</p><ul><li><b>Timers:</b> Executes callbacks scheduled by <code>setTimeout()</code> and <code>setInterval()</code>.</li><li><b>Pending callbacks:</b> Executes I/O callbacks deferred from the previous cycle.</li><li><b>Idle / Prepare:</b> Internal libuv coordination.</li><li><b>Poll:</b> Retrieves new I/O events from the OS kernel; blocks here if idle.</li><li><b>Check:</b> Executes callbacks scheduled by <code>setImmediate()</code>.</li><li><b>Close callbacks:</b> Executes socket and handle close callbacks (e.g. <code>socket.on('close')</code>).</li></ul>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing timer vs microtask resolution</h2>
+  <p>Trace the exact execution order of synchronous code, microtasks, and event loop macrotasks.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your understanding of the Node.js event loop and libuv.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You understand how Node.js achieves high concurrency on a single thread and how microtasks and macrotasks are sequenced.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Run a small script scheduling setTimeout, setImmediate, and process.nextTick to verify execution order.</li>
+    <li>Inspect the UV_THREADPOOL_SIZE environment variable and understand when background threads are used.</li>
+    <li>Explain the difference between I/O-bound and CPU-bound workloads in Node.js architecture.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Official Node.js Guide: *The Node.js Event Loop, Timers, and process.nextTick()*.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What happens if a developer runs a CPU-intensive loop (like calculating 10 billion hashes) on the main Node.js thread?",
+    a: ["The entire server halts: no other user requests or timer callbacks can be processed until the calculation finishes","Node.js automatically moves the loop to a new CPU core in the background","The loop runs asynchronously without affecting any other connected clients","The operating system kills the Node.js process immediately for exceeding CPU quota"],
+    c: 0,
+    why: "Because JavaScript execution is single-threaded, synchronous CPU computation blocks the event loop completely."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1. Timers",
+            "lines": [
+                  "setTimeout()",
+                  "setInterval()"
+            ]
+      },
+      {
+            "title": "2. Poll Phase",
+            "lines": [
+                  "Incoming network data",
+                  "File system completions"
+            ]
+      },
+      {
+            "title": "3. Check Phase",
+            "lines": [
+                  "setImmediate()",
+                  "runs after poll completes"
+            ]
+      },
+      {
+            "title": "Microtasks",
+            "lines": [
+                  "process.nextTick() & Promises",
+                  "Drained immediately after ANY phase"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "console.log('1: Sync');",
+      "setTimeout(() => console.log('2: Timer (macrotask)'), 0);",
+      "Promise.resolve().then(() => console.log('3: Promise (microtask)'));",
+      "process.nextTick(() => console.log('4: nextTick (microtask)'));",
+      "console.log('5: Sync');"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "stdout": "1: Sync"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "stdout": "5: Sync (Call stack empty, draining microtasks)"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "stdout": "4: nextTick (Highest priority microtask)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "stdout": "3: Promise (Microtask queue drained)"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "stdout": "2: Timer (Event loop enters Timers phase)"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The C library responsible for the event loop and thread pool in Node.js is <0>.",
+      "High priority microtasks scheduled with process.<1> execute before promises.",
+      "The event loop phase that runs setImmediate callbacks is the <2> phase."
+],
+    blanks: [
+      {
+            "a": [
+                  "libuv"
+            ],
+            "why": "libuv provides cross-platform asynchronous I/O."
+      },
+      {
+            "a": [
+                  "nextTick"
+            ],
+            "why": "process.nextTick executes immediately after the current operation."
+      },
+      {
+            "a": [
+                  "check"
+            ],
+            "why": "The check phase executes setImmediate."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What component in Node.js provides the asynchronous event loop and background thread pool?",
+      a: ["libuv","V8 Engine","npm registry","Express framework"],
+      c: 0,
+      why: "libuv is the C library providing the event loop and asynchronous thread pool abstractions."
+    },
+    {
+      q: "Why can Node.js handle 100,000 concurrent network connections on a single thread?",
+      a: ["It uses non-blocking OS socket polling (epoll/kqueue) and only wakes up when events arrive","It secretly compiles JavaScript into C++ multithreaded classes","It compresses incoming HTTP requests into binary zip files","It routes all network connections through local Redis instances"],
+      c: 0,
+      why: "Operating system kernel notification facilities (epoll, kqueue) allow a single thread to monitor thousands of idle sockets."
+    },
+    {
+      q: "When do Promise microtasks execute relative to event loop phases?",
+      a: ["Immediately after the current synchronous operation finishes, before entering the next phase","Only at the end of the entire application lifecycle","Inside the Timers phase only","In parallel on a separate background thread"],
+      c: 0,
+      why: "The microtask queue is drained immediately whenever the JavaScript call stack becomes empty."
+    },
+    {
+      q: "Which operations are offloaded to libuv's background thread pool rather than OS async sockets?",
+      a: ["File system calls (fs) and DNS lookups (dns.lookup)","TCP network incoming connections","console.log statements","Math.random() operations"],
+      c: 0,
+      why: "Because file system operations lack universal non-blocking OS support, libuv uses worker threads for them."
+    }
+  ]);
+</script>
+</body>
+</html>

@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI News — Concept Lab</title>
+<meta name="description" content="Latest AI news and articles.">
+<link rel="icon" type="image/svg+xml" href="assets/icons/favicon.svg">
+<link rel="stylesheet" href="assets/css/tokens.css">
+<link rel="stylesheet" href="assets/css/site.css">
+<link rel="stylesheet" href="assets/css/anim.css">
+</head>
+<body>
+
+<div class="bg-orbs" aria-hidden="true">
+  <div class="orb a"></div><div class="orb b"></div><div class="orb c"></div>
+</div>
+<div class="grid-overlay" aria-hidden="true"></div>
+
+<div class="wrap">
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <a class="logo" href="index.html"><span class="mark">CL</span> Concept&nbsp;Lab</a>
+    <nav class="topnav">
+      <a href="courses.html">All Courses</a>
+      <a href="index.html#paths">Paths</a>
+      <a href="glossary.html">Glossary</a>
+      <a href="news.html" class="active">AI News</a>
+    </nav>
+    <div class="search">
+      <input id="siteSearch" type="search" placeholder="Search courses, terms…"
+             autocomplete="off" aria-label="Search the site">
+      <div id="searchResults" class="search-results" role="listbox"></div>
+    </div>
+  </div>
+</div>
+
+<main class="page-content">
+  <div class="hero mini">
+    <h1>AI News</h1>
+    <p class="lead">The latest developments in Artificial Intelligence, curated by Bilal Fleifel.</p>
+  </div>
+
+  <div class="courses" id="newsGrid" style="margin-top: 40px;"></div>
+</main>
+
+<footer>
+  <p><b>Concept Lab</b> — a no-login learning space.</p>
+  <p class="small">Built as self-contained offline HTML. No tracking, no accounts, no dependencies.</p>
+</footer>
+
+</div>
+
+<button id="toTop" title="Back to top" aria-label="Back to top">↑</button>
+
+<script src="data/courses.js"></script>
+<script src="data/glossary.js"></script>
+<script src="data/news.js"></script>
+<script src="assets/js/search.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const grid = document.getElementById('newsGrid');
+    
+    function formatDate(dStr) {
+      if (!dStr) return '';
+      const parts = dStr.split('-');
+      if (parts.length !== 3) return dStr;
+      const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      const month = months[parseInt(parts[1], 10) - 1] || parts[1];
+      return `${month} ${parseInt(parts[2], 10)}, ${parts[0]}`;
+    }
+
+    if (window.NEWS && window.NEWS.length) {
+      const itemsPerPage = 20;
+      let currentPage = 1;
+      const totalPages = Math.ceil(window.NEWS.length / itemsPerPage);
+
+      function renderPage(page) {
+        grid.innerHTML = '';
+        const start = (page - 1) * itemsPerPage;
+        const end = start + itemsPerPage;
+        const pageItems = window.NEWS.slice(start, end);
+        
+        pageItems.forEach((article, index) => {
+          const card = document.createElement('a');
+          card.className = 'news-card';
+          card.href = `article.html?id=${article.id}`;
+          
+          // Slight delay for animation
+          setTimeout(() => {
+            card.classList.add('in');
+          }, index * 25);
+          
+          const initials = (article.author || 'BF')
+            .split(' ')
+            .map(n => n[0])
+            .join('')
+            .substring(0, 2);
+
+          card.innerHTML = `
+            <div class="news-thumb">
+              <img src="${article.image}" alt="${article.title}" class="news-thumb-img" loading="lazy" />
+              <div class="news-category-badge">${article.category || 'AI NEWS'}</div>
+              <div class="news-date-badge">${formatDate(article.date)}</div>
+            </div>
+            <div class="news-body">
+              <h3 class="news-title">${article.title}</h3>
+              <p class="news-summary">${article.summary}</p>
+            </div>
+            <div class="news-foot">
+              <div class="news-author-wrap">
+                <div class="news-author-avatar">${initials}</div>
+                <div class="news-author-meta">
+                  <span class="news-author-name">${article.author}</span>
+                  <span class="news-reading-time">${article.readTime || '4 min read'}</span>
+                </div>
+              </div>
+              <div class="news-read-btn">
+                <span>Read</span>
+                <span class="news-read-arrow">&rarr;</span>
+              </div>
+            </div>
+          `;
+          grid.appendChild(card);
+        });
+        
+        renderPagination();
+      }
+
+      function renderPagination() {
+        let pagination = document.getElementById('newsPagination');
+        if (!pagination) {
+          pagination = document.createElement('div');
+          pagination.id = 'newsPagination';
+          pagination.style.cssText = 'display: flex; justify-content: center; gap: 10px; margin-top: 40px; margin-bottom: 20px;';
+          grid.parentNode.insertBefore(pagination, grid.nextSibling);
+        }
+        
+        pagination.innerHTML = '';
+        
+        if (currentPage > 1) {
+          const prev = document.createElement('button');
+          prev.className = 'btn';
+          prev.textContent = '← Previous';
+          prev.onclick = () => { currentPage--; renderPage(currentPage); window.scrollTo({top: 0, behavior: 'smooth'}); };
+          pagination.appendChild(prev);
+        }
+        
+        if (currentPage < totalPages) {
+          const next = document.createElement('button');
+          next.className = 'btn';
+          next.textContent = 'Next →';
+          next.onclick = () => { currentPage++; renderPage(currentPage); window.scrollTo({top: 0, behavior: 'smooth'}); };
+          pagination.appendChild(next);
+        }
+      }
+
+      renderPage(currentPage);
+    } else {
+      grid.innerHTML = '<p>No news articles found.</p>';
+    }
+  });
+</script>
+</body>
+</html>

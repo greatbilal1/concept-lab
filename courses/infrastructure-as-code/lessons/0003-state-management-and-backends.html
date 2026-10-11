@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 03 — State Management & Backends</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="infrastructure-as-code" data-lesson="3" data-lesson-id="state-management-and-backends">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 03</span> · Terraform Primitives, Providers & State</span>
+
+  <h1 class="lesson-title">State Management & Backends</h1>
+  <p class="lesson-lede">
+    Terraform's state file is the single source of truth mapping your code to real-world cloud resources. Learn how to protect and lock it.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Configure remote backends with state locking and manage state safely across collaborative engineering teams</span>
+    <span><b>Mission link</b> Prevent corrupted state files and concurrent apply race conditions in multi-engineer teams</span>
+  </div>
+
+  <h2><span class="n">1</span>Why Terraform needs state</h2>
+  <p>When you declare <code>resource "aws_instance" "web"</code>, Terraform must record that this code block corresponds to the real-world cloud ID <code>i-0a8b9c1d2e3f</code> in AWS.</p><p>This mapping is stored in the <b>Terraform State file</b> (<code>terraform.tfstate</code>). The state file also caches metadata, resource dependencies, and sensitive output values. If you lose the state file, Terraform forgets what it owns and attempts to create duplicate resources on the next apply.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    The state file maps declarative code identifiers to real-world cloud IDs; without state, Terraform cannot manage existing resources.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Remote backends and state locking</h2>
+  <p>By default, Terraform stores state on your local laptop disk (<code>local backend</code>). In a team, this is disastrous: changes made by engineer A are unknown to engineer B.</p><p>A <b>remote backend</b> (e.g. AWS S3, Google Cloud Storage, Terraform Cloud) stores the state in a central, encrypted bucket. To prevent two engineers from running <code>terraform apply</code> at the same second (which corrupts state), backends provide <b>state locking</b> (e.g. via DynamoDB).</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing state locking contention</h2>
+  <p>Trace how state locking prevents race conditions between simultaneous deployments.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your understanding of Terraform state files and remote backend architecture.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can configure remote backends with S3 and DynamoDB locking, protect sensitive state data, and prevent state corruption.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Configure an S3 remote backend with server-side KMS encryption and versioning.</li>
+    <li>Create a DynamoDB table with primary key LockID to enable state locking.</li>
+    <li>Inspect the contents of a state file using terraform state show <resource_name>.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    HashiCorp Terraform Documentation: *Backend Type: s3* and *State Locking*.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Why should you NEVER commit 'terraform.tfstate' to a public Git repository?",
+    a: ["The state file often contains sensitive plaintext secrets (database passwords, private keys, API tokens)","Git cannot store files that end in .tfstate","Committing it automatically deletes the cloud resources","GitHub bans accounts that store JSON files"],
+    c: 0,
+    why: "Terraform state stores raw resource properties in plaintext, meaning secrets and credentials would be exposed in Git history."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Engineer A / CI Pipeline",
+            "lines": [
+                  "terraform apply",
+                  "Acquires lock in DynamoDB",
+                  "Executes changes safely"
+            ]
+      },
+      {
+            "title": "DynamoDB Lock Table",
+            "lines": [
+                  "LockID: state-prod",
+                  "Blocks Engineer B with error:",
+                  "'Error acquiring state lock'"
+            ]
+      },
+      {
+            "title": "Encrypted S3 Bucket",
+            "lines": [
+                  "terraform.tfstate (versioned)",
+                  "Single source of truth",
+                  "Encrypted with KMS"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "1. CI Runner 1 executes: terraform apply",
+      "2. Runner 1 writes lock entry to DynamoDB: { LockID: 'vpc/prod', Info: 'Runner-1' }",
+      "3. Engineer runs: terraform apply locally",
+      "4. Local apply queries DynamoDB: Lock already held by Runner-1",
+      "5. Local apply immediately halts with: 'Error: Error acquiring the state lock'",
+      "6. Runner 1 finishes, releases DynamoDB lock; state remains uncorrupted"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "runner_1": "Acquiring state lock"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "lock_status": "LOCKED by Runner-1"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "contention": "Second process blocked"
+            }
+      },
+      {
+            "line": 5,
+            "vars": {
+                  "safety": "Race condition successfully averted"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The file that maps HCL code to real-world cloud resource IDs is terraform.<0>.",
+      "A shared storage location for team state is called a remote <1>.",
+      "The feature that prevents concurrent apply executions from corrupting state is state <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "tfstate"
+            ],
+            "why": "terraform.tfstate is the state file."
+      },
+      {
+            "a": [
+                  "backend"
+            ],
+            "why": "Backends store state files centrally."
+      },
+      {
+            "a": [
+                  "locking"
+            ],
+            "why": "State locking prevents concurrent race conditions."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the primary role of the Terraform state file?",
+      a: ["It records the mapping between code resource declarations and real cloud resource identifiers","It compiles HCL code into C++ binaries","It acts as a load balancer for web traffic","It monitors server CPU usage in real time"],
+      c: 0,
+      why: "State is the critical bridge that allows Terraform to track which real-world cloud objects correspond to your code."
+    },
+    {
+      q: "What danger occurs when multiple engineers run 'terraform apply' simultaneously without state locking?",
+      a: ["Race conditions cause write conflicts that corrupt the state file or provision duplicate resources","The cloud provider doubles the server bill","The local computer crashes","The code is automatically deleted from Git"],
+      c: 0,
+      why: "Without locking, overlapping state writes overwrite each other, causing catastrophic state corruption."
+    },
+    {
+      q: "Why must state files stored in remote object storage (like S3) be encrypted at rest?",
+      a: ["Because Terraform state files contain plaintext secrets, passwords, and sensitive environment keys","Because S3 requires all files to be encrypted by federal law","Because unencrypted state files cannot be parsed by Terraform","Because encryption makes state downloads 10 times faster"],
+      c: 0,
+      why: "State files frequently hold database passwords and private keys in raw JSON; encryption is mandatory."
+    },
+    {
+      q: "Which command lists all resources currently tracked in the state file without inspecting cloud consoles?",
+      a: ["terraform state list","terraform list all","terraform resources","terraform dump"],
+      c: 0,
+      why: "terraform state list outputs every resource address tracked in the active state."
+    }
+  ]);
+</script>
+</body>
+</html>

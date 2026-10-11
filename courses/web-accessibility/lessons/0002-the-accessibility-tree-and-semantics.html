@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 02 — The Accessibility Tree & Native Semantics</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="web-accessibility" data-lesson="2" data-lesson-id="the-accessibility-tree-and-semantics">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 02</span> · Accessibility Foundations & Assistive Tech</span>
+
+  <h1 class="lesson-title">The Accessibility Tree & Native Semantics</h1>
+  <p class="lesson-lede">
+    Browsers create two trees: the DOM Tree for visual rendering, and the Accessibility Tree for assistive devices. Learn how they sync.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Inspect the browser Accessibility Tree and compute an element's Role, Name, State, and Value</span>
+    <span><b>Mission link</b> Guarantee that interactive UI elements communicate their purpose clearly to assistive software</span>
+  </div>
+
+  <h2><span class="n">1</span>The parallel tree: DOM vs AOM</h2>
+  <p>When a browser parses an HTML document, it constructs the <b>DOM Tree</b> (Document Object Model) to compute styling and layout. In parallel, it creates the <b>Accessibility Tree</b> (often called the Accessibility Object Model or AOM).</p><p>Assistive technologies do not inspect CSS pixels. They query the Accessibility Tree. Every accessible node has four essential properties:</p><ul><li><b>Role:</b> What the element is (e.g. <code>button</code>, <code>heading</code>, <code>checkbox</code>).</li><li><b>Name:</b> The label identifying this specific element (e.g. <i>"Submit Order"</i>).</li><li><b>State:</b> Current condition (e.g. <code>checked</code>, <code>expanded</code>, <code>disabled</code>).</li><li><b>Value:</b> Current data quantity (e.g. <code>50%</code> in a progress bar).</li></ul>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    The Accessibility Tree exposes Role, Name, State, and Value to assistive tech; styling does not affect accessibility.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>How Accessible Names are computed</h2>
+  <p>The <b>Accessible Name Computation algorithm</b> calculates an element's label following a strict hierarchy of precedence:</p><ol><li><code>aria-labelledby</code> (references another element's ID).</li><li><code>aria-label</code> (direct string attribute).</li><li>Native element label (e.g. <code>&lt;label for="..."&gt;</code> on inputs, or <code>alt</code> on images).</li><li>Subtree text content (the text inside the button).</li><li><code>title</code> attribute (weakest fallback).</li></ol>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing accessibility tree inspection in Chrome/Firefox DevTools</h2>
+  <p>Trace how browser DevTools inspects computed accessibility properties.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your understanding of the Accessibility Tree and accessible names.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can inspect the browser Accessibility Tree and verify that every interactive element has an unambiguous Role, Name, State, and Value.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Open Chrome DevTools, navigate to the Accessibility pane, and inspect five interactive elements on a web page.</li>
+    <li>Compare the accessible name calculation between an input with aria-label vs <label>.</li>
+    <li>Inspect an icon-only button and verify whether its accessible name is empty.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    W3C: *Accessible Name and Description Computation 1.2* (w3.org/TR/accname-1.2).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What does the browser Accessibility Tree display for: <div class='btn' onclick='pay()'>Pay Now</div>?",
+    a: ["Role: generic or text; Name: 'Pay Now' (it does NOT report as a button, and cannot be focused via keyboard)","Role: button; Name: 'Pay Now'","Role: payment-terminal","It is completely omitted from the tree"],
+    c: 0,
+    why: "A generic <div> has no semantic button role in the accessibility tree, making it invisible to button shortcuts."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "HTML Source",
+            "lines": [
+                  "<button aria-label='Search Site'>",
+                  "  <svg class='icon-glass' />",
+                  "</button>"
+            ]
+      },
+      {
+            "title": "Accessibility Tree Node",
+            "lines": [
+                  "Role: button",
+                  "Name: 'Search Site' (from aria-label)",
+                  "Focusable: true"
+            ]
+      },
+      {
+            "title": "Screen Reader Speech",
+            "lines": [
+                  "'Search Site, button'",
+                  "User knows action and element type!"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "1. Open Chrome DevTools -> Elements tab -> Accessibility panel",
+      "2. Inspect: <input type='checkbox' id='terms' checked>",
+      "3. Computed Properties: Role = 'checkbox'",
+      "4. Computed Properties: Name = 'Accept Terms and Conditions'",
+      "5. Computed Properties: Checked = true"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "tool": "Browser accessibility inspector opened"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "role_check": "Native HTML automatically provides role='checkbox'"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "name_check": "Resolved from associated <label for='terms'>"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "state_check": "Checked state correctly reflected in AOM"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The parallel tree created by browsers for assistive technologies is the <0> Tree.",
+      "The four core properties of an accessible node are Role, Name, State, and <1>.",
+      "The attribute with the highest precedence for naming an element is aria-<2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "Accessibility"
+            ],
+            "why": "The Accessibility Tree powers screen readers."
+      },
+      {
+            "a": [
+                  "Value"
+            ],
+            "why": "Role, Name, State, and Value."
+      },
+      {
+            "a": [
+                  "labelledby"
+            ],
+            "why": "aria-labelledby overrides all other name sources."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What four fundamental properties does the browser Accessibility Tree expose for an interactive control?",
+      a: ["Role, Name, State, and Value","Color, Font, Margin, and Padding","URL, Domain, Protocol, and Port","Width, Height, X, and Y"],
+      c: 0,
+      why: "Role (what it is), Name (what it's called), State (current condition), and Value (its data) define accessibility semantics."
+    },
+    {
+      q: "Why is '<button>Click Me</button>' infinitely better than '<div onclick=\"...\">Click Me</div>'?",
+      a: ["Native buttons automatically provide role='button', keyboard focusability (Tab), and Space/Enter key activations for free","Native buttons load 10 times faster","Div elements cannot have CSS styles applied to them","Native buttons bypass all browser security firewalls"],
+      c: 0,
+      why: "Native HTML elements supply full Accessibility Tree roles, keyboard focus, and keyboard activation without writing custom JavaScript."
+    },
+    {
+      q: "Which attribute takes HIGHEST precedence when the browser computes an element's accessible name?",
+      a: ["aria-labelledby","aria-label","title","placeholder"],
+      c: 0,
+      why: "aria-labelledby takes absolute precedence in the W3C Accessible Name Computation specification."
+    },
+    {
+      q: "What happens if an image tag is written as '<img src=\"cat.jpg\">' without an 'alt' attribute?",
+      a: ["Screen readers often read the raw file name (e.g. 'cat dot jpg'), creating a confusing, degraded user experience","The image is blocked by the browser","The browser crashes","The computer's speakers are muted"],
+      c: 0,
+      why: "Without an alt attribute, screen readers fall back to reading raw image source file paths, disrupting reading flow."
+    }
+  ]);
+</script>
+</body>
+</html>

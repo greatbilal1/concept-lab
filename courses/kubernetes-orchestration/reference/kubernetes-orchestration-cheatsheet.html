@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Kubernetes & Orchestration — Cheat Sheet</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
 <link rel="stylesheet" href="../../../assets/css/tokens.css">
 <link rel="stylesheet" href="../../../assets/css/components.css">
 <style>
@@ -32,16 +33,108 @@
   </p>
 
   <div class="ref-toc">
-    <a href="#section-one">Section one</a>
+    <a href="#sec-1">Essential kubectl Commands</a>
+    <a href="#sec-2">Deployment Manifest</a>
+    <a href="#sec-3">Service & Ingress</a>
+    <a href="#sec-4">Health Probes</a>
   </div>
 
-  <h2 id="section-one"><span class="n">1</span>Section one</h2>
-
+  <h2 id="sec-1"><span class="n">1</span>Essential kubectl Commands</h2>
   <div class="snippet">
-    <div class="lbl">Label</div>
-    <pre><code>code or summary here</code></pre>
+    <div class="lbl">Cluster inspection and troubleshooting</div>
+    <pre><code># Inspect cluster status
+kubectl get nodes -o wide
+kubectl get pods -A
+
+# Investigate pod failures
+kubectl describe pod &lt;pod-name&gt;
+kubectl logs &lt;pod-name&gt; --previous
+kubectl exec -it &lt;pod-name&gt; -- /bin/sh
+
+# Imperative port-forwarding for debugging
+kubectl port-forward svc/my-service 8080:80</code></pre>
   </div>
-  <p class="see">See <a href="../lessons/0001-slug.html">Lesson 01 — Title</a>.</p>
+  <p class="see">See <a href="../lessons/0001-control-plane-and-worker-nodes.html">Lesson 01 — Control Plane, etcd & Worker Architecture</a>.</p>
+
+  <h2 id="sec-2"><span class="n">2</span>Deployment Manifest</h2>
+  <div class="snippet">
+    <div class="lbl">Declarative stateless workload</div>
+    <pre><code>apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-server
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: api
+  template:
+    metadata:
+      labels:
+        app: api
+    spec:
+      containers:
+      - name: api
+        image: api:v1.2.0
+        ports:
+        - containerPort: 3000
+        resources:
+          limits:
+            memory: "256Mi"
+            cpu: "500m"</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0003-deployments-and-rolling-updates.html">Lesson 03 — Deployments, ReplicaSets & Rolling Updates</a>.</p>
+
+  <h2 id="sec-3"><span class="n">3</span>Service & Ingress</h2>
+  <div class="snippet">
+    <div class="lbl">Internal and external routing</div>
+    <pre><code>apiVersion: v1
+kind: Service
+metadata:
+  name: api-service
+spec:
+  type: ClusterIP
+  selector:
+    app: api
+  ports:
+  - port: 80
+    targetPort: 3000
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: api-ingress
+spec:
+  rules:
+  - host: api.example.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: api-service
+            port:
+              number: 80</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0005-services-and-kube-proxy.html">Lesson 05 — Services, ClusterIP & Ingress</a>.</p>
+
+  <h2 id="sec-4"><span class="n">4</span>Health Probes</h2>
+  <div class="snippet">
+    <div class="lbl">Automated container self-healing</div>
+    <pre><code>livenessProbe:
+  httpGet:
+    path: /healthz
+    port: 3000
+  initialDelaySeconds: 5
+  periodSeconds: 10
+readinessProbe:
+  httpGet:
+    path: /ready
+    port: 3000
+  periodSeconds: 5</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0008-hpa-probes-and-troubleshooting.html">Lesson 08 — Health Probes & Autoscaling</a>.</p>
 
   <div class="lesson-foot">
     <div class="links">
@@ -51,12 +144,5 @@
   </div>
 
 </div>
-
-<script src="../../../assets/js/icons.js"></script>
-<script src="../lessons.js"></script>
-<script src="../../../assets/js/teach/lesson-engine.js"></script>
-<script>
-  TeachLesson.init({ course: "kubernetes-orchestration", lessons: window.TeachLessons || [] });
-</script>
 </body>
 </html>

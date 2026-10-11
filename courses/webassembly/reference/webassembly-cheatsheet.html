@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>WebAssembly — Cheat Sheet</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
 <link rel="stylesheet" href="../../../assets/css/tokens.css">
 <link rel="stylesheet" href="../../../assets/css/components.css">
 <style>
@@ -32,16 +33,78 @@
   </p>
 
   <div class="ref-toc">
-    <a href="#section-one">Section one</a>
+    <a href="#sec-1">Streaming Instantiation</a>
+    <a href="#sec-2">Handwritten WAT Module</a>
+    <a href="#sec-3">Linear Memory Access</a>
+    <a href="#sec-4">Rust wasm-bindgen Export</a>
   </div>
 
-  <h2 id="section-one"><span class="n">1</span>Section one</h2>
-
+  <h2 id="sec-1"><span class="n">1</span>Streaming Instantiation</h2>
   <div class="snippet">
-    <div class="lbl">Label</div>
-    <pre><code>code or summary here</code></pre>
+    <div class="lbl">Fastest way to compile and load Wasm</div>
+    <pre><code>// Stream and compile simultaneously while downloading
+const { instance, module } = await WebAssembly.instantiateStreaming(
+  fetch("math.wasm"),
+  {
+    env: {
+      log: (val) =&gt; console.log("From Wasm:", val)
+    }
+  }
+);
+
+// Call exported Wasm function
+const sum = instance.exports.add(40, 2);</code></pre>
   </div>
-  <p class="see">See <a href="../lessons/0001-slug.html">Lesson 01 — Title</a>.</p>
+  <p class="see">See <a href="../lessons/0004-js-wasm-interop-and-web-apis.html">Lesson 04 — JavaScript & Wasm Interop</a>.</p>
+
+  <h2 id="sec-2"><span class="n">2</span>Handwritten WAT Module</h2>
+  <div class="snippet">
+    <div class="lbl">WebAssembly text syntax</div>
+    <pre><code>(module
+  ;; Import JS function
+  (import "env" "log" (func $log (param i32)))
+  
+  ;; Export add function
+  (func (export "add") (param $a i32) (param $b i32) (result i32)
+    local.get $a
+    local.get $b
+    i32.add
+  )
+)</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0002-wat-text-format-and-stack-machine.html">Lesson 02 — WAT & The Stack Machine</a>.</p>
+
+  <h2 id="sec-3"><span class="n">3</span>Linear Memory Access</h2>
+  <div class="snippet">
+    <div class="lbl">Reading bytes across the boundary</div>
+    <pre><code>// JavaScript allocating 64KB Wasm page
+const memory = new WebAssembly.Memory({ initial: 1 }); // 1 page = 64KB
+const view = new Uint8Array(memory.buffer);
+
+// Write text into Wasm memory
+const encoder = new TextEncoder();
+view.set(encoder.encode("Hello Wasm!"), 0);
+
+// Pass pointer (offset 0) and length into Wasm
+instance.exports.process_string(0, 11);</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0003-linear-memory-and-buffers.html">Lesson 03 — Linear Memory & TypedArrays</a>.</p>
+
+  <h2 id="sec-4"><span class="n">4</span>Rust wasm-bindgen Export</h2>
+  <div class="snippet">
+    <div class="lbl">Idiomatic compiled Rust</div>
+    <pre><code>use wasm_bindgen::prelude::*;
+
+#[wasm_bindgen]
+pub fn fibonacci(n: u32) -&gt; u32 {
+    match n {
+        0 =&gt; 0,
+        1 =&gt; 1,
+        _ =&gt; fibonacci(n - 1) + fibonacci(n - 2),
+    }
+}</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0005-compiling-rust-and-c-to-wasm.html">Lesson 05 — Compiling Rust & C to Wasm</a>.</p>
 
   <div class="lesson-foot">
     <div class="links">
@@ -51,12 +114,5 @@
   </div>
 
 </div>
-
-<script src="../../../assets/js/icons.js"></script>
-<script src="../lessons.js"></script>
-<script src="../../../assets/js/teach/lesson-engine.js"></script>
-<script>
-  TeachLesson.init({ course: "webassembly", lessons: window.TeachLessons || [] });
-</script>
 </body>
 </html>

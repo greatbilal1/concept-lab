@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 01 — Why WebAssembly: Performance & Architecture</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="webassembly" data-lesson="1" data-lesson-id="why-webassembly-and-vm-architecture">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 01</span> · Wasm Architecture & Stack VM</span>
+
+  <h1 class="lesson-title">Why WebAssembly: Performance & Architecture</h1>
+  <p class="lesson-lede">
+    JavaScript is dynamically typed and garbage collected. WebAssembly brings near-native compiled performance to the browser.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Articulate why WebAssembly exists, how it differs from JavaScript, and the sandboxed security model</span>
+    <span><b>Mission link</b> Accelerate CPU-heavy web applications without sacrificing browser sandboxing security</span>
+  </div>
+
+  <h2><span class="n">1</span>The performance limitations of JavaScript</h2>
+  <p>Modern V8 and SpiderMonkey engines are marvels of engineering, but JavaScript has architectural limits:</p><ul><li><b>Dynamic types:</b> V8 must make optimistic JIT assumptions. If a variable changes type from an integer to an object, the JIT de-optimizes and falls back to slow bytecode.</li><li><b>Garbage collection:</b> Periodic GC pauses cause frame drops in 60fps games and audio stutter in synthesizers.</li><li><b>Parsing overhead:</b> Large 10MB JavaScript files must be parsed, tokenized, and compiled before execution.</li></ul><p><b>WebAssembly (Wasm)</b> is a pre-compiled binary format. The browser validates and compiles Wasm directly to machine code in a single streaming pass with zero GC pauses.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    WebAssembly provides deterministic, pre-compiled binary execution with near-native speed and no garbage collection pauses.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The Wasm security sandbox</h2>
+  <p>Running compiled native code inside a browser sounds terrifying. What prevents a Wasm module from reading your hard drive or stealing passwords?</p><p>WebAssembly is strictly <b>sandboxed</b> inside the same security context as JavaScript. A Wasm module has <b>no access to the host operating system, filesystem, or network sockets</b> unless explicitly provided via imported JavaScript functions. Pointers cannot escape Wasm's isolated linear memory.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing the compilation and execution pipeline</h2>
+  <p>Trace how a compiled Wasm module is fetched and executed in the browser.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your understanding of WebAssembly foundations and security.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can articulate why WebAssembly is critical for high-performance computing on the web and describe its sandboxed security architecture.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Inspect a .wasm file in a hex editor to observe the magic number header (\0asm).</li>
+    <li>Benchmark array sorting in pure JavaScript vs compiled Wasm.</li>
+    <li>Verify that a WebAssembly module cannot call window or document directly without JS bridge functions.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    W3C WebAssembly Specification: *Introduction and Overview* (webassembly.github.io/spec).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Does WebAssembly replace JavaScript and deprecate frontend frameworks like React?",
+    a: ["No: WebAssembly is designed to work alongside JavaScript, handling CPU-heavy compute tasks while JS manages the DOM and UI","Yes: the W3C plans to remove JavaScript from browsers by 2030","Yes: WebAssembly has direct native access to the DOM tree","No: WebAssembly only runs on Android phones"],
+    c: 0,
+    why: "Wasm complements JavaScript: JS handles UI and DOM manipulation, while Wasm handles heavy numeric computation."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Browser Engine Sandbox",
+            "lines": [
+                  "Same security origin as JS",
+                  "Zero direct OS access",
+                  "No arbitrary syscalls"
+            ]
+      },
+      {
+            "title": "JavaScript Tier",
+            "lines": [
+                  "DOM manipulation",
+                  "Fetch API & network",
+                  "Event listeners"
+            ]
+      },
+      {
+            "title": "WebAssembly Tier",
+            "lines": [
+                  "Compiled Rust/C++ binary",
+                  "Stack machine execution",
+                  "Linear memory number crunching"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "1. Browser initiates: fetch('algorithm.wasm')",
+      "2. WebAssembly.instantiateStreaming compiles bytes while network chunks arrive",
+      "3. Module verified: Bytecode validated against type and memory safety rules",
+      "4. Host machine JIT emits native x86_64 or ARM64 assembly",
+      "5. JavaScript calls exported function: instance.exports.calculate()"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "download": "Binary .wasm stream started"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "streaming": "Concurrent download and compilation"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "validation": "Safety checks guarantee memory isolation"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "execution": "Near-native CPU instruction execution"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "WebAssembly is a binary instruction format for a <0>-based virtual machine.",
+      "Wasm runs inside an isolated browser security <1>.",
+      "WebAssembly memory is non-blocking because it has no automatic <2> collection."
+],
+    blanks: [
+      {
+            "a": [
+                  "stack"
+            ],
+            "why": "Wasm operates as a stack virtual machine."
+      },
+      {
+            "a": [
+                  "sandbox"
+            ],
+            "why": "Wasm is securely sandboxed."
+      },
+      {
+            "a": [
+                  "garbage"
+            ],
+            "why": "Manual memory eliminates GC pauses."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the primary motivation for using WebAssembly in a web application?",
+      a: ["To execute compute-intensive algorithms at near-native CPU speed without JavaScript JIT deoptimizations or garbage collection pauses","To replace CSS layout engines with C++ code","To bypass browser cookie security policies","To reduce font download file sizes"],
+      c: 0,
+      why: "Wasm provides consistent, high-performance execution for CPU-heavy tasks like physics, compression, and 3D rendering."
+    },
+    {
+      q: "How does WebAssembly interact with the browser's DOM (Document Object Model)?",
+      a: ["It cannot access the DOM directly; it must call imported JavaScript functions to interact with DOM nodes","It has direct pointer access to the browser's C++ DOM nodes","It replaces the DOM with raw OpenGL pixels","It uses SQL queries to update HTML elements"],
+      c: 0,
+      why: "WebAssembly has no native DOM access; all DOM modifications must be bridged through imported JavaScript functions."
+    },
+    {
+      q: "What are the four primary value types natively supported in standard WebAssembly bytecode?",
+      a: ["i32, i64, f32, and f64 (32-bit and 64-bit integers and floats)","string, number, boolean, and object","int, char, double, and pointer","JSON, XML, HTML, and binary"],
+      c: 0,
+      why: "Core Wasm operates directly on raw primitive numbers: 32-bit and 64-bit integers and floating-point values."
+    },
+    {
+      q: "Why is WebAssembly immune to buffer overflow attacks compromising the host operating system?",
+      a: ["It executes inside a secure browser sandbox with isolated linear memory and cannot execute arbitrary machine syscalls","Because C and Rust code cannot have memory bugs","Because browsers encrypt all memory with AES-256","Because Wasm only runs in read-only mode"],
+      c: 0,
+      why: "Wasm's memory is bounded within an allocated ArrayBuffer; invalid memory accesses trap safely within the sandbox."
+    }
+  ]);
+</script>
+</body>
+</html>

@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 03 — Linear Memory & TypedArrays</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="webassembly" data-lesson="3" data-lesson-id="linear-memory-and-buffers">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 03</span> · Linear Memory & Interoperability</span>
+
+  <h1 class="lesson-title">Linear Memory & TypedArrays</h1>
+  <p class="lesson-lede">
+    WebAssembly cannot access JavaScript garbage-collected objects directly. Instead, both communicate through shared Linear Memory.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Allocate, read, and write WebAssembly Linear Memory using JavaScript TypedArrays</span>
+    <span><b>Mission link</b> Exchange high-volume raw data (images, audio, geometries) between JS and Wasm with zero copying</span>
+  </div>
+
+  <h2><span class="n">1</span>The Linear Memory model</h2>
+  <p>WebAssembly modules do not have direct access to JavaScript variables or the DOM. Instead, Wasm programs interact with the outside world through <b>Linear Memory</b>: a single contiguous array of raw bytes represented as a <code>WebAssembly.Memory</code> object.</p><p>Memory is allocated in <b>pages of 64KB (65,536 bytes)</b>. Memory can grow dynamically using <code>memory.grow(pages)</code>. Both JavaScript and Wasm can read and write to this exact same memory buffer simultaneously.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Linear memory is a contiguous byte array (in 64KB pages) shared between JavaScript and WebAssembly.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Viewing memory with TypedArrays</h2>
+  <p>In JavaScript, a <code>WebAssembly.Memory</code> object wraps an <code>ArrayBuffer</code>. You inspect or modify memory by creating <b>TypedArray views</b> over its buffer:</p><ul><li><code>new Uint8Array(memory.buffer):</code> Byte-by-byte access (great for images and ASCII strings).</li><li><code>new Int32Array(memory.buffer):</code> 4-byte signed integers.</li><li><code>new Float32Array(memory.buffer):</code> 4-byte floating point numbers (great for 3D coordinates and audio waveforms).</li></ul>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing zero-copy image manipulation</h2>
+  <p>Trace how JavaScript and Wasm collaborate on an image filter without copying memory.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your mastery of WebAssembly linear memory and TypedArray views.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can allocate, read, and write to Wasm linear memory using TypedArray views to achieve zero-copy data exchanges.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Create a WebAssembly.Memory instance in JavaScript and pass it into a WAT module via imports.</li>
+    <li>Write an array of floats into linear memory from JS and compute their sum inside Wasm.</li>
+    <li>Demonstrate dynamic memory expansion by calling memory.grow(1) and recreating your TypedArray view.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    MDN Web Docs: *WebAssembly.Memory* (developer.mozilla.org).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is the size of one standard WebAssembly memory page?",
+    a: ["64 kilobytes (65,536 bytes)","1 megabyte","4 kilobytes","512 bytes"],
+    c: 0,
+    why: "WebAssembly memory pages are standardized at exactly 64KB (65,536 bytes)."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "WebAssembly Module",
+            "lines": [
+                  "Writes processed pixels",
+                  "at memory offset 0x1000",
+                  "Direct pointer arithmetic"
+            ]
+      },
+      {
+            "title": "Shared Linear Memory",
+            "lines": [
+                  "64KB contiguous byte block",
+                  "Zero copy overhead!"
+            ]
+      },
+      {
+            "title": "JavaScript (Canvas)",
+            "lines": [
+                  "new Uint8ClampedArray(mem.buffer)",
+                  "ctx.putImageData()",
+                  "Direct GPU screen rendering!"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "1. JS allocates Wasm memory: const mem = new WebAssembly.Memory({ initial: 10 }); // 640KB",
+      "2. JS writes raw image pixels into memory buffer starting at offset 0",
+      "3. JS invokes Wasm function: instance.exports.apply_blur(0, width, height)",
+      "4. Wasm loops over byte array in-place, applying convolution blur filter",
+      "5. JS renders modified buffer directly to <canvas> with zero byte copies"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "allocation": "10 pages (640KB) reserved"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "input_write": "Pixels copied to linear memory"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "wasm_processing": "Near-native C/Rust speed filter execution"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "zero_copy": "Canvas draws directly from memory.buffer"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The standard size of a WebAssembly memory page is <0> KB.",
+      "In JavaScript, the raw memory buffer is accessed via memory.<1>.",
+      "To view bytes as 8-bit unsigned integers, wrap the buffer in a <2>Array."
+],
+    blanks: [
+      {
+            "a": [
+                  "64"
+            ],
+            "why": "64KB per page."
+      },
+      {
+            "a": [
+                  "buffer"
+            ],
+            "why": "memory.buffer provides the ArrayBuffer."
+      },
+      {
+            "a": [
+                  "Uint8"
+            ],
+            "why": "Uint8Array reads bytes."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is Linear Memory in WebAssembly?",
+      a: ["A contiguous, resizable array of raw bytes shared between JavaScript and WebAssembly","A linear algebra library for machine learning","A hard drive partition formatted with ext4","A database index stored in memory"],
+      c: 0,
+      why: "Linear memory provides a flat byte-addressable buffer that both Wasm and JS can access directly."
+    },
+    {
+      q: "What critical gotcha happens in JavaScript when WebAssembly memory expands via 'memory.grow()'?",
+      a: ["The existing ArrayBuffer is detached and invalidated, requiring all JavaScript TypedArray views to be recreated","The browser crashes with an Out-Of-Memory error","All previous data in memory is erased","The WebAssembly instance terminates"],
+      c: 0,
+      why: "When memory grows, the underlying buffer address moves; existing TypedArray references detach and become zero-length."
+    },
+    {
+      q: "How many bytes are in 4 pages of WebAssembly memory?",
+      a: ["262,144 bytes (256 KB)","4,096 bytes","1,048,576 bytes","40,000 bytes"],
+      c: 0,
+      why: "4 pages * 65,536 bytes per page = 262,144 bytes."
+    },
+    {
+      q: "Why is passing pointers to linear memory vastly faster than JSON serialization for large datasets?",
+      a: ["It avoids parsing and string serialization overhead, operating directly on raw bytes in-place (zero copy)","Because JSON is forbidden by the W3C in modern browsers","Because linear memory compresses data automatically with gzip","Because TypedArrays run on the GPU"],
+      c: 0,
+      why: "Zero-copy pointer sharing eliminates expensive JSON string encoding and parsing overhead."
+    }
+  ]);
+</script>
+</body>
+</html>

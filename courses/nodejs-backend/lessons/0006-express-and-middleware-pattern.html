@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 06 — Express & The Middleware Pipeline</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="nodejs-backend" data-lesson="6" data-lesson-id="express-and-middleware-pattern">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 06</span> · HTTP Servers & REST APIs</span>
+
+  <h1 class="lesson-title">Express & The Middleware Pipeline</h1>
+  <p class="lesson-lede">
+    Express organizes server logic into an elegant pipeline of middleware functions. Learn how to compose clean REST APIs.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Design modular REST APIs using Express routers, middleware chains, and centralized error handlers</span>
+    <span><b>Mission link</b> Structure clean backend APIs with authentication, validation, and error boundaries</span>
+  </div>
+
+  <h2><span class="n">1</span>The middleware pattern explained</h2>
+  <p>At its core, <b>Express</b> is a routing and middleware web framework with minimal built-in functionality of its own. An Express application is essentially a series of <b>middleware function calls</b>.</p><p>A middleware function has the signature <code>(req, res, next) =&gt; { ... }</code>. It can execute arbitrary code, modify <code>req</code> and <code>res</code>, end the request-response cycle, or call <code>next()</code> to pass control to the next handler in the stack.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Middleware executes in sequential order: either call next() to continue or end the cycle with a response.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Centralized error handling middleware</h2>
+  <p>Express recognizes a special 4-argument signature as an <b>error-handling middleware</b>: <code>(err, req, res, next) =&gt; { ... }</code>. When you call <code>next(err)</code> anywhere in your application, Express bypasses all regular routes and jumps directly to the nearest error-handling middleware.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing middleware execution flow</h2>
+  <p>Trace how authentication middleware intercepts an unauthorized request before the controller runs.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your mastery of Express architecture and middleware patterns.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can architect clean, modular Express applications with robust middleware pipelines and centralized error handling.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Build an authentication middleware that verifies Bearer tokens and attaches req.user.</li>
+    <li>Implement a global 404 and 500 error handler in an Express application.</li>
+    <li>Refactor route handlers into modular files using express.Router().</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Express Official Guide: *Using middleware* and *Error handling* (expressjs.com).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What happens if a custom middleware function does not send a response AND forgets to call 'next()'?",
+    a: ["The request hangs indefinitely until the client browser times out","Express automatically skips to the next route handler","Express throws an UnhandledMiddlewareException","The server restarts automatically"],
+    c: 0,
+    why: "If next() is never invoked and no response is sent, execution halts and the client connection hangs."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1. Global Middleware",
+            "lines": [
+                  "app.use(express.json())",
+                  "app.use(cors())",
+                  "app.use(logger)"
+            ]
+      },
+      {
+            "title": "2. Router & Routes",
+            "lines": [
+                  "router.get('/users')",
+                  "Validation middleware",
+                  "Controller handler"
+            ]
+      },
+      {
+            "title": "3. Error Handler",
+            "lines": [
+                  "(err, req, res, next)",
+                  "Logs error internally",
+                  "res.status(500).json()"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "app.use('/admin', (req, res, next) => {",
+      "  if (!req.headers.authorization) {",
+      "    return res.status(401).json({ error: 'Unauthorized' });",
+      "  }",
+      "  next();",
+      "});",
+      "app.get('/admin/stats', (req, res) => res.json({ secret: 42 }));"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "request_received": "GET /admin/stats with NO authorization header"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "check_header": "req.headers.authorization is undefined"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "response_sent": "401 Unauthorized sent; next() is NOT called"
+            }
+      },
+      {
+            "line": 6,
+            "vars": {
+                  "route_skipped": "/admin/stats controller is never reached"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The function called to pass control to the next middleware is <0>().",
+      "An error handling middleware in Express must accept exactly <1> parameters.",
+      "To mount a group of related routes under a sub-path, use express.<2>()."
+],
+    blanks: [
+      {
+            "a": [
+                  "next"
+            ],
+            "why": "next() invokes the next handler."
+      },
+      {
+            "a": [
+                  "4",
+                  "four"
+            ],
+            "why": "The four arguments (err, req, res, next) distinguish error handlers."
+      },
+      {
+            "a": [
+                  "Router"
+            ],
+            "why": "express.Router() groups modular routes."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "How does Express determine that a middleware function is an error handler?",
+      a: ["The function explicitly declares four parameters in its signature: (err, req, res, next)","The function is named 'errorHandler'","It must be registered with app.error() instead of app.use()","It must return a rejected Promise"],
+      c: 0,
+      why: "Express inspects fn.length: functions with 4 arguments are invoked only when an error is passed to next(err)."
+    },
+    {
+      q: "What does calling 'next(new Error(\"Database failed\"))' do in Express?",
+      a: ["It skips all remaining standard middleware and jumps straight to error-handling middleware","It crashes the Node.js process immediately","It retries the current HTTP request automatically","It logs the error to disk and continues executing standard routes"],
+      c: 0,
+      why: "Passing any argument to next() signals an error, bypassing regular route handlers."
+    },
+    {
+      q: "What is the primary benefit of 'express.Router()'?",
+      a: ["It modularizes route definitions into isolated, reusable mini-applications mounted on specific path prefixes","It automatically optimizes SQL queries inside the handlers","It caches HTTP responses in Redis automatically","It enables WebSocket bidirectional communication"],
+      c: 0,
+      why: "express.Router() creates isolated route collections that can be organized into separate files."
+    },
+    {
+      q: "In what order does Express execute registered middleware functions?",
+      a: ["In the exact order they are registered via app.use() in the source code","In alphabetical order of their function names","In random order based on event loop idle time","Routes first, followed by middleware"],
+      c: 0,
+      why: "Express processes middleware strictly in the sequential order they are declared in the code."
+    }
+  ]);
+</script>
+</body>
+</html>

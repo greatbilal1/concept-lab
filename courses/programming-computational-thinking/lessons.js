@@ -75,7 +75,7 @@ window.TeachGlossary = [
       { term: "Pattern recognition", def: "Noticing that two parts of a problem are the same shape, so one solution can serve both.", lesson: 3, tags: ["patterns"] },
       { term: "Repetition", def: "The same step happening more than once. Repetition is the most common pattern and the easiest to exploit.", lesson: 3, tags: ["patterns"] },
       { term: "Similarity", def: "Two things that are not identical but differ only in a detail you can supply as a value.", lesson: 3, tags: ["patterns"] },
-      { term: "Generalisation", def: "Replacing several specific cases with one rule that covers all of them.", lesson: 3, tags: ["patterns"] },
+      { term: "Pattern generalisation", def: "Replacing several specific cases with one rule that covers all of them.", lesson: 3, tags: ["patterns"] },
       { term: "Reuse", def: "Solving a problem once and using that solution again instead of solving it a second time.", lesson: 3, tags: ["patterns"] },
       { term: "Counter-example", def: "A case that looks like it fits the pattern but does not. Finding one tells you the pattern is too broad.", lesson: 3, tags: ["patterns"] }
     ]

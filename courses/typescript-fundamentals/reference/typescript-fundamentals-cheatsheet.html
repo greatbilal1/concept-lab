@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TypeScript Fundamentals — Cheat Sheet</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
 <link rel="stylesheet" href="../../../assets/css/tokens.css">
 <link rel="stylesheet" href="../../../assets/css/components.css">
 <style>
@@ -32,16 +33,108 @@
   </p>
 
   <div class="ref-toc">
-    <a href="#section-one">Section one</a>
+    <a href="#sec-1">Primitives & Annotations</a>
+    <a href="#sec-2">any vs unknown vs never</a>
+    <a href="#sec-3">Interfaces vs Type Aliases</a>
+    <a href="#sec-4">Discriminated Unions</a>
+    <a href="#sec-5">Generics & Utility Types</a>
   </div>
 
-  <h2 id="section-one"><span class="n">1</span>Section one</h2>
-
+  <h2 id="sec-1"><span class="n">1</span>Primitives & Annotations</h2>
   <div class="snippet">
-    <div class="lbl">Label</div>
-    <pre><code>code or summary here</code></pre>
+    <div class="lbl">Basic types and variables</div>
+    <pre><code>let count: number = 42;
+let username: string = "Ada";
+let isActive: boolean = true;
+// Arrays
+let tags: string[] = ["web", "ts"];
+let matrix: Array&lt;number&gt; = [1, 2, 3];
+// Tuples: fixed length and types
+let pair: [string, number] = ["score", 100];</code></pre>
   </div>
-  <p class="see">See <a href="../lessons/0001-slug.html">Lesson 01 — Title</a>.</p>
+  <p class="see">See <a href="../lessons/0001-why-typescript-and-type-annotations.html">Lesson 01 — Why TypeScript & Type Annotations</a>.</p>
+
+  <h2 id="sec-2"><span class="n">2</span>any vs unknown vs never</h2>
+  <div class="snippet">
+    <div class="lbl">Safe top and bottom types</div>
+    <pre><code>// any disables the compiler completely (avoid!)
+let bad: any = "hello";
+bad.nonExistentMethod(); // compiles, crashes at runtime!
+
+// unknown requires narrowing before use (safe!)
+let input: unknown = JSON.parse('{"id": 1}');
+if (typeof input === "object" && input !== null && "id" in input) {
+  console.log((input as { id: number }).id);
+}
+
+// never represents values that can never occur
+function fail(msg: string): never {
+  throw new Error(msg);
+}</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0002-type-inference-and-primitive-types.html">Lesson 02 — Type Inference & Safe Types</a>.</p>
+
+  <h2 id="sec-3"><span class="n">3</span>Interfaces vs Type Aliases</h2>
+  <div class="snippet">
+    <div class="lbl">Modeling object shapes</div>
+    <pre><code>interface User {
+  readonly id: string;
+  name: string;
+  email?: string; // optional property
+}
+
+// Interfaces support declaration merging and extension
+interface Admin extends User {
+  role: "superadmin" | "moderator";
+}
+
+// Type aliases support unions, primitives, and mapped types
+type ID = string | number;
+type Callback = (data: string) =&gt; void;</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0003-interfaces-and-object-shapes.html">Lesson 03 — Interfaces & Object Shapes</a>.</p>
+
+  <h2 id="sec-4"><span class="n">4</span>Discriminated Unions</h2>
+  <div class="snippet">
+    <div class="lbl">Exhaustive state modeling</div>
+    <pre><code>type NetworkState =
+  | { state: "idle" }
+  | { state: "loading" }
+  | { state: "success"; data: string }
+  | { state: "error"; message: string };
+
+function render(s: NetworkState) {
+  switch (s.state) {
+    case "idle": return "Ready";
+    case "loading": return "Loading...";
+    case "success": return s.data; // TS knows data exists!
+    case "error": return s.message; // TS knows message exists!
+  }
+}</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0006-type-narrowing-and-guards.html">Lesson 06 — Type Narrowing & Guards</a>.</p>
+
+  <h2 id="sec-5"><span class="n">5</span>Generics & Utility Types</h2>
+  <div class="snippet">
+    <div class="lbl">Reusable abstractions</div>
+    <pre><code>// Generic function
+function wrapInArray&lt;T&gt;(item: T): T[] {
+  return [item];
+}
+
+interface Product {
+  id: number;
+  name: string;
+  price: number;
+}
+
+// Built-in utilities
+type ReadonlyProduct = Readonly&lt;Product&gt;;
+type ProductUpdate = Partial&lt;Product&gt;; // all fields optional
+type ProductPreview = Pick&lt;Product, "id" | "name"&gt;;
+type WithoutPrice = Omit&lt;Product, "price"&gt;;</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0008-utility-types-and-declaration-files.html">Lesson 08 — Utility Types & Generics</a>.</p>
 
   <div class="lesson-foot">
     <div class="links">
@@ -51,12 +144,5 @@
   </div>
 
 </div>
-
-<script src="../../../assets/js/icons.js"></script>
-<script src="../lessons.js"></script>
-<script src="../../../assets/js/teach/lesson-engine.js"></script>
-<script>
-  TeachLesson.init({ course: "typescript-fundamentals", lessons: window.TeachLessons || [] });
-</script>
 </body>
 </html>

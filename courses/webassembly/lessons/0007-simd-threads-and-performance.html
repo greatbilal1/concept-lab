@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 07 — High Performance: SIMD & Web Workers</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="webassembly" data-lesson="7" data-lesson-id="simd-threads-and-performance">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 07</span> · Wasm Beyond the Browser & WASI</span>
+
+  <h1 class="lesson-title">High Performance: SIMD & Web Workers</h1>
+  <p class="lesson-lede">
+    Unlock the full power of modern CPU silicon: process 4 or 8 numbers simultaneously with SIMD and run parallel threads with Web Workers.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Leverage WebAssembly SIMD vectorization and multithread with Web Workers and SharedArrayBuffer</span>
+    <span><b>Mission link</b> Achieve maximum floating-point and media throughput on modern multi-core devices</span>
+  </div>
+
+  <h2><span class="n">1</span>SIMD: Single Instruction, Multiple Data</h2>
+  <p>Standard CPU instructions process one number at a time (Scalar arithmetic). Modern CPU hardware (Intel SSE/AVX, ARM NEON) features <b>vector registers (128-bit)</b> that can perform arithmetic across multiple values in a single hardware cycle.</p><p><b>WebAssembly Fixed-width SIMD</b> introduces the <code>v128</code> type. A single <code>i32x4.add</code> instruction adds four 32-bit integers simultaneously, delivering immediate <b>2x to 8x speedups</b> for image filters, matrix math, physics, and machine learning.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Fixed-width SIMD (v128) processes four 32-bit floats or integers in a single CPU cycle.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Multithreading with Web Workers and SharedArrayBuffer</h2>
+  <p>By default, WebAssembly runs on the browser's main thread. If you run a 5-second computation, the UI freezes.</p><p>To achieve true parallel multithreading, you spawn <b>Web Workers</b> and share a single <code>WebAssembly.Memory</code> instance backed by a <b>SharedArrayBuffer</b>. Multiple worker threads execute compiled Wasm code across different CPU cores while sharing the same memory space, using atomic instructions (<code>i32.atomic.rmw.add</code>) to prevent race conditions.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing SIMD vector arithmetic</h2>
+  <p>Trace how a SIMD instruction transforms four vector pairs simultaneously.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your understanding of SIMD vectorization and multithreading.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can accelerate media and compute algorithms with SIMD vectorization and scale workloads across multiple CPU cores with Web Workers.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Check browser SIMD feature support using WebAssembly.validate() with a tiny SIMD module.</li>
+    <li>Configure cross-origin isolation headers (COOP and COEP) to enable SharedArrayBuffer in your server.</li>
+    <li>Benchmark a matrix multiplication algorithm with and without SIMD vectorization.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    W3C WebAssembly: *Fixed-width SIMD Specification*.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "How many 32-bit floating point numbers can a single 128-bit Wasm SIMD vector hold?",
+    a: ["4 (128 bits divided by 32 bits = 4 parallel numbers)","16","2","1"],
+    c: 0,
+    why: "A 128-bit vector register holds exactly four 32-bit floats (f32x4) or integers (i32x4)."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "SharedArrayBuffer Memory",
+            "lines": [
+                  "Shared linear memory pool",
+                  "Atomic instructions (Atomics.wait/notify)",
+                  "Zero inter-thread copying"
+            ]
+      },
+      {
+            "title": "Web Worker 1 (Core 1)",
+            "lines": [
+                  "Wasm Instance 1",
+                  "Renders Top Half of Image"
+            ]
+      },
+      {
+            "title": "Web Worker 2 (Core 2)",
+            "lines": [
+                  "Wasm Instance 2",
+                  "Renders Bottom Half of Image"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "Vector A: [ 10,  20,  30,  40 ] (128-bit register)",
+      "Vector B: [  1,   2,   3,   4 ] (128-bit register)",
+      "Execute: f32x4.add in a single hardware cycle",
+      "Result:   [ 11,  22,  33,  44 ] (128-bit register)"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "vector_a": "4 float numbers packed in 128 bits"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "vector_b": "4 float numbers packed in 128 bits"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "hardware_execution": "Hardware ARM NEON or Intel AVX instruction fired"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "result": "All 4 additions finish in 1 CPU cycle"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The vector processing acronym that executes one instruction across multiple values is <0>.",
+      "The 128-bit vector data type in WebAssembly is <1>.",
+      "To share Wasm linear memory across Web Workers, backing memory must be a <2>ArrayBuffer."
+],
+    blanks: [
+      {
+            "a": [
+                  "SIMD"
+            ],
+            "why": "Single Instruction Multiple Data."
+      },
+      {
+            "a": [
+                  "v128"
+            ],
+            "why": "v128 represents 128-bit vector types."
+      },
+      {
+            "a": [
+                  "Shared"
+            ],
+            "why": "SharedArrayBuffer allows multi-threaded shared memory."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the primary performance benefit of WebAssembly SIMD (Single Instruction, Multiple Data)?",
+      a: ["It allows the CPU to perform the same mathematical operation on multiple numbers simultaneously in a single clock cycle","It automatically moves calculations to remote cloud servers","It eliminates all memory allocation overhead","It compresses JavaScript files by 80%"],
+      c: 0,
+      why: "SIMD leverages CPU vector units to compute across 4, 8, or 16 values in parallel in one cycle."
+    },
+    {
+      q: "What security headers must a web server provide to enable 'SharedArrayBuffer' for multithreaded Wasm?",
+      a: ["Cross-Origin-Opener-Policy (COOP) and Cross-Origin-Embedder-Policy (COEP)","Content-Security-Policy: default-src *","Access-Control-Allow-Origin: *","Strict-Transport-Security"],
+      c: 0,
+      why: "Post-Spectre security requirements mandate COOP and COEP cross-origin isolation before SharedArrayBuffer is unlocked."
+    },
+    {
+      q: "How do multiple Web Workers running Wasm cooperate without data races when modifying shared memory?",
+      a: ["Using atomic memory instructions (such as i32.atomic.rmw.add) and synchronization primitives (Atomics.wait/notify)","By taking turns every 10 seconds","By sending each other Slack messages","By restarting the browser window"],
+      c: 0,
+      why: "Atomic operations guarantee thread-safe read-modify-write cycles without race conditions on shared memory."
+    },
+    {
+      q: "Why should heavy WebAssembly computations be offloaded from the main browser thread to a Web Worker?",
+      a: ["To prevent long-running computations from blocking the UI thread and freezing user interactions or dropping frames","Because WebAssembly cannot run on the main thread","Because Web Workers run with administrator privileges","Because Web Workers do not consume battery power"],
+      c: 0,
+      why: "Offloading CPU-heavy Wasm work to Web Workers keeps the main JavaScript thread responsive and smooth."
+    }
+  ]);
+</script>
+</body>
+</html>

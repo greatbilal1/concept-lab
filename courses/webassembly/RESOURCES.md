@@ -1,13 +1,10 @@
 # Resources — WebAssembly
 
 ## Knowledge (primary sources)
+- W3C WebAssembly Core Specification (webassembly.github.io/spec/core).
+- MDN Web Docs: *WebAssembly* (developer.mozilla.org).
+- *Programming WebAssembly with Rust* by Kevin Hoffman (Pragmatic Bookshelf).
+- Bytecode Alliance and WASI Documentation (bytecodealliance.org).
 
-- Title — author — why it is trustworthy. (Used by lesson "Primary source" notes.)
-
-## Wisdom (practitioner insight)
-
-- Source — the judgement it offers that a textbook does not.
-
-## Gaps
-
-- What no source covers well, and how you will fill it.
+## Wisdom
+- WebAssembly does not replace JavaScript; it gives JavaScript a bionic arm. Use JS for DOM and UI interactions; hand heavy numeric number-crunching to Wasm.

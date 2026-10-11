@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Infrastructure as Code — Cheat Sheet</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
 <link rel="stylesheet" href="../../../assets/css/tokens.css">
 <link rel="stylesheet" href="../../../assets/css/components.css">
 <style>
@@ -32,16 +33,86 @@
   </p>
 
   <div class="ref-toc">
-    <a href="#section-one">Section one</a>
+    <a href="#sec-1">Core CLI Workflow</a>
+    <a href="#sec-2">Remote State & Locking</a>
+    <a href="#sec-3">Resource & Variables</a>
+    <a href="#sec-4">Module Instantiation</a>
   </div>
 
-  <h2 id="section-one"><span class="n">1</span>Section one</h2>
-
+  <h2 id="sec-1"><span class="n">1</span>Core CLI Workflow</h2>
   <div class="snippet">
-    <div class="lbl">Label</div>
-    <pre><code>code or summary here</code></pre>
+    <div class="lbl">Lifecycle commands</div>
+    <pre><code># Initialize providers and backend
+terraform init
+
+# Preview changes against current state
+terraform plan -out=tfplan
+
+# Apply verified execution plan
+terraform apply tfplan
+
+# Inspect current managed state
+terraform state list
+terraform show</code></pre>
   </div>
-  <p class="see">See <a href="../lessons/0001-slug.html">Lesson 01 — Title</a>.</p>
+  <p class="see">See <a href="../lessons/0002-terraform-providers-and-resources.html">Lesson 02 — Terraform Architecture & Workflow</a>.</p>
+
+  <h2 id="sec-2"><span class="n">2</span>Remote State & Locking</h2>
+  <div class="snippet">
+    <div class="lbl">Backend configuration</div>
+    <pre><code>terraform {
+  required_version = "&gt;= 1.5.0"
+  backend "s3" {
+    bucket         = "corp-tf-state-prod"
+    key            = "vpc/terraform.tfstate"
+    region         = "us-east-1"
+    dynamodb_table = "terraform-locks" # State locking
+    encrypt        = true
+  }
+}</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0003-state-management-and-backends.html">Lesson 03 — State Management & Backends</a>.</p>
+
+  <h2 id="sec-3"><span class="n">3</span>Resource & Variables</h2>
+  <div class="snippet">
+    <div class="lbl">Declarative resource block</div>
+    <pre><code>variable "environment" {
+  type        = string
+  description = "Target deployment environment"
+  default     = "production"
+}
+
+resource "aws_s3_bucket" "data_lake" {
+  bucket = "company-data-${var.environment}"
+  tags = {
+    Environment = var.environment
+    ManagedBy   = "Terraform"
+  }
+}
+
+output "bucket_arn" {
+  value       = aws_s3_bucket.data_lake.arn
+  description = "The Amazon Resource Name of the bucket"
+}</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0004-variables-outputs-and-locals.html">Lesson 04 — Variables, Outputs & Locals</a>.</p>
+
+  <h2 id="sec-4"><span class="n">4</span>Module Instantiation</h2>
+  <div class="snippet">
+    <div class="lbl">Reusable infrastructure block</div>
+    <pre><code>module "vpc" {
+  source = "./modules/vpc"
+
+  cidr_block   = "10.0.0.0/16"
+  subnet_count = 3
+  environment  = "prod"
+}
+
+output "vpc_id" {
+  value = module.vpc.id
+}</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0005-modules-and-reusable-architecture.html">Lesson 05 — Modules & Reusable Architecture</a>.</p>
 
   <div class="lesson-foot">
     <div class="links">
@@ -51,12 +122,5 @@
   </div>
 
 </div>
-
-<script src="../../../assets/js/icons.js"></script>
-<script src="../lessons.js"></script>
-<script src="../../../assets/js/teach/lesson-engine.js"></script>
-<script>
-  TeachLesson.init({ course: "infrastructure-as-code", lessons: window.TeachLessons || [] });
-</script>
 </body>
 </html>

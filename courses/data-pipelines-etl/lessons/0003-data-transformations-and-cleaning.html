@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 03 — Data Cleaning, Schema Validation & Transformations</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="data-pipelines-etl" data-lesson="3" data-lesson-id="data-transformations-and-cleaning">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 03</span> · Batch Processing & Transformations</span>
+
+  <h1 class="lesson-title">Data Cleaning, Schema Validation & Transformations</h1>
+  <p class="lesson-lede">
+    Raw data is messy, corrupted, and untrusted. Learn the standard techniques for data normalization, type casting, and schema validation.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Build data cleaning transformations, handle null values, and enforce strict schema validation</span>
+    <span><b>Mission link</b> Prevent corrupted, malformed, or missing data from polluting analytical dashboards and ML models</span>
+  </div>
+
+  <h2><span class="n">1</span>Garbage In, Garbage Out</h2>
+  <p>Upstream systems are unreliable. Form fields allow invalid email formats, external APIs return unexpected nulls, and numeric columns arrive formatted as text strings with dollar signs (<code>"$1,240.50"</code>).</p><p>The transformation phase must sanitize raw input through:</p><ul><li><b>Type Casting:</b> Converting raw string representations into exact types (decimals, timestamps, booleans).</li><li><b>Normalization:</b> Trimming whitespace, standardizing ISO date formats (<code>YYYY-MM-DD</code>), and lowercasing strings.</li><li><b>Handling Missing Values:</b> Imputing defaults, isolating invalid records into dead-letter tables, or dropping corrupted rows.</li></ul>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Data cleaning sanitizes raw strings into typed, validated, and normalized records before analytical consumption.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Schema validation and contracts</h2>
+  <p>To guarantee reliability, modern pipelines validate data against explicit schemas (using JSON Schema, Pydantic, or Great Expectations). If an upstream service drops a required column or changes an integer to a float, schema validators catch the violation at the pipeline boundary.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing schema enforcement with Pydantic</h2>
+  <p>Trace how schema validation catches invalid types and isolates corrupted rows.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your understanding of data cleaning and schema validation techniques.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can write data transformation steps that clean, cast, and validate data while quarantining malformed records safely.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Write a Python data transformation using Pydantic that parses currency strings into floats.</li>
+    <li>Implement a pipeline filter that isolates malformed CSV rows into a dead_letter_records.json file.</li>
+    <li>Configure automated schema validation checks using Great Expectations or Soda SQL.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Joe Reis & Matt Housley, *Fundamentals of Data Engineering*, Chapter 8: *Transformation*.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What should a robust data pipeline do when it encounters 5 malformed rows inside a batch of 1,000,000 clean rows?",
+    a: ["Route the 5 malformed rows to a Dead-Letter Queue (DLQ) for inspection while processing the 999,995 clean rows successfully","Crash the entire pipeline immediately and discard all 1,000,000 rows","Silently delete the 5 rows without logging any alert","Replace the malformed data with random fake values"],
+    c: 0,
+    why: "Dead-letter queues isolate bad records for debugging without stopping the processing of valid business data."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Raw Input",
+            "lines": [
+                  "{ id: '101',",
+                  "  cost: '$24.99',",
+                  "  created: '05/12/26' }"
+            ]
+      },
+      {
+            "title": "Transformation Engine",
+            "lines": [
+                  "Cast cost -> Decimal(24.99)",
+                  "Parse date -> 2026-05-12",
+                  "Validate schema: Pydantic"
+            ]
+      },
+      {
+            "title": "Clean Target",
+            "lines": [
+                  "{ id: 101,",
+                  "  cost: 24.99,",
+                  "  created: '2026-05-12' }"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "class UserRecord(BaseModel): id: int; email: EmailStr; active: bool",
+      "Raw row 1: { 'id': 1, 'email': 'ada@lovelace.org', 'active': true } -> VALID",
+      "Raw row 2: { 'id': 2, 'email': 'not-an-email', 'active': 'yes' }",
+      "Validation catches: ValidationError at row 2 ('email' is invalid)",
+      "Row 2 redirected to quarantine table: rejected_users_dlq"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "schema_contract": "UserRecord definition active"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "row_1": "Successfully validated and parsed"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "error": "Validation failure detected at boundary"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "isolation": "Quarantined in DLQ for analysis"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The destination where invalid, unparseable records are quarantined is a <0>-Letter Queue.",
+      "Standardizing date strings into universal formats like ISO-8601 is called data <1>.",
+      "Verifying that a dataset conforms to expected types and constraints is schema <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "Dead",
+                  "Dead-Letter"
+            ],
+            "why": "Dead-Letter Queues store unprocessable records."
+      },
+      {
+            "a": [
+                  "normalization"
+            ],
+            "why": "Normalization ensures consistent formats."
+      },
+      {
+            "a": [
+                  "validation"
+            ],
+            "why": "Validation enforces data contracts."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the purpose of a Dead-Letter Queue (DLQ) in a data pipeline?",
+      a: ["To capture and isolate records that fail parsing or schema validation so the rest of the batch can process without interruption","To permanently delete customer records upon GDPR requests","To store old emails sent to deceased customers","To speed up database index rebuilds"],
+      c: 0,
+      why: "DLQs allow pipelines to continue processing valid data while preserving bad data for troubleshooting."
+    },
+    {
+      q: "Why is storing dates in ISO-8601 format ('YYYY-MM-DDTHH:MM:SSZ') the universal best practice in data pipelines?",
+      a: ["It is unambiguous, lexicographically sortable, and explicitly includes timezone information (UTC)","It takes up 50% less disk space than any other date format","It is the only format supported by Python","It automatically converts dates into Unix epoch seconds in memory"],
+      c: 0,
+      why: "ISO-8601 eliminates localization confusion (MM/DD vs DD/MM) and sorts chronologically as plain strings."
+    },
+    {
+      q: "What is schema evolution?",
+      a: ["The ability of a pipeline and storage layer to gracefully handle changes in fields (e.g. new optional columns) over time","The process of converting SQL databases into NoSQL databases","Upgrading the database server's operating system","Migrating an entire data warehouse from AWS to Azure"],
+      c: 0,
+      why: "Schema evolution allows upstream systems to add or deprecate fields without breaking downstream consumers."
+    },
+    {
+      q: "What should you do before casting a column of raw string values into numbers?",
+      a: ["Sanitize the string by stripping currency symbols, commas, and whitespace, and handle nulls","Multiply all string lengths by 100","Convert the entire table into Base64 format","Run a full table vacuum"],
+      c: 0,
+      why: "Raw strings often contain formatting artifacts ($1,234.50) that cause type casting exceptions unless stripped."
+    }
+  ]);
+</script>
+</body>
+</html>

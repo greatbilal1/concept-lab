@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Data Pipelines & ETL — Cheat Sheet</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
 <link rel="stylesheet" href="../../../assets/css/tokens.css">
 <link rel="stylesheet" href="../../../assets/css/components.css">
 <style>
@@ -32,16 +33,75 @@
   </p>
 
   <div class="ref-toc">
-    <a href="#section-one">Section one</a>
+    <a href="#sec-1">ETL vs ELT Architecture</a>
+    <a href="#sec-2">Idempotent Upsert (Merge)</a>
+    <a href="#sec-3">Airflow DAG Definition</a>
+    <a href="#sec-4">Kafka Event Consumer</a>
   </div>
 
-  <h2 id="section-one"><span class="n">1</span>Section one</h2>
-
+  <h2 id="sec-1"><span class="n">1</span>ETL vs ELT Architecture</h2>
   <div class="snippet">
-    <div class="lbl">Label</div>
-    <pre><code>code or summary here</code></pre>
+    <div class="lbl">Ingestion paradigms</div>
+    <pre><code>// Traditional ETL (Compute before load):
+Source DB -&gt; Heavy Transform Engine -&gt; Clean Data Warehouse
+
+// Modern Cloud ELT (Load raw, transform in warehouse):
+Source DB -&gt; Fast Raw Ingestion -&gt; Cloud Data Lake/Warehouse -&gt; dbt SQL Transforms</code></pre>
   </div>
-  <p class="see">See <a href="../lessons/0001-slug.html">Lesson 01 — Title</a>.</p>
+  <p class="see">See <a href="../lessons/0001-etl-vs-elt-and-data-ingestion.html">Lesson 01 — ETL vs ELT Architecture</a>.</p>
+
+  <h2 id="sec-2"><span class="n">2</span>Idempotent Upsert (Merge)</h2>
+  <div class="snippet">
+    <div class="lbl">Preventing duplicate records</div>
+    <pre><code>MERGE INTO target_users AS target
+USING staging_users AS source
+ON target.user_id = source.user_id
+WHEN MATCHED AND source.updated_at &gt; target.updated_at THEN
+  UPDATE SET name = source.name, email = source.email, updated_at = source.updated_at
+WHEN NOT MATCHED THEN
+  INSERT (user_id, name, email, updated_at)
+  VALUES (source.user_id, source.name, source.email, source.updated_at);</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0004-idempotent-pipelines-and-deduplication.html">Lesson 04 — Idempotency & Deduplication</a>.</p>
+
+  <h2 id="sec-3"><span class="n">3</span>Airflow DAG Definition</h2>
+  <div class="snippet">
+    <div class="lbl">Declarative pipeline workflow</div>
+    <pre><code>from airflow import DAG
+from airflow.operators.python import PythonOperator
+from datetime import datetime, timedelta
+
+with DAG(
+    dag_id="daily_user_sync",
+    start_date=datetime(2026, 1, 1),
+    schedule_interval="@daily",
+    catchup=False,
+) as dag:
+    extract = PythonOperator(task_id="extract_api", python_callable=fetch_users)
+    transform = PythonOperator(task_id="clean_data", python_callable=cleanse)
+    load = PythonOperator(task_id="load_warehouse", python_callable=upsert_db)
+
+    extract &gt;&gt; transform &gt;&gt; load</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0006-pipeline-orchestration-and-dags.html">Lesson 06 — Pipeline Orchestration & DAGs</a>.</p>
+
+  <h2 id="sec-4"><span class="n">4</span>Kafka Event Consumer</h2>
+  <div class="snippet">
+    <div class="lbl">Streaming distributed log</div>
+    <pre><code>// Producer writes to append-only topic partition
+producer.send(topic="orders", key=order.id, value=order.json())
+
+// Consumer group reads with offset tracking
+consumer.subscribe(["orders"])
+while (true) {
+  records = consumer.poll(timeout=100)
+  for (record in records) {
+    process(record.value)
+    consumer.commitSync() // mark checkpoint
+  }
+}</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0007-event-streaming-with-kafka.html">Lesson 07 — Event Streaming with Kafka</a>.</p>
 
   <div class="lesson-foot">
     <div class="links">
@@ -51,12 +111,5 @@
   </div>
 
 </div>
-
-<script src="../../../assets/js/icons.js"></script>
-<script src="../lessons.js"></script>
-<script src="../../../assets/js/teach/lesson-engine.js"></script>
-<script>
-  TeachLesson.init({ course: "data-pipelines-etl", lessons: window.TeachLessons || [] });
-</script>
 </body>
 </html>

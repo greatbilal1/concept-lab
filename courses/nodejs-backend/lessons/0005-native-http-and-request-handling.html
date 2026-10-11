@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 05 — Native HTTP Server & Request Handling</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="nodejs-backend" data-lesson="5" data-lesson-id="native-http-and-request-handling">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 05</span> · HTTP Servers & REST APIs</span>
+
+  <h1 class="lesson-title">Native HTTP Server & Request Handling</h1>
+  <p class="lesson-lede">
+    Understand what happens before Express: Node's native node:http module parses HTTP connections directly.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Create an HTTP server from scratch using node:http and parse URLs, methods, and JSON bodies</span>
+    <span><b>Mission link</b> Understand the raw HTTP engine underpinning every Node.js web framework</span>
+  </div>
+
+  <h2><span class="n">1</span>The node:http module</h2>
+  <p>Before installing Express or Fastify, every Node.js web server builds upon the native <code>node:http</code> module. Calling <code>http.createServer((req, res) => { ... })</code> registers an event listener that fires whenever a client initiates an HTTP request.</p><p>Inside the callback, <code>req</code> is an instance of <code>http.IncomingMessage</code> (a Readable stream of the request body), and <code>res</code> is an instance of <code>http.ServerResponse</code> (a Writable stream for the response).</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    The native HTTP request is a Readable stream; the response is a Writable stream.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Parsing headers, URLs, and streaming bodies</h2>
+  <p>To parse incoming JSON bodies natively, you accumulate chunks from <code>req</code> into an array of buffers, concatenate them upon the <code>'end'</code> event, and call <code>JSON.parse()</code>.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing native HTTP server request lifecycle</h2>
+  <p>Trace how a native HTTP server routes a request and sends a JSON response.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your understanding of native Node.js HTTP servers and stream handling.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can build lightweight HTTP servers without dependencies and understand stream-based body collection.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Build a native node:http server that parses POST request bodies without any npm packages.</li>
+    <li>Implement basic routing for /health and /echo endpoints using req.url and req.method.</li>
+    <li>Set custom security headers (X-Content-Type-Options, Content-Security-Policy) using res.setHeader.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Node.js Official Documentation: *HTTP* (nodejs.org/api/http.html).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "In native node:http, where is the POST request JSON body located when the (req, res) callback first fires?",
+    a: ["It has not arrived yet: it must be collected asynchronously in chunks as req emits 'data' events","It is automatically parsed into req.body as a JavaScript object","It is stored in the req.query object","It is automatically written to a temporary file in /tmp"],
+    c: 0,
+    why: "Because req is a stream, the body data is in transit over the network and must be read chunk-by-chunk."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Incoming Request (req)",
+            "lines": [
+                  "req.method ('GET', 'POST')",
+                  "req.url ('/api/users')",
+                  "req.headers (Host, Content-Type)",
+                  "Readable stream body"
+            ]
+      },
+      {
+            "title": "Server Logic",
+            "lines": [
+                  "URL routing & validation",
+                  "Buffer.concat(chunks)",
+                  "JSON.parse(rawBody)"
+            ]
+      },
+      {
+            "title": "Outgoing Response (res)",
+            "lines": [
+                  "res.writeHead(200, headers)",
+                  "res.write(chunk)",
+                  "res.end()"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "import http from 'node:http';",
+      "const server = http.createServer((req, res) => {",
+      "  if (req.method === 'GET' && req.url === '/api/status') {",
+      "    res.writeHead(200, { 'Content-Type': 'application/json' });",
+      "    res.end(JSON.stringify({ status: 'ok' }));",
+      "  }",
+      "});",
+      "server.listen(3000);"
+],
+    steps: [
+      {
+            "line": 1,
+            "vars": {
+                  "server": "Listening on port 3000"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "request": "method='GET', url='/api/status'"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "headers_sent": "HTTP/1.1 200 OK, application/json"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "response_ended": "Socket flushed and closed"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The native Node module used to build HTTP servers is node:<0>.",
+      "In the server callback, req is an instance of Incoming<1>.",
+      "To finalize and send an HTTP response, you must invoke res.<2>()."
+],
+    blanks: [
+      {
+            "a": [
+                  "http"
+            ],
+            "why": "node:http provides HTTP primitives."
+      },
+      {
+            "a": [
+                  "Message"
+            ],
+            "why": "http.IncomingMessage represents the request."
+      },
+      {
+            "a": [
+                  "end"
+            ],
+            "why": "res.end() flushes the buffer and closes the response stream."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why is 'req.body' undefined by default in native node:http without middleware or manual collection?",
+      a: ["Because HTTP request bodies stream across the network in chunks and must be read asynchronously","Because Node.js does not support JSON parsing","Because POST requests are forbidden by the W3C specification in native Node","Because the client must send a special __NODE_BODY__ header"],
+      c: 0,
+      why: "HTTP bodies are streams; Node does not buffer or parse the body into memory automatically."
+    },
+    {
+      q: "What happens if you do not call 'res.end()' in an HTTP request handler?",
+      a: ["The client continues waiting for more data until its socket times out (the request hangs)","Node.js automatically sends a 404 response after 100 milliseconds","The server process terminates immediately with an exit code 1","The response is automatically converted into a WebSocket"],
+      c: 0,
+      why: "res is a writable stream; until res.end() is called, the client keeps the connection open waiting for completion."
+    },
+    {
+      q: "Which method sends the HTTP status code and header object simultaneously?",
+      a: ["res.writeHead(status, headers)","res.sendStatus(status)","res.setHeaderAll(headers)","res.status(status).json()"],
+      c: 0,
+      why: "res.writeHead(statusCode, [statusMessage], [headers]) sets the status code and headers at once."
+    },
+    {
+      q: "How should you protect an HTTP server from denial-of-service via huge incoming POST payload streams?",
+      a: ["Track bytes received in 'data' chunks and destroy the socket if it exceeds a maximum size limit (e.g. 1MB)","Set the maxPayload property on package.json","Restart the server every 10 minutes","Limit the server to only accept GET requests"],
+      c: 0,
+      why: "Tracking chunk lengths and aborting oversized uploads prevents malicious clients from exhausting memory."
+    }
+  ]);
+</script>
+</body>
+</html>

@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 03 — File System, Buffers & Binary Data</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="nodejs-backend" data-lesson="3" data-lesson-id="file-system-and-buffers">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 03</span> · Asynchronous I/O, Buffers & Streams</span>
+
+  <h1 class="lesson-title">File System, Buffers & Binary Data</h1>
+  <p class="lesson-lede">
+    Node.js handles raw binary data outside V8 memory using Buffers. Learn safe asynchronous file manipulation.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Read, write, and manipulate binary data and files using Buffer and fs/promises</span>
+    <span><b>Mission link</b> Process images, files, and network sockets without memory corruption or blocking I/O</span>
+  </div>
+
+  <h2><span class="n">1</span>What is a Buffer?</h2>
+  <p>In standard browser JavaScript, strings handle text, but raw binary data (like images, network packets, or compressed archives) was historically awkward. Node.js introduced the global <b>Buffer</b> class.</p><p>A Buffer represents a fixed-size chunk of binary memory allocated outside the V8 heap in native C++ memory. Once allocated, its size cannot be changed.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Buffers represent raw chunks of binary memory allocated outside the V8 JavaScript garbage collection heap.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Modern file operations with fs/promises</h2>
+  <p>Never use synchronous methods like <code>fs.readFileSync()</code> in a request handler because they lock the entire server. Always prefer the promise-based API in <code>node:fs/promises</code>.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing buffer encoding and allocation</h2>
+  <p>Trace how a text string translates into byte representations inside a Node.js Buffer.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your understanding of binary buffers and file system APIs.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can manipulate binary files, convert between encodings (UTF-8, Base64, Hex), and write non-blocking file workflows.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Read a binary image file and convert its contents to a Base64 data URI string.</li>
+    <li>Compare memory usage between reading a 500MB file with fs.readFile vs stream reading.</li>
+    <li>Inspect Buffer.byteLength() vs string.length on strings with multi-byte emoji characters.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Node.js Official Documentation: *Buffer* and *File System*.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Why is 'Buffer.allocUnsafe(1024)' called 'unsafe'?",
+    a: ["It does not zero-initialize the memory, meaning it may contain sensitive remnants of previous heap memory","It crashes the server if the file is greater than 1024 bytes","It exposes the computer to physical hard drive hardware damage","It bypasses all operating system file permissions"],
+    c: 0,
+    why: "allocUnsafe allocates memory without overwriting it with zeros; it is fast, but uninitialized memory could expose old data."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Binary Source",
+            "lines": [
+                  "Network socket",
+                  "Disk file (PNG, PDF)",
+                  "Raw octet stream"
+            ]
+      },
+      {
+            "title": "Buffer (Native Memory)",
+            "lines": [
+                  "Buffer.from('hello', 'utf-8')",
+                  "Hex / Base64 / Binary bytes",
+                  "Fixed length in bytes"
+            ]
+      },
+      {
+            "title": "fs/promises API",
+            "lines": [
+                  "await fs.readFile()",
+                  "await fs.writeFile()",
+                  "await fs.mkdir()"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "const buf = Buffer.from('Node', 'utf-8');",
+      "console.log(buf.length); // 4 bytes",
+      "console.log(buf); // <Buffer 4e 6f 64 65>",
+      "console.log(buf.toString('hex')); // '4e6f6465'"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "text": "'Node'",
+                  "encoding": "utf-8"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "length": "4 bytes (1 byte per ASCII character)"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "hex_representation": "4e (N), 6f (o), 64 (d), 65 (e)"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "hex_output": "'4e6f6465'"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The global class representing raw fixed-size binary data in Node.js is <0>.",
+      "The modern asynchronous file system module in Node.js is node:fs/<1>.",
+      "To safely allocate a buffer initialized with zeros, call Buffer.<2>(size)."
+],
+    blanks: [
+      {
+            "a": [
+                  "Buffer"
+            ],
+            "why": "Buffer handles raw binary bytes."
+      },
+      {
+            "a": [
+                  "promises"
+            ],
+            "why": "node:fs/promises exposes clean async/await methods."
+      },
+      {
+            "a": [
+                  "alloc"
+            ],
+            "why": "Buffer.alloc safely zeros the memory."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why should 'fs.readFileSync' be strictly avoided in production server request handlers?",
+      a: ["It completely blocks the single JavaScript thread, freezing all other concurrent user connections while waiting for disk I/O","It corrupts data when reading files larger than 10MB","It only works on Linux servers and fails on macOS or Windows","It requires root administrative privileges"],
+      c: 0,
+      why: "Synchronous file calls freeze the main event loop, preventing all concurrent requests from being processed."
+    },
+    {
+      q: "What does 'Buffer.byteLength(\"🚀\")' return in UTF-8 encoding?",
+      a: ["4 bytes","1 byte","2 bytes","0 bytes"],
+      c: 0,
+      why: "Emoji and special Unicode characters require multiple bytes (up to 4) in UTF-8 encoding."
+    },
+    {
+      q: "How does 'Buffer.alloc(1024)' differ from 'Buffer.allocUnsafe(1024)'?",
+      a: ["alloc fills the memory with zeros; allocUnsafe leaves uninitialized memory as-is for speed","alloc only works with strings; allocUnsafe works with numbers","alloc stores memory on the GPU; allocUnsafe stores memory on disk","alloc is deprecated in modern Node.js versions"],
+      c: 0,
+      why: "Buffer.alloc is zero-initialized and safe from data leaks; allocUnsafe is faster but contains whatever garbage was previously in memory."
+    },
+    {
+      q: "Which method converts a Buffer into a Base64-encoded string?",
+      a: ["buf.toString('base64')","btoa(buf)","buf.toBase64()","JSON.stringify(buf)"],
+      c: 0,
+      why: "The toString(encoding) method accepts 'base64', 'hex', 'utf-8', and other standard encodings."
+    }
+  ]);
+</script>
+</body>
+</html>

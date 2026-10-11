@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 07 — Event Streaming & Message Brokers with Kafka</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="data-pipelines-etl" data-lesson="7" data-lesson-id="event-streaming-with-kafka">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 07</span> · Streaming, Quality & Idempotency</span>
+
+  <h1 class="lesson-title">Event Streaming & Message Brokers with Kafka</h1>
+  <p class="lesson-lede">
+    Traditional databases struggle with millions of events per second. Apache Kafka uses distributed append-only commit logs to stream data at massive scale.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Explain Kafka's partitioned commit log architecture, consumer offsets, and consumer groups</span>
+    <span><b>Mission link</b> Decouple microservices and process high-throughput event streams in real time</span>
+  </div>
+
+  <h2><span class="n">1</span>The distributed commit log</h2>
+  <p>Traditional message queues (RabbitMQ) delete messages once acknowledged by a consumer. This means you cannot replay history or add a new analytics consumer next month.</p><p><b>Apache Kafka</b> is an <b>append-only distributed commit log</b>. Events are permanently written to disk in sequence and retained for days or years. Multiple independent consumers can read the log at their own pace, seeking backward or forward by tracking their <b>offset</b>.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Kafka stores events in an append-only commit log on disk; messages are not deleted when consumed.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Topics, Partitions, and Consumer Groups</h2>
+  <p>To achieve horizontal scalability, Kafka structures data cleanly:</p><ul><li><b>Topic:</b> A category or stream name (e.g. <code>user-clicks</code>).</li><li><b>Partition:</b> A topic is divided into multiple ordered partitions distributed across cluster broker nodes. Partitions enable parallel throughput.</li><li><b>Message Key:</b> Messages with the same key (e.g. <code>user_id</code>) are guaranteed to route to the <i>same partition</i>, preserving strict ordering.</li><li><b>Consumer Group:</b> A group of cooperating worker instances. Each partition is assigned to exactly one consumer within the group.</li></ul>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing consumer offset replay</h2>
+  <p>Trace how a consumer recovers from a software bug by rewinding its offset.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your understanding of Apache Kafka architecture and event streaming.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You understand how Kafka powers real-time event streaming and how partitions, offsets, and consumer groups ensure scalable processing.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Produce and consume messages using a local Kafka Docker container using kafka-console-producer.</li>
+    <li>Demonstrate message replay by rewinding consumer group offsets using the Kafka CLI.</li>
+    <li>Explain how message keys guarantee in-order delivery per entity.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Jay Kreps, Neha Narkhede, Jun Rao (Creators of Kafka), *Kafka: The Definitive Guide* (O'Reilly).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What happens in Kafka when Consumer Group A finishes reading an event?",
+    a: ["Consumer Group A advances its committed offset; the event remains in Kafka untouched for Consumer Group B to read","The event is deleted from disk immediately to save space","The event is sent to all internet users","The entire Kafka cluster reboots"],
+    c: 0,
+    why: "Kafka decouples producers and consumers: messages persist regardless of consumption state."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Topic: 'orders'",
+            "lines": [
+                  "Partition 0: [0, 1, 2, 3...]",
+                  "Partition 1: [0, 1, 2, 3...]",
+                  "Partition 2: [0, 1, 2, 3...]"
+            ]
+      },
+      {
+            "title": "Producers",
+            "lines": [
+                  "Write events by Key",
+                  "Key hash determines partition",
+                  "Strict ordering per partition"
+            ]
+      },
+      {
+            "title": "Consumer Group",
+            "lines": [
+                  "Worker 1 -> Partition 0",
+                  "Worker 2 -> Partition 1",
+                  "Worker 3 -> Partition 2"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "1. A bug in consumer service calculates incorrect sales tax for 3 hours",
+      "2. Consumer offset is currently at: 1,500,000",
+      "3. Engineers deploy fixed code",
+      "4. Consumer group offset is reset backwards: kafka-consumer-groups --reset-offsets --to-offset 1,200,000",
+      "5. Consumer replays the 300,000 events, reprocessing them correctly without data loss"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "bug_detected": "Incorrect processing logic in production"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "patch": "New code deployed to workers"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "offset_rewind": "Pointer moved back in log"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "recovery": "Events re-read from immutable Kafka storage"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Kafka organizes messages into ordered, append-only logs called <0>.",
+      "The sequential integer identifying a message's position within a partition is its <1>.",
+      "A collection of consumers collaborating to read partitions in parallel is a consumer <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "partitions"
+            ],
+            "why": "Partitions are ordered logs."
+      },
+      {
+            "a": [
+                  "offset"
+            ],
+            "why": "Offsets uniquely identify log positions."
+      },
+      {
+            "a": [
+                  "group"
+            ],
+            "why": "Consumer groups share partition processing."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What fundamental architectural difference distinguishes Kafka from traditional message brokers like RabbitMQ?",
+      a: ["Kafka uses a persistent, append-only disk commit log where messages are not deleted after consumption, allowing multiple consumers and replays","Kafka runs entirely in browser memory","Kafka does not support network connections","RabbitMQ cannot store text messages"],
+      c: 0,
+      why: "Kafka's immutable append-only commit log allows messages to be retained and replayed by multiple consumer groups."
+    },
+    {
+      q: "How does Kafka guarantee that all events for a specific user (e.g. user_id = 42) are processed in strict chronological order?",
+      a: ["By using the user_id as the message key, ensuring all events for that user hash to the exact same partition","By processing only one event per hour globally","By sorting the entire cluster memory every second","By pausing all other producers"],
+      c: 0,
+      why: "Kafka guarantees ordering within a partition; messages sharing the same key always hash to the same partition."
+    },
+    {
+      q: "What is a Kafka consumer offset?",
+      a: ["A sequential integer bookmarking the position of the last processed event in a partition for a consumer group","The time delay in milliseconds between message send and receive","The memory address of the Kafka broker process","The secret password required to authenticate to the cluster"],
+      c: 0,
+      why: "An offset acts as a bookmark indicating which events a consumer has successfully read and committed."
+    },
+    {
+      q: "If a topic has 4 partitions, what is the maximum number of active consumers in a single consumer group that can read data in parallel?",
+      a: ["4 consumers (1 consumer per partition; any extra consumers remain idle as hot backups)","Unlimited consumers","1 consumer only","16 consumers"],
+      c: 0,
+      why: "Each partition can only be read by one consumer per group at a time; extra consumers sit idle."
+    }
+  ]);
+</script>
+</body>
+</html>

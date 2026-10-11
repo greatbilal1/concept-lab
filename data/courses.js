@@ -1632,7 +1632,11 @@ window.COURSES = [
     tag: "WEB", category: "web", level: "intermediate", tier: 3,
     desc: "Bring static typing to JavaScript for robust, scalable front-end and back-end applications.",
     chips: ["Static Types", "Interfaces", "Generics"], colors: { c1: "#2563eb", c2: "#0ea5e9" }, stageArt: "code",
-    status: "planned", tags: ["web", "typescript", "frontend", "types"],
+    status: "live", href: "courses/typescript-fundamentals/course.html",
+    lessons: { href: "courses/typescript-fundamentals/course.html", label: "Guided lessons" },
+    glossary: "courses/typescript-fundamentals/reference/typescript-fundamentals-glossary.html",
+    meta: "8 lessons · interactive quizzes · worked examples",
+    sections: [{"id":"types-and-inference","title":"Types & Type Inference","anim":"Code"},{"id":"contracts-and-aliases","title":"Object Contracts & Aliases","anim":"Code"},{"id":"unions-and-narrowing","title":"Unions & Type Narrowing","anim":"Code"},{"id":"generics-and-utilities","title":"Generics & Utility Types","anim":"Code"}], tags: ["web", "typescript", "frontend", "types"],
     prereq: ["javascript-fundamentals"], related: ["react-architecture", "nodejs-backend"], paths: ["frontend-engineer", "full-stack-developer"]
   },
   {
@@ -1640,7 +1644,11 @@ window.COURSES = [
     tag: "WEB", category: "web", level: "intermediate", tier: 4,
     desc: "Build scalable backend services using event-driven, non-blocking I/O in JavaScript.",
     chips: ["Event Loop", "Express", "Streams"], colors: { c1: "#22c55e", c2: "#0ea5e9" }, stageArt: "code-pulse",
-    status: "planned", tags: ["web", "backend", "nodejs", "javascript"],
+    status: "live", href: "courses/nodejs-backend/course.html",
+    lessons: { href: "courses/nodejs-backend/course.html", label: "Guided lessons" },
+    glossary: "courses/nodejs-backend/reference/nodejs-backend-glossary.html",
+    meta: "8 lessons · interactive quizzes · worked examples",
+    sections: [{"id":"runtime-architecture","title":"Node.js Runtime & Architecture","anim":"Code"},{"id":"buffers-and-streams","title":"Buffers, File I/O & Streams","anim":"Code"},{"id":"http-and-middleware","title":"HTTP Networking & Middleware","anim":"Code"},{"id":"production-scaling","title":"Production Scaling & Operations","anim":"Code"}], tags: ["web", "backend", "nodejs", "javascript"],
     prereq: ["javascript-fundamentals", "http"], related: ["rest-apis-json", "frontend-backend"], paths: ["backend-engineer", "full-stack-developer"]
   },
   {
@@ -1648,7 +1656,11 @@ window.COURSES = [
     tag: "DEVOPS", category: "devops", level: "advanced", tier: 6,
     desc: "Deploy, scale, and manage containerized applications securely across clusters.",
     chips: ["Pods", "Services", "Scaling"], colors: { c1: "#3b82f6", c2: "#8b5cf6" }, stageArt: "layers",
-    status: "planned", tags: ["devops", "cloud", "kubernetes", "containers"],
+    status: "live", href: "courses/kubernetes-orchestration/course.html",
+    lessons: { href: "courses/kubernetes-orchestration/course.html", label: "Guided lessons" },
+    glossary: "courses/kubernetes-orchestration/reference/kubernetes-orchestration-glossary.html",
+    meta: "8 lessons · interactive quizzes · worked examples",
+    sections: [{"id":"cluster-architecture","title":"Cluster Architecture & Control Plane","anim":"Code"},{"id":"workloads-and-pods","title":"Pods, Workloads & Controllers","anim":"Code"},{"id":"networking-and-services","title":"Networking, Services & Ingress","anim":"Code"},{"id":"storage-and-operations","title":"Storage, Config & Operations","anim":"Code"}], tags: ["devops", "cloud", "kubernetes", "containers"],
     prereq: ["docker-containers"], related: ["cloud-architecture", "distributed-systems"], paths: ["devops"]
   },
   {
@@ -1656,7 +1668,11 @@ window.COURSES = [
     tag: "DEVOPS", category: "devops", level: "intermediate", tier: 5,
     desc: "Define, provision, and version cloud infrastructure predictably and reliably.",
     chips: ["Terraform", "State", "Modules"], colors: { c1: "#8b5cf6", c2: "#c026d3" }, stageArt: "term-layers",
-    status: "planned", tags: ["devops", "cloud", "infrastructure", "automation"],
+    status: "live", href: "courses/infrastructure-as-code/course.html",
+    lessons: { href: "courses/infrastructure-as-code/course.html", label: "Guided lessons" },
+    glossary: "courses/infrastructure-as-code/reference/infrastructure-as-code-glossary.html",
+    meta: "8 lessons · interactive quizzes · worked examples",
+    sections: [{"id":"iac-philosophy","title":"IaC Philosophy & Declarative Systems","anim":"Code"},{"id":"terraform-and-state","title":"Terraform Engine & State Management","anim":"Code"},{"id":"modules-and-composition","title":"Variables, Outputs & Modules","anim":"Code"},{"id":"security-and-gitops","title":"Security, Drift & GitOps","anim":"Code"}], tags: ["devops", "cloud", "infrastructure", "automation"],
     prereq: ["cloud-architecture", "command-line-shell"], related: ["ci-cd", "kubernetes-orchestration"], paths: ["devops"]
   },
   {
@@ -1664,7 +1680,11 @@ window.COURSES = [
     tag: "DATA", category: "data", level: "intermediate", tier: 5,
     desc: "Extract, transform, and move large datasets efficiently and reliably between systems.",
     chips: ["ETL", "Batch", "Streaming"], colors: { c1: "#14b8a6", c2: "#3b82f6" }, stageArt: "flow",
-    status: "planned", tags: ["data", "etl", "pipelines", "engineering"],
+    status: "live", href: "courses/data-pipelines-etl/course.html",
+    lessons: { href: "courses/data-pipelines-etl/course.html", label: "Guided lessons" },
+    glossary: "courses/data-pipelines-etl/reference/data-pipelines-etl-glossary.html",
+    meta: "8 lessons · interactive quizzes · worked examples",
+    sections: [{"id":"ingestion-and-patterns","title":"Ingestion Architecture & Patterns","anim":"Code"},{"id":"transformations-and-idempotence","title":"Transformations & Idempotency","anim":"Code"},{"id":"storage-and-orchestration","title":"Data Storage & Orchestration","anim":"Code"},{"id":"streaming-and-quality","title":"Streaming & Data Observability","anim":"Code"}], tags: ["data", "etl", "pipelines", "engineering"],
     prereq: ["python-files-json-data", "sql-relational-databases"], related: ["database-indexes-performance", "machine-learning"], paths: ["data-engineer", "data-analyst"]
   },
   {
@@ -1672,7 +1692,11 @@ window.COURSES = [
     tag: "WEB", category: "web", level: "intermediate", tier: 3,
     desc: "Design and build web interfaces that are usable by everyone, regardless of ability.",
     chips: ["ARIA", "Semantics", "Keyboard"], colors: { c1: "#06b6d4", c2: "#3b82f6" }, stageArt: "layers",
-    status: "planned", tags: ["web", "frontend", "accessibility", "ui"],
+    status: "live", href: "courses/web-accessibility/course.html",
+    lessons: { href: "courses/web-accessibility/course.html", label: "Guided lessons" },
+    glossary: "courses/web-accessibility/reference/web-accessibility-glossary.html",
+    meta: "8 lessons · interactive quizzes · worked examples",
+    sections: [{"id":"a11y-foundations","title":"Accessibility Foundations & AOM","anim":"Code"},{"id":"structure-and-forms","title":"Document Semantics & Forms","anim":"Code"},{"id":"aria-and-live-regions","title":"ARIA Roles & Live Regions","anim":"Code"},{"id":"keyboard-and-auditing","title":"Keyboard Control & Auditing","anim":"Code"}], tags: ["web", "frontend", "accessibility", "ui"],
     prereq: ["html-dom", "css-layout"], related: ["ui-ux-for-engineers", "react-architecture"], paths: ["frontend-engineer", "full-stack-developer"]
   },
   {
@@ -1680,7 +1704,11 @@ window.COURSES = [
     tag: "WEB", category: "web", level: "advanced", tier: 8,
     desc: "Run compiled, high-performance code in the browser at near-native speed.",
     chips: ["Wasm", "Performance", "Compilation"], colors: { c1: "#6366f1", c2: "#ec4899" }, stageArt: "layers-orbit",
-    status: "planned", tags: ["web", "wasm", "performance", "frontend"],
+    status: "live", href: "courses/webassembly/course.html",
+    lessons: { href: "courses/webassembly/course.html", label: "Guided lessons" },
+    glossary: "courses/webassembly/reference/webassembly-glossary.html",
+    meta: "8 lessons · interactive quizzes · worked examples",
+    sections: [{"id":"wasm-architecture","title":"Wasm Architecture & Virtual Machine","anim":"Code"},{"id":"memory-and-interop","title":"Linear Memory & Interoperability","anim":"Code"},{"id":"compilation-and-types","title":"Languages & Compilation","anim":"Code"},{"id":"performance-and-wasi","title":"High Performance & WASI","anim":"Code"}], tags: ["web", "wasm", "performance", "frontend"],
     prereq: ["how-computers-work", "javascript-fundamentals"], related: ["html-dom", "how-the-internet-works"], paths: ["frontend-engineer"]
   },
   {
@@ -1688,7 +1716,11 @@ window.COURSES = [
     tag: "DESIGN", category: "design", level: "beginner", tier: 2,
     desc: "Design thinking, color theory, typography, and spacing for developers building interfaces.",
     chips: ["Layouts", "Colors", "Usability"], colors: { c1: "#ec4899", c2: "#f43f5e" }, stageArt: "layers",
-    status: "planned", tags: ["design", "ui", "ux", "frontend"],
+    status: "live", href: "courses/ui-ux-for-engineers/course.html",
+    lessons: { href: "courses/ui-ux-for-engineers/course.html", label: "Guided lessons" },
+    glossary: "courses/ui-ux-for-engineers/reference/ui-ux-for-engineers-glossary.html",
+    meta: "8 lessons · interactive quizzes · worked examples",
+    sections: [{"id":"design-thinking-and-affordances","title":"Design Thinking & Affordances","anim":"Code"},{"id":"hierarchy-and-spacing","title":"Visual Hierarchy & Spacing","anim":"Code"},{"id":"typography-and-color","title":"Typography & Color Systems","anim":"Code"},{"id":"feedback-and-usability","title":"Interaction Feedback & Usability","anim":"Code"}], tags: ["design", "ui", "ux", "frontend"],
     prereq: ["css-layout"], related: ["web-accessibility", "react-architecture"], paths: ["frontend-engineer", "full-stack-developer"]
   }
 ];

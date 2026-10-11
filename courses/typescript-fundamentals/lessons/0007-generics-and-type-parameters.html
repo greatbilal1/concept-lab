@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 07 — Generics & Type Parameters</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="typescript-fundamentals" data-lesson="7" data-lesson-id="generics-and-type-parameters">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 07</span> · Generics & Utility Types</span>
+
+  <h1 class="lesson-title">Generics & Type Parameters</h1>
+  <p class="lesson-lede">
+    Generics allow you to write reusable, flexible functions and classes while preserving full type information.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Author generic functions and interfaces with type parameters and constraints</span>
+    <span><b>Mission link</b> Build reusable libraries and utilities without sacrificing type safety or resorting to any</span>
+  </div>
+
+  <h2><span class="n">1</span>Why generics exist</h2>
+  <p>Imagine writing a function that returns the first item of an array. If you accept <code>any[]</code> and return <code>any</code>, all type safety is lost. If you write separate functions for <code>number[]</code> and <code>string[]</code>, you duplicate code.</p><p><b>Generics</b> solve this by introducing <b>type parameters</b> (conventionally named <code>T</code>, <code>U</code>, <code>V</code>). They act as variables for types, capturing the input type and flowing it to the output.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Generics capture and preserve the exact type of data passed into reusable functions and classes.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Generic constraints: extends keyword</h2>
+  <p>Sometimes a generic must guarantee certain properties. You can constrain a generic type parameter using <code>T extends Shape</code>.</p><p>For example, <code>function logLength&lt;T extends { length: number }&gt;(item: T)</code> guarantees that <code>item.length</code> is valid, accepting strings, arrays, or custom objects with a length property, while rejecting numbers or booleans.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing generic constraint validation</h2>
+  <p>Trace how the TypeScript compiler enforces generic constraints at call sites.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your understanding of generic type parameters and constraints.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can write reusable generic functions, interfaces, and classes with constraints instead of resorting to any.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Write a generic function to pick a random element from an array of any type T.</li>
+    <li>Create an interface PaginatedResponse<T> with items: T[], total: number, page: number.</li>
+    <li>Implement a generic key-value store class with set<K, V> and get<K, V>.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Official TypeScript Handbook, *Generics* (typescriptlang.org).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Given function identity<T>(arg: T): T { return arg; }, what is the inferred return type of identity(\"hello\")?",
+    a: ["string (or literal \"hello\")","any","unknown","T"],
+    c: 0,
+    why: "TypeScript captures T as 'hello' or string from the argument and preserves it as the return type."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Generic Parameter <T>",
+            "lines": [
+                  "function first<T>(arr: T[]): T",
+                  "T adapts to whatever array is passed"
+            ]
+      },
+      {
+            "title": "Constrained Generic",
+            "lines": [
+                  "<T extends HasId>",
+                  "Guarantees item has .id property",
+                  "Rejects incompatible shapes"
+            ]
+      },
+      {
+            "title": "Generic Interface",
+            "lines": [
+                  "interface ApiResponse<Data> {",
+                  "  status: number;",
+                  "  data: Data;",
+                  "}"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "function getLength<T extends { length: number }>(val: T): number {",
+      "  return val.length;",
+      "}",
+      "getLength('hello'); // valid: string has .length",
+      "getLength([1, 2, 3]); // valid: array has .length",
+      "// getLength(123); // Error: Argument of type 'number' is not assignable to parameter of type '{ length: number }'"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "constraint": "T must have property 'length: number'"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "test_string": "'hello'.length exists (T = string)"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "test_array": "[1, 2, 3].length exists (T = number[])"
+            }
+      },
+      {
+            "line": 5,
+            "vars": {
+                  "compiler_error": "TS2345: number does not satisfy { length: number }"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Type parameters in generics are enclosed in angle brackets: <<0>>.",
+      "To constrain a generic parameter to a specific interface, use the <1> keyword.",
+      "A generic interface wrapping API data is often written as ApiResponse<<2>>."
+],
+    blanks: [
+      {
+            "a": [
+                  "T"
+            ],
+            "why": "T is the standard placeholder for a type parameter."
+      },
+      {
+            "a": [
+                  "extends"
+            ],
+            "why": "extends restricts a generic parameter."
+      },
+      {
+            "a": [
+                  "T",
+                  "Data"
+            ],
+            "why": "T or Data parameterizes the response payload."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the primary advantage of using a generic function over a function accepting 'any'?",
+      a: ["Generics preserve the specific type information of the input, maintaining full static type safety","Generics execute faster in the browser's JavaScript runtime","Generics allow the function to accept only strings and numbers","Generics convert all arguments into JSON strings automatically"],
+      c: 0,
+      why: "Generics capture and retain the caller's specific type throughout the function's return and usage."
+    },
+    {
+      q: "What does '<T extends { id: string }>' mean in a generic function declaration?",
+      a: ["T can be any type as long as it has at least a string property named 'id'","T must be an instance of class Id","T will be renamed to id during compilation","T is optional and defaults to string"],
+      c: 0,
+      why: "'extends' establishes a constraint: whatever type replaces T must satisfy the shape { id: string }."
+    },
+    {
+      q: "Can a generic function have more than one type parameter (e.g. <T, U>)?",
+      a: ["Yes, you can declare as many comma-separated type parameters as needed","No, TypeScript strictly limits generic declarations to a single type parameter T","Yes, but only if one of them is a number","No, multiple parameters require using any"],
+      c: 0,
+      why: "Generics can accept multiple type parameters, such as <Key, Value> or <T, U>."
+    },
+    {
+      q: "If you call 'first([1, 2, 3])' on 'function first<T>(arr: T[]): T', what is T inferred as?",
+      a: ["number","number[]","any","Array<T>"],
+      c: 0,
+      why: "Because an array of numbers is passed, T[] matches number[], inferring T = number."
+    }
+  ]);
+</script>
+</body>
+</html>

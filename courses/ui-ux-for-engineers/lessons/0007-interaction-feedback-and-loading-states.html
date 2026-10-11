@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 07 — Interaction Feedback, Skeletons & Latency</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="ui-ux-for-engineers" data-lesson="7" data-lesson-id="interaction-feedback-and-loading-states">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 07</span> · Feedback, Micro-Interactions & Usability Testing</span>
+
+  <h1 class="lesson-title">Interaction Feedback, Skeletons & Latency</h1>
+  <p class="lesson-lede">
+    Slow network responses make apps feel broken. Master skeleton screens, optimistic UI, and the psychological perception of speed.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Design resilient loading states, skeleton screens, and optimistic UI to optimize perceived performance</span>
+    <span><b>Mission link</b> Make web applications feel fast, responsive, and trustworthy even over sluggish network connections</span>
+  </div>
+
+  <h2><span class="n">1</span>The psychology of waiting: Latency thresholds</h2>
+  <p>How fast does software need to feel? Decades of human-computer interaction (HCI) research define three critical time limits:</p><ul><li><b>&lt; 100 milliseconds:</b> Perceived as instantaneous. Direct tactile feedback (button depression, hover states, toggles) must happen within 100ms.</li><li><b>100ms to 1 second:</b> The user notices a slight delay, but feels in control. A subtle loading spinner or progress bar is recommended.</li><li><b>&gt; 1 second:</b> The user's focus wavers. Without feedback, users assume the app crashed, click the button again, or close the tab.</li><li><b>&gt; 10 seconds:</b> Complete task abandonment.</li></ul>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Respond within 100ms for tactile feedback; provide immediate loading indicators for any operation exceeding 1 second.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Optimistic UI and Empty States</h2>
+  <p>To make apps feel blazing fast, use <b>Optimistic UI</b>: when a user clicks 'Like' or sends a chat message, update the screen immediately (assume success). Send the network request in the background. If the request fails, revert the state and display an error alert.</p><p>Never forget <b>Empty States</b>: when a user has no messages, orders, or saved items, do not display a barren blank screen. Use an illustration, friendly copy, and a clear primary button directing them how to get started.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing skeleton loading transition</h2>
+  <p>Trace how skeleton screens transition seamlessly into real data without jarring layout shifts.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your understanding of interaction feedback, latency perception, and loading states.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can design responsive loading states, eliminate perceived latency with optimistic UI, and craft engaging empty states.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Replace a generic loading spinner on a card grid with an animated CSS skeleton screen.</li>
+    <li>Implement an optimistic UI toggle button that rolls back on simulated network failure.</li>
+    <li>Design an engaging empty state with an icon, explanatory copy, and a Call-To-Action button.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Jakob Nielsen: *Response Times: The 3 Important Limits* (nngroup.com).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "How does a 'skeleton screen' differ from a traditional spinning spinner?",
+    a: ["A skeleton screen displays a low-fidelity gray wireframe of the layout, reducing perceived wait time by preparing the user for where content will appear","Skeleton screens use 3D graphics","Skeleton screens only appear on Halloween","Skeleton screens make the network download 50% faster"],
+    c: 0,
+    why: "Skeletons give immediate visual structure, shifting attention to incoming content and making load times feel shorter."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Immediate Feedback",
+            "lines": [
+                  "Click 'Like' button",
+                  "Heart turns red instantly (<10ms)",
+                  "Optimistic UI!"
+            ]
+      },
+      {
+            "title": "Background Network",
+            "lines": [
+                  "POST /api/like in transit",
+                  "User continues scrolling seamlessly",
+                  "Zero perceived latency"
+            ]
+      },
+      {
+            "title": "Error Rollback",
+            "lines": [
+                  "Network 500 error?",
+                  "Heart reverts to gray",
+                  "Toast alert: 'Action failed. Tap to retry.'"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "1. Component mounts: data is null; isLoading = true",
+      "2. Render: <div class='skeleton-card'><div class='skeleton-avatar'></div><div class='skeleton-line'></div></div>",
+      "3. User perceives immediate layout geometry and shimmering pulse animation",
+      "4. Network response arrives in 400ms",
+      "5. Skeleton replaced with real image and title; zero cumulative layout shift (CLS)!"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "initial_state": "Loading initiated"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "visual_feedback": "Skeleton wireframe occupies identical dimensions as future content"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "network_resolution": "Data arrives"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "seamless_reveal": "Instant replacement with zero layout jump"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The latency threshold perceived as instantaneous by human brain perception is <0> milliseconds.",
+      "Updating the UI before server confirmation arrives is called <1> UI.",
+      "A wireframe placeholder mimicking content layout while data loads is a <2> screen."
+],
+    blanks: [
+      {
+            "a": [
+                  "100"
+            ],
+            "why": "Under 100ms feels instantaneous."
+      },
+      {
+            "a": [
+                  "optimistic"
+            ],
+            "why": "Optimistic UI assumes network success."
+      },
+      {
+            "a": [
+                  "skeleton"
+            ],
+            "why": "Skeleton screens reduce perceived latency."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why are skeleton screens psychologically superior to spinning loading spinners?",
+      a: ["They set visual expectations of the layout and give the impression that content is actively arriving, making wait times feel shorter","They reduce the amount of RAM consumed by the browser","They prevent the browser from timing out","They compress the data being downloaded"],
+      c: 0,
+      why: "Skeletons focus attention on content progress rather than a waiting indicator, reducing perceived duration."
+    },
+    {
+      q: "What is the defining characteristic of 'Optimistic UI'?",
+      a: ["The interface immediately reflects the expected successful outcome of an action before the server network request completes","The interface displays inspirational quotes to users","The interface only works when the user is smiling","The interface assumes that errors can never occur"],
+      c: 0,
+      why: "Optimistic UI eliminates perceived network latency by updating instantly and rolling back only if errors occur."
+    },
+    {
+      q: "What is an 'empty state' in interface design?",
+      a: ["The screen displayed when there is no user data to show (e.g. fresh account with no projects or an empty cart)","A screen that has crashed completely","A deleted database table","A form with missing required fields"],
+      c: 0,
+      why: "Empty states guide first-time or zero-data users on how to populate the screen and take their first action."
+    },
+    {
+      q: "What happens if a user clicks a button and receives zero visual feedback for 2 full seconds?",
+      a: ["They assume the click was not registered and repeatedly click the button, triggering duplicate requests or rage-quits","They assume the server is working at optimal speed","The browser automatically zooms in","The mouse cursor turns into an hourglass automatically"],
+      c: 0,
+      why: "Without immediate feedback within 100–300ms, users perceive the app as unresponsive and click repeatedly."
+    }
+  ]);
+</script>
+</body>
+</html>

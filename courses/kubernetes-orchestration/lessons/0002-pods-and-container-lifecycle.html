@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 02 — Pods & Container Lifecycle Management</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="kubernetes-orchestration" data-lesson="2" data-lesson-id="pods-and-container-lifecycle">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 02</span> · Cluster Architecture & Core Primitives</span>
+
+  <h1 class="lesson-title">Pods & Container Lifecycle Management</h1>
+  <p class="lesson-lede">
+    You do not run containers directly in Kubernetes; you run Pods. Understand why containers share localhost and volumes.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Write Pod manifests, use multi-container patterns (sidecars), and diagnose container lifecycle states</span>
+    <span><b>Mission link</b> Diagnose CrashLoopBackOff, OOMKilled, and image pull failures rapidly</span>
+  </div>
+
+  <h2><span class="n">1</span>Why Pods instead of bare containers?</h2>
+  <p>A <b>Pod</b> is the atomic unit of scheduling in Kubernetes. While most pods contain just one container, a pod can host multiple tightly coupled containers that share:</p><ul><li><b>Network namespace:</b> All containers in a pod share the same IP address and port space; they communicate with each other over <code>localhost</code>.</li><li><b>Storage volumes:</b> Containers in the same pod can mount shared volumes to exchange files.</li><li><b>IPC namespace:</b> Shared POSIX shared memory or signals.</li></ul>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Containers in the same pod share an IP address and communicate with each other over localhost.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Init containers and sidecars</h2>
+  <p>Pods support two important architectural patterns:</p><ul><li><b>Init Containers:</b> Run sequentially to completion <i>before</i> app containers start (ideal for database migrations, waiting for dependencies, or fetching secrets).</li><li><b>Sidecar Containers:</b> Run in parallel alongside the main application to handle cross-cutting concerns like log shipping (Fluentd) or proxying (Envoy / Istio).</li></ul>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing common pod failure states</h2>
+  <p>Trace how Kubernetes reflects container failure modes in the pod status.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your understanding of Pod structures and container lifecycles.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can write multi-container pod manifests and diagnose the exact cause of CrashLoopBackOff and OOMKilled errors.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Create a multi-container pod where a sidecar writes HTML to a shared emptyDir volume read by Nginx.</li>
+    <li>Trigger an intentional CrashLoopBackOff by running a container with exit 1 and inspect kubectl describe pod.</li>
+    <li>Add an initContainer that uses netcat to wait for a database port before the web server starts.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Kubernetes Documentation: *Pods* and *Pod Lifecycle*.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What happens if two containers in the same Pod both attempt to listen on TCP port 8080?",
+    a: ["One container fails to start with a 'port already in use' error, because they share the same network namespace","Kubernetes automatically assigns container 2 to port 8081","Traffic is automatically load-balanced between both containers","The pod is split into two separate pods automatically"],
+    c: 0,
+    why: "Because containers in a pod share a single IP and network namespace, port collisions occur on localhost."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Pod Boundary (10.244.1.45)",
+            "lines": [
+                  "Shared IP & Network Namespace",
+                  "Shared localhost port space"
+            ]
+      },
+      {
+            "title": "App Container",
+            "lines": [
+                  "Main web application",
+                  "Port 3000"
+            ]
+      },
+      {
+            "title": "Sidecar Container",
+            "lines": [
+                  "Log shipper / Metric exporter",
+                  "Reads shared volume / localhost:3000"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "State 1: ImagePullBackOff -> Registry authentication failed or tag does not exist",
+      "State 2: CrashLoopBackOff -> Container process exited with non-zero exit code repeatedly",
+      "State 3: OOMKilled (Exit Code 137) -> Container consumed more memory than resources.limits.memory",
+      "State 4: Pending -> No worker node has enough allocatable CPU/RAM to schedule the pod"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "check": "kubectl describe pod reveals failed pull events"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "debug_command": "kubectl logs <pod> --previous shows application fatal crash"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "root_cause": "Linux cgroup memory killer terminated container (128 + 9 = 137)"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "resolution": "Add more worker nodes or adjust resource requests"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Containers in the same pod communicate with each other over <0>.",
+      "Containers that must finish executing before app containers launch are <1> containers.",
+      "When a container is terminated for exceeding memory limits, its reason is <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "localhost"
+            ],
+            "why": "Containers share the pod network namespace."
+      },
+      {
+            "a": [
+                  "init"
+            ],
+            "why": "initContainers run sequentially prior to application start."
+      },
+      {
+            "a": [
+                  "OOMKilled"
+            ],
+            "why": "Out-Of-Memory killed indicates memory limit violation."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What do all containers within the same Pod share?",
+      a: ["The same IP address, network namespace, and storage volume mounts","The same root filesystem and disk binaries","The same CPU cores exclusively","The same operating system environment variables"],
+      c: 0,
+      why: "Pods share network and IPC namespaces and can share volumes, but container filesystems remain isolated."
+    },
+    {
+      q: "What does the pod status 'CrashLoopBackOff' indicate?",
+      a: ["The container started, crashed with an error, and Kubernetes is waiting with exponential backoff before restarting it","The Docker image could not be downloaded from the registry","The Kubernetes worker node ran out of disk space","The pod was evicted due to high network latency"],
+      c: 0,
+      why: "CrashLoopBackOff means the application process keeps exiting immediately on startup."
+    },
+    {
+      q: "What does an exit code of 137 on a container signify?",
+      a: ["The container was killed by the OS (SIGKILL) because it exceeded its allocated memory limit (OOMKilled)","The container successfully completed all tasks and exited cleanly","The YAML syntax of the pod manifest was invalid","The network cable was unplugged from the server"],
+      c: 0,
+      why: "Exit code 137 corresponds to 128 + 9 (SIGKILL), the standard termination signal for OOMKilled processes."
+    },
+    {
+      q: "When do 'initContainers' run in the pod lifecycle?",
+      a: ["Sequentially in order, and each must exit successfully before standard application containers start","In parallel with the main application continuously","Only when the pod is shutting down","Whenever an HTTP request fails"],
+      c: 0,
+      why: "initContainers run to completion one-by-one before any application container is launched."
+    }
+  ]);
+</script>
+</body>
+</html>

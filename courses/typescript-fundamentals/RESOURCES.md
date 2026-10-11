@@ -1,13 +1,10 @@
 # Resources — TypeScript Fundamentals
 
 ## Knowledge (primary sources)
+- Official TypeScript Handbook (typescriptlang.org/docs).
+- *Programming TypeScript* by Boris Cherny (O'Reilly).
+- *Effective TypeScript* by Dan Vanderkam (O'Reilly).
+- Matt Pocock's Total TypeScript tutorials and workshops.
 
-- Title — author — why it is trustworthy. (Used by lesson "Primary source" notes.)
-
-## Wisdom (practitioner insight)
-
-- Source — the judgement it offers that a textbook does not.
-
-## Gaps
-
-- What no source covers well, and how you will fill it.
+## Wisdom
+- Types in TypeScript describe the shape of values, not their runtime identity. Types vanish at runtime; only JavaScript remains.

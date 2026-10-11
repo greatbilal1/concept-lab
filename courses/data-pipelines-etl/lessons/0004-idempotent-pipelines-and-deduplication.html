@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 04 — Idempotency & Deduplication</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="data-pipelines-etl" data-lesson="4" data-lesson-id="idempotent-pipelines-and-deduplication">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 04</span> · Batch Processing & Transformations</span>
+
+  <h1 class="lesson-title">Idempotency & Deduplication</h1>
+  <p class="lesson-lede">
+    If a nightly pipeline crashes halfway through, running it again must not create duplicate payments or skewed revenue numbers.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Design idempotent pipeline tasks and write deduplicating upsert/merge queries</span>
+    <span><b>Mission link</b> Prevent double-counting revenue and corrupting business metrics during pipeline retries</span>
+  </div>
+
+  <h2><span class="n">1</span>The principle of pipeline idempotency</h2>
+  <p>In distributed data engineering, failure is inevitable. Servers run out of memory, network connections drop, and upstream APIs return HTTP 503. The standard response is to <b>retry the failed job</b>.</p><p>However, if your pipeline task simply executes <code>INSERT INTO revenue SELECT * FROM staging</code>, running the job twice doubles every sales record! An <b>idempotent pipeline</b> guarantees that running a task once, twice, or ten times on the same input produces the <i>exact same final state</i>.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    An idempotent data pipeline can be safely retried after a failure without producing duplicate records or state corruption.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Idempotent patterns: Overwrite and Merge</h2>
+  <p>Two common strategies guarantee idempotency in data pipelines:</p><ul><li><b>Delete-Insert / Overwrite:</b> Partition by date (e.g. <code>2026-05-12</code>). Before loading, wipe that partition or run <code>INSERT OVERWRITE</code>. Any retry cleanly replaces the partition.</li><li><b>Upsert (MERGE):</b> Use a unique primary key (e.g. <code>order_id</code>). Match against existing rows: update if the timestamp is newer, insert if the ID is missing.</li></ul>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing idempotent MERGE execution</h2>
+  <p>Trace how a MERGE operation handles updates and avoids duplicate inserts upon retries.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your mastery of pipeline idempotency and deduplication patterns.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can design self-healing pipelines that can be safely retried without human intervention or data corruption.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Write an idempotent SQL MERGE query that upserts customer updates based on updated_at timestamps.</li>
+    <li>Implement a partition-overwrite pipeline task in Python/SQL for a daily reporting table.</li>
+    <li>Explain why UUID generation inside a transformation step breaks pipeline idempotency.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Maxime Beauchemin (Creator of Apache Airflow): *Functional Data Engineering — a modern way of thinking about data pipelines*.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Which SQL command is inherently idempotent when loading data into a partition?",
+    a: ["INSERT OVERWRITE TABLE daily_sales PARTITION (date='2026-05-12') SELECT ...","INSERT INTO daily_sales SELECT ...","UPDATE daily_sales SET count = count + 1","ALTER TABLE daily_sales ADD COLUMN extra_count INT"],
+    c: 0,
+    why: "INSERT OVERWRITE replaces the target partition completely, ensuring re-runs cleanly replace previous partial attempts."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Non-Idempotent Run",
+            "lines": [
+                  "INSERT INTO sales",
+                  "Runs twice -> 200 rows",
+                  "Duplicates & corrupted totals!"
+            ]
+      },
+      {
+            "title": "Idempotent MERGE",
+            "lines": [
+                  "MERGE INTO sales USING staging",
+                  "ON sales.id = staging.id",
+                  "Match: UPDATE | Absent: INSERT"
+            ]
+      },
+      {
+            "title": "Result after 5 runs",
+            "lines": [
+                  "Exactly 100 rows",
+                  "Zero duplicates",
+                  "Consistent, trustworthy metrics"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "Target table contains: { id: 101, status: 'PENDING' }",
+      "Batch run 1 processes: { id: 101, status: 'SHIPPED' }, { id: 102, status: 'NEW' }",
+      "MERGE updates id 101 to 'SHIPPED'; inserts id 102 as 'NEW'",
+      "Network drops! Orchestrator automatically retries Batch run 1",
+      "MERGE re-evaluates: id 101 updated to 'SHIPPED'; id 102 updated to 'NEW'; 0 duplicates added"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "initial_state": "1 row in target"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "first_execution": "Target now has 2 rows"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "retry_event": "Identical batch re-executed"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "final_state": "Still exactly 2 rows; zero duplicates created"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The property where repeated execution produces the same result is <0>.",
+      "The atomic SQL statement that combines insert and update is <1>.",
+      "Replacing an entire date partition on re-runs is achieved via INSERT <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "idempotence",
+                  "idempotency"
+            ],
+            "why": "Idempotency prevents duplicate state."
+      },
+      {
+            "a": [
+                  "MERGE"
+            ],
+            "why": "MERGE executes upsert logic."
+      },
+      {
+            "a": [
+                  "OVERWRITE"
+            ],
+            "why": "INSERT OVERWRITE replaces partition contents."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why is a plain 'INSERT INTO table SELECT ...' operation dangerous in a scheduled automated pipeline?",
+      a: ["If the pipeline job fails halfway and retries, it inserts duplicate rows for every record already written","It locks the database table for 24 hours","It permanently deletes all previous data in the table","It causes an Out-Of-Memory error on the client"],
+      c: 0,
+      why: "Non-idempotent INSERT statements append duplicate rows whenever a task is retried."
+    },
+    {
+      q: "What does an idempotent pipeline task guarantee?",
+      a: ["Executing the task multiple times with the same input produces the exact same end state as executing it once","The task executes in under 1 millisecond","The task never uses disk storage","The task runs on all cloud providers simultaneously"],
+      c: 0,
+      why: "Idempotency guarantees that re-running tasks creates zero duplicate records or unexpected side effects."
+    },
+    {
+      q: "How does the 'INSERT OVERWRITE' pattern achieve idempotency in partitioned data lakes?",
+      a: ["It atomicaly replaces the specific target partition directory, wiping old data before writing the new results","It encrypts the partition with a new secret key","It converts all strings to uppercase","It prevents any user from querying the table forever"],
+      c: 0,
+      why: "Replacing the partition contents completely ensures that retries simply overwrite previous partial attempts."
+    },
+    {
+      q: "Why does generating random UUIDs or calling CURRENT_TIMESTAMP() inside a transformation violate idempotency?",
+      a: ["Every retry produces different values, creating differing outputs for identical historical inputs","UUIDs cannot be indexed in SQL databases","CURRENT_TIMESTAMP() slows down CPU processing","Databases do not support UUID generation"],
+      c: 0,
+      why: "Non-deterministic functions generate different results on each re-run, breaking deterministic repeatability."
+    }
+  ]);
+</script>
+</body>
+</html>

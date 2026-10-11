@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 06 — Plan Lifecycle & Drift Detection</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="infrastructure-as-code" data-lesson="6" data-lesson-id="state-drift-and-plan-lifecycle">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 06</span> · Drift Detection, CI/CD & Security</span>
+
+  <h1 class="lesson-title">Plan Lifecycle & Drift Detection</h1>
+  <p class="lesson-lede">
+    What happens when an engineer modifies a security group manually in the cloud console? Learn how Terraform detects and reconciles drift.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Detect infrastructure drift with terraform plan and safely reconcile discrepancies without downtime</span>
+    <span><b>Mission link</b> Maintain 100% fidelity between your Git codebase and live cloud deployments</span>
+  </div>
+
+  <h2><span class="n">1</span>The three-way merge: Code vs State vs Reality</h2>
+  <p>Whenever you execute <code>terraform plan</code>, Terraform performs a sophisticated three-way reconciliation:</p><ul><li><b>Code:</b> What your HCL manifests declare.</li><li><b>State:</b> What Terraform previously recorded in <code>terraform.tfstate</code>.</li><li><b>Reality:</b> The actual live resources queried right now via cloud APIs.</li></ul><p>First, Terraform runs a <b>refresh</b> step, querying cloud APIs to update its in-memory view of Reality. It compares Reality to Code and calculates the exact surgical steps required to restore compliance.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Terraform plan refreshes live reality, compares it to declared code, and computes the restorative plan.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Importing existing resources into Terraform</h2>
+  <p>What if you have existing cloud resources created before you adopted Terraform? You use the <code>import</code> block (or <code>terraform import</code> command).</p><p>Importing attaches an existing cloud resource ID (e.g. <code>i-0123456789abcdef0</code>) to a declared resource block in your code, recording it in the state file without recreating it.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing drift detection and remediation</h2>
+  <p>Trace how running terraform apply eliminates unauthorized console changes.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your understanding of drift detection, plan lifecycles, and resource importing.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can detect unauthorized cloud modifications, audit drift, and import legacy resources into IaC safely.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Manually change a tag on an S3 bucket in the cloud console and run terraform plan to observe drift.</li>
+    <li>Import an existing unmanaged resource into your configuration using the modern import block.</li>
+    <li>Set up a scheduled cron job that runs terraform plan -detailed-exitcode to alert on drift.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    HashiCorp Terraform Documentation: *Detecting Drift* and *Import*.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "If an engineer manually deletes a cloud EC2 instance directly from the AWS console, what will 'terraform plan' propose?",
+    a: ["It detects the instance is missing in reality and plans to create a brand new instance to restore desired state","It removes the instance from the HCL code automatically","It crashes with a MissingResourceException","It deletes the entire VPC"],
+    c: 0,
+    why: "Terraform's job is to enforce desired state: if an object is missing in reality, it plans to recreate it."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1. Code (HCL)",
+            "lines": [
+                  "aws_security_group 'web'",
+                  "port: 443 only"
+            ]
+      },
+      {
+            "title": "2. Live Cloud Reality",
+            "lines": [
+                  "Port 443 + Port 22 (SSH)",
+                  "Manual rogue rule added in console!"
+            ]
+      },
+      {
+            "title": "3. Drift Plan Output",
+            "lines": [
+                  "~ aws_security_group.web",
+                  "- ingress rule: port 22 (destroy)",
+                  "Restores declared security posture"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "1. Rogue admin opens port 22 to 0.0.0.0/0 in AWS web console",
+      "2. Scheduled daily CI job runs: terraform plan -detailed-exitcode",
+      "3. Plan detects drift: exit code 2 (drift detected)",
+      "4. CI triggers alert: Slack message sent to security team",
+      "5. terraform apply runs: Rogue port 22 rule revoked; security restored"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "drift_introduced": "Out-of-band console change"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "detection": "Cloud API refresh discovers untracked port 22 rule"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "remediation": "Apply brings reality back into 100% compliance with Git"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Updating the in-memory state by querying live cloud APIs is called a state <0>.",
+      "Bringing existing unmanaged cloud resources under Terraform control is resource <1>.",
+      "The CLI flag that makes plan return exit code 2 when drift is found is -detailed-exit<2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "refresh"
+            ],
+            "why": "refresh syncs state with live reality."
+      },
+      {
+            "a": [
+                  "import"
+            ],
+            "why": "import binds existing resources."
+      },
+      {
+            "a": [
+                  "code"
+            ],
+            "why": "-detailed-exitcode enables CI drift detection."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What does 'terraform plan -detailed-exitcode' return when configuration drift is detected?",
+      a: ["Exit code 2 (indicating differences exist between code and reality)","Exit code 0","Exit code 1","Exit code 137"],
+      c: 0,
+      why: "Exit code 0 means no changes; 1 means error; 2 means diff/drift detected (useful for automated CI alerts)."
+    },
+    {
+      q: "How does modern Terraform (v1.5+) import existing resources into management?",
+      a: ["Using the declarative 'import' block specifying the resource address and cloud ID","By uploading screenshots of the AWS console to Terraform Cloud","By rebooting the cloud provider's regional datacenter","By writing raw JSON directly into the binary provider file"],
+      c: 0,
+      why: "Terraform 1.5+ introduced the declarative import { to = ... id = ... } syntax."
+    },
+    {
+      q: "If an engineer modifies a server's tags in the cloud console, and code has no tags declared, what does apply do?",
+      a: ["It strips away the manual tags in the cloud to make reality match the empty code declaration","It updates the local .tf file to add the tags","It leaves the tags alone forever","It creates a second server with no tags"],
+      c: 0,
+      why: "Terraform enforces code: if the code does not declare those tags, it removes them to restore code conformity."
+    },
+    {
+      q: "Why is automated scheduled drift detection recommended in production enterprise environments?",
+      a: ["To catch accidental manual console edits or emergency hotfixes that were never committed to Git","To speed up database query performance","To check if engineers are logged into their laptops","To automatically generate invoices for clients"],
+      c: 0,
+      why: "Automated drift detection ensures emergency hotfixes or accidental changes are identified and committed."
+    }
+  ]);
+</script>
+</body>
+</html>

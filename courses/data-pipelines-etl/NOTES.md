@@ -1,15 +1,5 @@
 # Notes — Data Pipelines & ETL
 
-Authoring decisions and open questions. Append as you go; never rewrite history.
-
 ## Decisions
-
-- (date) Decision and the reason for it.
-
-## Open questions
-
-- Question that still needs an answer.
-
-## Known gaps
-
-- Something the course does not yet cover.
+- Group into four themes: Ingestion Architecture, Batch & Idempotency, Storage & Orchestration, and Streaming & Quality.
+- Ground explanations in distributed commit logs, columnar storage efficiencies, and idempotent pipeline design.

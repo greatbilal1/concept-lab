@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 02 — Terraform Architecture & Workflow</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="infrastructure-as-code" data-lesson="2" data-lesson-id="terraform-providers-and-resources">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 02</span> · Terraform Primitives, Providers & State</span>
+
+  <h1 class="lesson-title">Terraform Architecture & Workflow</h1>
+  <p class="lesson-lede">
+    Terraform connects to hundreds of clouds via plugins called providers. Learn the core syntax and CLI lifecycle.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Write provider and resource blocks in HCL and navigate the init, plan, apply, and destroy workflow</span>
+    <span><b>Mission link</b> Provision cloud infrastructure cleanly using the industry-standard HashiCorp Configuration Language (HCL)</span>
+  </div>
+
+  <h2><span class="n">1</span>The Terraform architecture: Core + Plugins</h2>
+  <p>Terraform is divided into two parts:</p><ul><li><b>Terraform Core:</b> The open-source engine that parses HCL code, builds the directed acyclic graph (DAG) of resource dependencies, and computes plans.</li><li><b>Providers (Plugins):</b> Independent binary executables (e.g. AWS, GCP, Azure, GitHub, Cloudflare, Kubernetes) that translate Terraform resource requests into real REST API calls.</li></ul><p>When you run <code>terraform init</code>, Terraform inspects your provider requirements and downloads the matching provider binaries.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Terraform Core calculates dependencies and plans; Providers make the actual vendor-specific API calls.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The four core workflow commands</h2>
+  <p>Mastering Terraform requires mastering the four primary lifecycle commands:</p><ul><li><code>terraform init:</code> Downloads provider plugins and initializes the state backend.</li><li><code>terraform plan:</code> Compares code against live state and displays a non-destructive preview of changes.</li><li><code>terraform apply:</code> Prompts for confirmation and executes the changes against cloud APIs.</li><li><code>terraform destroy:</code> Safely tears down and deletes all resources tracked by the state file.</li></ul>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing HCL resource declaration and dependency</h2>
+  <p>Trace how Terraform automatically infers dependencies when one resource references another.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your mastery of Terraform architecture, providers, and workflow commands.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You understand Terraform's plugin architecture and can execute the standard init, plan, and apply lifecycle.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Initialize a project with the local provider (local_file) and create a test file using terraform apply.</li>
+    <li>Inspect the hidden .terraform directory created after running terraform init.</li>
+    <li>Generate a dependency graph image using terraform graph | dot -Tpng > graph.png.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    HashiCorp Terraform Documentation: *The Core Workflow*.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What happens if you run 'terraform plan' in a directory before running 'terraform init'?",
+    a: ["It fails with an error stating that providers and backend are not initialized","It automatically downloads all providers silently","It runs the plan against local mock servers","It deletes the current directory"],
+    c: 0,
+    why: "terraform init is mandatory to download provider plugins and configure the backend before running plans."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "1. terraform init",
+            "lines": [
+                  "Downloads plugins (AWS, Azure)",
+                  "Configures state storage"
+            ]
+      },
+      {
+            "title": "2. terraform plan",
+            "lines": [
+                  "Refreshes live state",
+                  "Computes additions / changes",
+                  "Zero infrastructure mutations"
+            ]
+      },
+      {
+            "title": "3. terraform apply",
+            "lines": [
+                  "Executes cloud API calls",
+                  "Updates terraform.tfstate",
+                  "Live resources created"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "resource 'aws_vpc' 'main' { cidr_block = '10.0.0.0/16' }",
+      "resource 'aws_subnet' 'web' {",
+      "  vpc_id     = aws_vpc.main.id # Implicit dependency!",
+      "  cidr_block = '10.0.1.0/24'",
+      "}"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "resource_1": "aws_vpc.main defined"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "dependency": "aws_subnet.web references aws_vpc.main.id"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "dag_graph": "Terraform enforces creation order: VPC created first, then Subnet"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The plugin that talks to a specific cloud provider's API is a <0>.",
+      "The command that downloads provider binaries and configures the backend is terraform <1>.",
+      "The command that previews changes without making any cloud modifications is terraform <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "provider"
+            ],
+            "why": "Providers translate HCL to API calls."
+      },
+      {
+            "a": [
+                  "init"
+            ],
+            "why": "terraform init sets up dependencies."
+      },
+      {
+            "a": [
+                  "plan"
+            ],
+            "why": "terraform plan generates a non-destructive diff."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the function of a Terraform Provider?",
+      a: ["It is a plugin that translates Terraform configuration blocks into REST API calls for a specific service or cloud","It provides free electricity to cloud data centers","It encrypts Git commits before pushing to GitHub","It runs automated unit tests inside Docker containers"],
+      c: 0,
+      why: "Providers bridge Terraform Core with cloud vendor APIs like AWS, GCP, Azure, and Datadog."
+    },
+    {
+      q: "Why is 'terraform plan' an essential step before running 'terraform apply'?",
+      a: ["It allows engineers to review the exact resources to be created, modified, or destroyed before any mutations occur","It converts HCL into Python scripts","It benchmarks CPU performance on the local machine","It deletes old backup files from S3"],
+      c: 0,
+      why: "terraform plan generates a safe, non-destructive preview of proposed infrastructure changes."
+    },
+    {
+      q: "How does Terraform determine the order in which to create resources?",
+      a: ["It builds a Directed Acyclic Graph (DAG) by tracing references between resources","It creates resources in strict top-to-bottom order as written in the .tf file","It creates all resources simultaneously in parallel without ordering","It sorts resources alphabetically by resource name"],
+      c: 0,
+      why: "Terraform parses property references (e.g. subnet referencing vpc.id) to construct an execution dependency graph."
+    },
+    {
+      q: "What does 'terraform destroy' do?",
+      a: ["It terminates and removes all cloud resources tracked in the current state file","It formats the local computer's hard drive","It deletes the Git commit history","It cancels your cloud provider billing account"],
+      c: 0,
+      why: "terraform destroy cleanly tears down all infrastructure provisioned by the current configuration."
+    }
+  ]);
+</script>
+</body>
+</html>

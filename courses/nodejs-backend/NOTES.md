@@ -1,15 +1,5 @@
 # Notes — Node.js & Backend JavaScript
 
-Authoring decisions and open questions. Append as you go; never rewrite history.
-
 ## Decisions
-
-- (date) Decision and the reason for it.
-
-## Open questions
-
-- Question that still needs an answer.
-
-## Known gaps
-
-- Something the course does not yet cover.
+- Group into four themes: Runtime Architecture, Streams & Buffers, HTTP & Middleware, and Production & Scaling.
+- Ground explanations in libuv thread pool mechanics, single-threaded concurrency trade-offs, and memory backpressure.

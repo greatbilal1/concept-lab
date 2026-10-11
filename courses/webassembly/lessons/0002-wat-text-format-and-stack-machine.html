@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 02 — WAT & The Stack Machine</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="webassembly" data-lesson="2" data-lesson-id="wat-text-format-and-stack-machine">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 02</span> · Wasm Architecture & Stack VM</span>
+
+  <h1 class="lesson-title">WAT & The Stack Machine</h1>
+  <p class="lesson-lede">
+    WebAssembly is binary, but it has a human-readable counterpart: WAT. Learn how stack operations push and pop operands.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Read and write WebAssembly Text format (WAT) and understand stack-based bytecode evaluation</span>
+    <span><b>Mission link</b> Understand the raw execution model underpinning every compiled Wasm module</span>
+  </div>
+
+  <h2><span class="n">1</span>The stack machine paradigm</h2>
+  <p>Most modern hardware CPUs are <b>register-based</b> (they operate on named registers like <code>RAX</code>, <code>RBX</code>). WebAssembly is designed as a <b>stack machine</b> because stack bytecode is compact, fast to transmit, and easy to validate.</p><p>In a stack machine, instructions push numbers onto an evaluation stack, operations pop their arguments from the stack, compute the result, and push the result back onto the stack.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    A stack machine pushes values onto an evaluation stack and pops them to compute results.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>WebAssembly Text format (WAT)</h2>
+  <p>Because binary <code>.wasm</code> files are unreadable by humans, the W3C defined <b>WAT (WebAssembly Text Format)</b> using Lisp-style S-expressions (parentheses). The <code>wat2wasm</code> tool from the WABT toolkit compiles WAT text into binary Wasm.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing stack execution for a multiplication function</h2>
+  <p>Trace how operands move on and off the evaluation stack during execution.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your understanding of the WebAssembly stack machine and WAT syntax.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can read and author simple WebAssembly Text modules and explain the stack evaluation process.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Install the WABT toolkit (brew install wabt) and compile a small WAT file using wat2wasm.</li>
+    <li>Write a WAT function that calculates the square of an integer: x * x.</li>
+    <li>Disassemble a compiled .wasm binary back into readable text using wasm2wat.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    MDN Web Docs: *Understanding WebAssembly text format* (developer.mozilla.org).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is the result of executing: i32.const 10, i32.const 20, i32.add?",
+    a: ["The stack contains one element: 30","The stack contains two elements: 10 and 20","An error: stack overflow","The value 1020"],
+    c: 0,
+    why: "i32.const pushes 10 and 20; i32.add pops both, adds them (30), and pushes 30 back onto the stack."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "WAT S-Expression",
+            "lines": [
+                  "(func $add (param $a i32) (param $b i32)",
+                  "  local.get $a",
+                  "  local.get $b",
+                  "  i32.add)"
+            ]
+      },
+      {
+            "title": "wat2wasm Compiler",
+            "lines": [
+                  "Transforms text S-expressions",
+                  "into compact binary opcode stream"
+            ]
+      },
+      {
+            "title": "Binary .wasm",
+            "lines": [
+                  "00 61 73 6d 01 00 00 00",
+                  "Compact 40-byte binary payload"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "local.get $x      ;; Push x (e.g. 5) onto stack  -> Stack: [5]",
+      "local.get $y      ;; Push y (e.g. 4) onto stack  -> Stack: [5, 4]",
+      "i32.mul           ;; Pop 4 and 5, multiply, push -> Stack: [20]",
+      "return            ;; Function returns top of stack: 20"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "stack": "[5]"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "stack": "[5, 4]"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "stack": "[20]"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "result": "20 returned to caller"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The human-readable S-expression format for WebAssembly is <0>.",
+      "The command that pushes a 32-bit constant onto the stack is i32.<1>.",
+      "The CLI tool that converts WAT text files into binary wasm is <2>2wasm."
+],
+    blanks: [
+      {
+            "a": [
+                  "WAT"
+            ],
+            "why": "WebAssembly Text format."
+      },
+      {
+            "a": [
+                  "const"
+            ],
+            "why": "i32.const pushes integer constants."
+      },
+      {
+            "a": [
+                  "wat"
+            ],
+            "why": "wat2wasm compiles WAT to Wasm."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is WAT in the WebAssembly ecosystem?",
+      a: ["The human-readable S-expression text representation of WebAssembly binary code","A testing framework for Node.js","A WebAssembly package manager","A WebAssembly browser extension"],
+      c: 0,
+      why: "WAT (WebAssembly Text) is the standardized text syntax used for authoring and inspecting Wasm."
+    },
+    {
+      q: "How does a stack-based virtual machine evaluate operations like 'i32.sub'?",
+      a: ["It pops the two top values from the stack, subtracts the second popped from the first, and pushes the result onto the stack","It looks up values in CPU registers RAX and RBX","It queries a relational database table","It allocates a new thread in the background"],
+      c: 0,
+      why: "Stack machines pop arguments from the top of the evaluation stack and push the computed result."
+    },
+    {
+      q: "Which tool from the official WABT toolkit converts binary .wasm into human-readable .wat?",
+      a: ["wasm2wat","wat2wasm","wasm-decompile","wasm-strip"],
+      c: 0,
+      why: "wasm2wat disassembles binary bytecode into human-readable WAT format."
+    },
+    {
+      q: "What is the purpose of the '(export \"add\" (func $add))' instruction in WAT?",
+      a: ["It exposes the internal $add function to the JavaScript environment under the name 'add'","It uploads the function to the npm registry","It writes the function to the local hard drive","It makes the function run on every CPU core"],
+      c: 0,
+      why: "export declarations make functions callable from JavaScript host code via instance.exports."
+    }
+  ]);
+</script>
+</body>
+</html>

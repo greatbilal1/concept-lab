@@ -1,15 +1,5 @@
 # Notes — Kubernetes & Orchestration
 
-Authoring decisions and open questions. Append as you go; never rewrite history.
-
 ## Decisions
-
-- (date) Decision and the reason for it.
-
-## Open questions
-
-- Question that still needs an answer.
-
-## Known gaps
-
-- Something the course does not yet cover.
+- Group into four themes: Cluster Architecture, Workloads & Controllers, Networking & Ingress, and Storage & Operations.
+- Emphasize declarative manifests (GitOps) and the continuous control loop reconciliation philosophy.

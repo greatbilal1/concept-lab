@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 08 — Data Quality, Schemas & Observability</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="data-pipelines-etl" data-lesson="8" data-lesson-id="data-quality-monitoring-and-observability">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 08</span> · Streaming, Quality & Idempotency</span>
+
+  <h1 class="lesson-title">Data Quality, Schemas & Observability</h1>
+  <p class="lesson-lede">
+    Silent data corruption is the nightmare of every data team. Implement automated data quality tests, contracts, and observability.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Implement automated data quality assertions and monitor freshness, volume, and schema drift</span>
+    <span><b>Mission link</b> Catch broken upstream data before executives see corrupted metrics on dashboards</span>
+  </div>
+
+  <h2><span class="n">1</span>Silent data corruption: The invisible killer</h2>
+  <p>When software engineers ship a bug, buttons break or servers return HTTP 500. When data engineers ship a bug, nothing crashes: queries finish successfully, but revenue is quietly calculated as negative or user counts are halved.</p><p>This is <b>silent data corruption</b>. By the time someone notices, executives have made strategic business decisions based on fabricated figures. Modern data teams treat data quality like software unit tests, running automated assertions on every pipeline execution.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Silent data corruption does not throw errors; automated data quality tests must validate data correctness at every stage.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Automated quality checks with dbt & Great Expectations</h2>
+  <p>You should never trust data blindly. Frameworks like <b>dbt tests</b> and <b>Great Expectations</b> allow you to define declarative constraints:</p><ul><li><code>unique:</code> Primary keys must have zero duplicate values.</li><li><code>not_null:</code> Critical columns (e.g. <code>customer_id</code>) cannot be empty.</li><li><code>accepted_values:</code> Categorical columns must match approved lists (e.g. <code>['active', 'churned']</code>).</li><li><code>relationships:</code> Foreign keys must exist in parent tables (referential integrity).</li></ul>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing a data quality assertion failure</h2>
+  <p>Trace how an automated test halts downstream pipeline execution upon detecting anomalous data.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your mastery of data quality assertions and data observability.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can implement automated data quality gates, define data contracts, and build comprehensive data observability dashboards.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Add unique and not_null schema tests to a dbt model and run dbt test.</li>
+    <li>Define a Great Expectations test suite asserting that values in a column fall between 0 and 100.</li>
+    <li>Implement a data lineage graph mapping raw source tables to downstream executive dashboards.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Barr Moses, Lior Gavish, Molly Vorwerck, *Data Quality Fundamentals* (O'Reilly).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What are the five pillars of modern data observability?",
+    a: ["Freshness, Volume, Schema, Distribution, and Lineage","CPU, RAM, Disk, Network, and Power","HTML, CSS, JavaScript, Webpack, and React","Password, Username, Token, Cookie, and Session"],
+    c: 0,
+    why: "Data observability tracks whether data arrived on time (freshness), expected row counts (volume), valid types (schema), values (distribution), and dependencies (lineage)."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Raw Data Load",
+            "lines": [
+                  "Staging tables updated",
+                  "100,000 new rows loaded"
+            ]
+      },
+      {
+            "title": "Automated Quality Gate",
+            "lines": [
+                  "Test: user_id is unique",
+                  "Test: order_total >= 0",
+                  "Test: delivery_date is valid"
+            ]
+      },
+      {
+            "title": "Quality Evaluation",
+            "lines": [
+                  "PASSED -> Publish to Production Mart",
+                  "FAILED -> Halt pipeline & trigger PagerDuty!"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "1. Nightly dbt build runs: dbt test --select orders",
+      "2. Test evaluates: assert_positive_revenue: SELECT * FROM orders WHERE total < 0",
+      "3. Query returns 42 rows with negative totals (Bug in upstream mobile app discount logic!)",
+      "4. Test fails with exit code 1; downstream reporting table update is BLOCKED",
+      "5. Alert dispatched to Slack #data-alerts; production dashboard remains protected"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "check_phase": "Automated data testing in progress"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "violation": "42 rows violated positive revenue assertion"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "gate_closed": "Downstream marts shielded from corrupted data"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "notification": "Engineers alerted to triage before stakeholders notice"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The data observability pillar tracking whether data arrived on schedule is <0>.",
+      "Ensuring foreign keys in child tables exist in parent tables is referential <1>.",
+      "A formal specification between producers and consumers defining schemas and SLAs is a data <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "freshness"
+            ],
+            "why": "Freshness monitors data arrival timing."
+      },
+      {
+            "a": [
+                  "integrity"
+            ],
+            "why": "Referential integrity verifies relationships."
+      },
+      {
+            "a": [
+                  "contract"
+            ],
+            "why": "Data contracts establish formal agreements."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why is silent data corruption more dangerous in analytics pipelines than runtime crashes?",
+      a: ["Because no error is thrown, allowing corrupted or fabricated numbers to spread unnoticed into executive decisions","Because it permanently damages computer RAM","Because it deletes the cloud provider billing history","Because it makes SQL queries run 10 times slower"],
+      c: 0,
+      why: "Silent failures pass unnoticed through systems, leading to faulty financial reports and compromised business decisions."
+    },
+    {
+      q: "What does the 'freshness' pillar in data observability monitor?",
+      a: ["Whether data has arrived within expected SLA time boundaries and is not stale","How recently the database operating system was updated","The ambient temperature of the server room","How many lines of comments are in the SQL query"],
+      c: 0,
+      why: "Freshness monitors whether upstream updates are arriving on schedule or experiencing pipeline delays."
+    },
+    {
+      q: "What is a 'Data Contract'?",
+      a: ["An explicit agreement between data producers and consumers specifying schema structure, data semantics, and quality guarantees","A legal NDA signed with cloud vendors","A document certifying that all database passwords are changed monthly","A paper contract signed by all company shareholders"],
+      c: 0,
+      why: "Data contracts establish explicit schemas, quality rules, and change procedures between software teams and data teams."
+    },
+    {
+      q: "What action should an automated pipeline take when a critical data quality assertion (like unique primary key) fails?",
+      a: ["Halt execution immediately before publishing to production mart tables and alert the engineering team","Silently ignore the test and publish the data anyway","Delete all historical records in the database","Reboot the client's laptop"],
+      c: 0,
+      why: "Halting the pipeline prevents corrupted records from contaminating user-facing production dashboards."
+    }
+  ]);
+</script>
+</body>
+</html>

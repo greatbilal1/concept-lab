@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 06 — Type Narrowing & Guards</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="typescript-fundamentals" data-lesson="6" data-lesson-id="type-narrowing-and-guards">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 06</span> · Unions, Narrowing & Literals</span>
+
+  <h1 class="lesson-title">Type Narrowing & Guards</h1>
+  <p class="lesson-lede">
+    Type narrowing turns broad union types into specific, safe types using runtime checks and discriminated unions.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Narrow union types using typeof, instanceof, in operator, and discriminated unions</span>
+    <span><b>Mission link</b> Write bulletproof branch logic that guarantees type safety across every execution path</span>
+  </div>
+
+  <h2><span class="n">1</span>How TypeScript narrows types</h2>
+  <p><b>Type narrowing</b> is the process where TypeScript analyzes your JavaScript control flow statements (like <code>if</code>, <code>switch</code>, and ternary operators) to refine a broad type into a narrower, more specific type inside that block.</p><p>Standard JavaScript operators serve as built-in <b>type guards</b>: <code>typeof</code> (for primitives), <code>instanceof</code> (for class instances), and the <code>in</code> operator (for property existence).</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    TypeScript traces runtime condition checks to narrow types automatically inside conditional blocks.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Discriminated unions: the gold standard</h2>
+  <p>A <b>discriminated union</b> (or tagged union) is an architectural pattern where each object type in a union shares a common literal property—called the <b>discriminant</b> (e.g. <code>kind</code>, <code>type</code>, or <code>status</code>).</p><p>When you switch on this property, TypeScript narrows the exact shape in each <code>case</code> block with zero casting.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing discriminated union narrowing</h2>
+  <p>Trace how checking the discriminant unlocks access to variant-specific fields.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your mastery of type guards and discriminated unions.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can safely narrow union types using standard guards and architect robust state machines with discriminated unions.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Model an asynchronous API request state (idle, loading, success, error) as a discriminated union.</li>
+    <li>Implement an exhaustive switch statement that asserts default: assertNever(val).</li>
+    <li>Write a custom user-defined type guard function using the 'param is Type' syntax.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Matt Pocock, *Total TypeScript: Narrowing and Discriminated Unions*.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "In 'function fn(x: string | number) { if (typeof x === \"string\") { ... } }', what is the type of x inside the else block?",
+    a: ["number","string","string | number","any"],
+    c: 0,
+    why: "Since x was string | number and the string case was handled, TypeScript knows x must be number in the else branch."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Circle Variant",
+            "lines": [
+                  "{ kind: 'circle',",
+                  "  radius: number }"
+            ]
+      },
+      {
+            "title": "Square Variant",
+            "lines": [
+                  "{ kind: 'square',",
+                  "  sideLength: number }"
+            ]
+      },
+      {
+            "title": "Exhaustive Switch",
+            "lines": [
+                  "switch (shape.kind) {",
+                  "  case 'circle': shape.radius",
+                  "  case 'square': shape.sideLength",
+                  "}"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "type Action = { type: 'LOGIN'; username: string } | { type: 'LOGOUT' };",
+      "function handle(action: Action) {",
+      "  if (action.type === 'LOGIN') {",
+      "    console.log(action.username); // valid: narrowed to LOGIN variant",
+      "  }",
+      "}"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "Action": "Union of LOGIN and LOGOUT variants"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "check": "action.type === 'LOGIN' evaluated"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "narrowed_type": "{ type: 'LOGIN'; username: string }"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The process of refining a broad type into a specific type is called type <0>.",
+      "The operator used to check if an object is an instance of a class is <1>.",
+      "In a discriminated union, the common literal tag property is called the <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "narrowing"
+            ],
+            "why": "Control flow analysis narrows types within conditional blocks."
+      },
+      {
+            "a": [
+                  "instanceof"
+            ],
+            "why": "instanceof checks prototype inheritance at runtime."
+      },
+      {
+            "a": [
+                  "discriminant"
+            ],
+            "why": "The discriminant is the shared literal tag key."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What makes a union of object types a 'discriminated union'?",
+      a: ["All members have a common property with a unique literal type that acts as a tag","All members implement the same abstract class","The union is exported from a separate .d.ts declaration file","The types contain no optional properties"],
+      c: 0,
+      why: "A discriminant is a shared literal property that enables unambiguous branching."
+    },
+    {
+      q: "Which JavaScript operator checks whether a specific property key exists in an object for type narrowing?",
+      a: ["The 'in' operator (e.g. 'email' in user)","The 'has' operator","The 'exists' operator","The 'typeof' operator"],
+      c: 0,
+      why: "The 'in' operator verifies property existence and acts as a built-in TypeScript type guard."
+    },
+    {
+      q: "What does the return type 'pet is Dog' indicate on a function signature?",
+      a: ["It is a user-defined type guard: if the function returns true, TypeScript treats pet as a Dog","It converts pet into an instance of class Dog at runtime","It asserts that pet can never be null","It is an alias for boolean"],
+      c: 0,
+      why: "Type predicates (arg is Type) instruct the compiler to narrow the argument when the predicate returns true."
+    },
+    {
+      q: "How can you enforce compile-time exhaustive checking in a switch over a discriminated union?",
+      a: ["Assign the switch's default case variable to a type of 'never'","Include a comment with @exhaustive","Wrap the switch in a try/catch block","Use while (true) instead of switch"],
+      c: 0,
+      why: "Assigning an unhandled union variant to 'never' causes a compiler error if any case is forgotten."
+    }
+  ]);
+</script>
+</body>
+</html>

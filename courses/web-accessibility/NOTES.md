@@ -1,15 +1,5 @@
-# Notes — Web Accessibility
-
-Authoring decisions and open questions. Append as you go; never rewrite history.
+# Notes — Web Accessibility (a11y)
 
 ## Decisions
-
-- (date) Decision and the reason for it.
-
-## Open questions
-
-- Question that still needs an answer.
-
-## Known gaps
-
-- Something the course does not yet cover.
+- Group into four themes: Foundations & AOM, Structure & Forms, ARIA Mechanics, and Keyboard & Auditing.
+- Ground explanations in WCAG 2.2 principles (Perceivable, Operable, Understandable, Robust) and browser Accessibility Tree construction.

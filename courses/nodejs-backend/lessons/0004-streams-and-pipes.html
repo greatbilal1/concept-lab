@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 04 — Streams & Piping Large Datasets</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="nodejs-backend" data-lesson="4" data-lesson-id="streams-and-pipes">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 04</span> · Asynchronous I/O, Buffers & Streams</span>
+
+  <h1 class="lesson-title">Streams & Piping Large Datasets</h1>
+  <p class="lesson-lede">
+    Never load gigabyte files into memory at once. Streams process data chunk-by-chunk with automatic backpressure control.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Pipe data efficiently using stream.pipeline and manage backpressure across read and write operations</span>
+    <span><b>Mission link</b> Prevent Out-Of-Memory (OOM) crashes when handling large file uploads and data exports</span>
+  </div>
+
+  <h2><span class="n">1</span>The problem with buffering everything</h2>
+  <p>If a client uploads a 2GB video file and your server runs <code>await fs.readFile()</code>, Node.js attempts to allocate a 2GB contiguous buffer in RAM. If five clients upload simultaneously, the server crashes with <code>JavaScript heap out of memory</code>.</p><p><b>Streams</b> solve this by processing data in manageable chunks (typically 64KB). Data flows from the source (Readable) to the destination (Writable) continuously, keeping memory usage constant regardless of file size.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Streams process data chunk by chunk, enabling constant memory usage even when handling gigabytes of data.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The four stream types & pipeline</h2>
+  <p>Node.js defines four fundamental stream types:</p><ul><li><b>Readable:</b> Source of data (e.g. <code>fs.createReadStream</code>, HTTP incoming request).</li><li><b>Writable:</b> Destination for data (e.g. <code>fs.createWriteStream</code>, HTTP response).</li><li><b>Duplex:</b> Both readable and writable (e.g. TCP net socket).</li><li><b>Transform:</b> Duplex stream that modifies data as it passes through (e.g. <code>zlib.createGzip()</code>).</li></ul><p>Always use the promise-based <code>stream/promises.pipeline()</code> helper: it handles errors, cleans up file descriptors, and manages backpressure automatically.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing stream pipeline data flow</h2>
+  <p>Trace how stream.pipeline coordinates data transfer with automatic error cleanup.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your mastery of Node.js streams and backpressure mechanics.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can stream large files and network payloads with constant, minimal memory footprint using stream pipelines.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Implement a script that compresses a large CSV file with zlib using stream.pipeline.</li>
+    <li>Build a custom Transform stream that converts incoming text to uppercase line-by-line.</li>
+    <li>Observe process.memoryUsage() before and during a streaming file transfer.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Node.js Official Documentation: *Stream*.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What happens if a fast readable stream pumps data into a slow writable network socket faster than the client can download?",
+    a: ["Unbounded chunks would pile up in RAM until the server runs out of memory, unless backpressure pauses reading","The extra data is automatically deleted without warning","The client's internet connection is forcibly boosted by the server","The operating system drops the connection immediately"],
+    c: 0,
+    why: "Without backpressure, buffering faster than the consumer can write exhausts available server RAM."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Readable Stream",
+            "lines": [
+                  "fs.createReadStream()",
+                  "Emits 64KB chunks",
+                  "Pauses when write buffer full"
+            ]
+      },
+      {
+            "title": "Transform Stream",
+            "lines": [
+                  "zlib.createGzip()",
+                  "Compresses chunks on the fly",
+                  "Passes compressed data forward"
+            ]
+      },
+      {
+            "title": "Writable Stream",
+            "lines": [
+                  "fs.createWriteStream()",
+                  "Writes chunks to disk",
+                  "Emits 'drain' when buffer clears"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "import { pipeline } from 'node:stream/promises';",
+      "import fs from 'node:fs';",
+      "import zlib from 'node:zlib';",
+      "await pipeline(",
+      "  fs.createReadStream('raw.log'),",
+      "  zlib.createGzip(),",
+      "  fs.createWriteStream('raw.log.gz')",
+      ");"
+],
+    steps: [
+      {
+            "line": 3,
+            "vars": {
+                  "pipeline": "Initialized with source, transform, destination"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "chunk_read": "Emits 64KB chunk from disk"
+            }
+      },
+      {
+            "line": 5,
+            "vars": {
+                  "gzip_transform": "Chunk compressed in memory"
+            }
+      },
+      {
+            "line": 6,
+            "vars": {
+                  "chunk_write": "Chunk written to raw.log.gz on disk"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "A stream that can be read from is a <0> stream.",
+      "The signal that instructs a fast producer to slow down is called <1>.",
+      "The recommended method to safely chain and error-handle streams is stream/promises.<2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "Readable"
+            ],
+            "why": "Readable streams emit data."
+      },
+      {
+            "a": [
+                  "backpressure"
+            ],
+            "why": "Backpressure manages mismatched data rates."
+      },
+      {
+            "a": [
+                  "pipeline"
+            ],
+            "why": "pipeline ensures clean error handling and stream destruction."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the primary danger of using readable.pipe(writable) instead of stream.pipeline()?",
+      a: ["If an error occurs, .pipe() does not properly close or destroy the streams, leading to memory and file descriptor leaks",".pipe() does not work with HTTPS connections",".pipe() is 10 times slower than pipeline",".pipe() is forbidden when running on Linux"],
+      c: 0,
+      why: "Legacy .pipe() does not propagate errors across multi-stream chains, leaving streams open and leaking resources."
+    },
+    {
+      q: "What is backpressure in the context of Node.js streams?",
+      a: ["A flow-control mechanism where a slow writer signals a fast reader to pause sending chunks until the internal buffer drains","A hardware sensor in the computer's CPU measuring thermal throttling","A database index algorithm for sorting queries in reverse order","A security technique for preventing DDoS attacks"],
+      c: 0,
+      why: "Backpressure prevents fast producers from filling server RAM by pausing reads until write buffers drain."
+    },
+    {
+      q: "Which stream type is zlib.createGzip()?",
+      a: ["Transform Stream","Readable Stream only","Writable Stream only","Buffer Stream"],
+      c: 0,
+      why: "Transform streams accept data, compute a transformation on it (like compression), and emit the result."
+    },
+    {
+      q: "What is the default buffer threshold (highWaterMark) for standard object-less Node.js streams?",
+      a: ["64 KB (or 16 KB for standard Readable streams)","1 GB","512 bytes","100 MB"],
+      c: 0,
+      why: "Standard streams use 64KB (or 16KB) highWaterMark buffers to maintain high throughput with low memory usage."
+    }
+  ]);
+</script>
+</body>
+</html>

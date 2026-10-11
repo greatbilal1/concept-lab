@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 04 — JavaScript & Wasm Interoperability</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="webassembly" data-lesson="4" data-lesson-id="js-wasm-interop-and-web-apis">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 04</span> · Linear Memory & Interoperability</span>
+
+  <h1 class="lesson-title">JavaScript & Wasm Interoperability</h1>
+  <p class="lesson-lede">
+    How do JavaScript and WebAssembly communicate? Master the WebAssembly JavaScript API, imports, exports, and streaming.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Use WebAssembly.instantiateStreaming to fetch, compile, and exchange functions between JS and Wasm</span>
+    <span><b>Mission link</b> Integrate high-speed compiled modules into production frontend web applications</span>
+  </div>
+
+  <h2><span class="n">1</span>The WebAssembly JavaScript API</h2>
+  <p>Modern browsers provide the global <code>WebAssembly</code> namespace. The gold standard for loading modules is <code>WebAssembly.instantiateStreaming()</code>.</p><p>Unlike legacy approaches that wait for the entire binary to download before compiling, <code>instantiateStreaming</code> parses and compiles bytecode into machine code <i>in a background thread while network chunks are still in transit</i>.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    instantiateStreaming downloads and compiles WebAssembly concurrently in a background thread.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Imports and Exports: The bridge</h2>
+  <p>Communication between JS and Wasm flows across two boundaries:</p><ul><li><b>Exports:</b> Functions, globals, and memory defined in Wasm that JavaScript calls via <code>instance.exports.myFunction()</code>.</li><li><b>Imports:</b> JavaScript functions, objects, or memory passed into Wasm during instantiation via the import object. This allows Wasm to call JavaScript logging or timing functions.</li></ul>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing bidirectional function calling</h2>
+  <p>Trace how a Wasm module calls an imported JavaScript callback during execution.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your understanding of the WebAssembly JavaScript API and streaming instantiation.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can fetch, compile, and link WebAssembly modules with bidirectional function calls and custom imports.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Implement a web page that loads a Wasm module via WebAssembly.instantiateStreaming(fetch(...)).</li>
+    <li>Pass a JavaScript console.log callback into Wasm and invoke it from a loop inside Wasm.</li>
+    <li>Handle instantiateStreaming fallback when a server sends an incorrect MIME type.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    MDN Web Docs: *Loading and running WebAssembly code*.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What HTTP header must a web server send for 'WebAssembly.instantiateStreaming' to succeed?",
+    a: ["Content-Type: application/wasm","Content-Type: application/octet-stream","Accept-Encoding: gzip","X-WebAssembly: enabled"],
+    c: 0,
+    why: "Browsers strictly mandate the official MIME type 'application/wasm' for streaming compilation."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "JavaScript Host",
+            "lines": [
+                  "imports: { env: { print: (n) => console.log(n) } }",
+                  "Calls: instance.exports.run()"
+            ]
+      },
+      {
+            "title": "WebAssembly Bridge",
+            "lines": [
+                  "Bidirectional function calls",
+                  "Primitive numbers passed directly"
+            ]
+      },
+      {
+            "title": "WebAssembly Module",
+            "lines": [
+                  "calls imported 'print' function",
+                  "exports 'run' function"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "1. JS supplies import: const imports = { env: { notify: (code) => alert('Code: ' + code) } };",
+      "2. JS calls: instance.exports.validate_token(999);",
+      "3. Wasm executes validation loop in compiled bytecode",
+      "4. Wasm hits call instruction targeting imported $notify function",
+      "5. Engine switches context: JS alert('Code: 200') executes!"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "import_table": "JS notify callback registered in Wasm"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "js_to_wasm": "Execution enters Wasm stack machine"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "wasm_to_js": "Wasm invokes imported host callback"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "completed": "Control returns seamlessly across boundary"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The fastest method to compile and load Wasm is WebAssembly.<0>Streaming.",
+      "The mandatory MIME type header for Wasm files is application/<1>.",
+      "Functions exposed by Wasm to JavaScript live on instance.<2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "instantiate"
+            ],
+            "why": "instantiateStreaming compiles during download."
+      },
+      {
+            "a": [
+                  "wasm"
+            ],
+            "why": "application/wasm is the official MIME type."
+      },
+      {
+            "a": [
+                  "exports"
+            ],
+            "why": "instance.exports contains exported symbols."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why is 'WebAssembly.instantiateStreaming' faster than fetching an ArrayBuffer and calling 'WebAssembly.instantiate'?",
+      a: ["It compiles bytecode concurrently as network packets arrive, avoiding the need to wait for the entire download to complete","It runs on the cloud instead of the client machine","It uses UDP instead of TCP","It skips all security validation checks"],
+      c: 0,
+      why: "Streaming compilation processes byte chunks in a background compiler thread simultaneously with network download."
+    },
+    {
+      q: "What happens if the web server serves a .wasm file with 'Content-Type: text/plain'?",
+      a: ["WebAssembly.instantiateStreaming fails with a TypeError, requiring a fallback to arrayBuffer parsing","The browser converts the file to JavaScript automatically","The file is executed as a CSS stylesheet","The browser executes the module with 50% slower speed"],
+      c: 0,
+      why: "instantiateStreaming enforces strict MIME type checking; non-conforming types reject the promise."
+    },
+    {
+      q: "How does a WebAssembly module call a JavaScript function like console.log()?",
+      a: ["The JavaScript function must be passed into the module as an import object during instantiation","Wasm can call window.console.log directly via pointer arithmetic","Wasm executes a shell command to run Node.js","It is impossible for Wasm to trigger any JavaScript code"],
+      c: 0,
+      why: "Wasm only knows about host functions that are explicitly declared in its imports table."
+    },
+    {
+      q: "What types can be passed directly as arguments to an exported WebAssembly function without memory manipulation?",
+      a: ["Numbers (32-bit and 64-bit integers and floats)","Strings, arrays, and objects","DOM HTML elements","Promises and async callbacks"],
+      c: 0,
+      why: "Core Wasm only accepts numeric primitives (i32, i64, f32, f64) natively across function boundaries."
+    }
+  ]);
+</script>
+</body>
+</html>

@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 03 — Deployments, ReplicaSets & Rolling Updates</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="kubernetes-orchestration" data-lesson="3" data-lesson-id="deployments-and-rolling-updates">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 03</span> · Workloads & Controllers</span>
+
+  <h1 class="lesson-title">Deployments, ReplicaSets & Rolling Updates</h1>
+  <p class="lesson-lede">
+    Never create standalone Pods in production. Deployments manage ReplicaSets to ensure high availability and zero-downtime rollouts.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Manage stateless applications using Deployments, execute rolling updates, and perform instant rollbacks</span>
+    <span><b>Mission link</b> Ship code changes to production continuously without dropping a single active customer request</span>
+  </div>
+
+  <h2><span class="n">1</span>The Deployment hierarchy</h2>
+  <p>If you create a naked Pod and its worker node crashes, that pod is dead forever. To achieve high availability and self-healing, Kubernetes provides controller hierarchies:</p><ul><li><b>Deployment:</b> High-level controller representing your application version. Handles updates and rollbacks.</li><li><b>ReplicaSet:</b> Mid-level controller managed by the Deployment that guarantees an exact number of identical pod replicas are running.</li><li><b>Pod:</b> The running workload instances.</li></ul>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    A Deployment manages ReplicaSets; a ReplicaSet manages Pods. Never modify ReplicaSets directly.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Rolling update parameters: maxSurge and maxUnavailable</h2>
+  <p>You fine-tune rolling update behavior using two properties:</p><ul><li><code>maxSurge:</code> How many extra pods can be created above the desired replica count during the rollout (e.g. <code>25%</code>).</li><li><code>maxUnavailable:</code> How many pods can be unavailable during the update process (e.g. <code>0</code> guarantees no capacity loss).</li></ul>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing a rollback with kubectl</h2>
+  <p>Trace how quickly an erroneous deployment can be reverted using revision history.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your mastery of Deployments and zero-downtime rolling updates.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can write Deployment manifests, tune rolling update concurrency, and perform instant production rollbacks.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Deploy an application with 5 replicas and perform an image update with maxUnavailable: 0.</li>
+    <li>Observe the rollout progress live using kubectl rollout status deployment/<name>.</li>
+    <li>Intentionally deploy an invalid image and recover the service using kubectl rollout undo.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Kubernetes Documentation: *Deployments* (kubernetes.io).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What happens when you update the image tag on a Deployment from v1.0.0 to v2.0.0?",
+    a: ["The Deployment creates a new ReplicaSet for v2.0.0 and gradually scales it up while scaling down the old v1.0.0 ReplicaSet","All v1.0.0 pods are killed simultaneously, causing 30 seconds of downtime while v2.0.0 downloads","The running containers are live-patched in memory without restarting","The Deployment rejects the change unless the cluster is restarted"],
+    c: 0,
+    why: "Deployments perform rolling updates by orchestrating two ReplicaSets: scaling up the new while scaling down the old."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Deployment Spec",
+            "lines": [
+                  "replicas: 4",
+                  "image: api:v2.0.0",
+                  "strategy: RollingUpdate"
+            ]
+      },
+      {
+            "title": "Old ReplicaSet (v1)",
+            "lines": [
+                  "Scaled down: 4 -> 3 -> 2 -> 0",
+                  "Retained for instant rollback"
+            ]
+      },
+      {
+            "title": "New ReplicaSet (v2)",
+            "lines": [
+                  "Scaled up: 0 -> 1 -> 2 -> 4",
+                  "Accepts traffic once ready"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "1. kubectl set image deployment/web web=app:v2.0.0 # Bad release (crashes)",
+      "2. Deployment detects v2 pods failing readiness probes; pauses rollout",
+      "3. User checks history: kubectl rollout history deployment/web",
+      "4. User triggers instant rollback: kubectl rollout undo deployment/web",
+      "5. Deployment scales old v1 ReplicaSet back to 100% capacity"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "rollout": "Triggered update to v2.0.0"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "safety": "maxUnavailable protects healthy v1 pods from being killed"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "rollback": "kubectl rollout undo executed"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "status": "Cluster restored to healthy v1.0.0 state in seconds"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The controller that maintains a fixed number of running Pod replicas is a Replica<0>.",
+      "The default update strategy for Kubernetes Deployments is <1>Update.",
+      "To revert a failed rollout to the previous working revision, run kubectl rollout <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "Set"
+            ],
+            "why": "ReplicaSet manages identical pods."
+      },
+      {
+            "a": [
+                  "Rolling"
+            ],
+            "why": "RollingUpdate replaces pods gradually."
+      },
+      {
+            "a": [
+                  "undo"
+            ],
+            "why": "kubectl rollout undo performs rollbacks."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why should you manage pods with a Deployment instead of creating bare Pod objects?",
+      a: ["Deployments automatically replace crashed or evicted pods and support zero-downtime updates and rollbacks","Bare pods cannot communicate over HTTP","Deployments run containers at double CPU clock speed","Bare pods are automatically deleted after 60 minutes"],
+      c: 0,
+      why: "Deployments provide self-healing, replica guarantees, and declarative update mechanisms."
+    },
+    {
+      q: "What does setting 'maxUnavailable: 0' achieve during a Deployment rolling update?",
+      a: ["It guarantees that 100% of desired replica capacity remains healthy and available throughout the rollout","It speeds up the deployment process by skipping image downloads","It prevents any new pods from being created","It requires all pods to run on the same worker node"],
+      c: 0,
+      why: "With maxUnavailable: 0, no old pod is terminated until a new pod has fully launched and passed its readiness probe."
+    },
+    {
+      q: "What happens to the old ReplicaSet when a Deployment completes a rolling update to a new version?",
+      a: ["It is scaled to 0 replicas but retained in etcd to enable instant rollbacks","It is permanently deleted from the cluster","It is exported to an external tar archive","It continues running alongside the new version indefinitely"],
+      c: 0,
+      why: "Old ReplicaSets are scaled to zero but preserved so kubectl rollout undo can instantly scale them back up."
+    },
+    {
+      q: "Which command pauses an in-progress deployment rollout?",
+      a: ["kubectl rollout pause deployment/<name>","kubectl stop deployment/<name>","kubectl freeze deployment/<name>","kubectl sleep deployment/<name>"],
+      c: 0,
+      why: "kubectl rollout pause allows making multiple changes without triggering intermediate rollouts."
+    }
+  ]);
+</script>
+</body>
+</html>

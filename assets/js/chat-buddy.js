@@ -248,7 +248,7 @@
         <div id="chat-buddy-settings">
           <h3 style="margin-top:0;font-size:15px;margin-bottom:12px;">API Settings</h3>
           <p style="font-size:12px;color:var(--text-muted);margin-bottom:16px;">
-            Configure your AI provider. Keys are saved securely in your browser's local storage and never sent to our servers.
+            Configure your AI provider. Your key stays in this browser's local storage and is sent directly to the provider you choose. Do not enter a key on a shared device.
           </p>
           <div class="settings-group">
             <label>Provider URL</label>

@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 08 — Color Contrast, Reduced Motion & Auditing</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="web-accessibility" data-lesson="8" data-lesson-id="contrast-motion-and-automated-auditing">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 08</span> · Keyboard Navigation, Focus & Auditing</span>
+
+  <h1 class="lesson-title">Color Contrast, Reduced Motion & Auditing</h1>
+  <p class="lesson-lede">
+    Low-contrast text and dizzying animations alienate millions. Learn how to audit applications using automated engines and manual heuristics.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Ensure WCAG color contrast compliance, respect prefers-reduced-motion, and automate auditing with Axe and Lighthouse</span>
+    <span><b>Mission link</b> Integrate accessibility testing into CI/CD to prevent regressions before shipping to production</span>
+  </div>
+
+  <h2><span class="n">1</span>Color contrast and the 4.5:1 rule</h2>
+  <p>Light gray text on white backgrounds (<code>#999999</code> on <code>#FFFFFF</code>) is a rampant design trend that makes reading agonizing for low-vision users, elderly readers, and anyone looking at a phone in bright sunlight.</p><p>WCAG 2.2 Level AA establishes strict mathematical luminance contrast ratios:</p><ul><li><b>Normal text (under 18pt / 24px):</b> Minimum contrast ratio of <b>4.5:1</b>.</li><li><b>Large text (18pt+ or 14pt bold):</b> Minimum contrast ratio of <b>3:1</b>.</li><li><b>UI components & icons:</b> Minimum contrast ratio of <b>3:1</b> against adjacent backgrounds.</li></ul><p><b>Never rely on color alone:</b> A form error cannot just turn a border red; it must include an icon or text error message for colorblind users.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    WCAG AA requires at least 4.5:1 contrast for regular text and forbids using color as the sole conveyor of information.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Automated auditing vs manual testing</h2>
+  <p>Tools like <b>Axe Core</b> and <b>Google Lighthouse</b> are indispensable: they scan the DOM in seconds, catching 30–50% of accessibility issues automatically (contrast failures, missing alt text, duplicate IDs, missing form labels).</p><p>However, automated tools <b>cannot evaluate context</b>: an automated linter cannot know if <code>alt="dog"</code> is accurate when the photo is a cat, or whether a focus trap operates properly. Professional accessibility audits combine automated CI gates with manual keyboard testing.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing prefers-reduced-motion in CSS</h2>
+  <p>Trace how media queries respect user accessibility settings to disable vestibular motion sickness triggers.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your understanding of color contrast, reduced motion, and auditing techniques.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can audit color contrast ratios, respect motion sensitivities, and combine automated Axe testing with manual keyboard validation.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Run an Axe DevTools or Lighthouse accessibility scan on your project and resolve all critical contrast warnings.</li>
+    <li>Add a prefers-reduced-motion CSS block that disables smooth scrolling and spinning animations.</li>
+    <li>Verify that error states in your form utilize icons and text in addition to red border colors.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    W3C: *WCAG 2.2 Understanding Docs: Contrast (Minimum)* (w3.org/WAI/WCAG22/Understanding/contrast-minimum).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What CSS media query detects if a user has requested operating system settings to minimize motion due to vestibular disorders?",
+    a: ["@media (prefers-reduced-motion: reduce)","@media (no-animation: true)","@media (motion: zero)","@media (screen-stability: high)"],
+    c: 0,
+    why: "prefers-reduced-motion: reduce allows styling animations to be disabled for users prone to motion sickness or dizziness."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Automated Testing (Axe)",
+            "lines": [
+                  "Scans DOM in CI pipeline",
+                  "Catches missing alt, low contrast",
+                  "Detects missing form labels (40%)"
+            ]
+      },
+      {
+            "title": "Manual Keyboard Audit",
+            "lines": [
+                  "Test Tab, Enter, Escape keys",
+                  "Verify visible focus indicators",
+                  "Test modal focus traps"
+            ]
+      },
+      {
+            "title": "Screen Reader Testing",
+            "lines": [
+                  "VoiceOver / NVDA test",
+                  "Verify announcement accuracy",
+                  "Test live region behavior"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "/* Default animation */",
+      ".card { transition: transform 0.5s ease-in-out; }",
+      ".card:hover { transform: scale(1.1) rotate(5deg); }",
+      "/* Accessible override */",
+      "@media (prefers-reduced-motion: reduce) {",
+      "  .card { transition: none; transform: none; }",
+      "}"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "default": "Dynamic scaling animation active"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "media_query": "OS setting 'Reduce Motion' detected"
+            }
+      },
+      {
+            "line": 5,
+            "vars": {
+                  "accessible_state": "Transform stripped; subtle opacity change applied instead"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The minimum WCAG AA contrast ratio for regular body text is <0>:1.",
+      "The CSS media query that respects user motion sensitivity is prefers-reduced-<1>.",
+      "The industry-standard open-source automated accessibility testing engine is <2> Core."
+],
+    blanks: [
+      {
+            "a": [
+                  "4.5"
+            ],
+            "why": "4.5:1 is the minimum AA ratio."
+      },
+      {
+            "a": [
+                  "motion"
+            ],
+            "why": "prefers-reduced-motion detects motion preferences."
+      },
+      {
+            "a": [
+                  "Axe"
+            ],
+            "why": "Axe Core powers automated accessibility linters."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the minimum color contrast ratio required by WCAG 2.2 Level AA for normal body text?",
+      a: ["4.5:1","3:1","7:1","1:1"],
+      c: 0,
+      why: "4.5:1 is the required ratio for normal body text; large text requires at least 3:1."
+    },
+    {
+      q: "Why is it forbidden to communicate information using color alone (e.g. indicating errors with only a red border)?",
+      a: ["Colorblind users and users with monochromatic monitors cannot distinguish red from gray or green without an accompanying text or icon indicator","Red ink is more expensive in web hosting bandwidth","Browsers automatically strip red colors on mobile devices","Red color codes cause screen readers to mute"],
+      c: 0,
+      why: "Colorblind users (8% of men) cannot perceive specific color differences without supporting text or icons."
+    },
+    {
+      q: "What percentage of accessibility issues can automated testing tools (like Axe or Lighthouse) detect?",
+      a: ["Approximately 30% to 50% (manual testing and screen reader checks are mandatory to catch the rest)","100% of all possible issues","0% (automated tools cannot detect any accessibility bugs)","Only image file sizes"],
+      c: 0,
+      why: "Automated scanners only detect deterministic rules (like contrast and syntax); context, keyboard traps, and clarity require manual testing."
+    },
+    {
+      q: "Why should web developers support '@media (prefers-reduced-motion: reduce)'?",
+      a: ["Excessive parallax scrolling and spinning animations can trigger severe nausea, vertigo, and migraines in users with vestibular disorders","It saves battery power on desktop computers","It compresses CSS file sizes","It improves Wi-Fi network reception"],
+      c: 0,
+      why: "Vestibular disorders cause physical sickness when unexpected or fast animations move across the screen."
+    }
+  ]);
+</script>
+</body>
+</html>

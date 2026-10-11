@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 07 — Keyboard Navigation, Tabindex & Focus Trapping</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="web-accessibility" data-lesson="7" data-lesson-id="keyboard-navigation-and-focus-trapping">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 07</span> · Keyboard Navigation, Focus & Auditing</span>
+
+  <h1 class="lesson-title">Keyboard Navigation, Tabindex & Focus Trapping</h1>
+  <p class="lesson-lede">
+    If you cannot use your website with just a keyboard, it is broken. Master focus indicators, tabindex rules, and modal dialog focus traps.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Manage keyboard focus, remove outlines responsibly, and implement bulletproof focus traps for modal dialogs</span>
+    <span><b>Mission link</b> Guarantee full accessibility for users with motor impairments who cannot use a mouse</span>
+  </div>
+
+  <h2><span class="n">1</span>The Golden Rule of Keyboard Navigation</h2>
+  <p>Millions of people navigate computers exclusively with keyboards, switch devices, or head wands due to motor disabilities (paralysis, tremors, arthritis). The fundamental rule of web engineering is: <b>Any action that can be performed with a mouse must be fully operable with a keyboard alone</b>.</p><p>Key navigation expectations:</p><ul><li><b>Tab / Shift+Tab:</b> Move forward and backward between interactive controls.</li><li><b>Enter / Space:</b> Activate buttons, links, and checkboxes.</li><li><b>Arrow Keys:</b> Navigate within complex composite widgets (radios, menus, select dropdowns).</li><li><b>Never remove focus outlines:</b> Removing <code>outline: none</code> without an accessible alternative makes keyboard navigation impossible.</li></ul>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Every interactive control must have a visible focus indicator and be fully operable via standard keyboard keys.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Tabindex rules & Modal focus trapping</h2>
+  <p>The <code>tabindex</code> attribute controls keyboard focusability:</p><ul><li><code>tabindex="0":</code> Inserts a non-interactive element into the natural sequential keyboard tab order.</li><li><code>tabindex="-1":</code> Makes an element focusable via JavaScript (<code>element.focus()</code>), but skips it during keyboard tabbing.</li><li><b>Positive tabindex (tabindex="1+"):</b> An anti-pattern! Never use positive tabindex because it overrides natural DOM order.</li></ul><p>When an accessible <b>modal dialog</b> opens, you must <b>trap focus</b>: tabbing past the last element in the modal wraps focus back to the first element, preventing focus from escaping into the inert background page. Pressing <b>Escape</b> must close the modal and return focus to the trigger button.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing modal focus trap execution</h2>
+  <p>Trace how a focus trap confines keyboard navigation inside an active modal dialog.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your understanding of keyboard navigation, tabindex, and modal focus management.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can implement clean visible focus states, navigate without a mouse, and build accessible modal dialogs with focus trapping.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Audit a website using only Tab, Shift+Tab, and Enter to complete an entire user workflow.</li>
+    <li>Implement a custom focus indicator using CSS :focus-visible { outline: 3px solid #2563eb; }.</li>
+    <li>Build a modal dialog with Escape-to-close and focus return using the native <dialog> element.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    W3C WAI-ARIA APG: *Dialog (Modal) Pattern* (w3.org/WAI/ARIA/apg/patterns/dialog-modal).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "What is the disastrous consequence of writing 'outline: none;' in global CSS without providing an alternate focus style?",
+    a: ["Keyboard users become completely blind to their location on the page, unable to tell which button or link is currently focused","The browser disables all CSS animations","The mouse cursor disappears","Keyboard keys stop registering inputs in text boxes"],
+    c: 0,
+    why: "Removing focus outlines without a replacement makes it impossible for sighted keyboard users to see where they are."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Trigger Button",
+            "lines": [
+                  "User clicks 'Open Modal'",
+                  "Stores trigger: const prev = activeElement"
+            ]
+      },
+      {
+            "title": "Modal Dialog (Focus Trap)",
+            "lines": [
+                  "role='dialog' aria-modal='true'",
+                  "Focus moved to first input",
+                  "Tab wraps: Last -> First",
+                  "Escape -> Closes dialog"
+            ]
+      },
+      {
+            "title": "Return Focus",
+            "lines": [
+                  "Modal closes",
+                  "prev.focus() restores focus",
+                  "User resumes reading location"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "1. Modal opens: focus set to modal's first interactive element (#close-btn)",
+      "2. Background page set to inert: document.querySelector('main').inert = true",
+      "3. User tabs through modal inputs: name, email, submit button",
+      "4. Focus is on submit button (last element); user presses Tab",
+      "5. Keydown listener intercepts: prevents default, moves focus back to #close-btn",
+      "6. User presses Escape: modal closes, focus returned to 'Edit Profile' trigger button"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "open": "Focus transferred inside dialog"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "inert": "Background rendered un-clickable and un-tabbable"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "boundary": "Last focusable element reached"
+            }
+      },
+      {
+            "line": 5,
+            "vars": {
+                  "escape": "Clean exit restores focus to original trigger"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "To allow an element to be focused programmatically with JS but excluded from Tab order, set tabindex='<0>'.",
+      "Confining keyboard Tab navigation within an open dialog is called a focus <1>.",
+      "The modern HTML attribute that disables an entire background section from interaction is <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "-1"
+            ],
+            "why": "tabindex='-1' allows script focus."
+      },
+      {
+            "a": [
+                  "trap"
+            ],
+            "why": "Focus traps enclose modal navigation."
+      },
+      {
+            "a": [
+                  "inert"
+            ],
+            "why": "inert makes subtrees completely unreachable."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why is 'tabindex=\"1\"' (or any positive integer) strongly discouraged in web development?",
+      a: ["It disrupts natural reading order by forcing focus ahead of all standard elements, creating a jarring, unpredictable tab flow","It causes browser memory leaks","It turns off CSS hover effects","It is forbidden by the ECMAScript language specification"],
+      c: 0,
+      why: "Positive tabindex creates an unmaintainable, broken tab order that overrides natural DOM reading order."
+    },
+    {
+      q: "What should happen to keyboard focus when a modal dialog is closed by the user?",
+      a: ["Focus should return to the original button or element that opened the dialog","Focus should jump to the very top of the webpage","Focus should be removed completely from the browser window","Focus should jump to the submit button in the footer"],
+      c: 0,
+      why: "Restoring focus to the trigger button ensures the user can resume their previous workflow without disorientation."
+    },
+    {
+      q: "What is the purpose of the CSS ':focus-visible' pseudo-class compared to ':focus'?",
+      a: ["It only displays the focus indicator when the user navigates via keyboard, avoiding outlines on mouse clicks while preserving them for keyboard users","It makes text bold on hover","It changes the color of visited links","It detects if the user is looking at the screen"],
+      c: 0,
+      why: ":focus-visible provides a clean aesthetic compromise: visible outlines for keyboard users, suppressed for mouse clicks."
+    },
+    {
+      q: "What does the HTML 'inert' attribute do when added to an element?",
+      a: ["It makes the element and all its children completely un-focusable, un-clickable, and hidden from the Accessibility Tree","It permanently deletes the element from memory","It converts all images inside into black-and-white","It forces the element to remain fixed on screen"],
+      c: 0,
+      why: "inert freezes an entire DOM subtree, making background page content inert while a modal dialog is active."
+    }
+  ]);
+</script>
+</body>
+</html>

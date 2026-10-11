@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 02 — Type Inference & Safe Types</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="typescript-fundamentals" data-lesson="2" data-lesson-id="type-inference-and-primitive-types">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 02</span> · Basic Types & Type Inference</span>
+
+  <h1 class="lesson-title">Type Inference & Safe Types</h1>
+  <p class="lesson-lede">
+    You do not need to annotate every variable. TypeScript's inference engine automatically calculates types, while unknown and any control type safety.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Rely on type inference where appropriate and use unknown instead of any for unvalidated data</span>
+    <span><b>Mission link</b> Prevent unsafe code from sneaking into type-checked codebases</span>
+  </div>
+
+  <h2><span class="n">1</span>The power of type inference</h2>
+  <p>TypeScript is smart: when you declare a variable with an initial value, the compiler automatically deduces its type. Writing <code>let score = 100;</code> infers <code>number</code> without requiring <code>let score: number = 100;</code>.</p><p>Over-annotating code adds clutter. The standard best practice is: <b>let TypeScript infer local variable types; explicitly annotate function parameters and public APIs</b>.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Let TypeScript infer local variable types from assignments; annotate function boundaries and complex returns.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>any versus unknown versus never</h2>
+  <p>Understanding the top and bottom types is crucial:</p><ul><li><b>any:</b> Disables all type checking. It is an escape hatch that allows calling arbitrary methods and assigning to anything. Avoid using it!</li><li><b>unknown:</b> Represents a value of any type, but you <i>cannot</i> use or call properties on it until you narrow its type (e.g. via <code>typeof</code> or assertion).</li><li><b>never:</b> Represents a state that can never exist (e.g. a function that always throws, or unreachable code branches).</li></ul>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing unknown type narrowing</h2>
+  <p>Trace how the compiler enforces narrowing before permitting operations on an unknown variable.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your mastery of type inference, any, unknown, and never.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can write idiomatic code leveraging type inference and use unknown to safely handle external inputs.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Replace occurrences of any in a script with unknown and add typeof narrowing.</li>
+    <li>Write a function that never returns and inspect its inferred never return type.</li>
+    <li>Check how const vs let produces literal types vs widened primitive types during inference.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Boris Cherny, *Programming TypeScript*, Chapter 3: *All About Types*.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "If you declare 'let greeting = \"Hello World\";' and later write 'greeting = 42;', what happens?",
+    a: ["TypeScript reports a compile error: Type 'number' is not assignable to type 'string'","TypeScript silently re-infers greeting as number","The program crashes at runtime","greeting is automatically converted to the string '42'"],
+    c: 0,
+    why: "greeting was inferred as string upon initialization; reassigning a number causes a static compile error."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "unknown (Safe Top Type)",
+            "lines": [
+                  "Can hold any value",
+                  "Requires narrowing before access",
+                  "Preferred for unvalidated input"
+            ]
+      },
+      {
+            "title": "any (Unsafe Wildcard)",
+            "lines": [
+                  "Disables all compiler checks",
+                  "Propagates bugs throughout codebase",
+                  "Use only as absolute last resort"
+            ]
+      },
+      {
+            "title": "never (Bottom Type)",
+            "lines": [
+                  "Represents impossible states",
+                  "Exhaustive switch checks",
+                  "Functions that throw or loop forever"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "let data: unknown = JSON.parse('\"Ada Lovelace\"');",
+      "// data.toUpperCase(); // Error: 'data' is of type 'unknown'",
+      "if (typeof data === 'string') {",
+      "  console.log(data.toUpperCase()); // Valid! TS narrowed data to string",
+      "}"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "data": "unknown"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "compiler_guard": "Object is of type 'unknown', access forbidden"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "check": "typeof data === 'string' -> true"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "narrowed_type": "string",
+                  "method_call": "'ADA LOVELACE'"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The type that turns off all TypeScript safety checks is <0>.",
+      "The safe top type that requires validation before property access is <1>.",
+      "The bottom type representing values that never occur is <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "any"
+            ],
+            "why": "any disables the compiler."
+      },
+      {
+            "a": [
+                  "unknown"
+            ],
+            "why": "unknown forces you to prove what type it is before using it."
+      },
+      {
+            "a": [
+                  "never"
+            ],
+            "why": "never is the empty bottom type."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "Why is 'unknown' preferred over 'any' when handling API responses or user inputs?",
+      a: ["unknown prevents accidental property access until you explicitly prove its runtime type","unknown automatically parses JSON strings into JavaScript objects","unknown makes API responses load 50% faster","unknown is compatible with older versions of Internet Explorer"],
+      c: 0,
+      why: "unknown forces the developer to check the value's type before using it, preserving type safety."
+    },
+    {
+      q: "What type does TypeScript infer for: const name = 'Alice' vs let name = 'Alice'?",
+      a: ["const infers the literal type 'Alice'; let infers the widened type string","Both infer string","Both infer any","const infers string; let infers undefined"],
+      c: 0,
+      why: "Since const cannot be reassigned, TS infers the exact literal type 'Alice'. Since let can be reassigned, it widens to string."
+    },
+    {
+      q: "When does a function have a return type of 'never'?",
+      a: ["When it always throws an error or enters an infinite loop, never finishing normally","When it returns null or undefined","When it returns an empty object {}","When it is an asynchronous function"],
+      c: 0,
+      why: "never signifies that the function never returns a value to the caller."
+    },
+    {
+      q: "What is the recommended approach to annotating local variables with obvious initial values?",
+      a: ["Let TypeScript infer the type automatically to avoid boilerplate code","Always write explicit annotations on every single line","Cast every variable using the 'as any' operator","Annotate variables using JSDoc comments only"],
+      c: 0,
+      why: "TypeScript's inference is robust; manual annotations on simple local assignments are redundant."
+    }
+  ]);
+</script>
+</body>
+</html>

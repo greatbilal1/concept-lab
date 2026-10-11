@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 02 — Batch vs Streaming: Latency & Boundaries</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="data-pipelines-etl" data-lesson="2" data-lesson-id="batch-vs-streaming-data">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 02</span> · ETL Architecture & Ingestion Patterns</span>
+
+  <h1 class="lesson-title">Batch vs Streaming: Latency & Boundaries</h1>
+  <p class="lesson-lede">
+    Not every pipeline needs to be real-time. Understand the latency, throughput, cost, and complexity trade-offs between batch and streaming.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Choose appropriately between batch, micro-batch, and real-time streaming architectures</span>
+    <span><b>Mission link</b> Prevent over-engineering high-cost streaming solutions when batch meets business SLAs</span>
+  </div>
+
+  <h2><span class="n">1</span>Bounded vs Unbounded data</h2>
+  <p>All data pipelines process one of two fundamental data types:</p><ul><li><b>Bounded Data (Batch):</b> A finite dataset with an explicit beginning and end (e.g. all transactions from yesterday, a 10GB log file). Processed in chunks with high throughput.</li><li><b>Unbounded Data (Streaming):</b> An infinite, continuously arriving stream of events with no end (e.g. sensor readings, credit card transactions). Processed event-by-event or in micro-batches with low latency.</li></ul>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Batch processes bounded chunks with high throughput; streaming processes unbounded events with low latency.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The cost and complexity curve</h2>
+  <p>Real-time streaming sounds attractive, but latency has an exponential cost curve. Moving from <b>24-hour batch</b> to <b>1-hour micro-batch</b> is relatively simple. Moving to <b>sub-second real-time streaming</b> introduces out-of-order events, late-arriving data, stateful watermarking, and complex distributed debugging.</p>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing late-arriving data in streaming</h2>
+  <p>Trace how network delays cause out-of-order streaming events and how watermarks handle them.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your understanding of batch and streaming trade-offs.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can evaluate business requirements against the cost/complexity curve to choose between batch, micro-batch, and stream processing.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Evaluate an existing company dashboard and determine its true freshness requirements (hourly vs real-time).</li>
+    <li>Explain how tumbling, sliding, and session windows aggregate streaming data over time.</li>
+    <li>Inspect a micro-batch pipeline implemented with Apache Spark Structured Streaming.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Martin Kleppmann, *Designing Data-Intensive Applications*, Chapter 11: *Stream Processing*.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "If an executive dashboard is only reviewed by managers once every Monday morning, which architecture is best?",
+    a: ["Batch processing: a weekly or nightly batch pipeline is simple, cheap, and robust","Real-time millisecond streaming using a 20-node Kafka cluster","Manual copy-pasting into spreadsheets","Writing a custom C++ network socket server"],
+    c: 0,
+    why: "Streaming infrastructure introduces high operational complexity and cost; if business decisions are weekly, batch is the optimal choice."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Batch Processing",
+            "lines": [
+                  "Latency: Hours / Days",
+                  "Throughput: Very High",
+                  "Cost & Complexity: Low"
+            ]
+      },
+      {
+            "title": "Micro-batching",
+            "lines": [
+                  "Latency: 1 to 15 minutes",
+                  "Throughput: High",
+                  "Cost & Complexity: Moderate"
+            ]
+      },
+      {
+            "title": "Real-time Streaming",
+            "lines": [
+                  "Latency: Milliseconds",
+                  "Throughput: Variable",
+                  "Cost & Complexity: High"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "Event A created: 12:00:01 (Arrives at 12:00:02) -> Processed in Window 1",
+      "Event B created: 12:00:03 (Arrives at 12:00:04) -> Processed in Window 1",
+      "Window 1 closes at 12:00:05; watermark emitted",
+      "Event C created: 12:00:02 (Mobile phone was offline; arrives at 12:00:10)",
+      "Event C rejected or diverted to dead-letter queue as late-arriving data"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "in_order": "Event arrives in real-time"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "window_closed": "Aggregation emitted to downstream storage"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "late_event": "Timestamp lags behind the window boundary"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "complexity": "Requires watermarking or side-output handling"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "Finite data with a clear beginning and end is <0> data.",
+      "Continuous infinite data that never stops arriving is <1> data.",
+      "In streaming, the threshold tracking how late data can arrive before window closure is a <2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "bounded"
+            ],
+            "why": "Bounded datasets have defined limits."
+      },
+      {
+            "a": [
+                  "unbounded"
+            ],
+            "why": "Unbounded streams flow continuously."
+      },
+      {
+            "a": [
+                  "watermark"
+            ],
+            "why": "Watermarks manage late data in stream processing."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What defines an 'unbounded' dataset in data engineering?",
+      a: ["Data that is continuous and infinite with no defined end, generating events in real time","A dataset that exceeds 1 terabyte in size","A database table with no primary key","A CSV file stored on Google Drive"],
+      c: 0,
+      why: "Unbounded data represents ongoing continuous streams (like user clicks or financial trades) that never end."
+    },
+    {
+      q: "Why is streaming data architecture significantly more complex to maintain than batch processing?",
+      a: ["It must handle network latency variations, out-of-order events, stateful aggregations, and late-arriving data","Streaming is written in assembly language","Streaming does not work over standard TCP/IP networks","Streaming requires human approval for every record"],
+      c: 0,
+      why: "Handling time windows, late data arrival, and distributed consumer recovery makes streaming far more complex."
+    },
+    {
+      q: "Which processing paradigm is typically the most cost-effective for computing monthly financial reports?",
+      a: ["Batch processing executed once at month-end","Sub-second streaming processing via Apache Flink running 24/7","Micro-batching every 5 seconds","Querying production OLTP databases directly on every page load"],
+      c: 0,
+      why: "Scheduled batch processing consumes compute resources only during execution, avoiding idle 24/7 streaming costs."
+    },
+    {
+      q: "What is a 'micro-batch' in pipeline terminology?",
+      a: ["Accumulating incoming streaming events over a brief window (e.g. 10 to 60 seconds) and processing them in small batches","A batch containing only 1 single record","A pipeline that runs on a Raspberry Pi","A database index containing only foreign keys"],
+      c: 0,
+      why: "Micro-batching strikes a pragmatic balance by collecting small chunks of events over seconds to leverage batch efficiencies."
+    }
+  ]);
+</script>
+</body>
+</html>

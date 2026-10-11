@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 05 — Services, ClusterIP, NodePort & kube-proxy</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="kubernetes-orchestration" data-lesson="5" data-lesson-id="services-and-kube-proxy">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 05</span> · Networking, Services & Ingress</span>
+
+  <h1 class="lesson-title">Services, ClusterIP, NodePort & kube-proxy</h1>
+  <p class="lesson-lede">
+    Pods are ephemeral and their IP addresses change constantly. Services provide stable virtual IPs and load balancing.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Create ClusterIP, NodePort, and LoadBalancer services and explain kube-proxy packet routing</span>
+    <span><b>Mission link</b> Provide dependable internal and external network routing across dynamic container fleets</span>
+  </div>
+
+  <h2><span class="n">1</span>The problem of ephemeral Pod IPs</h2>
+  <p>Every pod in Kubernetes gets a private IP address. But pods crash, scale up, and roll over constantly—each new pod receives a new IP address. If frontend pods hardcoded backend pod IPs, everything would break within minutes.</p><p>A <b>Service</b> is an abstraction that defines a logical set of Pods (identified by a <b>label selector</b>) and a policy by which to access them. A Service gets a permanent, stable virtual IP (<b>ClusterIP</b>) and a DNS name (e.g. <code>api-service.default.svc.cluster.local</code>) that never changes.</p>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    A Service provides a permanent virtual IP and DNS name that routes traffic across dynamically changing Pod IPs.
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>The four Service types</h2>
+  <p>Kubernetes provides four Service exposure types:</p><ul><li><b>ClusterIP (Default):</b> Exposes the Service on an internal cluster-only virtual IP. Accessible only from inside the cluster.</li><li><b>NodePort:</b> Exposes the Service on a static high-range port (30000–32767) on <i>every worker node's external IP</i>.</li><li><b>LoadBalancer:</b> Provisions an external cloud load balancer (e.g. AWS NLB, GCP Load Balancer) that routes to the Service.</li><li><b>ExternalName:</b> Maps the Service to a CNAME DNS record outside the cluster.</li></ul>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing packet routing via kube-proxy</h2>
+  <p>Trace how kube-proxy rewrites network packet destinations using iptables or IPVS.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your understanding of Kubernetes Services and network routing.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can create robust service discovery layers and choose appropriately between ClusterIP, NodePort, and LoadBalancer.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Create a ClusterIP service and query its DNS record from inside a debugging pod using nslookup.</li>
+    <li>Inspect the active endpoints of a service using kubectl get endpoints <service-name>.</li>
+    <li>Compare iptables mode vs IPVS mode performance in kube-proxy architecture.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Kubernetes Documentation: *Services, Load Balancing, and Networking*.
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "How does a Service know which specific Pods should receive its network traffic?",
+    a: ["It uses a label selector (e.g. app: api) that matches metadata labels assigned to Pods","It automatically routes traffic to every pod in the entire namespace","The developer must manually enter every pod IP in the Service manifest","Traffic is broadcast to all worker nodes simultaneously"],
+    c: 0,
+    why: "Services use label selectors to dynamically discover and track matching Pod endpoints."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Service (ClusterIP)",
+            "lines": [
+                  "Stable VIP: 10.96.0.15",
+                  "DNS: backend.default.svc",
+                  "Selector: app=backend"
+            ]
+      },
+      {
+            "title": "Endpoints Object",
+            "lines": [
+                  "Auto-managed by controller",
+                  "List of healthy Pod IPs",
+                  "10.244.1.5, 10.244.2.8"
+            ]
+      },
+      {
+            "title": "kube-proxy (iptables / IPVS)",
+            "lines": [
+                  "Intercepts Service VIP packets",
+                  "Rewrites destination to a healthy Pod IP",
+                  "Balances load evenly"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "1. Pod A sends HTTP packet to Service VIP: 10.96.0.15:80",
+      "2. Linux kernel iptables rules configured by kube-proxy intercept packet",
+      "3. NAT (Network Address Translation) rule randomly selects Pod B IP: 10.244.1.8:3000",
+      "4. Packet destination rewritten: 10.244.1.8:3000 and routed across overlay network",
+      "5. Pod B processes request and replies back through NAT translation"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "source": "Pod A (10.244.2.3)",
+                  "destination": "Service VIP (10.96.0.15)"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "intercept": "Kernel iptables DNAT rule triggered"
+            }
+      },
+      {
+            "line": 2,
+            "vars": {
+                  "rewritten_dest": "Target Pod B IP (10.244.1.8)"
+            }
+      },
+      {
+            "line": 4,
+            "vars": {
+                  "completion": "Direct pod-to-pod packet arrival"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "The default internal-only Kubernetes Service type is <0>.",
+      "The mechanism used by Services to match target pods is a label <1>.",
+      "The node-level network agent configuring iptables/IPVS routing is kube-<2>."
+],
+    blanks: [
+      {
+            "a": [
+                  "ClusterIP"
+            ],
+            "why": "ClusterIP provides internal routing."
+      },
+      {
+            "a": [
+                  "selector"
+            ],
+            "why": "Selectors query matching metadata labels."
+      },
+      {
+            "a": [
+                  "proxy"
+            ],
+            "why": "kube-proxy programs the Linux kernel packet filters."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What is the primary role of a Kubernetes Service?",
+      a: ["To provide a permanent, stable virtual IP and DNS name that routes traffic to a dynamic group of healthy Pods","To build Docker images from Git repositories","To restart worker nodes when memory is exhausted","To generate SSL certificates automatically"],
+      c: 0,
+      why: "Services decouple callers from dynamic, changing pod IP addresses."
+    },
+    {
+      q: "Which Service type exposes an application on a high-range static port across every worker node's external IP?",
+      a: ["NodePort","ClusterIP","InternalPort","DirectPort"],
+      c: 0,
+      why: "NodePort exposes a port between 30000 and 32767 on all node IPs."
+    },
+    {
+      q: "How does CoreDNS resolve the internal service domain 'users.default.svc.cluster.local'?",
+      a: ["It returns the stable virtual ClusterIP of the 'users' service in the 'default' namespace","It queries Google Public DNS (8.8.8.8) over the public internet","It returns the IP address of the worker node where the pod was compiled","It returns a random external IP"],
+      c: 0,
+      why: "In-cluster CoreDNS resolves Service names directly to their stable virtual ClusterIPs."
+    },
+    {
+      q: "What component is responsible for translating a Service's virtual IP into actual Pod IP addresses on a worker node?",
+      a: ["kube-proxy","kube-scheduler","etcd","containerd"],
+      c: 0,
+      why: "kube-proxy programs operating system packet filtering rules (iptables/IPVS) on each node to forward traffic to pod IPs."
+    }
+  ]);
+</script>
+</body>
+</html>

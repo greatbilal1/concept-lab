@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 06 — Pipeline Orchestration, DAGs & Airflow</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/components.css">
+</head>
+<body class="lesson-body" data-course="data-pipelines-etl" data-lesson="6" data-lesson-id="pipeline-orchestration-and-dags">
+
+<div class="readbar"><div class="fill" id="readFill"></div></div>
+<div class="readpill"><span class="dot"></span><span id="readPct">0%</span></div>
+
+<div class="lesson-wrap">
+
+  <div class="lesson-top">
+    <a class="lesson-back" href="../course.html">← Course map</a>
+    <span class="lesson-progress-mini">
+      <span class="track"><i id="miniFill"></i></span>
+      <span id="miniPct">0%</span>
+    </span>
+  </div>
+
+  <span class="lesson-kicker"><span class="n">Lesson 06</span> · Data Warehouses & Orchestration</span>
+
+  <h1 class="lesson-title">Pipeline Orchestration, DAGs & Airflow</h1>
+  <p class="lesson-lede">
+    Cron jobs fail silently and lack dependency management. Modern pipelines use DAG orchestrators to manage multi-step workflows.
+  </p>
+
+  <div class="lesson-meta">
+    <span><b>Time</b> ~10 min</span>
+    <span><b>Win</b> Author and schedule data workflows using Directed Acyclic Graphs (DAGs) in Apache Airflow</span>
+    <span><b>Mission link</b> Eliminate brittle cron scripts and ensure multi-step pipeline dependencies execute reliably</span>
+  </div>
+
+  <h2><span class="n">1</span>The limits of Linux cron</h2>
+  <p>In simple setups, engineers schedule jobs with cron: <code>0 2 * * * python extract.py</code>, followed by <code>0 3 * * * python transform.py</code>. This approach is brittle and hazardous:</p><ul><li><b>No dependency awareness:</b> If <code>extract.py</code> runs slow and takes 70 minutes, <code>transform.py</code> starts prematurely on half-written data.</li><li><b>No retry state:</b> If step 3 of 10 fails, cron cannot retry only step 3; it either fails silently or requires running the whole job again.</li><li><b>No monitoring:</b> You have zero visibility into task durations, failures, or bottlenecks.</li></ul>
+
+  <div class="note">
+    <span class="note-label">Key idea</span>
+    Cron has no concept of dependencies or state; orchestrators model workflows as Directed Acyclic Graphs (DAGs).
+  </div>
+
+  <div id="predict1"></div>
+
+  <h2><span class="n">2</span>Core concepts of Apache Airflow</h2>
+  <p><b>Apache Airflow</b> is the industry-standard workflow orchestrator. In Airflow, workflows are authored as standard Python code:</p><ul><li><b>DAG:</b> The collection of tasks organized with explicit directional dependencies (e.g. <code>task_a >> task_b</code>).</li><li><b>Operator:</b> The template for a single task (e.g. <code>PythonOperator</code>, <code>BashOperator</code>, <code>PostgresOperator</code>).</li><li><b>Task Instance:</b> An individual run of a task for a specific point in time (execution date).</li><li><b>Scheduler:</b> The background daemon that monitors DAGs and triggers tasks when their upstream dependencies succeed.</li></ul>
+
+  <div id="diagram1"></div>
+
+  <h2><span class="n">3</span>Tracing DAG execution with task branching</h2>
+  <p>Trace how the Airflow scheduler executes tasks respecting dependency order.</p>
+
+  <div id="trace1"></div>
+
+  <h2><span class="n">4</span>Practice</h2>
+  <p>Test your understanding of workflow orchestration and DAG design.</p>
+
+  <div id="fill1"></div>
+
+  <div class="win">
+    <h3>✓ Your win for today</h3>
+    <p>You can define robust multi-step pipeline DAGs with parallel execution branches, automated retries, and monitoring in Airflow.</p>
+  </div>
+
+  <h2><span class="n">5</span>Do this next</h2>
+  <ol>
+    <li>Author a Python Airflow DAG that extracts an API, transforms JSON, and loads SQLite with explicit dependencies.</li>
+    <li>Configure task retries with retries=3 and retry_delay=timedelta(minutes=5).</li>
+    <li>Inspect the Airflow web UI Grid view to diagnose a failed task instance.</li>
+  </ol>
+
+  <div class="note">
+    <span class="note-label">Primary source</span>
+    Apache Airflow Official Documentation: *Core Concepts: DAGs and Operators* (airflow.apache.org).
+  </div>
+
+  <div class="ask-teacher">
+    <b>Stuck, or curious?</b> Ask your teacher — there are no bad questions here.
+  </div>
+
+  <div id="quiz"></div>
+
+  <div id="lessonNav"></div>
+
+  <div class="course-map">
+    <h3>Course map</h3>
+    <div id="courseMap"></div>
+  </div>
+
+</div>
+
+<script src="../../../assets/js/icons.js"></script>
+<script src="../lessons.js"></script>
+<script src="../../../assets/js/teach/lesson-engine.js"></script>
+<script src="../../../assets/js/teach/quiz.js"></script>
+<script src="../../../assets/js/teach/widgets.js"></script>
+<script>
+  TeachWidgets.predict("#predict1", {
+    q: "Why must a pipeline graph be 'acyclic' (Directed Acyclic Graph)?",
+    a: ["If it contained a cycle (Task A -> Task B -> Task A), the workflow would enter an infinite loop and could never finish","Cyclic graphs are forbidden by the Linux operating system","Acyclic graphs execute 10 times faster","Cycles cause hard drives to overheat"],
+    c: 0,
+    why: "An acyclic graph guarantees a clear execution direction with no circular dependencies that would run forever."
+  });
+
+  TeachWidgets.diagram("#diagram1", {
+    boxes: [
+      {
+            "title": "Extract Task (A)",
+            "lines": [
+                  "Pulls Stripe API data",
+                  "Writes raw records to S3"
+            ]
+      },
+      {
+            "title": "Transform Tasks (B & C)",
+            "lines": [
+                  "B: Anonymize PII",
+                  "C: Calculate sales metrics",
+                  "Run in PARALLEL after A!"
+            ]
+      },
+      {
+            "title": "Load Task (D)",
+            "lines": [
+                  "Upserts to Snowflake",
+                  "Runs only after B & C complete",
+                  "A >> [B, C] >> D"
+            ]
+      }
+]
+  });
+
+  TeachWidgets.trace("#trace1", {
+    code: [
+      "DAG defined: extract >> [transform_orders, transform_users] >> load_analytics",
+      "1. Scheduler triggers: 'extract' task moves to RUNNING state",
+      "2. 'extract' succeeds with exit code 0",
+      "3. Scheduler detects upstream dependencies met for 'transform_orders' and 'transform_users'",
+      "4. Both transform tasks launch in PARALLEL across worker nodes",
+      "5. Once BOTH finish, scheduler unlocks and runs 'load_analytics'"
+],
+    steps: [
+      {
+            "line": 0,
+            "vars": {
+                  "dag_structure": "1 root, 2 parallel branches, 1 convergence"
+            }
+      },
+      {
+            "line": 1,
+            "vars": {
+                  "task_1": "extract finishes successfully"
+            }
+      },
+      {
+            "line": 3,
+            "vars": {
+                  "parallel_dispatch": "Workers execute independent transforms simultaneously"
+            }
+      },
+      {
+            "line": 5,
+            "vars": {
+                  "convergence": "Downstream join task executes cleanly"
+            }
+      }
+]
+  });
+
+  TeachWidgets.fill("#fill1", {
+    label: "From memory — fill in the core terms",
+    lines: [
+      "A workflow graph without circular loops is a Directed <0> Graph.",
+      "The industry-standard open-source Python orchestrator is Apache <1>.",
+      "To declare that task A must complete before task B in Airflow, write task_a <2> task_b."
+],
+    blanks: [
+      {
+            "a": [
+                  "Acyclic"
+            ],
+            "why": "Acyclic means no circular loops."
+      },
+      {
+            "a": [
+                  "Airflow"
+            ],
+            "why": "Airflow orchestrates data workflows."
+      },
+      {
+            "a": [
+                  ">>"
+            ],
+            "why": "Bitshift operator (>>) sets upstream dependencies."
+      }
+]
+  });
+
+  TeachQuiz.mount("#quiz", [
+    {
+      q: "What makes a Directed Acyclic Graph (DAG) the ideal model for data pipeline workflows?",
+      a: ["It defines clear upstream/downstream task dependencies and guarantees that tasks cannot get trapped in infinite circular loops","It automatically optimizes SQL queries inside the database","It converts Python code into WebAssembly","It prevents data from being written to disk"],
+      c: 0,
+      why: "DAGs enforce clear execution order while preventing circular loops where tasks wait on each other indefinitely."
+    },
+    {
+      q: "How does Apache Airflow handle an individual task failure in a 10-step DAG?",
+      a: ["It can automatically retry only the failed task (with configurable delays), leaving upstream successful tasks intact","It deletes the entire Airflow database immediately","It crashes the server and sends a physical letter to the admin","It skips all remaining tasks and pretends everything succeeded"],
+      c: 0,
+      why: "Airflow tracks task instances independently; failed tasks can retry without repeating expensive upstream work."
+    },
+    {
+      q: "What is an Airflow Operator?",
+      a: ["A template or class that defines a single unit of work (e.g. executing a Python function, running a SQL query, or firing a Bash script)","The human administrator who monitors the server","A mathematical addition symbol","A physical keyboard attached to the server rack"],
+      c: 0,
+      why: "Operators (like PythonOperator or BashOperator) encapsulate the code that runs when a task executes."
+    },
+    {
+      q: "In modern data engineering, what is the role of an orchestrator like Airflow versus a transformation tool like dbt?",
+      a: ["Airflow schedules and coordinates end-to-end workflows (extract, fire dbt, run checks, send alerts); dbt executes the SQL transforms inside the warehouse","Airflow is obsolete and has been completely replaced by dbt","dbt schedules the Airflow clusters","Airflow only works with MongoDB"],
+      c: 0,
+      why: "Orchestrators coordinate broad multi-technology pipelines; dbt specializes in SQL transformations within the warehouse."
+    }
+  ]);
+</script>
+</body>
+</html>

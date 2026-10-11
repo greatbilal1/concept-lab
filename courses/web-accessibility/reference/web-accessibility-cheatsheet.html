@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Web Accessibility — Cheat Sheet</title>
+<title>Web Accessibility (a11y) — Cheat Sheet</title>
+<link rel="icon" type="image/svg+xml" href="../../../assets/icons/favicon.svg">
 <link rel="stylesheet" href="../../../assets/css/tokens.css">
 <link rel="stylesheet" href="../../../assets/css/components.css">
 <style>
@@ -25,23 +26,90 @@
 <div class="lesson-wrap">
 
   <span class="lesson-kicker">Reference · Cheat sheet</span>
-  <h1 class="lesson-title">Web Accessibility — Cheat Sheet</h1>
+  <h1 class="lesson-title">Web Accessibility (a11y) — Cheat Sheet</h1>
   <p class="lesson-lede">
     The whole course on one page. Every snippet links back to the lesson that
     teaches it.
   </p>
 
   <div class="ref-toc">
-    <a href="#section-one">Section one</a>
+    <a href="#sec-1">Semantic Landmarks</a>
+    <a href="#sec-2">Accessible Form Field</a>
+    <a href="#sec-3">ARIA Live Region</a>
+    <a href="#sec-4">Modal Focus Trap</a>
   </div>
 
-  <h2 id="section-one"><span class="n">1</span>Section one</h2>
-
+  <h2 id="sec-1"><span class="n">1</span>Semantic Landmarks</h2>
   <div class="snippet">
-    <div class="lbl">Label</div>
-    <pre><code>code or summary here</code></pre>
+    <div class="lbl">Page structure skeleton</div>
+    <pre><code>&lt;body&gt;
+  &lt;header&gt;
+    &lt;a href="#main" class="skip-link"&gt;Skip to main content&lt;/a&gt;
+    &lt;nav aria-label="Main Navigation"&gt;...&lt;/nav&gt;
+  &lt;/header&gt;
+  &lt;main id="main"&gt;
+    &lt;h1&gt;Page Title&lt;/h1&gt;
+    &lt;section aria-labelledby="sec1"&gt;
+      &lt;h2 id="sec1"&gt;Section Title&lt;/h2&gt;
+    &lt;/section&gt;
+  &lt;/main&gt;
+  &lt;footer&gt;...&lt;/footer&gt;
+&lt;/body&gt;</code></pre>
   </div>
-  <p class="see">See <a href="../lessons/0001-slug.html">Lesson 01 — Title</a>.</p>
+  <p class="see">See <a href="../lessons/0003-landmark-elements-and-page-structure.html">Lesson 03 — Document Landmarks & Page Structure</a>.</p>
+
+  <h2 id="sec-2"><span class="n">2</span>Accessible Form Field</h2>
+  <div class="snippet">
+    <div class="lbl">Label, description, and error wiring</div>
+    <pre><code>&lt;div class="form-group"&gt;
+  &lt;label for="user-email"&gt;Email Address&lt;/label&gt;
+  &lt;input 
+    id="user-email" 
+    type="email" 
+    aria-describedby="email-hint email-error"
+    aria-invalid="true" 
+    required
+  /&gt;
+  &lt;span id="email-hint" class="hint"&gt;We never share your email.&lt;/span&gt;
+  &lt;span id="email-error" class="error" role="alert"&gt;Please enter a valid email address.&lt;/span&gt;
+&lt;/div&gt;</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0004-accessible-forms-and-error-states.html">Lesson 04 — Accessible Forms & Error States</a>.</p>
+
+  <h2 id="sec-3"><span class="n">3</span>ARIA Live Region</h2>
+  <div class="snippet">
+    <div class="lbl">Dynamic update announcements</div>
+    <pre><code>&lt;!-- Polite: waits until screen reader is idle --&gt;
+&lt;div aria-live="polite" aria-atomic="true" id="cart-status"&gt;
+  3 items in shopping cart
+&lt;/div&gt;
+
+&lt;!-- Assertive (role="alert"): interrupts immediately --&gt;
+&lt;div role="alert" id="error-banner"&gt;
+  Connection lost. Please retry.
+&lt;/div&gt;</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0006-aria-live-regions-and-dynamic-content.html">Lesson 06 — ARIA Live Regions & Dynamic Content</a>.</p>
+
+  <h2 id="sec-4"><span class="n">4</span>Modal Focus Trap</h2>
+  <div class="snippet">
+    <div class="lbl">Keyboard confinement pattern</div>
+    <pre><code>// Keyboard listener for dialog
+modal.addEventListener("keydown", (e) =&gt; {
+  if (e.key === "Escape") closeModal();
+  if (e.key === "Tab") {
+    const focusables = modal.querySelectorAll("button, [href], input, [tabindex='0']");
+    const first = focusables[0];
+    const last = focusables[focusables.length - 1];
+    if (e.shiftKey && document.activeElement === first) {
+      last.focus(); e.preventDefault();
+    } else if (!e.shiftKey && document.activeElement === last) {
+      first.focus(); e.preventDefault();
+    }
+  }
+});</code></pre>
+  </div>
+  <p class="see">See <a href="../lessons/0007-keyboard-navigation-and-focus-trapping.html">Lesson 07 — Keyboard Navigation & Focus Traps</a>.</p>
 
   <div class="lesson-foot">
     <div class="links">
@@ -51,12 +119,5 @@
   </div>
 
 </div>
-
-<script src="../../../assets/js/icons.js"></script>
-<script src="../lessons.js"></script>
-<script src="../../../assets/js/teach/lesson-engine.js"></script>
-<script>
-  TeachLesson.init({ course: "web-accessibility", lessons: window.TeachLessons || [] });
-</script>
 </body>
 </html>
