@@ -68,7 +68,7 @@ Each article is a self-contained page with a reading time, category, and author 
 
 ## Run it locally
 
-No build step or package installation is required. Clone the repository, then open `index.html` in a modern browser:
+No build step, no package installation, and **no web server required**. Clone the repository and open `index.html` directly in a modern browser:
 
 ```bash
 git clone https://github.com/greatbilal1/concept-lab.git
@@ -76,13 +76,7 @@ cd concept-lab
 open index.html
 ```
 
-On Windows, open `index.html` from File Explorer. If you prefer a local web server, for example:
-
-```bash
-python3 -m http.server 8000
-```
-
-Then visit [http://localhost:8000](http://localhost:8000).
+On Windows, just double-click `index.html` in File Explorer. Everything — courses, lessons, search, glossary, and icons — runs straight from disk over `file://`. (A local server such as `python3 -m http.server` still works if you prefer one, but it is not needed.)
 
 ## What's inside
 
@@ -97,6 +91,12 @@ Then visit [http://localhost:8000](http://localhost:8000).
 | `assets/css/` | Design tokens, site styles, explainer animations, motion layer |
 | `assets/js/` | Renderer, search, motion engine, and the optional Labby assistant |
 | `screenshots/` | README screenshots |
+
+The SVG icon sprites are embedded directly into `assets/js/icons.js` so the site works over `file://` with no server. If you change `assets/icons/sprite.svg` or `assets/icons/tabler-sprite.svg`, regenerate it with:
+
+```bash
+node tools/build-icons-js.js
+```
 
 ## Add or improve a course
 

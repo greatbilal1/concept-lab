@@ -121,6 +121,33 @@ Exit `0` = every page passed. Exit `1` = at least one problem. Run it alongside
 
 ---
 
+## Asset builders
+
+### `build-icons-js.js` — embed the SVG sprites
+
+```bash
+node tools/build-icons-js.js
+```
+
+Embeds `assets/icons/sprite.svg` and `assets/icons/tabler-sprite.svg` directly
+into `assets/js/icons.js`. This is what lets the site run from `file://` with no
+server: external `<use href="file.svg#id">` references and `XMLHttpRequest` are
+both blocked by the browser's same-origin policy on `file://`, so the sprite
+markup is inlined into the document instead. Re-run this whenever either sprite
+changes.
+
+### `build-tabler-sprite.js` — regenerate the Tabler sprite
+
+```bash
+node tools/build-tabler-sprite.js
+```
+
+Reads the vendored Tabler outline SVGs in `assets/icons/tabler/` and writes
+`assets/icons/tabler-sprite.svg`. Run this first, then `build-icons-js.js`, when
+adding or updating Tabler icons.
+
+---
+
 ## Quiz template & checklist
 
 See [`QUIZ_TEMPLATE.md`](./QUIZ_TEMPLATE.md) for a copy-paste quiz snippet and
