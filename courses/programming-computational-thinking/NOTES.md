@@ -2,8 +2,7 @@
 
 ## Workspace conventions
 
-- This course follows the frozen Concept Lab contracts in
-  `.agents/skills/course-builder-skill/`.
+- This course follows the Concept Lab content conventions.
 - Canonical reference course: `courses/how-computers-work/`.
 - Shared assets are never forked. Only course-specific files are added:
   `course.html`, `lessons.js`, `lessons/*.html`, `reference/*.html`,

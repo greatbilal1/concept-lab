@@ -1,7 +1,7 @@
 # Concept Lab — tools
 
 Dev-only scripts. None of them ship to the browser; they exist so that a course
-author (human or agent) never has to hand-derive structure, hand-count words, or
+author never has to hand-derive structure, hand-count words, or
 hand-audit pages.
 
 Run everything from the repo root.
@@ -12,9 +12,8 @@ Run everything from the repo root.
 
 **The contracts are the only style source.**
 
-`LESSON_CONTRACT.md` and `COURSE_CONTRACT.md` (in
-`.agents/skills/course-builder-skill/`) are the single source of truth for
-structure, style, and the widget API. They are `STATUS: FROZEN`.
+`LESSON_CONTRACT.md` and `COURSE_CONTRACT.md` are the single source of truth for
+structure, style, and the widget API.
 
 - Do **not** re-derive conventions by reading old courses.
 - Do **not** compare several courses to "see how they do it".
